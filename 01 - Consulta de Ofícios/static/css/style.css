@@ -278,17 +278,43 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
-.stat-pill {
+/* Container Direito da Navbar */
+.nav-right {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.85rem;
+    gap: 8px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+@media (max-width: 1240px) {
+    .nav-center {
+        display: none !important;
+    }
+}
+
+@media (max-width: 960px) {
+    .stat-pill {
+        display: none !important;
+    }
+}
+
+.stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    height: 34px;
+    min-height: 34px;
     background-color: var(--badge-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-full);
     font-size: 0.82rem;
     font-weight: 500;
     color: var(--text-secondary);
+    white-space: nowrap;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .stat-pill i {
@@ -296,10 +322,13 @@ body {
 }
 
 .nav-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.45rem 0.85rem;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 12px;
+    height: 34px;
+    min-height: 34px;
     background-color: var(--bg-card);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -308,6 +337,9 @@ body {
     font-weight: 500;
     cursor: pointer;
     transition: var(--transition);
+    white-space: nowrap;
+    box-sizing: border-box;
+    flex-shrink: 0;
 }
 
 .nav-btn:hover {
@@ -317,11 +349,16 @@ body {
 }
 
 .nav-btn.icon-only {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
     padding: 0;
     justify-content: center;
-    border-radius: 50%;
+    border-radius: var(--radius-md);
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
 }
 
 /* ==========================================================================
