@@ -545,7 +545,7 @@ body {
 }
 
 /* ==========================================================================
-   Responsive
+   Mobile & Responsive Adaptability (100% Fluido em Celulares e Tablets)
    ========================================================================== */
 @media (max-width: 860px) {
     .portal-grid {
@@ -556,7 +556,7 @@ body {
         padding: 0 16px;
     }
     .nav-center {
-        display: none;
+        display: none !important;
     }
     .hub-title {
         font-size: 26px;
@@ -573,5 +573,109 @@ body {
     .portal-action-btn {
         height: 48px;
         font-size: 14.5px;
+    }
+}
+
+/* Telas Mobile Smartphones (iPhone & Android <= 600px) */
+@media (max-width: 600px) {
+    .navbar {
+        height: 56px;
+        padding: 0 12px;
+    }
+    .brand-logo-img {
+        height: 28px;
+    }
+    .brand-title {
+        font-size: 13.5px;
+    }
+    .brand-title .hub-tag {
+        font-size: 9px;
+        padding: 1px 5px;
+    }
+    .brand-divider,
+    .brand-subtitle {
+        display: none !important;
+    }
+    #systemStatusText {
+        display: none !important;
+    }
+    .system-status-pill {
+        padding: 6px;
+        border-radius: 50%;
+    }
+    .pulse-dot {
+        margin: 0;
+    }
+    .nav-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .hub-main {
+        padding: 20px 14px 28px 14px;
+    }
+    .hub-header {
+        margin-bottom: 22px;
+    }
+    .hub-header-badge {
+        font-size: 10px;
+        padding: 4px 10px;
+        margin-bottom: 10px;
+    }
+    .hub-title {
+        font-size: 22px;
+        letter-spacing: -0.4px;
+        margin-bottom: 6px;
+    }
+    .hub-subtitle {
+        font-size: 13px;
+        line-height: 1.4;
+    }
+
+    .portal-grid {
+        gap: 16px;
+    }
+    .portal-card {
+        padding: 24px 18px 20px 18px;
+        border-radius: var(--radius-lg);
+    }
+    .portal-icon-box {
+        width: 60px;
+        height: 60px;
+        font-size: 26px;
+        border-radius: 16px;
+        margin-bottom: 14px;
+    }
+    .portal-badge {
+        font-size: 10.5px;
+        padding: 3px 10px;
+        margin-bottom: 8px;
+    }
+    .portal-name {
+        font-size: 20px;
+        margin-bottom: 4px;
+    }
+    .portal-metric {
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+    .portal-action-btn {
+        height: 44px;
+        font-size: 14px;
+        border-radius: var(--radius-md);
+    }
+
+    .hub-footer {
+        height: auto;
+        padding: 16px 12px;
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+        font-size: 11px;
+    }
+    .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
     }
 }

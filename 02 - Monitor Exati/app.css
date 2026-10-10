@@ -3559,21 +3559,39 @@ canvas {
 
   .brand-logo {
     gap: 0.5rem;
+    flex-shrink: 0;
+  }
+
+  .btn-back-hub {
+    padding: 0 8px !important;
+    height: 32px !important;
+    width: 32px !important;
+    min-width: 32px !important;
+    justify-content: center !important;
+    border-radius: 8px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .btn-back-hub span {
+    display: none !important;
   }
 
   .brand-logo-img {
-    height: 28px;
-    max-width: 120px;
+    height: 26px;
+    max-width: 110px;
+    flex-shrink: 0;
   }
 
   .brand-divider,
   .brand-subtitle,
-  .stat-pill {
+  .stat-pill,
+  .nav-center,
+  .topbar-sync-notice {
     display: none !important;
   }
 
   .brand-title {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     line-height: 1.1;
   }
 
@@ -3582,9 +3600,11 @@ canvas {
   }
 
   .nav-btn {
-    padding: 0.45rem 0.65rem;
-    min-height: 36px;
-    font-size: 0.8rem;
+    padding: 0 8px;
+    height: 32px;
+    min-height: 32px;
+    font-size: 0.78rem;
+    border-radius: 8px;
   }
 
   .nav-btn span:not(.filter-btn-pill) {
@@ -3592,26 +3612,11 @@ canvas {
   }
 
   #btn-filter-trigger {
-    padding: 0.45rem 0.65rem;
+    padding: 0 8px;
+    height: 32px;
   }
 
   #btn-filter-trigger span#filter-btn-label {
-    display: none !important;
-  }
-
-  .topbar-sync-notice {
-    padding: 4px 8px;
-    font-size: 0.7rem;
-    gap: 4px;
-    max-width: 130px;
-    overflow: hidden;
-  }
-
-  .sync-notice-label {
-    display: none !important;
-  }
-
-  .sync-notice-val strong {
     display: none !important;
   }
 

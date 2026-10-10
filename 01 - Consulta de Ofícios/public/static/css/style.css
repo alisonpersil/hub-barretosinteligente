@@ -1981,14 +1981,29 @@ body {
         box-sizing: border-box;
     }
 
+    .btn-back-hub {
+        padding: 0 8px !important;
+        height: 32px !important;
+        width: 32px !important;
+        min-width: 32px !important;
+        justify-content: center !important;
+        border-radius: 8px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .btn-back-hub span {
+        display: none !important;
+    }
+
     .brand-logo-img {
-        height: 30px;
-        max-width: 130px;
+        height: 28px;
+        max-width: 120px;
     }
 
     .brand-divider, 
     .brand-subtitle, 
     .stat-pill, 
+    .nav-center,
     .prompt-shortcut, 
     .btn-import-text,
     .nav-btn span {
@@ -1996,7 +2011,7 @@ body {
     }
 
     .nav-right {
-        gap: 0.4rem;
+        gap: 0.35rem;
     }
 
     .nav-btn, .btn-import {
