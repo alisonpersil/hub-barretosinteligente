@@ -57,128 +57,64 @@
                     <span id="systemStatusText">Sistemas Operacionais</span>
                 </div>
 
-                <button id="btnThemeToggle" class="nav-btn icon-only" title="Alternar tema claro / escuro">
+                <button id="btnThemeToggle" class="nav-btn" title="Alternar tema claro / escuro">
                     <i class="fa-solid fa-moon"></i>
                 </button>
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main>
-            <!-- Hero Section -->
-            <section class="hero-section">
-                <div class="hero-badge">
-                    <i class="fa-solid fa-layer-group"></i>
-                    <span>Portal Unificado de Automações & CCO</span>
+        <!-- Main Content: Central Launchpad -->
+        <main class="hub-main">
+            <div class="hub-container">
+                <header class="hub-header">
+                    <div class="hub-header-badge">
+                        <i class="fa-solid fa-layer-group"></i>
+                        <span>Central de Automações PMO & CCO</span>
+                    </div>
+                    <h1 class="hub-title">Selecione o <span>Sistema</span></h1>
+                    <p class="hub-subtitle">Acesso direto e unificado aos portais de inteligência documental e operações</p>
+                </header>
+
+                <div class="portal-grid">
+                    <!-- Card 1: Consulta de Ofícios -->
+                    <a href="/oficios" class="portal-card oficios-card" id="cardOficios" title="Acessar Consulta de Ofícios">
+                        <div class="portal-card-glow"></div>
+                        <div class="portal-icon-box">
+                            <i class="fa-solid fa-folder-open"></i>
+                        </div>
+                        <span class="portal-badge">
+                            <i class="fa-solid fa-circle"></i> Acervo Digital
+                        </span>
+                        <h2 class="portal-name">Consulta de Ofícios</h2>
+                        <p class="portal-metric">
+                            <span class="metric-tag" id="metricDocCount">47 Documentos Indexados</span>
+                        </p>
+                        <div class="portal-action-btn" id="btnOpenOficios">
+                            <span>Acessar Painel de Ofícios</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
+                    </a>
+
+                    <!-- Card 2: Monitor Exati -->
+                    <a href="/exati" class="portal-card exati-card" id="cardExati" title="Acessar Monitor Exati">
+                        <div class="portal-card-glow"></div>
+                        <div class="portal-icon-box">
+                            <i class="fa-solid fa-chart-line"></i>
+                        </div>
+                        <span class="portal-badge blue">
+                            <i class="fa-solid fa-circle"></i> Gestão Operacional
+                        </span>
+                        <h2 class="portal-name">Monitor Exati</h2>
+                        <p class="portal-metric">
+                            <span class="metric-tag" id="metricExatiAtendidos">2.804 Atendimentos</span> &bull; SLA <span id="metricExatiSla">3.0 dias</span>
+                        </p>
+                        <div class="portal-action-btn blue" id="btnOpenExati">
+                            <span>Acessar Monitor Exati</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </div>
+                    </a>
                 </div>
-                <h1 class="hero-title">
-                    Central Integrada de <span>Operações & Governança</span>
-                </h1>
-                <p class="hero-subtitle">
-                    Acesso unificado e instantâneo às plataformas de acervo documental, controle de ordens de serviço e inteligência de dados da PPP Barretos Inteligente.
-                </p>
-
-                <!-- Faixa de Indicadores Rápidos -->
-                <div class="metrics-strip">
-                    <div class="metric-pill">
-                        <i class="fa-solid fa-file-pdf"></i>
-                        <span class="lbl">Acervo Digital:</span>
-                        <span class="val" id="metricDocCount">47 docs</span>
-                    </div>
-                    <div class="metric-pill blue">
-                        <i class="fa-solid fa-clipboard-check"></i>
-                        <span class="lbl">Atendimentos 2026:</span>
-                        <span class="val" id="metricExatiAtendidos">2.804</span>
-                    </div>
-                    <div class="metric-pill">
-                        <i class="fa-solid fa-bolt"></i>
-                        <span class="lbl">SLA Médio:</span>
-                        <span class="val" id="metricExatiSla">3.0 dias</span>
-                    </div>
-                    <div class="metric-pill blue">
-                        <i class="fa-solid fa-cloud"></i>
-                        <span class="lbl">Hospedagem:</span>
-                        <span class="val">Vercel Cloud</span>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Cards dos Módulos Principais (Ofícios e Exati) -->
-            <section class="modules-section">
-                <div class="modules-grid">
-                    <!-- Módulo 1: Consulta de Ofícios -->
-                    <article class="module-card">
-                        <div>
-                            <div class="card-top">
-                                <div class="card-icon-wrapper">
-                                    <i class="fa-solid fa-folder-open"></i>
-                                </div>
-                                <span class="status-badge online">
-                                    <span class="status-dot"></span> Online &bull; v2.4
-                                </span>
-                            </div>
-
-                            <div class="card-content">
-                                <h2 class="card-title">Consulta de Ofícios</h2>
-                                <p class="card-description">
-                                    Acervo oficial de ofícios, termos de referência, relatórios de desempenho e garantias. Busca semântica estilo ChatGPT, pré-visualização de PDFs e importação individual/em lote resiliente.
-                                </p>
-
-                                <ul class="card-features">
-                                    <li><i class="fa-solid fa-check"></i> Pesquisa inteligente por termo, número ou ano</li>
-                                    <li><i class="fa-solid fa-check"></i> Visualizador embutido de PDF com zoom e download direto</li>
-                                    <li><i class="fa-solid fa-check"></i> Upload sequencial com proteção anti-estouro (4.5 MB)</li>
-                                    <li><i class="fa-solid fa-check"></i> Sincronização contínua com repositório no GitHub</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="card-footer-actions">
-                            <a href="/oficios" class="btn-primary-action" id="btnOpenOficios" title="Abrir sistema Consulta de Ofícios">
-                                <span>Acessar Ofícios</span>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </article>
-
-                    <!-- Módulo 2: Monitor Exati -->
-                    <article class="module-card blue-card">
-                        <div>
-                            <div class="card-top">
-                                <div class="card-icon-wrapper">
-                                    <i class="fa-solid fa-chart-line"></i>
-                                </div>
-                                <span class="status-badge online">
-                                    <span class="status-dot"></span> Online &bull; v5.0
-                                </span>
-                            </div>
-
-                            <div class="card-content">
-                                <h2 class="card-title">Monitor Exati</h2>
-                                <p class="card-description">
-                                    Painel executivo de monitoramento operacional do sistema Exati. Acompanhamento rigoroso de SLA em dias, conformidade contratual, backlog ativo de chamados e exportação para Excel e PDF.
-                                </p>
-
-                                <ul class="card-features">
-                                    <li><i class="fa-solid fa-check"></i> Painel executivo C-Level com gráficos interativos</li>
-                                    <li><i class="fa-solid fa-check"></i> Diagnóstico de chamados vencidos e prazos operacionais</li>
-                                    <li><i class="fa-solid fa-check"></i> Filtros dinâmicos por ano, mês e intervalos de datas</li>
-                                    <li><i class="fa-solid fa-check"></i> Exportação direta de relatórios consolidados em Excel</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="card-footer-actions">
-                            <a href="/exati" class="btn-primary-action blue-btn" id="btnOpenExati" title="Abrir painel Monitor Exati">
-                                <span>Acessar Monitor Exati</span>
-                                <i class="fa-solid fa-arrow-right"></i>
-                            </a>
-                        </div>
-                    </article>
-                </div>
-            </section>
-
-
+            </div>
         </main>
 
         <!-- Footer Oficial -->
@@ -186,10 +122,10 @@
             <div class="footer-left">
                 <span>&copy; 2026 Barretos Inteligente &bull; Consórcio de Iluminação Pública &bull; PMO / CCO</span>
             </div>
-            <div class="footer-right">
-                <a href="/oficios">Ofícios</a>
+            <div class="footer-links">
+                <a href="/oficios">Consulta de Ofícios</a>
                 <span>&bull;</span>
-                <a href="/exati">Exati</a>
+                <a href="/exati">Monitor Exati</a>
                 <span>&bull;</span>
                 <span>hub.barretosinteligente.com.br</span>
             </div>

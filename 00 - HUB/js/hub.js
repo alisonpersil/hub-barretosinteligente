@@ -76,6 +76,11 @@
         if (linkExatiNav) linkExatiNav.href = urls.exati;
         if (btnOpenOficios) btnOpenOficios.href = urls.oficios;
         if (btnOpenExati) btnOpenExati.href = urls.exati;
+
+        const cardOficios = document.getElementById('cardOficios');
+        const cardExati = document.getElementById('cardExati');
+        if (cardOficios) cardOficios.href = urls.oficios;
+        if (cardExati) cardExati.href = urls.exati;
     }
 
     // 3. Carregamento de Métricas em Tempo Real
@@ -91,12 +96,12 @@
             if (resOficios.ok) {
                 const data = await resOficios.json();
                 if (data.count && docCountEl) {
-                    docCountEl.textContent = `${data.count} docs`;
+                    docCountEl.textContent = `${data.count} Documentos Indexados`;
                 }
             }
         } catch (_) {
             // Em caso de execução offline, mantém valores do acervo local
-            if (docCountEl) docCountEl.textContent = '47 docs';
+            if (docCountEl) docCountEl.textContent = '47 Documentos Indexados';
         }
 
         // Tenta obter dados do Monitor Exati
@@ -106,7 +111,7 @@
                 const dataExati = await resExati.json();
                 if (dataExati.kpis) {
                     if (exatiAtendidosEl && dataExati.kpis.total_atendidos) {
-                        exatiAtendidosEl.textContent = Number(dataExati.kpis.total_atendidos).toLocaleString('pt-BR');
+                        exatiAtendidosEl.textContent = `${Number(dataExati.kpis.total_atendidos).toLocaleString('pt-BR')} Atendimentos`;
                     }
                     if (exatiSlaEl && dataExati.kpis.sla_medio_dias) {
                         exatiSlaEl.textContent = `${Number(dataExati.kpis.sla_medio_dias).toFixed(1)} dias`;
@@ -115,7 +120,7 @@
             }
         } catch (_) {
             // Valores padrão de referência executiva
-            if (exatiAtendidosEl) exatiAtendidosEl.textContent = '2.804 atendimentos';
+            if (exatiAtendidosEl) exatiAtendidosEl.textContent = '2.804 Atendimentos';
             if (exatiSlaEl) exatiSlaEl.textContent = '3.0 dias';
         }
 
