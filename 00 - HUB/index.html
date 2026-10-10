@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>HUB Central • Barretos Inteligente | PMO & CCO</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./img/favicon.png">
+    <link rel="apple-touch-icon" href="./img/favicon.png">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- CSS Oficial do HUB (Brandbook Padrão Ofícios) -->
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div class="hub-layout">
+        <!-- Top Navigation Bar (Header Unificado) -->
+        <header class="navbar">
+            <div class="nav-left">
+                <a href="./index.html" class="brand-logo" title="Barretos Inteligente - Hub Central">
+                    <img src="./img/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+                    <div class="brand-divider"></div>
+                    <div class="brand-text">
+                        <span class="brand-title">Central HUB <span class="hub-tag">PMO</span></span>
+                        <span class="brand-subtitle">Gestão Integrada & Governança</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Central Switcher (Navegação Rápida entre Portais) -->
+            <nav class="nav-center" aria-label="Navegação Central">
+                <a href="./index.html" class="nav-pill active" title="Você está no Hub Central">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Hub Central</span>
+                </a>
+                <a href="/oficios" class="nav-pill" id="linkOficiosNav" title="Ir para Consulta de Ofícios">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>Consulta de Ofícios</span>
+                </a>
+                <a href="/exati" class="nav-pill" id="linkExatiNav" title="Ir para Monitor Exati">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Monitor Exati</span>
+                </a>
+            </nav>
+
+            <div class="nav-right">
+                <div class="system-status-pill" title="Status de conexão com servidores">
+                    <span class="pulse-dot"></span>
+                    <span id="systemStatusText">Sistemas Operacionais</span>
+                </div>
+
+                <button id="btnThemeToggle" class="nav-btn icon-only" title="Alternar tema claro / escuro">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="hero-badge">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Portal Unificado de Automações & CCO</span>
+                </div>
+                <h1 class="hero-title">
+                    Central Integrada de <span>Operações & Governança</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Acesso unificado e instantâneo às plataformas de acervo documental, controle de ordens de serviço e inteligência de dados da PPP Barretos Inteligente.
+                </p>
+
+                <!-- Faixa de Indicadores Rápidos -->
+                <div class="metrics-strip">
+                    <div class="metric-pill">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span class="lbl">Acervo Digital:</span>
+                        <span class="val" id="metricDocCount">47 docs</span>
+                    </div>
+                    <div class="metric-pill blue">
+                        <i class="fa-solid fa-clipboard-check"></i>
+                        <span class="lbl">Atendimentos 2026:</span>
+                        <span class="val" id="metricExatiAtendidos">2.804</span>
+                    </div>
+                    <div class="metric-pill">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span class="lbl">SLA Médio:</span>
+                        <span class="val" id="metricExatiSla">3.0 dias</span>
+                    </div>
+                    <div class="metric-pill blue">
+                        <i class="fa-solid fa-cloud"></i>
+                        <span class="lbl">Hospedagem:</span>
+                        <span class="val">Vercel Cloud</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Cards dos Módulos Principais (Ofícios e Exati) -->
+            <section class="modules-section">
+                <div class="modules-grid">
+                    <!-- Módulo 1: Consulta de Ofícios -->
+                    <article class="module-card">
+                        <div>
+                            <div class="card-top">
+                                <div class="card-icon-wrapper">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                </div>
+                                <span class="status-badge online">
+                                    <span class="status-dot"></span> Online &bull; v2.4
+                                </span>
+                            </div>
+
+                            <div class="card-content">
+                                <h2 class="card-title">Consulta de Ofícios</h2>
+                                <p class="card-description">
+                                    Acervo oficial de ofícios, termos de referência, relatórios de desempenho e garantias. Busca semântica estilo ChatGPT, pré-visualização de PDFs e importação individual/em lote resiliente.
+                                </p>
+
+                                <ul class="card-features">
+                                    <li><i class="fa-solid fa-check"></i> Pesquisa inteligente por termo, número ou ano</li>
+                                    <li><i class="fa-solid fa-check"></i> Visualizador embutido de PDF com zoom e download direto</li>
+                                    <li><i class="fa-solid fa-check"></i> Upload sequencial com proteção anti-estouro (4.5 MB)</li>
+                                    <li><i class="fa-solid fa-check"></i> Sincronização contínua com repositório no GitHub</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card-footer-actions">
+                            <a href="/oficios" class="btn-primary-action" id="btnOpenOficios" title="Abrir sistema Consulta de Ofícios">
+                                <span>Acessar Ofícios</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+
+                    <!-- Módulo 2: Monitor Exati -->
+                    <article class="module-card blue-card">
+                        <div>
+                            <div class="card-top">
+                                <div class="card-icon-wrapper">
+                                    <i class="fa-solid fa-chart-line"></i>
+                                </div>
+                                <span class="status-badge online">
+                                    <span class="status-dot"></span> Online &bull; v5.0
+                                </span>
+                            </div>
+
+                            <div class="card-content">
+                                <h2 class="card-title">Monitor Exati</h2>
+                                <p class="card-description">
+                                    Painel executivo de monitoramento operacional do sistema Exati. Acompanhamento rigoroso de SLA em dias, conformidade contratual, backlog ativo de chamados e exportação para Excel e PDF.
+                                </p>
+
+                                <ul class="card-features">
+                                    <li><i class="fa-solid fa-check"></i> Painel executivo C-Level com gráficos interativos</li>
+                                    <li><i class="fa-solid fa-check"></i> Diagnóstico de chamados vencidos e prazos operacionais</li>
+                                    <li><i class="fa-solid fa-check"></i> Filtros dinâmicos por ano, mês e intervalos de datas</li>
+                                    <li><i class="fa-solid fa-check"></i> Exportação direta de relatórios consolidados em Excel</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="card-footer-actions">
+                            <a href="/exati" class="btn-primary-action blue-btn" id="btnOpenExati" title="Abrir painel Monitor Exati">
+                                <span>Acessar Monitor Exati</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Seção de Recursos de Governança & Arquitetura -->
+            <section class="overview-section">
+                <div class="section-header">
+                    <h3 class="section-title">
+                        <i class="fa-solid fa-cubes"></i>
+                        <span>Pilares do HUB Barretos Inteligente</span>
+                    </h3>
+                </div>
+
+                <div class="info-cards-grid">
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <i class="fa-solid fa-palette"></i>
+                            <h4 class="info-card-title">Identidade Unificada</h4>
+                        </div>
+                        <p class="info-card-text">
+                            Transição suave entre módulos. O Brandbook dos Ofícios garante paleta de cores corporativa, modo claro e escuro sincronizados e tipografia legível em todas as telas.
+                        </p>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <i class="fa-solid fa-shield-halved"></i>
+                            <h4 class="info-card-title">Alta Disponibilidade</h4>
+                        </div>
+                        <p class="info-card-text">
+                            Hospedagem de alta performance distribuída globalmente via Vercel Edge Network, assegurando carregamento veloz em menos de 200ms para toda a equipe.
+                        </p>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-card-header">
+                            <i class="fa-solid fa-database"></i>
+                            <h4 class="info-card-title">Governança & PMO</h4>
+                        </div>
+                        <p class="info-card-text">
+                            Dados consolidados de infraestrutura e iluminação pública para respaldar relatórios mensais, medições contratuais e reuniões com o Poder Concedente.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Callout de Domínio Personalizado -->
+                <div class="cloud-deployment-banner">
+                    <div class="banner-left">
+                        <div class="banner-icon">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+                        <div class="banner-text">
+                            <h4>Acesso Centralizado por Domínio Oficial</h4>
+                            <p>Todos os sistemas estão integrados e acessíveis a partir do endereço unificado de produção.</p>
+                        </div>
+                    </div>
+                    <div class="banner-domain-tag">
+                        hub.barretosinteligente.com.br
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer Oficial -->
+        <footer class="hub-footer">
+            <div class="footer-left">
+                <span>&copy; 2026 Barretos Inteligente &bull; Consórcio de Iluminação Pública &bull; PMO / CCO</span>
+            </div>
+            <div class="footer-right">
+                <a href="/oficios">Ofícios</a>
+                <span>&bull;</span>
+                <a href="/exati">Exati</a>
+                <span>&bull;</span>
+                <span>hub.barretosinteligente.com.br</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Script de Inicialização -->
+    <script src="./js/hub.js"></script>
+</body>
+</html>

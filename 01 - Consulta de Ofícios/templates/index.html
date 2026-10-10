@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Consulta de Ofícios | PMO</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/static/img/favicon.png">
+    <link rel="apple-touch-icon" href="/static/img/favicon.png">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons for clean UI -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom CSS (Inlined for instant rendering & cloud resilience) -->
+    {% if inline_css %}
+    <style>
+        {{ inline_css | safe }}
+    </style>
+    {% else %}
+    <link rel="stylesheet" href="/static/css/style.css">
+    {% endif %}
+</head>
+<body>
+    <div class="app-layout">
+        <!-- Top Navigation Bar -->
+        <header class="navbar">
+            <div class="nav-left">
+                <a href="/" class="brand-logo" title="Ir para o Hub Central">
+                    <img src="/static/img/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+                    <div class="brand-divider"></div>
+                    <div class="brand-text">
+                        <span class="brand-title">Consulta de Ofícios</span>
+                        <span class="brand-subtitle">PMO &bull; Acervo Digital</span>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Central Switcher (Navegação Rápida entre Portais) -->
+            <nav class="nav-center" aria-label="Navegação Central">
+                <a href="/" class="nav-pill" id="linkHubNav" title="Ir para o Hub Central">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Hub Central</span>
+                </a>
+                <a href="/oficios" class="nav-pill active" title="Você está na Consulta de Ofícios">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>Consulta de Ofícios</span>
+                </a>
+                <a href="/exati" class="nav-pill" id="linkExatiNav" title="Ir para Monitor Exati">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Monitor Exati</span>
+                </a>
+            </nav>
+
+            <div class="nav-right">
+                <div class="stat-pill" title="Total de ofícios indexados no sistema">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span id="headerDocCount">47 documentos</span>
+                </div>
+                <button id="btnOpenImportModal" class="nav-btn btn-import" title="Importar novos ofícios (1 arquivo ou em lote)">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span class="btn-import-text">Importar</span>
+                </button>
+                <button id="btnRefresh" class="nav-btn" title="Recarregar ofícios da pasta">
+                    <i class="fa-solid fa-rotate"></i>
+                    <span>Atualizar</span>
+                </button>
+                <button id="btnThemeToggle" class="nav-btn icon-only" title="Alternar tema claro / escuro">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Area (ChatGPT Style) -->
+        <main class="main-container">
+            <!-- Hero & AI Chat Prompt Section -->
+            <section class="chat-hero">
+                <div class="ai-avatar-badge">
+                    <i class="fa-solid fa-sparkles"></i>
+                    <span>Pesquisa Inteligente de Ofícios</span>
+                </div>
+                <h1 class="hero-title">Como posso ajudar com seus ofícios hoje?</h1>
+                <p class="hero-subtitle">
+                    Digite qualquer termo, número do ofício ou ano para consultar imediatamente.
+                </p>
+
+                <!-- ChatGPT-Style Prompt Search Box -->
+                <div class="prompt-box-wrapper">
+                    <div class="prompt-box">
+                        <div class="prompt-icon">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="searchInput" 
+                            class="prompt-input" 
+                            placeholder="Pesquise por qualquer ofício (ex: '2024-001', 'videomonitoramento', 'garantia')..." 
+                            autocomplete="off"
+                            spellcheck="false"
+                        >
+                        <button id="btnClearSearch" class="btn-clear-search hidden" title="Limpar pesquisa">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                        <div class="prompt-shortcut" title="Atalho de teclado">
+                            <span>Ctrl K</span>
+                        </div>
+                        <button id="btnSearchSubmit" class="btn-send-prompt" title="Buscar">
+                            <i class="fa-solid fa-arrow-up"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Suggested Prompt Filter Chips -->
+                <div class="filter-chips-container">
+                    <span class="chips-label">Filtros rápidos:</span>
+                    <div class="chips-list">
+                        <button class="chip active" data-filter="all">
+                            <i class="fa-solid fa-layer-group"></i> Todos
+                        </button>
+                        <button class="chip" data-filter="2024">
+                            <i class="fa-solid fa-calendar"></i> Ofícios 2024
+                        </button>
+                        <button class="chip" data-filter="2023">
+                            <i class="fa-solid fa-calendar-days"></i> Ofícios 2023
+                        </button>
+                        <button class="chip" data-filter="videomonitoramento">
+                            <i class="fa-solid fa-video"></i> Videomonitoramento
+                        </button>
+                        <button class="chip" data-filter="garantia">
+                            <i class="fa-solid fa-shield-halved"></i> Garantia
+                        </button>
+                        <button class="chip" data-filter="iluminacao">
+                            <i class="fa-solid fa-lightbulb"></i> Iluminação
+                        </button>
+                        <button class="chip" data-filter="relatorio">
+                            <i class="fa-solid fa-chart-pie"></i> Relatórios
+                        </button>
+                        <button class="chip" data-filter="anexo">
+                            <i class="fa-solid fa-paperclip"></i> Anexos
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section">
+                <!-- Controls and Sorting Toolbar -->
+                <div class="results-toolbar">
+                    <div class="results-info">
+                        <span class="results-counter" id="resultsCounter">
+                            Exibindo <strong>47</strong> ofícios
+                        </span>
+                        <span id="activeFilterTag" class="active-filter-badge hidden">
+                            Filtro: <span id="activeFilterText"></span>
+                            <i class="fa-solid fa-xmark" id="btnRemoveFilter"></i>
+                        </span>
+                    </div>
+
+                    <div class="toolbar-actions">
+                        <!-- Sort Dropdown -->
+                        <div class="sort-wrapper">
+                            <label for="sortSelect" class="sort-label">
+                                <i class="fa-solid fa-arrow-down-wide-short"></i>
+                                <span>Ordenar por:</span>
+                            </label>
+                            <select id="sortSelect" class="sort-select">
+                                <option value="mtime_desc">Data de Modificação (Mais recente)</option>
+                                <option value="mtime_asc">Data de Modificação (Mais antigo)</option>
+                                <option value="ctime_desc">Data de Criação (Mais recente)</option>
+                                <option value="ctime_asc">Data de Criação (Mais antigo)</option>
+                                <option value="name_asc">Nome (A &rarr; Z)</option>
+                                <option value="name_desc">Nome (Z &rarr; A)</option>
+                                <option value="size_desc">Tamanho (Maior primeiro)</option>
+                                <option value="size_asc">Tamanho (Menor primeiro)</option>
+                            </select>
+                        </div>
+
+                        <!-- View Layout Toggle -->
+                        <div class="view-toggle">
+                            <button id="btnViewCards" class="view-btn active" title="Visualização em Cartões">
+                                <i class="fa-solid fa-table-cells-large"></i>
+                            </button>
+                            <button id="btnViewList" class="view-btn" title="Visualização em Lista/Tabela">
+                                <i class="fa-solid fa-list-ul"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State Message -->
+                <div id="emptyState" class="empty-state hidden">
+                    <div class="empty-icon">
+                        <i class="fa-solid fa-file-circle-question"></i>
+                    </div>
+                    <h3>Nenhum ofício encontrado</h3>
+                    <p>Não encontramos nenhum documento correspondente a sua pesquisa. Tente usar outras palavras ou limpe a busca.</p>
+                    <button id="btnClearSearchEmpty" class="btn-primary">
+                        <i class="fa-solid fa-rotate-left"></i> Limpar pesquisa
+                    </button>
+                </div>
+
+                <!-- Loading Spinner State -->
+                <div id="loadingState" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Carregando ofícios...</p>
+                </div>
+
+                <!-- Documents Container: Cards Grid View -->
+                <div id="documentsCardsContainer" class="documents-grid">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <!-- Documents Container: Table View -->
+                <div id="documentsTableContainer" class="documents-table-wrapper hidden">
+                    <table class="documents-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 45%;">Nome do Ofício</th>
+                                <th style="width: 15%;">Data Modificação</th>
+                                <th style="width: 15%;">Data Criação</th>
+                                <th style="width: 10%;">Tamanho</th>
+                                <th style="width: 15%; text-align: right;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="documentsTableBody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- PDF Preview Modal -->
+        <div id="previewModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+            <div class="modal-container">
+                <!-- Modal Top Header -->
+                <div class="modal-header">
+                    <div class="modal-title-area">
+                        <div class="modal-doc-icon">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </div>
+                        <div class="modal-doc-info">
+                            <h3 id="modalDocTitle" class="modal-doc-title">Nome do Ofício.pdf</h3>
+                            <div class="modal-doc-meta" id="modalDocMeta">
+                                <span><i class="fa-regular fa-clock"></i> Modificado: 15/02/2024</span>
+                                <span>&bull;</span>
+                                <span><i class="fa-solid fa-hard-drive"></i> 640 KB</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button id="btnModalDelete" class="btn-modal-action btn-danger-action" title="Excluir este ofício">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span>Excluir</span>
+                        </button>
+                        <button id="btnModalDownload" class="btn-modal-action" title="Baixar arquivo">
+                            <i class="fa-solid fa-download"></i>
+                            <span>Baixar</span>
+                        </button>
+                        <a id="btnModalNewTab" href="#" target="_blank" class="btn-modal-action" title="Abrir em tela cheia / nova aba">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            <span>Nova Aba</span>
+                        </a>
+                        <button id="btnModalClose" class="btn-modal-close" title="Fechar visualização (Esc)">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal Body (PDF Viewer) -->
+                <div class="modal-body">
+                    <!-- Mobile Friendly Notice / Direct Open Button -->
+                    <div class="mobile-pdf-notice">
+                        <a id="btnMobileOpenPdf" href="#" target="_blank" class="btn-mobile-pdf">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Abrir Documento Completo</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                        </a>
+                    </div>
+                    <div id="modalLoading" class="modal-pdf-loading">
+                        <div class="spinner"></div>
+                        <p>Carregando pré-visualização do PDF...</p>
+                    </div>
+                    <iframe id="pdfViewerFrame" class="pdf-iframe" src="" title="Pré-visualização do PDF"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import Ofícios Modal -->
+        <div id="importModal" class="modal-overlay hidden" aria-hidden="true">
+            <div class="modal-container import-modal-container">
+                <div class="modal-header">
+                    <div class="modal-title-group">
+                        <div class="modal-badge import-badge">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload de Documentos
+                        </div>
+                        <h2 class="modal-title">Importar Ofícios</h2>
+                        <span class="modal-subtitle">Envie um ou múltiplos arquivos PDF, ou selecione uma pasta inteira.</span>
+                    </div>
+                    <div class="modal-actions">
+                        <button id="btnImportModalClose" class="btn-modal-close" title="Fechar (Esc)">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-body import-modal-body">
+                    <!-- Alert Notice for Cloud / Token info -->
+                    <div id="importNoticeAlert" class="import-notice-alert hidden">
+                        <div class="import-alert-icon">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                        </div>
+                        <div class="import-alert-text">
+                            <strong>Atenção para salvar no Vercel (Nuvem):</strong>
+                            <p id="importNoticeMessage">Para que os arquivos fiquem salvos permanentemente no site sem precisar do seu computador ligado, adicione a variável <code>GITHUB_TOKEN</code> na Vercel ou informe seu token abaixo.</p>
+                        </div>
+                    </div>
+
+                    <!-- Import Type Switcher -->
+                    <div class="import-tabs">
+                        <button id="tabImportFiles" class="import-tab active" type="button">
+                            <i class="fa-solid fa-file-pdf"></i> Arquivos (1 ou vários)
+                        </button>
+                        <button id="tabImportFolder" class="import-tab" type="button">
+                            <i class="fa-solid fa-folder-tree"></i> Pasta Completa
+                        </button>
+                    </div>
+
+                    <!-- Drag and drop zone -->
+                    <div id="dropZone" class="drop-zone">
+                        <input type="file" id="fileInputMultiple" accept=".pdf,application/pdf" multiple class="hidden-input">
+                        <input type="file" id="fileInputFolder" webkitdirectory directory multiple class="hidden-input">
+                        
+                        <div class="drop-zone-content">
+                            <div class="drop-zone-icon-circle">
+                                <i class="fa-solid fa-cloud-arrow-up"></i>
+                            </div>
+                            <h3 class="drop-zone-title" id="dropZoneTitle">Arraste seus PDFs aqui ou clique para selecionar</h3>
+                            <p class="drop-zone-desc" id="dropZoneDesc">Você pode selecionar vários arquivos de uma só vez (formato PDF)</p>
+                            <button type="button" id="btnBrowseFiles" class="btn-browse">
+                                <i class="fa-solid fa-folder-open"></i> Selecionar Arquivos
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Selected files preview list -->
+                    <div id="importFileListContainer" class="import-files-container hidden">
+                        <div class="import-files-header">
+                            <span id="importFileCount">0 arquivo(s) selecionado(s)</span>
+                            <button type="button" id="btnClearImportList" class="btn-link-action">Limpar seleção</button>
+                        </div>
+                        <div id="importFileList" class="import-files-list"></div>
+                        
+                        <!-- Progress bar -->
+                        <div id="importProgressBarContainer" class="import-progress-wrapper hidden">
+                            <div class="import-progress-bar">
+                                <div id="importProgressFill" class="import-progress-fill"></div>
+                            </div>
+                            <span id="importProgressLabel" class="import-progress-label">Enviando arquivos...</span>
+                        </div>
+                    </div>
+
+                    <!-- Cloud / GitHub Token Settings Box (Hidden by default) -->
+                    <div id="cloudSettingsCard" class="cloud-settings-card hidden">
+                        <div class="cloud-settings-header" id="btnToggleGithubSettings">
+                            <div class="cloud-status-indicator">
+                                <div class="github-badge-icon">
+                                    <i class="fa-brands fa-github"></i>
+                                </div>
+                                <div class="cloud-status-text-group">
+                                    <span class="cloud-status-title" id="cloudStatusTitle">Sincronização com GitHub</span>
+                                    <span class="cloud-status-subtitle" id="cloudStatusSubtitle">Verificando status de conexão...</span>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-chevron-down toggle-icon" id="githubSettingsChevron"></i>
+                        </div>
+                        <div id="githubSettingsBody" class="cloud-settings-body hidden">
+                            <p class="cloud-settings-desc">
+                                Na Vercel (servidor online), os arquivos importados são comitados diretamente no GitHub para atualizar o site automaticamente. 
+                                <strong>Dica:</strong> Se você configurar a variável <code>GITHUB_TOKEN</code> na Vercel uma vez, nenhum usuário precisará preencher este campo!
+                            </p>
+                            <div class="github-token-input-group">
+                                <label for="githubTokenInput">GitHub Personal Access Token (para salvar/excluir direto no Vercel):</label>
+                                <div class="input-with-button">
+                                    <input type="password" id="githubTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxxxxxx..." autocomplete="off">
+                                    <button type="button" id="btnSaveGithubToken" class="btn-save-token">Salvar no Navegador</button>
+                                </div>
+                                <small class="token-help">O token fica salvo com segurança apenas no seu navegador para autorizar uploads e exclusões.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer import-modal-footer">
+                    <button type="button" id="btnCancelImport" class="btn-secondary">Cancelar</button>
+                    <button type="button" id="btnStartImport" class="btn-primary" disabled>
+                        <i class="fa-solid fa-upload"></i>
+                        <span>Iniciar Importação</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal" class="modal-overlay hidden" aria-hidden="true">
+            <div class="modal-container delete-modal-container">
+                <div class="delete-modal-content">
+                    <div class="delete-icon-wrapper">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                    </div>
+                    <h3 class="delete-modal-title">Excluir Ofício?</h3>
+                    <p class="delete-modal-message">
+                        Tem certeza de que deseja remover <strong id="deleteDocName"></strong>?
+                    </p>
+                    <p class="delete-modal-warning">
+                        Esta ação removerá o arquivo permanentemente do acervo e do site.
+                    </p>
+                    <div class="delete-modal-actions">
+                        <button type="button" id="btnCancelDelete" class="btn-secondary">Cancelar</button>
+                        <button type="button" id="btnConfirmDelete" class="btn-danger-confirm">
+                            <i class="fa-solid fa-trash-can"></i>
+                            <span>Sim, Excluir</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div id="toastContainer" class="toast-container"></div>
+    </div>
+
+    <script>
+        window.INITIAL_DOCS = {{ initial_documents | tojson | safe if initial_documents else '[]' }};
+    </script>
+
+    <!-- Application JavaScript (Inlined for instant execution & cloud resilience) -->
+    {% if inline_js %}
+    <script>
+        {{ inline_js | safe }}
+    </script>
+    {% else %}
+    <script src="/static/js/app.js"></script>
+    {% endif %}
+
+    <script>
+        if (typeof initApp === 'function') {
+            initApp();
+        }
+    </script>
+</body>
+</html>

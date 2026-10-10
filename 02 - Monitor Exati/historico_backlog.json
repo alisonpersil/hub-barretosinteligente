@@ -1,0 +1,28 @@
+{
+  "snapshots": [
+    {
+      "arquivo": "ExportacaoConsulta (1).xlsx",
+      "data": "2026-10-08",
+      "data_formatada": "08/10/2026",
+      "total_chamados": 11,
+      "total_pontos": 32,
+      "vencidos": 6,
+      "no_prazo": 5,
+      "ronda_pontos": 27,
+      "callcenter_pontos": 5,
+      "mtime": 1791464152
+    },
+    {
+      "arquivo": "ExportacaoConsulta_teste_sync.xlsx",
+      "data": "2026-10-08",
+      "data_formatada": "08/10/2026",
+      "total_chamados": 11,
+      "total_pontos": 32,
+      "vencidos": 6,
+      "no_prazo": 5,
+      "ronda_pontos": 27,
+      "callcenter_pontos": 5,
+      "mtime": 1791487451
+    }
+  ]
+}

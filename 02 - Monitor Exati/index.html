@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Painel Exati &bull; PMO Gestão Operacional</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="./favicon.png">
+  <link rel="shortcut icon" type="image/png" href="./favicon.png">
+  <link rel="apple-touch-icon" href="./favicon.png">
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Executivo -->
+  <link rel="stylesheet" href="./app.css?v=20261009_v5">
+
+  <!-- SheetJS para Upload e Exportação Direta no Navegador -->
+  <script src="./xlsx.full.min.js"></script>
+
+  <!-- Chart.js para Gráficos -->
+  <script src="./chart.umd.min.js"></script>
+  <script>
+    if (typeof Chart === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+
+  <div class="app-layout" id="app-layout">
+    
+    <!-- ==================== HEADER STICKY UNIFICADO (BARRA DE TÍTULO + ABAS FIXAS) ==================== -->
+    <div class="sticky-header-wrapper" id="sticky-header-wrapper">
+      <header class="navbar">
+      <div class="nav-left">
+        <a href="/" class="brand-logo" title="Ir para o Hub Central">
+          <img src="./logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+          <div class="brand-divider"></div>
+          <div class="brand-text">
+            <span class="brand-title">Painel Exati</span>
+            <span class="brand-subtitle">PMO &bull; Gestão Operacional</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Central Switcher (Navegação Rápida entre Portais) -->
+      <nav class="nav-center" aria-label="Navegação Central">
+        <a href="/" class="nav-pill" id="linkHubNav" title="Ir para o Hub Central">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+          <span>Hub Central</span>
+        </a>
+        <a href="/oficios" class="nav-pill" id="linkOficiosNav" title="Ir para Consulta de Ofícios">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+          <span>Consulta de Ofícios</span>
+        </a>
+        <a href="/exati" class="nav-pill active" title="Você está no Monitor Exati">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          <span>Monitor Exati</span>
+        </a>
+      </nav>
+
+      <div class="nav-right">
+        
+        <!-- AVISO PEQUENO DE DATA E HORA DE ATUALIZAÇÃO DAS PLANILHAS -->
+        <div class="topbar-sync-notice" id="topbar-sync-notice" title="Status das planilhas importadas">
+          <span class="sync-pulse-dot"></span>
+          <div class="sync-notice-text">
+            <span class="sync-notice-label">Planilhas Exati:</span>
+            <span class="sync-notice-val" id="topbar-sync-times">
+              <strong>Atendidos:</strong> <span id="time-badge-atendidos">08/10 09:32</span> &bull; 
+              <strong>Pendentes:</strong> <span id="time-badge-pendentes">08/10 09:55</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- DROPDOWN DE FILTRO DE PERÍODO -->
+        <div class="filter-dropdown-wrapper" id="filter-dropdown-wrapper">
+          <button class="nav-btn btn-filter-trigger" id="btn-filter-trigger" title="Filtrar período ou selecionar datas">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+            <span id="filter-btn-label">Período: Ano 2026</span>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="chevron-icon">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </button>
+
+          <!-- Popover do Filtro -->
+          <div class="filter-popover" id="filter-popover">
+            <div class="popover-title-row">
+              <span class="popover-title">Filtrar Intervalo de Atendimentos</span>
+              <button class="popover-close" id="btn-close-popover" title="Fechar painel">&times;</button>
+            </div>
+            
+            <div class="popover-section">
+              <span class="popover-lbl">Atalhos Rápidos:</span>
+              <div class="popover-presets">
+                <button class="preset-btn active" data-preset="2026">Ano 2026</button>
+                <button class="preset-btn" data-preset="30d">Últimos 30 Dias</button>
+                <button class="preset-btn" data-preset="90d">Últimos 90 Dias</button>
+                <button class="preset-btn" data-preset="2025">Ano 2025</button>
+                <button class="preset-btn" data-preset="tudo">Histórico Total</button>
+              </div>
+            </div>
+
+            <div class="popover-divider"></div>
+
+            <div class="popover-section">
+              <span class="popover-lbl">Período Personalizado:</span>
+              <div class="popover-dates-grid">
+                <div class="popover-input-group">
+                  <label for="filtro-data-inicio">De:</label>
+                  <input type="date" id="filtro-data-inicio" class="date-input" value="2026-01-01">
+                </div>
+                <div class="popover-input-group">
+                  <label for="filtro-data-fim">Até:</label>
+                  <input type="date" id="filtro-data-fim" class="date-input" value="2026-10-09">
+                </div>
+              </div>
+              <div class="popover-actions-row">
+                <button class="btn-filter-apply" id="btn-aplicar-data">Aplicar Filtro</button>
+                <button class="btn-filter-reset" id="btn-limpar-data" title="Resetar para Ano Atual">Resetar</button>
+              </div>
+            </div>
+
+            <div class="popover-summary" id="popover-resumo-banner">
+              Exibindo: Ano 2026 &bull; 2.804 atendimentos &bull; SLA Médio: 3d
+            </div>
+          </div>
+        </div>
+
+        <!-- BOTÃO IMPORTAR -->
+        <button id="btn-abrir-upload" class="nav-btn btn-import" title="Importar nova planilha do Exati (.xlsx)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+          </svg>
+          <span class="btn-import-text">Importar</span>
+        </button>
+
+        <!-- BOTÃO EXPORTAR -->
+        <button id="btn-exportar-excel" class="nav-btn" title="Baixar relatório consolidado em Excel">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+          </svg>
+          <span>Exportar</span>
+        </button>
+
+        <!-- BOTÃO GERAR PDF -->
+        <button id="btn-imprimir-relatorio" class="nav-btn" title="Imprimir Relatório Executivo ou Salvar como PDF">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+            <rect x="6" y="14" width="12" height="8"></rect>
+          </svg>
+          <span>PDF</span>
+        </button>
+
+        <!-- BOTÃO ALTERNAR TEMA -->
+        <button id="btn-toggle-theme" class="nav-btn icon-only" title="Alternar tema claro / escuro">
+          <span id="theme-icon">🌙</span>
+        </button>
+
+      </div>
+    </header>
+
+    <!-- ==================== SUBNAV BAR: CHIPS DE NAVEGAÇÃO ENTRE ABAS ==================== -->
+    <nav class="subnav-bar">
+      <div class="subnav-container">
+        <button class="subnav-chip active" data-target="tab-cockpit" data-title="Cockpit Executivo">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="9"></rect>
+            <rect x="14" y="3" width="7" height="5"></rect>
+            <rect x="14" y="12" width="7" height="9"></rect>
+            <rect x="3" y="16" width="7" height="5"></rect>
+          </svg>
+          <span>Cockpit Executivo</span>
+        </button>
+
+        <button class="subnav-chip" data-target="tab-simulador" data-title="Simulador Preditivo">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          <span>Simulador Preditivo</span>
+          <span class="chip-badge highlight">Destaque</span>
+        </button>
+
+        <button class="subnav-chip" data-target="tab-backlog" data-title="Gestão do Backlog">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          <span>Gestão do Backlog</span>
+          <span class="chip-badge alert" id="badge-backlog-count">11 ordens</span>
+        </button>
+
+        <button class="subnav-chip" data-target="tab-bairros" data-title="Distribuição Bairros">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+            <line x1="8" y1="2" x2="8" y2="18"></line>
+            <line x1="16" y1="6" x2="16" y2="22"></line>
+          </svg>
+          <span>Distribuição Bairros</span>
+        </button>
+
+        <button class="subnav-chip" data-target="tab-analitico" data-title="Tabela Analítica (SLA)" data-sub="Detalhamento linha a linha dos 2.796 atendimentos, tempos de resolução e SLA">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="3" y1="15" x2="21" y2="15"></line>
+            <line x1="9" y1="3" x2="9" y2="21"></line>
+          </svg>
+          <span>Tabela Analítica (SLA)</span>
+          <span class="chip-badge highlight" id="badge-analitico-count">2.804 ordens</span>
+        </button>
+
+        <button class="subnav-chip highlight-star" data-target="tab-pitch" data-title="Resumo do Dia • Marcela" data-sub="Síntese diária da operação e decisões estratégicas para diretoria">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          <span>Resumo do Dia</span>
+          <span class="chip-badge star-badge">⭐ Marcela</span>
+        </button>
+
+        <button class="subnav-chip" data-target="tab-powerbi" data-title="Guia Power BI (DAX)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 20V10M12 20V4M6 20v-6"></path>
+          </svg>
+          <span>Guia Power BI (DAX)</span>
+        </button>
+      </div>
+    </nav>
+  </div>
+
+    <!-- ==================== CONTAINER PRINCIPAL DAS ABAS ==================== -->
+    <main class="main-container">
+
+      <!-- Cabeçalho Exclusivo para Impressão e PDF Executivo -->
+      <div class="print-header" id="print-header" style="display: none;">
+        <div class="print-brand-left">
+          <div class="logo-card print-logo-card">
+            <img src="./logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="header-logo" style="height: 34px; max-height: 34px; max-width: 160px; width: auto; object-fit: contain;">
+          </div>
+          <div class="print-titles">
+            <h2>Barretos Inteligente &bull; Painel Exati</h2>
+            <p>PMO &bull; Gestão Operacional de Atendimentos, SLA & Preditivo</p>
+          </div>
+        </div>
+        <div class="print-meta-right">
+          <div><strong id="print-periodo">Período: Ano 2026</strong></div>
+          <div id="print-data-emissao">Emitido pelo CCO / PMO</div>
+          <div>Parque Operacional: <strong>Barretos / SP</strong></div>
+        </div>
+      </div>
+
+      <!-- ==================== ABA 1: COCKPIT EXECUTIVO ==================== -->
+      <section id="tab-cockpit" class="tab-content active">
+      
+      <!-- Grid de KPIs C-Level com Comparação Mês Atual vs Mês Anterior (MoM) e Consolidado -->
+      <section class="kpi-grid">
+        
+        <!-- Card 1: Atendimentos Realizados -->
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <div class="kpi-title-wrap">
+              <span class="kpi-title">Atendimentos Realizados</span>
+              <span class="kpi-tag-mes" id="tag-mes-atend">Out/26</span>
+            </div>
+            <div class="kpi-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-value-row">
+            <div class="kpi-value">
+              <span id="kpi-total-atendidos">39</span>
+              <span class="kpi-unit">ordens</span>
+            </div>
+            <span class="kpi-mom-badge down-neutral" id="kpi-atendidos-mom" title="Comparativo com o mês anterior">
+              &darr; vs Set/26: -89% (-330 ordens)
+            </span>
+          </div>
+          <div class="kpi-footer">
+            <span id="kpi-total-footer-label">Consolidado 2026: <strong id="kpi-atendidos-2026">2.804</strong> ordens</span>
+            <span class="kpi-trend trend-up" id="kpi-total-trend">
+              &uarr; <span id="kpi-atendidos-30d">322</span> ult. 30d
+            </span>
+          </div>
+        </div>
+
+        <!-- Card 2: Backlog Pendente Ativo -->
+        <div class="kpi-card danger">
+          <div class="kpi-header">
+            <div class="kpi-title-wrap">
+              <span class="kpi-title">Backlog Pendente Ativo</span>
+              <span class="kpi-tag-mes danger">Ativo</span>
+            </div>
+            <div class="kpi-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-value-row">
+            <div class="kpi-value">
+              <span id="kpi-backlog-chamados">11</span>
+              <span class="kpi-unit">ordens</span>
+            </div>
+            <span class="kpi-badge-secondary" title="Total físico de lâmpadas e pontos a atender">
+              Físico: <strong id="kpi-backlog-pontos">32 pts</strong>
+            </span>
+            <span class="kpi-mom-badge up-danger" id="kpi-backlog-mom" title="Variação em relação ao mês anterior">
+              &uarr; vs Set/26: +83% (+5 ordens)
+            </span>
+          </div>
+          <div class="kpi-footer">
+            <span class="kpi-pill danger" title="Ordens com prazo SLA estourado">
+              <span class="pill-dot red"></span>
+              <strong id="kpi-backlog-vencidos">6</strong> vencidos
+            </span>
+            <span class="kpi-pill success" title="Ordens dentro do prazo SLA">
+              <span class="pill-dot green"></span>
+              <strong id="kpi-backlog-prazo">5</strong> no prazo
+            </span>
+          </div>
+        </div>
+
+        <!-- Card 3: SLA -->
+        <div class="kpi-card success" id="card-sla-medio" title="Prazo de atendimento em dias entre a abertura e a conclusão física.">
+          <div class="kpi-header">
+            <div class="kpi-title-wrap">
+              <span class="kpi-title">SLA</span>
+              <span class="kpi-tag-mes" id="tag-mes-sla">Out/26</span>
+            </div>
+            <div class="kpi-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <polyline points="12 6 12 12 16 14"></polyline>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-value-row">
+            <div class="kpi-value" id="kpi-tma-medio">5d</div>
+            <span class="kpi-mom-badge up-danger" id="kpi-tma-mom" title="Comparativo do SLA contra o mês anterior">
+              &uarr; vs Set/26: +150% (+3d)
+            </span>
+          </div>
+          <div class="kpi-footer">
+            <span id="kpi-tma-footer-label">Consolidado 2026: <strong id="kpi-tma-consolidado">3d</strong></span>
+            <span>Meta: <strong>&le; 7 dias</strong></span>
+          </div>
+        </div>
+
+        <!-- Card 4: Ritmo Diário de Ordens (OS) -->
+        <div class="kpi-card warning" title="Média de ordens de serviço (OS) concluídas por dia útil pelas equipes.">
+          <div class="kpi-header">
+            <div class="kpi-title-wrap">
+              <span class="kpi-title">Ritmo Diário de Ordens (OS)</span>
+              <span class="kpi-tag-mes" id="tag-mes-ritmo">Out/26</span>
+            </div>
+            <div class="kpi-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+              </svg>
+            </div>
+          </div>
+          <div class="kpi-value-row">
+            <div class="kpi-value">
+              <span id="kpi-media-diaria">6</span>
+              <span class="kpi-unit">ordens/dia</span>
+            </div>
+            <span class="kpi-mom-badge down-neutral" id="kpi-ritmo-mom" title="Ritmo diário comparado com o mês anterior">
+              &darr; vs Set/26: -67% (-12/dia)
+            </span>
+          </div>
+          <div class="kpi-footer">
+            <span id="kpi-ritmo-footer-label">Consolidado 2026: <strong id="kpi-media-anual">15</strong> ordens/dia</span>
+            <span class="kpi-trend trend-up">&#10003; Capacidade Estável</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Gráfico Principal: Evolução de Atendimentos & SLA em Dias -->
+      <section style="margin-bottom: 24px;">
+        <div class="card" style="width: 100%;">
+          <div class="card-header pbi-card-header">
+            <div>
+              <div class="drill-title-row">
+                <h2 class="card-title" id="titulo-grafico-evolucao">Evolução de Atendimentos, SLA &amp; Backlog Pendente</h2>
+                <span class="drill-badge" id="drill-badge" style="display: none;">
+                  <span class="drill-dot"></span>
+                  <span id="drill-badge-text">Detalhando Mês</span>
+                </span>
+              </div>
+              <p class="card-subtitle" id="subtitulo-grafico-evolucao">Volume executado de ordens (barras azuis), SLA médio em dias (linha verde em 2º eixo) e passivo pendente em aberto (linha vermelha)</p>
+            </div>
+
+            <!-- Controles de Granularidade e Drill-Down (Estilo Power BI) -->
+            <div class="pbi-drill-controls">
+              <div class="drill-toggle-pills" id="drill-toggle-pills" role="group" aria-label="Granularidade temporal">
+                <button type="button" class="drill-pill-btn active" id="btn-drill-mes" title="Visão Consolidada por Mês (Padrão)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  <span>Mês</span>
+                </button>
+                <button type="button" class="drill-pill-btn" id="btn-drill-dia" title="Descer nível: Ver atendimentos dia a dia (Power BI)">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                  </svg>
+                  <span>Dia</span>
+                </button>
+              </div>
+
+              <!-- Botão Subir Nível (Up) -->
+              <button type="button" class="drill-pill-btn drill-up-btn" id="btn-drill-up" style="display: none;" title="Subir nível para Mês (Power BI)">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="18 15 12 9 6 15"></polyline>
+                </svg>
+                <span>Subir Nível (Mês)</span>
+              </button>
+            </div>
+          </div>
+          <div class="chart-wrapper" style="height: 380px;">
+            <canvas id="chartMensal"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Segunda Linha: Produtividade Recente e Equipes -->
+      <section class="grid-2">
+        <div class="card col-6">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Produtividade Diária (Últimos 30 Dias)</h2>
+              <p class="card-subtitle" id="subtitulo-chart-ultimos-dias">Oscilação diária de atendimento vs Linha de Capacidade Média (15/dia)</p>
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="chartUltimosDias"></canvas>
+          </div>
+        </div>
+
+        <div class="card col-6">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Produtividade &amp; SLA por Equipe (2026)</h2>
+              <p class="card-subtitle">Volume executado e SLA médio em dias de atendimento por equipe</p>
+            </div>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="chartEquipes"></canvas>
+          </div>
+          <!-- Resumo de SLA Individual das Equipes -->
+          <div class="equipes-sla-grid">
+            <div class="equipe-sla-badge-item">
+              <div class="eq-badge-top">
+                <span class="eq-badge-name">Equipe 6</span>
+                <span class="eq-badge-tag green">1d SLA</span>
+              </div>
+              <div class="eq-badge-sub">1.315 atend. &bull; 0 atrasos</div>
+            </div>
+            <div class="equipe-sla-badge-item">
+              <div class="eq-badge-top">
+                <span class="eq-badge-name">Equipe 01</span>
+                <span class="eq-badge-tag warning">4d SLA</span>
+              </div>
+              <div class="eq-badge-sub">1.250 atend. &bull; 85 atrasos</div>
+            </div>
+            <div class="equipe-sla-badge-item">
+              <div class="eq-badge-top">
+                <span class="eq-badge-name">Equipe 04</span>
+                <span class="eq-badge-tag green">3d SLA</span>
+              </div>
+              <div class="eq-badge-sub">99 atend. &bull; 0 atrasos</div>
+            </div>
+            <div class="equipe-sla-badge-item">
+              <div class="eq-badge-top">
+                <span class="eq-badge-name">Telegestão</span>
+                <span class="eq-badge-tag blue">0d Ronda</span>
+              </div>
+              <div class="eq-badge-sub">132 atend. &bull; 0 atrasos</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Seção: Diagnóstico de Ocorrências & SLA em Dias (Por Defeito e Por Bairro) -->
+      <section class="grid-2" style="margin-bottom: 24px;">
+        
+        <!-- CARD 1: SLA Médio (em Dias) por Natureza de Ocorrência -->
+        <div class="card col-6">
+          <div class="card-header" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h2 class="card-title">⏱️ SLA Médio (em Dias) por Ocorrência</h2>
+              <p class="card-subtitle">Tempo médio de resolução física para cada tipo de chamado reclamado</p>
+            </div>
+            <div class="card-actions">
+              <span class="badge badge-info" id="badge-tipo-sla-media">Limite SLA: 7d</span>
+            </div>
+          </div>
+          <div class="chart-wrapper" style="height: 320px;">
+            <canvas id="chartTiposSla"></canvas>
+          </div>
+          <div class="ocorrencias-summary-strip" id="ocorrencias-summary-strip" style="display: flex; gap: 12px; margin-top: 12px; font-size: 0.78rem; color: var(--text-dim); border-top: 1px solid var(--border-color); padding-top: 10px; flex-wrap: wrap;">
+            <span>🚨 <strong>Mais Demorados:</strong> Luminária Apagada (4d) &bull; Fio Exposto (3d)</span>
+            <span>⚡ <strong>Mais Rápidos:</strong> NOX Offline (1d) &bull; Poste Caído (2d)</span>
+          </div>
+        </div>
+
+        <!-- CARD 2: Comparativo de SLA da Ocorrência por Bairro -->
+        <div class="card col-6">
+          <div class="card-header" style="justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
+            <div>
+              <h2 class="card-title">🗺️ SLA por Bairro na Ocorrência Selecionada</h2>
+              <p class="card-subtitle">Descubra a discrepância de prazo entre bairros para o mesmo defeito</p>
+            </div>
+            <div class="card-actions select-bairro-container" style="min-width: 250px;">
+              <select id="select-ocorrencia-bairro" class="custom-select select-executivo">
+                <option value="Todas as Ocorrências" selected>Todas as Ocorrências Combinadas</option>
+                <option value="Luminária Apagada Durante a Noite">Luminária Apagada (Noite)</option>
+                <option value="Iluminação Pública - Outros">Iluminação Pública - Outros</option>
+                <option value="Lâmpada oscilando">Lâmpada oscilando</option>
+                <option value="Vários pontos apagados noite em sequencia">Vários pontos apagados</option>
+                <option value="NOX - nox offline">NOX Offline</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="chart-wrapper" style="height: 320px;">
+            <canvas id="chartBairroOcorrenciaSla"></canvas>
+          </div>
+
+          <div class="bairro-diagnostico-box" id="bairro-diagnostico-box" style="margin-top: 12px; padding: 10px 14px; background: var(--bg-card-sub); border: 1px solid var(--border-color); border-radius: 8px; font-size: 0.8rem; line-height: 1.4;">
+            <!-- Preenchido dinamicamente via JavaScript -->
+          </div>
+        </div>
+
+      </section>
+
+    </section>
+
+    <!-- ==================== ABA 2: SIMULADOR PREDITIVO & REGRESSÃO LINEAR ==================== -->
+    <section id="tab-simulador" class="tab-content">
+      
+      <div class="simulator-hero">
+        <div class="card-header" style="margin-bottom: 8px;">
+          <div>
+            <h2 class="card-title" style="font-size: 1.35rem;">
+              ⚡ Simulador Preditivo de Capacidade & Regressão Linear do Backlog
+            </h2>
+            <p class="card-subtitle" style="font-size: 0.9rem;">
+              Dimensione a equipe em tempo real: altere a meta de atendimentos diários e veja quantos dias úteis levará para zerar o backlog sem estourar o SLA.
+            </p>
+          </div>
+        </div>
+
+        <!-- Controles Interativos -->
+        <div class="sim-control-grid">
+          
+          <!-- Controle 1: Slider de Capacidade -->
+          <div class="control-item">
+            <div class="control-label">
+              <span>Capacidade Diária de Atendimento:</span>
+              <span class="control-val-badge" id="val-capacidade">15</span>
+            </div>
+            <input type="range" class="range-slider" id="slider-capacidade" min="1" max="40" step="1" value="15">
+            <div style="display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-dim);">
+              <span>1 (Mínimo)</span>
+              <span>15 (Média da Base)</span>
+              <span>40 (Turno Duplo)</span>
+            </div>
+          </div>
+
+          <!-- Controle 2: Alternância de Unidade -->
+          <div class="control-item">
+            <div class="control-label">
+              <span>Base de Cálculo da Simulação:</span>
+            </div>
+            <div class="toggle-group">
+              <button class="toggle-btn active" id="toggle-pontos">Pontos Físicos (32 pts)</button>
+              <button class="toggle-btn" id="toggle-chamados">Solicitações (11 ordens)</button>
+            </div>
+            <span style="font-size: 0.72rem; color: var(--text-dim); margin-top: 4px;">
+              *Recomendado: <strong>Pontos Físicos</strong>, pois reflete o trabalho real nos postes.
+            </span>
+          </div>
+
+        </div>
+
+        <!-- Métricas da Projeção -->
+        <div class="projection-metrics">
+          <div class="proj-card highlight">
+            <div class="proj-title">Tempo para Zerar Backlog</div>
+            <div class="proj-value" id="sim-dias-zerar" style="color: #60a5fa;">2 dias úteis</div>
+            <div class="proj-sub">Projeção linear direta</div>
+          </div>
+
+          <div class="proj-card">
+            <div class="proj-title">Data Estimada de Backlog Zero</div>
+            <div class="proj-value" id="sim-data-zerar" style="color: #34d399;">12/10/2026</div>
+            <div class="proj-sub">Excluindo fins de semana</div>
+          </div>
+
+          <div class="proj-card">
+            <div class="proj-title">Status da Capacidade</div>
+            <div class="proj-value" id="sim-velocidade-status" style="font-size: 1rem; margin-top: 8px;">
+              <span class="badge badge-success">Ritmo Excelente</span>
+            </div>
+            <div class="proj-sub">Frente à demanda reprimida</div>
+          </div>
+
+          <div class="proj-card">
+            <div class="proj-title">Avaliação de Risco de SLA</div>
+            <div class="proj-value" id="sim-risco-sla" style="font-size: 0.95rem; margin-top: 8px;">
+              <span class="text-success">100% no prazo mantido</span>
+            </div>
+            <div class="proj-sub">Chamados atualmente no prazo</div>
+          </div>
+        </div>
+
+        <!-- Calculadora Reversa -->
+        <div class="calculator-box">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2">
+              <rect x="4" y="2" width="16" height="20" rx="2"></rect>
+              <line x1="8" y1="6" x2="16" y2="6"></line>
+              <line x1="16" y1="14" x2="16" y2="18"></line>
+              <path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01"/>
+            </svg>
+            <div>
+              <span style="font-weight: 700; font-size: 0.95rem; color: var(--text-main);">Calculadora Reversa de Meta:</span>
+              <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">Quantos dias você quer que a equipe leve para zerar tudo?</p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span>Zerar em:</span>
+            <input type="number" id="input-meta-dias" class="calc-input" value="2" min="1" max="30">
+            <span>dias úteis &rarr; <strong>Capacidade Necessária:</strong></span>
+            <span class="control-val-badge" id="calc-capacidade-necessaria" style="font-size: 1.15rem; color: #34d399;">16/dia</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Gráfico da Regressão Linear / Burndown -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">Regressão Linear & Projeção de Queima do Backlog (Burndown)</h2>
+            <p class="card-subtitle">
+              Trajetória dia a dia de redução do backlog até zero chamados, comparando o cenário escolhido com ritmos alternativos
+            </p>
+          </div>
+        </div>
+        <div class="chart-wrapper-tall">
+          <canvas id="chartBurndown"></canvas>
+        </div>
+      </div>
+
+      <!-- Análise de Cenários -->
+      <div class="grid-2">
+        <div class="card col-4">
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: #f87171; margin-bottom: 8px;">
+            ⚠️ Cenário Crítico (5 atendimentos/dia)
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Se o ritmo cair para 5 pontos/dia, levará <strong>7 dias úteis</strong> para zerar. Consequência: <strong>100% dos 5 chamados de munícipes estourarão o SLA</strong> de 7 dias!
+          </p>
+        </div>
+
+        <div class="card col-4">
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: #60a5fa; margin-bottom: 8px;">
+            ⚡ Cenário Atual da Base (15 atendimentos/dia)
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Mantendo a média de 15,3/dia, a equipe zera todos os 32 pontos pendentes em <strong>apenas 2 dias úteis</strong>. Todos os chamados de munícipes são solucionados dentro do prazo regulamentar.
+          </p>
+        </div>
+
+        <div class="card col-4">
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: #34d399; margin-bottom: 8px;">
+            🚀 Cenário de Mutirão (25 atendimentos/dia)
+          </h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+            Com dedicação concentrada de 2 equipes (Equipe 6 + Equipe 01), o passivo completo é eliminado em <strong>1,3 dias (cerca de 24 horas úteis)</strong>.
+          </p>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== ABA 3: GESTÃO DO BACKLOG PENDENTE ==================== -->
+    <section id="tab-backlog" class="tab-content">
+      
+      <!-- Diagnóstico Crítico Minimizado por Padrão (Foco em Gráficos e Indicadores) -->
+      <details class="insight-accordion" id="accordion-diagnostico-ronda">
+        <summary class="insight-summary">
+          <div class="insight-summary-left">
+            <span style="font-size: 1rem;">🚨</span>
+            <span class="insight-summary-title">Diagnóstico Crítico: Fator "Ronda Própria" vs Call Center</span>
+            <span class="insight-summary-badge">6 ordens vencidas (27 pts) na Ronda</span>
+          </div>
+          <div class="insight-summary-right">
+            <span>Ver detalhes textuais</span>
+            <span class="insight-arrow">▼</span>
+          </div>
+        </summary>
+        <div class="insight-accordion-content">
+          Dos <strong>11 chamados pendentes</strong>, existe uma divisão nítida na operação:<br>
+          &bull; <strong>Call Center (Munícipes):</strong> 5 chamados (5 pontos) &rarr; Abertos entre 02/10 e 07/10. <strong>100% estão dentro do SLA</strong> (restam de 1 a 6 dias). A equipe atende a população rigorosamente no prazo!<br>
+          &bull; <strong>Ronda Própria (Inspeção Técnica Interna):</strong> 6 chamados (27 pontos!) &rarr; Abertos entre 18/08 e 22/09. <strong>100% estão com SLA vencido</strong> (atraso de até 44 dias). Os chamados da ronda foram preteridos em favor do Call Center, acumulando passivo nos bairros.
+        </div>
+      </details>
+
+      <!-- Linha do Tempo: Evolução dos Chamados Pendentes & Atendimentos Concluídos -->
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-header" style="flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 class="card-title">📈 Linha do Tempo: Backlog Pendente vs Chamados Atendidos</h2>
+            <p class="card-subtitle">
+              Comparativo contínuo entre os chamados resolvidos pela equipe e o passivo em aberto desde agosto (18/08). Comprova alta produtividade (452 ordens concluídas no mesmo período).
+            </p>
+          </div>
+          <div class="card-actions" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <div class="timeline-view-switch" style="display: inline-flex; background: var(--bg-card-sub); border: 1px solid var(--border-color); border-radius: 8px; padding: 2px;">
+              <button class="btn-timeline-toggle" id="btn-tl-diaria" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--text-dim);">Visão Diária (31 dias)</button>
+              <button class="btn-timeline-toggle active" id="btn-tl-marcos" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; background: var(--primary); color: #fff;">Marcos do Backlog (7 datas)</button>
+            </div>
+            <span class="badge badge-warning" id="badge-backlog-versao">
+              📁 Última Versão: ExportacaoConsulta (1).xlsx
+            </span>
+          </div>
+        </div>
+
+        <!-- Mini Strip de Indicadores do Backlog -->
+        <div class="backlog-timeline-kpis">
+          <div class="timeline-kpi-item">
+            <span class="tkpi-label">Passivo Atual em Aberto</span>
+            <span class="tkpi-val red" id="tkpi-pontos-atual">32 pts</span>
+            <span class="tkpi-sub" id="tkpi-chamados-atual">11 ordens ativas</span>
+          </div>
+          <div class="timeline-kpi-item">
+            <span class="tkpi-label">Origem Ronda Interna</span>
+            <span class="tkpi-val amber" id="tkpi-ronda-pts">27 pts (84%)</span>
+            <span class="tkpi-sub">Passivo represado</span>
+          </div>
+          <div class="timeline-kpi-item">
+            <span class="tkpi-label">Origem Call Center</span>
+            <span class="tkpi-val blue" id="tkpi-callcenter-pts">5 pts (16%)</span>
+            <span class="tkpi-sub">100% no prazo</span>
+          </div>
+          <div class="timeline-kpi-item">
+            <span class="tkpi-label">Atendidos no Período</span>
+            <span class="tkpi-val green" id="tkpi-atendidos-periodo">452 ordens</span>
+            <span class="tkpi-sub" id="tkpi-dias-operacao">31 dias ativos desde 18/08</span>
+          </div>
+        </div>
+
+        <div class="chart-wrapper-tall" style="height: 340px; margin-top: 16px;">
+          <canvas id="chartEvolucaoPendentes"></canvas>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h2 class="card-title" id="titulo-tabela-backlog">Lista Completa de Solicitações Pendentes</h2>
+            <p class="card-subtitle" id="table-total-count">11 ordens exibidas</p>
+          </div>
+          
+          <div class="card-actions" style="flex-wrap: wrap;">
+            <!-- Campo de Busca Reativa -->
+            <input type="text" id="input-busca-pendentes" class="search-input" placeholder="🔍 Buscar por protocolo, bairro...">
+
+            <!-- Filtros Rápidos -->
+            <button class="btn-header filter-btn active" data-filter="todos">Todos (11)</button>
+            <button class="btn-header filter-btn" data-filter="vencidos" style="color: #f87171;">Vencidos (6)</button>
+            <button class="btn-header filter-btn" data-filter="no_prazo" style="color: #34d399;">No Prazo (5)</button>
+            <button class="btn-header filter-btn" data-filter="ronda" style="color: #fbbf24;">Ronda (27 pts)</button>
+            <button class="btn-header filter-btn" data-filter="callcenter" style="color: #60a5fa;">Call Center (5 pts)</button>
+          </div>
+        </div>
+
+        <!-- Banner Interativo de Filtro por Clique no Gráfico -->
+        <div id="banner-filtro-grafico" class="grafico-filter-banner" style="display: none;">
+          <div class="grafico-filter-left">
+            <span style="font-size: 1.15rem;">🎯</span>
+            <div>
+              <div class="grafico-filter-title">
+                Filtrado pelo ponto no gráfico: <span id="grafico-filter-data" style="color: var(--primary);">02/10</span> &bull; <span id="grafico-filter-desc">7 ordens acumuladas no backlog</span>
+              </div>
+              <div class="grafico-filter-hint">
+                Alternar visualização entre o passivo acumulado até a data ou ordens abertas no dia:
+              </div>
+            </div>
+            <div class="filter-mode-switch">
+              <button class="btn-micro-toggle active" id="btn-filtro-acumulado" title="Ver ordens acumuladas no backlog até esta data">Acumulado até a data</button>
+              <button class="btn-micro-toggle" id="btn-filtro-dia" title="Ver ordens abertas especificamente nesta data">Abertas no dia</button>
+            </div>
+          </div>
+          <button id="btn-limpar-filtro-grafico" class="btn-clear-filter">
+            ✕ Limpar Filtro (Ver Todas)
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead id="thead-backlog-tabela">
+              <tr>
+                <th>Protocolo</th>
+                <th>Data Abertura</th>
+                <th>Origem</th>
+                <th>Pontos Físicos</th>
+                <th>Bairro(s)</th>
+                <th>Solicitante</th>
+                <th>Status SLA</th>
+                <th>Tempo Restante / Atraso</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-pendentes">
+              <!-- Preenchido via Javascript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== ABA 4: DISTRIBUIÇÃO POR BAIRROS ==================== -->
+    <section id="tab-bairros" class="tab-content">
+      <div class="bairros-layout-grid">
+        
+        <!-- LADO ESQUERDO: GRÁFICO DE BARRAS VERTICAIS -->
+        <div class="card bairros-chart-card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title">Distribuição de Atendimentos &amp; SLA por Bairro</h2>
+              <p class="card-subtitle">Volume executado (barras azuis) interceptado pelo SLA médio em dias (linha verde em 2º eixo)</p>
+            </div>
+          </div>
+          <div class="bairros-chart-wrapper">
+            <canvas id="chartBairros"></canvas>
+          </div>
+        </div>
+
+        <!-- LADO DIREITO: QUADROS EMPILHADOS UM EM CIMA DO OUTRO -->
+        <div class="bairros-side-column">
+          
+          <div class="card bairros-info-card">
+            <div class="card-header" style="margin-bottom: 10px;">
+              <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                <span style="color: #ef4444;">📍</span> Concentração de Demandas Pendentes
+              </h3>
+            </div>
+            <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+              Dos bairros com chamados em aberto no momento:<br>
+              &bull; <strong>Barretos Centro, Jardim Allah e Jardim São Paulo:</strong> 9 pontos (Ronda 1867977/10)<br>
+              &bull; <strong>Jardim Europa e Los Angeles:</strong> 6 pontos (Ronda 1868101/13)<br>
+              &bull; <strong>Pedro Cavalini:</strong> 5 pontos (Ronda 1878415/19)<br>
+              &bull; <strong>Dom João Bosco e Marília:</strong> 4 pontos (Ronda 1868096/11)<br>
+              <span style="display: block; margin-top: 8px; font-weight: 600; color: #2563eb;">
+                💡 Recomendação: Realizar rota geográfica agrupada por região (Sul/Leste) para economizar deslocamento.
+              </span>
+            </p>
+          </div>
+
+          <div class="card bairros-info-card">
+            <div class="card-header" style="margin-bottom: 10px;">
+              <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
+                <span style="color: #10b981;">⚡</span> Eficiência Logística de Campo
+              </h3>
+            </div>
+            <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
+              A distância média entre pontos atendidos pela equipe em Barretos é de apenas <strong>1,7m a 13,9m</strong> por chamada em vias urbanas.<br>
+              Ao agrupar os 4 chamados da zona sul no mesmo turno, a produtividade diária estimada sobe de 15 para até <strong>25 pontos/dia</strong> com economia direta de combustível.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== ABA 5: RESUMO DO DIA • VISÃO MARCELA ==================== -->
+    <section id="tab-pitch" class="tab-content">
+      
+      <!-- HERO EXECUTIVE BRIEFING -->
+      <div class="resumo-hero">
+        <div class="resumo-hero-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+          </svg>
+          ⭐ BRIEFING DIÁRIO &bull; VISÃO EXECUTIVA MARCELA
+        </div>
+        <h2 class="resumo-hero-title">
+          Resumo do Dia &bull; Marcela
+        </h2>
+        <p class="resumo-hero-sub">
+          Visão consolidada em 60 segundos sobre o status da operação de iluminação pública em Barretos. O cockpit executivo que resume metas, gargalos pontuais e ações recomendadas para o dia sem necessidade de navegar pelas demais páginas.
+        </p>
+
+        <!-- Status Bar Sintética -->
+        <div class="resumo-status-strip">
+          <span class="resumo-pill status-green">
+            <span class="status-dot"></span>
+            <strong>Status Geral:</strong> Operação Saudável &amp; Sob Controle
+          </span>
+          <span class="resumo-pill">
+            ⚡ <strong>SLA Médio:</strong> 3 dias (Limite: até 7d)
+          </span>
+          <span class="resumo-pill">
+            📍 <strong>Backlog Real:</strong> 32 pontos (11 ordens)
+          </span>
+          <span class="resumo-pill status-blue">
+            ⏱️ <strong>Tempo p/ Zerar:</strong> 1 a 2 dias úteis
+          </span>
+        </div>
+      </div>
+
+      <!-- OS 4 PILARES DA OPERAÇÃO HOJE -->
+      <div class="resumo-pillars-grid">
+        
+        <!-- PILAR 1: SAÚDE OPERACIONAL -->
+        <div class="resumo-pillar-card">
+          <div class="resumo-pillar-header">
+            <div class="resumo-pillar-icon green">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <div class="resumo-pillar-titles">
+              <div class="resumo-pillar-tag green">Pilar 01 &bull; Desempenho Contratual</div>
+              <h3 class="resumo-pillar-title">Saúde da Operação em Alta</h3>
+            </div>
+          </div>
+          <div class="resumo-pillar-body">
+            A operação em Barretos opera com excelente tração em 2026: o SLA médio de atendimento é de <strong>3 dias</strong> (com mediana de 1 dia — metade dos chamados resolvida em 24h), superando amplamente o prazo limite regulamentar de até 7 dias (168h). Já são mais de <strong>56 mil atendimentos</strong> acumulados no contrato.
+          </div>
+          <div class="resumo-pillar-footer">
+            <span style="color: var(--text-dim);">Conclusão Executiva</span>
+            <span style="color: var(--success); font-weight: 700;">🟢 Risco Contratual Zero</span>
+          </div>
+        </div>
+
+        <!-- PILAR 2: DIAGNÓSTICO DO BACKLOG -->
+        <div class="resumo-pillar-card">
+          <div class="resumo-pillar-header">
+            <div class="resumo-pillar-icon red">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+            </div>
+            <div class="resumo-pillar-titles">
+              <div class="resumo-pillar-tag red">Pilar 02 &bull; Ponto Crítico de Atenção</div>
+              <h3 class="resumo-pillar-title">Onde Está o Backlog Real</h3>
+            </div>
+          </div>
+          <div class="resumo-pillar-body">
+            O painel registra apenas <strong>11 ordens abertas</strong>, representando <strong>32 pontos físicos</strong> a reparar. Ponto decisivo: <strong>100% dos chamados abertos pela população (Call Center) estão rigorosamente no prazo</strong>. Os 6 chamados em atraso vieram da nossa <strong>Ronda Interna</strong>, que acumulou até 9 pontos por chamado e ficaram represados até 44 dias.
+          </div>
+          <div class="resumo-pillar-footer">
+            <span style="color: var(--text-dim);">Foco de Ação</span>
+            <span style="color: var(--danger); font-weight: 700;">🔴 Liquidar os 6 lotes de Ronda</span>
+          </div>
+        </div>
+
+        <!-- PILAR 3: RESOLUÇÃO PREDITIVA -->
+        <div class="resumo-pillar-card">
+          <div class="resumo-pillar-header">
+            <div class="resumo-pillar-icon blue">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+              </svg>
+            </div>
+            <div class="resumo-pillar-titles">
+              <div class="resumo-pillar-tag blue">Pilar 03 &bull; Capacidade &amp; IA Preditiva</div>
+              <h3 class="resumo-pillar-title">Tempo Estimado para Zerar</h3>
+            </div>
+          </div>
+          <div class="resumo-pillar-body">
+            A capacidade de entrega atual é de <strong>15 ordens executadas por dia</strong>. Com essa capacidade de campo, todo o passivo de 32 pontos pendentes é <strong>liquidado em 1 a 2 dias úteis</strong>. Com o reforço integrado das Equipes 06 e 01, o backlog é zerado em menos de 24 horas úteis sem necessidade de horas extras adicionais.
+          </div>
+          <div class="resumo-pillar-footer">
+            <span style="color: var(--text-dim);">Previsão de Conclusão</span>
+            <span style="color: var(--primary); font-weight: 700;">⚡ Até 48 horas úteis</span>
+          </div>
+        </div>
+
+        <!-- PILAR 4: LOGÍSTICA DE CAMPO -->
+        <div class="resumo-pillar-card">
+          <div class="resumo-pillar-header">
+            <div class="resumo-pillar-icon purple">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
+                <line x1="8" y1="2" x2="8" y2="18"></line>
+                <line x1="16" y1="6" x2="16" y2="22"></line>
+              </svg>
+            </div>
+            <div class="resumo-pillar-titles">
+              <div class="resumo-pillar-tag purple">Pilar 04 &bull; Logística Geográfica</div>
+              <h3 class="resumo-pillar-title">Rota Otimizada de Campo</h3>
+            </div>
+          </div>
+          <div class="resumo-pillar-body">
+            A distância entre os pontos pendentes é curta (média de <strong>1,7m a 13,9m</strong> entre chamados próximos). A maior densidade está na <strong>Zona Sul (bairros Cristiano de Carvalho, Barretos II e Cecap)</strong>. Ao agrupar a rota por cluster territorial, a produtividade diária salta de 15 para até <strong>25 pontos/dia</strong> com economia direta de combustível.
+          </div>
+          <div class="resumo-pillar-footer">
+            <span style="color: var(--text-dim);">Ganho Operacional</span>
+            <span style="color: #8b5cf6; font-weight: 700;">🚀 +66% de Produtividade</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CHECKLIST DE DECISÕES DIRECIONADAS PARA A MARCELA -->
+      <div class="resumo-decisions-card">
+        <div class="card-header" style="margin-bottom: 16px;">
+          <div>
+            <h2 class="card-title" style="font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
+              <span>🎯</span> 3 Decisões e Orientações Estratégicas para Marcela Hoje
+            </h2>
+            <p class="card-subtitle">Ações executivas imediatas para blindar indicadores e manter Barretos como referência</p>
+          </div>
+        </div>
+
+        <div class="decision-item">
+          <div class="decision-icon">1</div>
+          <div class="decision-content">
+            <div class="decision-title">Autorizar Mutirão Concentrado de 48h para os 6 Lotes de Ronda</div>
+            <div class="decision-desc">
+              Determinar que a coordenação operacional aloque as Equipes 06 e 01 exclusivamente na Zona Sul nos próximos 2 dias. Com isso, os 6 chamados mais antigos de ronda serão baixados no sistema e o backlog em atraso retornará a <strong>zero absoluto</strong>.
+            </div>
+          </div>
+        </div>
+
+        <div class="decision-item">
+          <div class="decision-icon">2</div>
+          <div class="decision-content">
+            <div class="decision-title">Adequar Abertura de Chamados de Ronda no Sistema Exati</div>
+            <div class="decision-desc">
+              Para evitar que novos lotes com 7 a 9 lâmpadas continuem acumulando prazo em lote único, orientar os fiscais de campo a cadastrarem chamados de ronda fracionados (máximo de 3 pontos por chamado) ou com subtarefas independentes.
+            </div>
+          </div>
+        </div>
+
+        <div class="decision-item">
+          <div class="decision-icon">3</div>
+          <div class="decision-content">
+            <div class="decision-title">Adotar Esta Página como Cockpit Semanal de Diretoria</div>
+            <div class="decision-desc">
+              Utilizar esta aba como a síntese oficial semanal do PMO. Acompanhando o SLA semanalmente acima de 90%, garantimos pontuação máxima de performance contratual perante a prefeitura e os munícipes.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dicionário de Indicadores -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📘 Dicionário de Indicadores (KPIs) para a Gestão</h2>
+            <p class="card-subtitle">Conceitos, fórmulas e referências recomendadas para diretoria</p>
+          </div>
+        </div>
+
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Indicador</th>
+                <th>O que mede?</th>
+                <th>Como é Calculado?</th>
+                <th>Valor Atual</th>
+                <th>Meta Recomendada</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>SLA Médio (em Dias)</strong></td>
+                <td>Prazo médio transcorrido entre a abertura da ocorrência pelo munícipe e sua conclusão física.</td>
+                <td>&sum; (Data Conclusão - Data Reclamação) / Total de Atendimentos com Chamado</td>
+                <td><strong style="color: #10b981;">3 dias</strong> (mediana 1d)</td>
+                <td>&le; 3 dias (Limite: 7d)</td>
+              </tr>
+              <tr>
+                <td><strong>Backlog Físico (Pontos)</strong></td>
+                <td>Quantidade de pontos luminosos reais aguardando reparo na cidade.</td>
+                <td>Soma do campo 'Pontos de solicitação' da pasta Pendentes</td>
+                <td><span class="badge badge-danger">32 pontos</span> (em 11 ordens)</td>
+                <td>&le; 20 pontos ativos</td>
+              </tr>
+              <tr>
+                <td><strong>Ritmo Diário (Throughput)</strong></td>
+                <td>Média de chamados concluídos por dia de trabalho da equipe de campo.</td>
+                <td>Total Atendidos no Período / Número de Dias com Operação</td>
+                <td><strong style="color: #fbbf24;">15 / dia</strong></td>
+                <td>15 a 20 / dia</td>
+              </tr>
+              <tr>
+                <td><strong>Dias para Zerar (Backlog Burndown)</strong></td>
+                <td>Tempo necessário estimado via regressão para eliminar todo o passivo em aberto.</td>
+                <td>Backlog Restante / Capacidade Diária Pactuada</td>
+                <td><span class="badge badge-info">2.0 dias úteis</span></td>
+                <td>&le; 3.0 dias úteis</td>
+              </tr>
+              <tr>
+                <td><strong>Aging do Backlog</strong></td>
+                <td>Idade cronológica dos chamados que continuam em aberto.</td>
+                <td>Data Atual - Data da Solicitação</td>
+                <td>Até 44 dias (Ronda)</td>
+                <td>Zero chamados &gt; 7 dias</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== ABA: TABELA ANALÍTICA (DRILL-DOWN SLA) ==================== -->
+    <section id="tab-analitico" class="tab-content">
+
+      <!-- Header Informativo com Rastreabilidade de Cálculo -->
+      <div class="card analitico-top-card" style="margin-bottom: 10px; padding: 12px 18px 14px 18px;">
+        <div class="card-header" style="flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color);">
+          <div>
+            <h2 class="card-title" style="font-size: 1.12rem; margin-bottom: 2px;">🔍 Explorador Analítico & Auditoria de Indicadores</h2>
+            <p class="card-subtitle" style="font-size: 0.76rem;">Auditoria linha a linha das 2.796 ordens de serviço executadas em 2026 &bull; SLA Médio Consolidado: 3 dias</p>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button id="btn-exportar-analitico" class="btn-export-excel" title="Exportar todas as linhas filtradas em planilha Excel (.xlsx)">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="8" y1="13" x2="16" y2="13"></line>
+                <line x1="8" y1="17" x2="16" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              <span>Exportar Linhas em Excel (.xlsx)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Strip de Mini-KPIs Dinâmicos (Imediatamente no Topo) -->
+        <div class="analitico-kpi-grid">
+          <div class="analitico-kpi-card">
+            <span class="analitico-kpi-label">Ordens Filtradas</span>
+            <span class="analitico-kpi-val" id="analitico-kpi-total">2.796</span>
+            <span class="analitico-kpi-sub">Total no filtro ativo</span>
+          </div>
+          <div class="analitico-kpi-card">
+            <span class="analitico-kpi-label">SLA</span>
+            <span class="analitico-kpi-val highlight-blue" id="analitico-kpi-tma">3 dias</span>
+            <span class="analitico-kpi-sub" id="analitico-kpi-horas">~63 horas</span>
+          </div>
+          <div class="analitico-kpi-card">
+            <span class="analitico-kpi-label">Ordens no Prazo</span>
+            <span class="analitico-kpi-val highlight-green" id="analitico-kpi-noprazo-count">885</span>
+            <span class="analitico-kpi-sub">Dentro do SLA (≤ 7 dias)</span>
+          </div>
+          <div class="analitico-kpi-card">
+            <span class="analitico-kpi-label">Ordens Atrasadas</span>
+            <span class="analitico-kpi-val highlight-red" id="analitico-kpi-atrasadas">72</span>
+            <span class="analitico-kpi-sub">Excederam 7 dias (> 7d)</span>
+          </div>
+          <div class="analitico-kpi-card">
+            <span class="analitico-kpi-label">Rondas Preventivas</span>
+            <span class="analitico-kpi-val highlight-gray" id="analitico-kpi-ronda">1.839</span>
+            <span class="analitico-kpi-sub">Vistoria sem reclamação</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metodologia e Explicação Minimizada por Padrão (Estilo Gestão do Backlog) -->
+      <details class="insight-accordion info" id="accordion-metodologia-sla" style="margin-bottom: 10px;">
+        <summary class="insight-summary">
+          <div class="insight-summary-left">
+            <span style="font-size: 1rem;">💡</span>
+            <span class="insight-summary-title">Metodologia &amp; Auditoria: Como o SLA em dias é calculado linha a linha?</span>
+            <span class="insight-summary-badge" id="badge-metodologia-sla">957 com chamado (Base do SLA) &bull; 1.839 rondas</span>
+          </div>
+          <div class="insight-summary-right">
+            <span>Ver metodologia</span>
+            <span class="insight-arrow">▼</span>
+          </div>
+        </summary>
+        <div class="insight-accordion-content">
+          <strong>Como o SLA em dias é calculado linha a linha?</strong><br>
+          Das <strong>2.804 ordens de 2026</strong>, <strong>957 foram abertas com chamado de munícipe</strong> (possuem Data da Reclamação formal). O tempo de resolução de cada ordem é a diferença exata em dias corridos entre <code>Data Conclusão - Data Reclamação</code>.<br>
+          &bull; <strong>SLA Geral: 3 dias</strong> (arredondado para número inteiro).<br>
+          &bull; <strong>Ordens no Prazo: 885 ordens (92,5%)</strong> atendidas dentro do limite contratual de até 7 dias.<br>
+          &bull; <strong>Ordens Atrasadas: 72 ordens (7,5%)</strong> excederam o prazo contratual de 7 dias.<br>
+          &bull; <strong>Rondas Preventivas: 1.839 ordens</strong> realizadas proativamente pela concessionária (sem reclamação prévia).
+        </div>
+      </details>
+
+      <!-- Barra de Filtros e Busca Rápida (Compacta) -->
+      <div class="card analitico-filter-card" style="margin-bottom: 10px; padding: 10px 14px;">
+        <div class="analitico-filter-toolbar">
+          <div class="analitico-search-box">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="busca-analitico" placeholder="Buscar OS, protocolo, bairro, equipe, defeito..." autocomplete="off">
+            <button id="btn-limpar-busca" class="btn-clear" title="Limpar busca" style="display: none;">&times;</button>
+          </div>
+
+          <div class="analitico-select-group">
+            <label for="filtro-analitico-sla" class="filter-label">SLA:</label>
+            <select id="filtro-analitico-sla" class="custom-select">
+              <option value="todos">Todos os Status</option>
+              <option value="com_rec">Munícipes (com Reclamação)</option>
+              <option value="no_prazo">✓ No Prazo (≤ 7 dias)</option>
+              <option value="atrasado">⚠️ Atrasado (> 7 dias)</option>
+              <option value="ronda">🛡️ Ronda Interna</option>
+            </select>
+          </div>
+
+          <div class="analitico-select-group">
+            <label for="filtro-analitico-tma" class="filter-label">Faixa:</label>
+            <select id="filtro-analitico-tma" class="custom-select">
+              <option value="todas">Todas as Faixas</option>
+              <option value="rapido">⚡ SLA Rápido (≤ 1 dia)</option>
+              <option value="padrao">⏱️ SLA Padrão (2 a 3 dias)</option>
+              <option value="limite">⚠️ SLA Limite (4 a 7 dias)</option>
+              <option value="critico">🚨 Acima do SLA (> 7 dias)</option>
+            </select>
+          </div>
+
+          <div class="analitico-select-group">
+            <label for="filtro-analitico-equipe" class="filter-label">Equipe:</label>
+            <select id="filtro-analitico-equipe" class="custom-select">
+              <option value="todas">Todas as Equipes</option>
+            </select>
+          </div>
+
+          <div class="analitico-select-group">
+            <label for="filtro-analitico-origem" class="filter-label">Origem:</label>
+            <select id="filtro-analitico-origem" class="custom-select">
+              <option value="todas">Todas as Origens</option>
+              <option value="callcenter">📞 Call Center</option>
+              <option value="ronda">🛡️ Ronda (Própria / Interna)</option>
+              <option value="app">📱 App Munícipe</option>
+              <option value="internet">🌐 Internet / Web</option>
+              <option value="telegestao">📡 Telegestão (NOX)</option>
+              <option value="chatbot">🤖 Chatbot</option>
+            </select>
+          </div>
+
+          <button id="btn-reset-analitico" class="btn-reset-analitico" title="Limpar todos os filtros">
+            <span>↺ Limpar Filtros</span>
+          </button>
+        </div>
+
+        <!-- Chips de 1 Clique para Filtro Imediato -->
+        <div class="analitico-quick-chips">
+          <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-dim); margin-right: 2px;">Atalhos rápidos:</span>
+          <button class="quick-chip" data-origem="callcenter">📞 Call Center</button>
+          <button class="quick-chip" data-origem="ronda">🛡️ Rondas</button>
+          <button class="quick-chip" data-sla="atrasado">🚨 Atrasados (> 7d)</button>
+          <button class="quick-chip" data-sla="com_rec">📞 Munícipes (Base 3d)</button>
+          <button class="quick-chip" data-tma="rapido">⚡ SLA ≤ 24h</button>
+          <button class="quick-chip active" data-reset="true">🔄 Todos (<span id="analitico-chip-total">2.796</span>)</button>
+        </div>
+      </div>
+
+      <!-- Tabela Analítica de Ordens -->
+      <div class="card">
+        <div class="card-header" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <h3 class="card-title" style="font-size: 1rem;">Registros de Atendimento (<span id="analitico-table-count">2.796</span>)</h3>
+            <span class="badge badge-info" id="analitico-sort-info" style="font-size: 0.72rem;">Ordenado por: SLA em Dias (Maior p/ Menor)</span>
+          </div>
+
+          <div class="analitico-page-size-selector">
+            <label for="analitico-per-page" style="font-size: 0.8rem; color: var(--text-dim);">Linhas por página:</label>
+            <select id="analitico-per-page" class="custom-select" style="padding: 4px 8px; font-size: 0.8rem; height: auto;">
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-responsive" style="max-height: 640px; overflow-y: auto;">
+          <table class="data-table analitico-table" id="tabela-analitico">
+            <thead>
+              <tr>
+                <th data-sort="os" class="sortable">OS / Chamado <span class="sort-icon">↕</span></th>
+                <th data-sort="origem" class="sortable">Origem <span class="sort-icon">↕</span></th>
+                <th data-sort="dt_rec" class="sortable">Data Reclamação <span class="sort-icon">↕</span></th>
+                <th data-sort="dt_fim" class="sortable">Data Conclusão <span class="sort-icon">↕</span></th>
+                <th data-sort="dias" class="sortable active-sort desc">SLA / Resolução (Dias) <span class="sort-icon">▼</span></th>
+                <th data-sort="sla" class="sortable">Status SLA <span class="sort-icon">↕</span></th>
+                <th data-sort="eq" class="sortable">Equipe <span class="sort-icon">↕</span></th>
+                <th data-sort="bairro" class="sortable">Bairro <span class="sort-icon">↕</span></th>
+                <th>Defeito Reclamado</th>
+                <th>Solução Aplicada</th>
+              </tr>
+            </thead>
+            <tbody id="analitico-tbody">
+              <!-- Renderizado via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Barra de Paginação -->
+        <div class="analitico-pagination">
+          <div class="pagination-info" id="analitico-page-info">
+            Mostrando 1–25 de 2.796 ordens
+          </div>
+          <div class="pagination-buttons">
+            <button id="analitico-first" class="btn-page" title="Primeira Página">&laquo;</button>
+            <button id="analitico-prev" class="btn-page" title="Página Anterior">&lsaquo; Anterior</button>
+            <span id="analitico-current-page-num" class="page-current-pill">1</span>
+            <button id="analitico-next" class="btn-page" title="Próxima Página">Próxima &rsaquo;</button>
+            <button id="analitico-last" class="btn-page" title="Última Página">&raquo;</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================== ABA 6: GUIA POWER BI ==================== -->
+    <section id="tab-powerbi" class="tab-content">
+      
+      <div class="card" style="margin-bottom: 24px;">
+        <div class="card-header">
+          <div>
+            <h2 class="card-title">📈 Guia de Implantação no Power BI</h2>
+            <p class="card-subtitle">Como transformar este modelo e a base de dados em um relatório Power BI oficial</p>
+          </div>
+        </div>
+
+        <p style="font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+          Já geramos na pasta do projeto o arquivo consolidado <code>base_consolidada_powerbi.xlsx</code>. Para criar no Power BI Desktop, basta importar as abas <strong>Historico_Mensal</strong>, <strong>Backlog_Pendentes</strong> e <strong>Desempenho_Equipes_2026</strong> e criar as seguintes Medidas DAX:
+        </p>
+
+        <div style="margin-bottom: 18px;">
+          <h4 style="color: #60a5fa; font-size: 0.9rem; margin-bottom: 6px;">1. Percentual de SLA Cumprido no Prazo (% SLA)</h4>
+          <div class="code-container">
+            <button class="btn-copy" data-code="dax-1">Copiar DAX</button>
+            <pre id="dax-1">% SLA no Prazo = 
+DIVIDE(
+    CALCULATE(COUNTROWS(fAtendidos), fAtendidos[Atraso] = "Não"),
+    CALCULATE(COUNTROWS(fAtendidos), fAtendidos[Atraso] IN { "Não", "Sim" }),
+    0
+)</pre>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <h4 style="color: #60a5fa; font-size: 0.9rem; margin-bottom: 6px;">2. Backlog Total de Pontos Físicos</h4>
+          <div class="code-container">
+            <button class="btn-copy" data-code="dax-2">Copiar DAX</button>
+            <pre id="dax-2">Backlog Pontos = SUM(fPendentes[pontos])</pre>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <h4 style="color: #60a5fa; font-size: 0.9rem; margin-bottom: 6px;">3. Média Diária de Atendimentos</h4>
+          <div class="code-container">
+            <button class="btn-copy" data-code="dax-3">Copiar DAX</button>
+            <pre id="dax-3">Media Diaria Atendimentos = 
+AVERAGEX(
+    VALUES(dCalendario[Data]),
+    CALCULATE(COUNTROWS(fAtendidos))
+)</pre>
+          </div>
+        </div>
+
+        <div style="margin-bottom: 18px;">
+          <h4 style="color: #60a5fa; font-size: 0.9rem; margin-bottom: 6px;">4. Dias Preditivos para Zerar Backlog (What-If Parameter)</h4>
+          <div class="code-container">
+            <button class="btn-copy" data-code="dax-4">Copiar DAX</button>
+            <pre id="dax-4">Dias Para Zerar Backlog = 
+VAR BacklogAtual = [Backlog Pontos]
+VAR CapacidadeDiaria = SELECTEDVALUE('Parametro Capacidade'[Valor], 15)
+RETURN
+DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
+          </div>
+        </div>
+
+      </div>
+    </section> <!-- fim #tab-powerbi -->
+
+  </main> <!-- fim .main-container -->
+</div> <!-- fim .app-layout -->
+
+  <!-- Modal de Upload de Novas Planilhas -->
+  <div class="modal-overlay" id="modal-upload">
+    <div class="modal-card">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+        📂 Importar Nova Planilha do Exati
+      </h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+        Arraste uma planilha de <strong>Pendentes</strong> ou <strong>Atendidos</strong> (`.xlsx` ou `.xls`). Os dados e indicadores serão recalculados em tempo real na tela!
+      </p>
+
+      <!-- Seletor de Categoria / Destino da Planilha -->
+      <div class="upload-category-selector">
+        <label class="category-chip active" id="chip-cat-auto">
+          <input type="radio" name="upload-cat" value="auto" checked>
+          <span>⚡ Detecção Automática (Nome do Arquivo)</span>
+        </label>
+        <label class="category-chip" id="chip-cat-pendentes">
+          <input type="radio" name="upload-cat" value="pendentes">
+          <span>📋 Chamados Pendentes (Base de dados/Pendentes)</span>
+        </label>
+        <label class="category-chip" id="chip-cat-atendidos">
+          <input type="radio" name="upload-cat" value="atendidos">
+          <span>✅ Ordens Atendidas (Base de dados/Atendidos)</span>
+        </label>
+      </div>
+
+      <div class="drop-zone" id="drop-zone">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" style="margin-bottom: 12px;">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+        </svg>
+        <p style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);" id="drop-zone-main-text">
+          Arraste o arquivo aqui ou <span style="color: var(--primary);">clique para selecionar</span>
+        </p>
+        <p style="font-size: 0.78rem; color: var(--text-dim); margin-top: 4px;" id="drop-zone-sub-text">
+          Se tiver 'sgi' no nome &rarr; pasta Atendidos | Se tiver 'consulta' no nome &rarr; pasta Pendentes
+        </p>
+      </div>
+      <input type="file" id="file-input" accept=".xlsx, .xls" style="display: none;">
+
+      <!-- Caixa de Preview do Arquivo e Confirmação de Envio -->
+      <div id="upload-preview-box" class="upload-preview-box" style="display: none;">
+        <div class="ufile-meta-row">
+          <div class="ufile-info">
+            <span class="ufile-icon">📄</span>
+            <div>
+              <strong id="ufile-name" style="display: block; font-size: 0.92rem; color: var(--text-main);">ExportacaoConsulta.xlsx</strong>
+              <span id="ufile-size" style="font-size: 0.76rem; color: var(--text-dim);">14.2 KB</span>
+            </div>
+          </div>
+          <span id="ufile-target" class="ufile-badge-target pendente">
+            📁 Destino: Base de dados/Pendentes
+          </span>
+        </div>
+
+        <!-- Alerta de Sobrescrita de Atualização Feita Hoje -->
+        <div id="upload-overwrite-warning" class="upload-warning-banner" style="display: none;">
+          <div class="warning-icon-wrap">
+            <span class="warning-icon">⚠️</span>
+          </div>
+          <div class="warning-content">
+            <div class="warning-title" id="overwrite-warning-title">
+              Base já atualizada hoje!
+            </div>
+            <div class="warning-desc" id="overwrite-warning-desc">
+              O painel já foi atualizado hoje às <strong id="overwrite-time">--:--</strong> com a planilha <strong id="overwrite-file">--</strong>.
+              <br>
+              Você pretende atualizar com os dados atuais? <em>Isso substituirá a atualização feita hoje.</em>
+            </div>
+          </div>
+        </div>
+
+        <!-- Painel de Auditoria e Mapeamento Inteligente de Colunas -->
+        <div id="column-audit-box" class="column-audit-card" style="display: none;">
+          <div class="audit-stat-strip">
+            <span style="font-weight: 700; font-size: 0.84rem; color: var(--text-main);">
+              🧠 Reconhecimento Inteligente de Colunas:
+            </span>
+            <span class="audit-badge success" id="audit-confidence-badge">
+              🎯 100% Mapeado
+            </span>
+          </div>
+          <p style="font-size: 0.76rem; color: var(--text-dim); margin: 4px 0 8px 0;" id="audit-summary-text">
+            Todas as colunas foram identificadas independentemente da posição na planilha.
+          </p>
+          <div style="max-height: 180px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px;">
+            <table class="audit-table-mini">
+              <thead>
+                <tr>
+                  <th>Indicador Semântico</th>
+                  <th>Coluna Encontrada no Exati</th>
+                  <th>Posição no Excel</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="audit-tbody">
+                <!-- Preenchido dinamicamente via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <button id="btn-confirm-upload" class="btn-confirm-upload">
+          <span>🚀 Confirmar &amp; Atualizar Painel</span>
+        </button>
+
+        <div style="display: flex; justify-content: center; margin-top: 8px;">
+          <button id="btn-reset-original-data" type="button" style="background: transparent; border: none; color: var(--text-dim); font-size: 0.76rem; text-decoration: underline; cursor: pointer; padding: 4px 8px; transition: color 0.2s ease;">
+            ↺ Descartar cache e restaurar base original
+          </button>
+        </div>
+      </div>
+
+      <!-- Barra de Progresso / Loading -->
+      <div id="upload-loading-bar" class="upload-loading-bar" style="display: none;">
+        <div class="spinner"></div>
+        <span id="upload-loading-text">Salvando planilha e recalculando indicadores em tempo real...</span>
+      </div>
+
+      <div style="font-size: 0.78rem; color: var(--text-dim); text-align: center; margin-top: 12px;">
+        *Dica: Você também pode usar o arquivo <code>atualizar_dashboard.bat</code> na pasta para sincronizar lotes pesados.
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript da Aplicação -->
+  <script src="./app.js?v=20261010_v2"></script>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pkl
+.agents/
+
+# Virtual Environment
+.venv/
+venv/
+env/
+.env
+
+# Backups & Temporary files
+*.tmp
+*.temp
+.git_standalone_backup/
+*.log
+
+# Heavy presentation drafts
+*.pptx
+gerar_apresentacao.py
+
+# OS metadata
+Thumbs.db
+desktop.ini
+.DS_Store
