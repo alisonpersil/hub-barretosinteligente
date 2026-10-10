@@ -3726,30 +3726,227 @@ canvas {
     overflow: hidden;
   }
 
-  /* 6. Grid de KPIs (2 colunas organizadas) */
+  /* 6. Grid de KPIs Executivos Mobile (1 Coluna Robusta - Zero Vazamento de Texto) */
   .kpi-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 8px;
-    width: 100%;
-    box-sizing: border-box;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .kpi-card {
-    padding: 12px 10px;
+    padding: 16px 16px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    border-radius: var(--radius-lg) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    word-wrap: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .kpi-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+    margin-bottom: 4px !important;
+    width: 100% !important;
     min-width: 0 !important;
   }
 
+  .kpi-title-wrap {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    flex-wrap: wrap !important;
+    min-width: 0 !important;
+    flex: 1 !important;
+  }
+
   .kpi-title {
-    font-size: 0.7rem;
+    font-size: 0.82rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.03em !important;
+    text-transform: uppercase !important;
+    color: var(--text-muted) !important;
+    line-height: 1.25 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .kpi-tag-mes {
+    font-size: 0.68rem !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  .kpi-icon {
+    width: 32px !important;
+    height: 32px !important;
+    flex-shrink: 0 !important;
+    border-radius: 8px !important;
+  }
+
+  .kpi-value-row {
+    display: flex !important;
+    align-items: baseline !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 6px 10px !important;
+    margin-bottom: 6px !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
 
   .kpi-value {
-    font-size: 1.35rem;
-    word-break: break-word;
+    font-size: 1.85rem !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    letter-spacing: -0.02em !important;
+    color: var(--text-main) !important;
+    margin-bottom: 0 !important;
+    display: inline-flex !important;
+    align-items: baseline !important;
+    gap: 4px !important;
+    min-width: 0 !important;
   }
 
-  .kpi-sub {
-    font-size: 0.68rem;
+  .kpi-unit {
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    color: var(--text-dim) !important;
+    margin-left: 2px !important;
+  }
+
+  .kpi-mom-badge {
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+    line-height: 1.25 !important;
+    max-width: 100% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+  }
+
+  .kpi-badge-secondary {
+    font-size: 0.72rem !important;
+    font-weight: 600 !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    white-space: nowrap !important;
+  }
+
+  .kpi-footer {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 6px 10px !important;
+    font-size: 0.76rem !important;
+    color: var(--text-dim) !important;
+    padding-top: 8px !important;
+    border-top: 1px solid var(--border-subtle) !important;
+    margin-top: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .kpi-footer > * {
+    min-width: 0 !important;
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .kpi-trend {
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    white-space: nowrap !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 3px !important;
+  }
+
+  .kpi-pill {
+    font-size: 0.74rem !important;
+    padding: 3px 8px !important;
+    border-radius: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+  }
+
+  /* Projeções e Simulador Mobile */
+  .projection-metrics {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .proj-card {
+    padding: 14px 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    word-break: break-word !important;
+  }
+
+  .sim-control-grid {
+    grid-template-columns: 1fr !important;
+    padding: 14px 12px !important;
+    gap: 14px !important;
+  }
+
+  .calculator-box {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    padding: 14px !important;
+  }
+
+  /* Resumo do Dia / Pilares Mobile */
+  .resumo-pillars-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+
+  .resumo-pillar-card {
+    padding: 16px 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    word-break: break-word !important;
+  }
+
+  .resumo-pillar-body {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .resumo-decisions-card {
+    padding: 16px 14px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    word-break: break-word !important;
   }
 
   /* 7. Distribuição de Carros / Bairros */
@@ -3906,16 +4103,16 @@ canvas {
   }
 
   .kpi-grid {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 6px;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
   }
 
   .kpi-card {
-    padding: 10px 8px;
+    padding: 14px 14px !important;
   }
 
   .kpi-value {
-    font-size: 1.25rem;
+    font-size: 1.75rem !important;
   }
 
   .chart-wrapper,
