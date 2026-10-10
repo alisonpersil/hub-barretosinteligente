@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="dark">
 <head>
+  <base href="/exati/">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Painel Exati &bull; PMO Gestão Operacional</title>
   
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="./favicon.png">
-  <link rel="shortcut icon" type="image/png" href="./favicon.png">
-  <link rel="apple-touch-icon" href="./favicon.png">
+  <link rel="icon" type="image/png" href="/exati/favicon.png">
+  <link rel="shortcut icon" type="image/png" href="/exati/favicon.png">
+  <link rel="apple-touch-icon" href="/exati/favicon.png">
   
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,13 +17,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
   <!-- CSS Executivo -->
-  <link rel="stylesheet" href="./app.css?v=20261009_v5">
+  <link rel="stylesheet" href="/exati/app.css?v=20261010_v3">
 
   <!-- SheetJS para Upload e Exportação Direta no Navegador -->
-  <script src="./xlsx.full.min.js"></script>
+  <script src="/exati/xlsx.full.min.js"></script>
 
   <!-- Chart.js para Gráficos -->
-  <script src="./chart.umd.min.js"></script>
+  <script src="/exati/chart.umd.min.js"></script>
   <script>
     if (typeof Chart === 'undefined') {
       document.write('<script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>');
@@ -37,8 +38,14 @@
     <div class="sticky-header-wrapper" id="sticky-header-wrapper">
       <header class="navbar">
       <div class="nav-left">
+        <!-- Botão Destacado: Voltar ao HUB Central -->
+        <a href="/" class="btn-back-hub" title="Voltar ao início de tudo (Hub Central)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          <span>Voltar ao HUB</span>
+        </a>
+        <div class="brand-divider"></div>
         <a href="/" class="brand-logo" title="Ir para o Hub Central">
-          <img src="./logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+          <img src="/exati/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
           <div class="brand-divider"></div>
           <div class="brand-text">
             <span class="brand-title">Painel Exati</span>
@@ -1533,7 +1540,7 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
   </div>
 
   <!-- JavaScript da Aplicação -->
-  <script src="./app.js?v=20261010_v2"></script>
+  <script src="/exati/app.js?v=20261010_v3"></script>
 
 </body>
 </html>

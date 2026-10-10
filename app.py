@@ -442,6 +442,10 @@ def upload_oficios():
 # Rotas: 02 - Monitor Exati (/exati)
 # ==============================================================================
 @app.route("/exati")
+def exati_redirect():
+    """Redireciona /exati para /exati/ garantindo resolução correta de caminhos relativos."""
+    return redirect("/exati/", code=301)
+
 @app.route("/exati/")
 def exati_index():
     """Serve o Painel Executivo do Monitor Exati."""
@@ -462,6 +466,31 @@ def serve_dashboard_data_root():
     if os.path.exists(data_path):
         return send_file(data_path, mimetype="application/json")
     return jsonify({}), 404
+
+@app.route("/app.css")
+def fallback_app_css():
+    """Fallback caso app.css seja solicitado na raiz."""
+    return send_from_directory(EXATI_DIR, "app.css")
+
+@app.route("/app.js")
+def fallback_app_js():
+    """Fallback caso app.js seja solicitado na raiz."""
+    return send_from_directory(EXATI_DIR, "app.js")
+
+@app.route("/chart.umd.min.js")
+def fallback_chart_js():
+    """Fallback caso chart.umd.min.js seja solicitado na raiz."""
+    return send_from_directory(EXATI_DIR, "chart.umd.min.js")
+
+@app.route("/xlsx.full.min.js")
+def fallback_xlsx_js():
+    """Fallback caso xlsx.full.min.js seja solicitado na raiz."""
+    return send_from_directory(EXATI_DIR, "xlsx.full.min.js")
+
+@app.route("/logo-ipbarretos-horizontal-alta.png")
+def fallback_logo_horizontal():
+    """Fallback caso a logo horizontal seja solicitada na raiz."""
+    return send_from_directory(EXATI_DIR, "logo-ipbarretos-horizontal-alta.png")
 
 # ==============================================================================
 # Inicialização Local do Servidor
