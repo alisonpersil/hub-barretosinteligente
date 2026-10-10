@@ -3582,17 +3582,16 @@ canvas {
     flex-shrink: 0;
   }
 
+  .brand-text,
+  .brand-title,
   .brand-divider,
   .brand-subtitle,
   .stat-pill,
   .nav-center,
-  .topbar-sync-notice {
+  .topbar-sync-notice,
+  #btn-exportar-excel,
+  #btn-imprimir-relatorio {
     display: none !important;
-  }
-
-  .brand-title {
-    font-size: 0.9rem;
-    line-height: 1.1;
   }
 
   .nav-right {
