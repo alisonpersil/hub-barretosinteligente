@@ -83,18 +83,7 @@
             });
         }
 
-        // Alternância do submenu de Relatórios fora da home
-        const tabBtnRelatorios = document.getElementById('tabBtnRelatorios');
-        const subRelatorios = document.getElementById('subRelatorios');
-        const isHubHome = window.location.pathname === '/' || window.location.pathname === '/hub' || window.location.pathname.endsWith('00 - HUB/index.html');
-        
-        if (tabBtnRelatorios && subRelatorios && !isHubHome) {
-            tabBtnRelatorios.addEventListener('click', (e) => {
-                e.preventDefault();
-                const isVisible = window.getComputedStyle(subRelatorios).display !== 'none';
-                subRelatorios.style.display = isVisible ? 'none' : 'flex';
-            });
-        }
+        // Permite navegação direta dos botões de módulos (Relatórios -> /?tab=relatorios, Automações -> /?tab=automacoes)
 
         // Resolução dinâmica de links caso esteja no file://
         if (window.location.protocol === 'file:') {

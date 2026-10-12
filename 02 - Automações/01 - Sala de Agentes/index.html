@@ -54,16 +54,14 @@
             </div>
 
             <div class="nav-right">
-                <!-- Status da Malha de Agentes CCO -->
-                <div class="topbar-sync-notice" id="topbar-sync-notice" title="Status da Sala de Operações">
-                    <span class="sync-pulse-dot" style="background: #22c55e; box-shadow: 0 0 10px #22c55e;"></span>
-                    <div class="sync-notice-text">
-                        <span class="sync-notice-val" style="color: #4ade80; font-weight: 600;">CCO Online &bull; 5 Agentes Ativos</span>
-                    </div>
+                <!-- Status da Sala (componente padrão do sistema) -->
+                <div class="system-status-pill" id="agentsStatusPill" title="Agentes em atividade na sala">
+                    <span class="pulse-dot"></span>
+                    <span id="agentsStatusText">Agentes ativos</span>
                 </div>
 
                 <!-- Botão de Despacho Rápido Global -->
-                <button id="btnOpenGlobalDispatch" class="nav-btn btn-import" style="background: linear-gradient(135deg, #7d36ec, #a469ff); color: #fff; border: 1px solid rgba(255,255,255,0.15); font-weight: 600; padding: 7px 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(125,54,236,0.35);" title="Despachar nova tarefa para um agente">
+                <button id="btnOpenGlobalDispatch" class="btn-dispatch-nav" title="Despachar nova tarefa para um agente">
                     <i class="fa-solid fa-paper-plane"></i>
                     <span>Despachar Tarefa</span>
                 </button>
@@ -95,16 +93,16 @@
 
                         <!-- Módulo 1: Relatórios -->
                         <div class="sidebar-group">
-                            <button class="sidebar-item" id="tabBtnRelatorios" title="Módulo de Relatórios">
+                            <a href="/?tab=relatorios" class="sidebar-item" id="tabBtnRelatorios" title="Módulo de Relatórios">
                                 <div class="item-left">
                                     <i class="fa-solid fa-chart-pie item-icon"></i>
                                     <span class="item-text">Relatórios</span>
                                 </div>
                                 <span class="sidebar-badge" title="3 páginas disponíveis">3</span>
-                            </button>
+                            </a>
 
                             <!-- Submenu com as páginas de Relatórios -->
-                            <div class="sidebar-submenu" id="subRelatorios" style="display: none;">
+                            <div class="sidebar-submenu" id="subRelatorios" style="display: flex;">
                                 <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Consulta de Ofícios">
                                     <i class="fa-solid fa-folder-open sub-icon green"></i>
                                     <span class="sub-text">Consulta de Ofícios</span>
@@ -120,20 +118,28 @@
                             </div>
                         </div>
 
-                        <!-- Módulo 2: Automações (Ativo) -->
+                        <!-- Módulo 2: Automações -->
                         <div class="sidebar-group">
-                            <a href="/sala-agentes" class="sidebar-item active" id="tabBtnAutomacoes" title="Sala de Operações dos Agentes">
+                            <a href="/?tab=automacoes" class="sidebar-item active" id="tabBtnAutomacoes" title="Módulo de Automações">
                                 <div class="item-left">
                                     <i class="fa-solid fa-bolt item-icon"></i>
                                     <span class="item-text">Automações</span>
                                 </div>
-                                <span class="sidebar-pill-badge" style="background: rgba(125,54,236,0.2); color: #c499ff; border: 1px solid rgba(125,54,236,0.4);">Sala de Agentes</span>
+                                <span class="sidebar-badge" title="1 ferramenta disponível">1</span>
                             </a>
+
+                            <!-- Submenu com as ferramentas de Automações -->
+                            <div class="sidebar-submenu" id="subAutomacoes" style="display: flex;">
+                                <a href="/sala-agentes" class="sidebar-subitem active" id="sideLinkSala" title="Sala de Agentes Autônomos">
+                                    <i class="fa-solid fa-robot sub-icon purple"></i>
+                                    <span class="sub-text">Sala de Agentes</span>
+                                </a>
+                            </div>
                         </div>
 
                         <!-- Módulo 3: Book -->
                         <div class="sidebar-group">
-                            <a href="/book" class="sidebar-item" id="tabBtnBook" title="Livro de Governança">
+                            <a href="/?tab=book" class="sidebar-item" id="tabBtnBook" title="Livro de Governança">
                                 <div class="item-left">
                                     <i class="fa-solid fa-book-bookmark item-icon"></i>
                                     <span class="item-text">Book</span>
@@ -245,7 +251,7 @@
                 <!-- Footer Oficial / Endbar Padrão do Barretos Inteligente -->
                 <footer class="hub-footer">
                     <div class="footer-left">
-                        <span>&copy; 2026 Barretos Inteligente &bull; CCO &amp; PMO Concessão</span>
+                        <span>&copy; 2026 Barretos Inteligente</span>
                     </div>
                     <div class="footer-center">
                         <a href="https://www.linkedin.com/in/alisonviper/" target="_blank" rel="noopener noreferrer" class="footer-linkedin-link" title="LinkedIn • Alison Persil" aria-label="Perfil do LinkedIn de Alison Persil">

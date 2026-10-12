@@ -146,6 +146,12 @@ function renderRoom() {
   const orfas = counts.orfas ?? 0;
   const ultimo = counts.ultimo_evento || '11/10/2026 23:20';
 
+  const statusText = $('#agentsStatusText');
+  if (statusText) {
+    const ativos = (counts.trabalhando || 0) + (counts.delegando || 0) + (counts.aguardando || 0);
+    statusText.textContent = `${ativos} agentes ativos`;
+  }
+
   const opBar = $('#operation-bar');
   if (opBar) {
     opBar.innerHTML = `

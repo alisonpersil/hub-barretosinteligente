@@ -60,8 +60,16 @@ O ecossistema **Barretos Inteligente** foi concebido para entregar portais e fer
   * `Relatórios` (`fa-chart-pie`): Com badge indicativa e submenu contendo:
     * `Consulta de Ofícios` (`fa-folder-open`, acento verde).
     * `Monitor Exati` (`fa-chart-line`, acento azul).
-  * `Automações` (`fa-bolt`): Badge *"Em breve"*.
-  * `Book` (`fa-book-bookmark`): Badge *"Em breve"*.
+    * `QA do Site` (`fa-shield-halved`, acento roxo).
+  * `Automações` (`fa-bolt`): Badge *"Sala de Agentes"*.
+  * `Book` (`fa-book-bookmark`): Badge *"Governança"*.
+* **✅ Regra Obrigatória de Navegação por Módulo:**
+  * Clicar no item de um **módulo** na sidebar SEMPRE leva à **aba do módulo na Central HUB**, nunca direto para uma página interna, independentemente da página em que o usuário esteja:
+    * `Relatórios` → `/?tab=relatorios`
+    * `Automações` → `/?tab=automacoes`
+    * `Book` → `/?tab=book`
+  * O acesso direto às páginas internas (ex.: `/oficios`, `/sala-agentes`) acontece apenas pelos **subitens** do submenu ou pelos cards dentro da aba do módulo.
+  * ❌ Proibido usar `<button>` sem destino ou interceptar o clique do item de módulo com `preventDefault()` fora da HUB.
 * **Persistência de Estado:** Gravada automaticamente no `localStorage ('hub_sidebar_collapsed')`. Ao navegar entre HUB, Ofícios e Exati, o estado escolhido é mantido.
 * **Modo Mobile (≤ 860px) & Safe Area:** Transforma-se em gaveta deslizante (`drawer`) com backdrop escurecido (`.sidebar-backdrop`), abrindo via botão hamburguer e fechando ao clicar fora.
   * **Prevenção de Corte de Texto:** A gaveta ocupa altura total (`top: 0; bottom: 0; height: 100dvh;`) com preenchimento superior seguro `padding-top: calc(62px + env(safe-area-inset-top, 0px))` e `z-index: 90` sob a navbar (`z-index: 100`).
@@ -71,7 +79,7 @@ O ecossistema **Barretos Inteligente** foi concebido para entregar portais e fer
 ### 2.4 Endbar Oficial no Rodapé (Footer Corporativo • `.hub-footer`)
 * **Presença Obrigatória:** Rodapé executivo idêntico em todas as páginas do portal.
 * **Layout em 3 Zonas Simétricas (Grid `1fr auto 1fr`):**
-  * **Esquerda:** Copyright institucional: `© 2026 Barretos Inteligente`.
+  * **Esquerda:** Copyright institucional: `© 2026 Barretos Inteligente` — sem complementos (❌ proibido acrescentar textos como *"CCO & PMO Concessão"*).
   * **Centro:** Ícone vetorial do LinkedIn (`fa-brands fa-linkedin`) com link direto para o perfil pessoal do autor:  
     👉 **`https://www.linkedin.com/in/alisonviper/`** (`target="_blank" rel="noopener noreferrer"`).  
     *Efeito Hover:* Transição suave para a cor oficial do LinkedIn (`#0a66c2`), leve elevação (`translateY(-2px)`) e halo suave.

@@ -34,6 +34,38 @@
 }
 
 /* ==========================================================================
+   Navbar da Sala: botão de despacho e status (padrão do sistema)
+   ========================================================================== */
+.navbar .nav-right { flex-wrap: nowrap; }
+.navbar .system-status-pill { white-space: nowrap; }
+.btn-dispatch-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-md, 8px);
+  background: linear-gradient(135deg, #7d36ec, #a469ff);
+  color: #fff;
+  font: 600 13px/1 Inter, system-ui, sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(125, 54, 236, 0.35);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.btn-dispatch-nav:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(125, 54, 236, 0.5); }
+.btn-dispatch-nav i { font-size: 12px; }
+@media (max-width: 900px) {
+  .navbar .system-status-pill { display: none; }
+}
+@media (max-width: 640px) {
+  .btn-dispatch-nav { width: 36px; padding: 0; justify-content: center; }
+  .btn-dispatch-nav span { display: none; }
+}
+
+/* ==========================================================================
    Agent Popover Modal (Identical to AiOperationsRoom Screenshot)
    ========================================================================== */
 .cena-bloco { position: relative; }
