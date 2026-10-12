@@ -67,6 +67,22 @@
             }
         });
 
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 860) {
+                closeMobileSidebar();
+            }
+        });
+
+        if (hubSidebar) {
+            hubSidebar.querySelectorAll('a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 860) {
+                        closeMobileSidebar();
+                    }
+                });
+            });
+        }
+
         // Alternância do submenu de Relatórios fora da home
         const tabBtnRelatorios = document.getElementById('tabBtnRelatorios');
         const subRelatorios = document.getElementById('subRelatorios');

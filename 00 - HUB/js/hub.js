@@ -59,7 +59,84 @@
     initTheme();
 
     // =========================================================================
-    // 2. Navegação por Abas (Home, Relatórios, Automações, Book)
+    // 2. Controle da Barra Lateral & Backdrop Mobile
+    // =========================================================================
+    const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+    const hubSidebar = document.getElementById('hubSidebar');
+    const SIDEBAR_STATE_KEY = 'hub_sidebar_collapsed';
+
+    let backdrop = document.getElementById('sidebarBackdrop');
+    if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.id = 'sidebarBackdrop';
+        backdrop.className = 'sidebar-backdrop';
+        document.body.appendChild(backdrop);
+    }
+
+    function closeMobileSidebar() {
+        if (hubSidebar) hubSidebar.classList.remove('mobile-open');
+        if (backdrop) backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function openMobileSidebar() {
+        if (hubSidebar) hubSidebar.classList.add('mobile-open');
+        if (backdrop) backdrop.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function initSidebarState() {
+        if (window.innerWidth > 860) {
+            const isCollapsed = localStorage.getItem(SIDEBAR_STATE_KEY) === 'true';
+            if (isCollapsed && hubSidebar) {
+                hubSidebar.classList.add('collapsed');
+            }
+        }
+    }
+
+    if (btnToggleSidebar && hubSidebar) {
+        btnToggleSidebar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.innerWidth <= 860) {
+                const isCurrentlyOpen = hubSidebar.classList.contains('mobile-open');
+                if (isCurrentlyOpen) {
+                    closeMobileSidebar();
+                } else {
+                    openMobileSidebar();
+                }
+            } else {
+                hubSidebar.classList.toggle('collapsed');
+                const isCollapsed = hubSidebar.classList.contains('collapsed');
+                try {
+                    localStorage.setItem(SIDEBAR_STATE_KEY, isCollapsed ? 'true' : 'false');
+                } catch (_) {}
+            }
+        });
+    }
+
+    if (backdrop) {
+        backdrop.addEventListener('click', closeMobileSidebar);
+    }
+
+    // Fecha sidebar no mobile se clicar fora
+    document.addEventListener('click', (e) => {
+        if (window.innerWidth <= 860 && hubSidebar && hubSidebar.classList.contains('mobile-open')) {
+            if (!hubSidebar.contains(e.target) && btnToggleSidebar && !btnToggleSidebar.contains(e.target)) {
+                closeMobileSidebar();
+            }
+        }
+    });
+
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 860) {
+            closeMobileSidebar();
+        }
+    });
+
+    initSidebarState();
+
+    // =========================================================================
+    // 3. Navegação por Abas (Home, Relatórios, Automações, Book)
     // =========================================================================
     const sidebarItems = document.querySelectorAll('.sidebar-item[data-tab]');
     const tabPanels = {
@@ -101,9 +178,9 @@
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
 
+        // Fecha a gaveta mobile e limpa o backdrop imediatamente
         if (window.innerWidth <= 860) {
-            const hubSidebar = document.getElementById('hubSidebar');
-            if (hubSidebar) hubSidebar.classList.remove('mobile-open');
+            closeMobileSidebar();
         }
     }
 
@@ -133,59 +210,6 @@
             switchTab(backTab);
         });
     });
-
-    // =========================================================================
-    // 3. Controle da Barra Lateral (Toggle Recolher / Expandir)
-    // =========================================================================
-    const btnToggleSidebar = document.getElementById('btnToggleSidebar');
-    const hubSidebar = document.getElementById('hubSidebar');
-    const SIDEBAR_STATE_KEY = 'hub_sidebar_collapsed';
-
-    function initSidebarState() {
-        if (window.innerWidth > 860) {
-            const isCollapsed = localStorage.getItem(SIDEBAR_STATE_KEY) === 'true';
-            if (isCollapsed && hubSidebar) {
-                hubSidebar.classList.add('collapsed');
-            }
-        }
-    }
-
-    let backdrop = document.getElementById('sidebarBackdrop');
-    if (!backdrop) {
-        backdrop = document.createElement('div');
-        backdrop.id = 'sidebarBackdrop';
-        backdrop.className = 'sidebar-backdrop';
-        document.body.appendChild(backdrop);
-    }
-
-    function closeMobileSidebar() {
-        if (hubSidebar) hubSidebar.classList.remove('mobile-open');
-        if (backdrop) backdrop.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
-    if (btnToggleSidebar && hubSidebar) {
-        btnToggleSidebar.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (window.innerWidth <= 860) {
-                const isOpen = hubSidebar.classList.toggle('mobile-open');
-                if (backdrop) backdrop.classList.toggle('active', isOpen);
-                document.body.style.overflow = isOpen ? 'hidden' : '';
-            } else {
-                hubSidebar.classList.toggle('collapsed');
-                const isCollapsed = hubSidebar.classList.contains('collapsed');
-                try {
-                    localStorage.setItem(SIDEBAR_STATE_KEY, isCollapsed ? 'true' : 'false');
-                } catch (_) {}
-            }
-        });
-    }
-
-    if (backdrop) {
-        backdrop.addEventListener('click', closeMobileSidebar);
-    }
-
-    initSidebarState();
 
     // =========================================================================
     // 4. Clique na Logo: Retorna sempre para o Início do HUB
