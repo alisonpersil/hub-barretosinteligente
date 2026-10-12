@@ -33,11 +33,15 @@ HUB_DIR = resolve_dir(
     os.path.join(BASE_DIR, "HUB")
 )
 OFICIOS_DIR = resolve_dir(
+    os.path.join(BASE_DIR, "01 - Relatórios", "01 - Consulta de Ofícios"),
+    os.path.join(BASE_DIR, "01 - Relatorios", "01 - Consulta de Ofícios"),
     os.path.join(BASE_DIR, "Relatórios", "01 - Consulta de Ofícios"),
     os.path.join(BASE_DIR, "Relatorios", "01 - Consulta de Ofícios"),
     os.path.join(BASE_DIR, "01 - Consulta de Ofícios")
 )
 EXATI_DIR = resolve_dir(
+    os.path.join(BASE_DIR, "01 - Relatórios", "02 - Monitor Exati"),
+    os.path.join(BASE_DIR, "01 - Relatorios", "02 - Monitor Exati"),
     os.path.join(BASE_DIR, "Relatórios", "02 - Monitor Exati"),
     os.path.join(BASE_DIR, "Relatorios", "02 - Monitor Exati"),
     os.path.join(BASE_DIR, "02 - Monitor Exati")
