@@ -80,7 +80,7 @@
                                     <i class="fa-solid fa-chart-pie item-icon"></i>
                                     <span class="item-text">Relatórios</span>
                                 </div>
-                                <span class="sidebar-badge" title="2 páginas disponíveis">2</span>
+                                <span class="sidebar-badge" title="3 páginas disponíveis">3</span>
                             </button>
 
                             <!-- Submenu com as páginas vinculadas a Relatórios -->
@@ -93,6 +93,10 @@
                                     <i class="fa-solid fa-chart-line sub-icon blue"></i>
                                     <span class="sub-text">Monitor Exati</span>
                                 </a>
+                                <a href="/qa" class="sidebar-subitem" id="sideLinkQA" title="Acessar QA do Site">
+                                    <i class="fa-solid fa-shield-halved sub-icon purple"></i>
+                                    <span class="sub-text">QA do Site</span>
+                                </a>
                             </div>
                         </div>
 
@@ -103,7 +107,7 @@
                                     <i class="fa-solid fa-bolt item-icon"></i>
                                     <span class="item-text">Automações</span>
                                 </div>
-                                <span class="sidebar-pill-badge">Em breve</span>
+                                <span class="sidebar-pill-badge">Sala de Agentes</span>
                             </button>
                         </div>
 
@@ -114,7 +118,7 @@
                                     <i class="fa-solid fa-book-bookmark item-icon"></i>
                                     <span class="item-text">Book</span>
                                 </div>
-                                <span class="sidebar-pill-badge">Em breve</span>
+                                <span class="sidebar-pill-badge">Governança</span>
                             </button>
                         </div>
                     </nav>
@@ -219,11 +223,24 @@
                                         <i class="fa-solid fa-arrow-right"></i>
                                     </div>
                                 </a>
+
+                                <!-- Card 3: QA do Site -->
+                                <a href="/qa" class="portal-card qa-card" id="cardQA" title="Acessar Auditoria & QA do Site">
+                                    <div class="portal-card-glow glow-purple"></div>
+                                    <div class="portal-icon-box purple">
+                                        <i class="fa-solid fa-shield-halved"></i>
+                                    </div>
+                                    <h2 class="portal-name">QA do Site</h2>
+                                    <div class="portal-action-btn purple" id="btnOpenQA">
+                                        <span>Acessar Painel de QA</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                </a>
                             </div>
                         </div>
                     </section>
 
-                    <!-- PAINEL 2: AUTOMAÇÕES (Vazio para não gerar expectativa) -->
+                    <!-- PAINEL 2: AUTOMAÇÕES (Sala de Agentes Autônomos) -->
                     <section class="hub-tab-panel" id="panelAutomacoes">
                         <div class="hub-container">
                             <div class="back-nav-bar">
@@ -235,16 +252,27 @@
 
                             <header class="hub-header">
                                 <h1 class="hub-title">Módulo de <span>Automações</span></h1>
+                                <p class="hub-subtitle">Centro de inteligência e agentes virtuais autônomos</p>
                             </header>
 
-                            <div class="empty-module-placeholder">
-                                <i class="fa-solid fa-screwdriver-wrench"></i>
-                                <p>Módulo em desenvolvimento</p>
+                            <div class="portal-grid">
+                                <a href="/sala-agentes" class="portal-card sala-card" id="cardSalaAgentes" title="Acessar Sala de Operações de Agentes">
+                                    <div class="portal-card-glow"></div>
+                                    <div class="portal-icon-box green">
+                                        <i class="fa-solid fa-robot"></i>
+                                    </div>
+                                    <h2 class="portal-name">Sala de Agentes Autônomos</h2>
+                                    <p style="font-size: 13.5px; color: var(--text-secondary); margin: 8px 0 16px 0; line-height: 1.5;">Posto virtual em Pixel Art com 5 agentes (CCO, Exati, Ofícios, QA e Book), orquestração de tarefas e despacho remoto via celular.</p>
+                                    <div class="portal-action-btn green" id="btnOpenSala">
+                                        <span>Entrar na Sala de Agentes</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                </a>
                             </div>
                         </div>
                     </section>
 
-                    <!-- PAINEL 3: BOOK (Vazio para não gerar expectativa) -->
+                    <!-- PAINEL 3: BOOK (Livro de Governança & Inovações) -->
                     <section class="hub-tab-panel" id="panelBook">
                         <div class="hub-container">
                             <div class="back-nav-bar">
@@ -256,11 +284,22 @@
 
                             <header class="hub-header">
                                 <h1 class="hub-title">Módulo <span>Book</span></h1>
+                                <p class="hub-subtitle">Governança viva, indicadores e inovações da concessão</p>
                             </header>
 
-                            <div class="empty-module-placeholder">
-                                <i class="fa-solid fa-screwdriver-wrench"></i>
-                                <p>Módulo em desenvolvimento</p>
+                            <div class="portal-grid">
+                                <a href="/book" class="portal-card book-portal-card" id="cardBookPortal" title="Acessar Book de Governança">
+                                    <div class="portal-card-glow glow-purple"></div>
+                                    <div class="portal-icon-box purple">
+                                        <i class="fa-solid fa-book-bookmark"></i>
+                                    </div>
+                                    <h2 class="portal-name">Book de Governança &amp; Inovação</h2>
+                                    <p style="font-size: 13.5px; color: var(--text-secondary); margin: 8px 0 16px 0; line-height: 1.5;">Registro executivo de marcos de engenharia e melhorias de software catalogadas dinamicamente pelo Agente Book.</p>
+                                    <div class="portal-action-btn purple" id="btnOpenBookPortal">
+                                        <span>Acessar Livro de Governança</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                </a>
                             </div>
                         </div>
                     </section>

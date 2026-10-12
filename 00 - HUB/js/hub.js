@@ -252,12 +252,18 @@
             return {
                 oficios: '../01 - Consulta de Ofícios/index.html',
                 exati: '../02 - Monitor Exati/index.html',
+                qa: '../01 - Relatórios/03 - QA do Site/index.html',
+                sala: '../02 - Automações/01 - Sala de Agentes/index.html',
+                book: '../03 - Book/index.html',
                 home: './index.html'
             };
         }
         return {
             oficios: '/oficios',
             exati: '/exati',
+            qa: '/qa',
+            sala: '/sala-agentes',
+            book: '/book',
             home: '/'
         };
     }
@@ -267,17 +273,21 @@
         
         const sideLinkOficios = document.getElementById('sideLinkOficios');
         const sideLinkExati = document.getElementById('sideLinkExati');
+        const sideLinkQA = document.getElementById('sideLinkQA');
         const cardOficios = document.getElementById('cardOficios');
         const cardExati = document.getElementById('cardExati');
-        const btnOpenOficios = document.getElementById('btnOpenOficios');
-        const btnOpenExati = document.getElementById('btnOpenExati');
+        const cardQA = document.getElementById('cardQA');
+        const cardSalaAgentes = document.getElementById('cardSalaAgentes');
+        const cardBookPortal = document.getElementById('cardBookPortal');
 
         if (sideLinkOficios) sideLinkOficios.href = urls.oficios;
         if (sideLinkExati) sideLinkExati.href = urls.exati;
+        if (sideLinkQA) sideLinkQA.href = urls.qa;
         if (cardOficios) cardOficios.href = urls.oficios;
         if (cardExati) cardExati.href = urls.exati;
-        if (btnOpenOficios) btnOpenOficios.href = urls.oficios;
-        if (btnOpenExati) btnOpenExati.href = urls.exati;
+        if (cardQA) cardQA.href = urls.qa;
+        if (cardSalaAgentes) cardSalaAgentes.href = urls.sala;
+        if (cardBookPortal) cardBookPortal.href = urls.book;
 
         if (mainBrandLogo && !window.location.protocol.startsWith('http')) {
             mainBrandLogo.href = urls.home;

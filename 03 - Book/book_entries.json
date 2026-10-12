@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "title": "Arquitetura Bimodal CCO & PMO (Light/Dark Mode)",
+    "category": "UX & Acessibilidade",
+    "badge": "Design System",
+    "icon": "fa-moon",
+    "color": "blue",
+    "impact": "Alternância instantânea de tema (modo corporativo diurno e modo escuro CCO) com persistência no LocalStorage e sincronização entre todas as aplicações do ecossistema.",
+    "date": "Outubro 2026",
+    "author": "Alison Persil",
+    "version": "v1.2.0"
+  },
+  {
+    "id": 2,
+    "title": "Paginação Dinâmica de Documentos (15 por Página)",
+    "category": "Performance & Dados",
+    "badge": "Otimização",
+    "icon": "fa-folder-open",
+    "color": "green",
+    "impact": "Eliminação de sobrecarga em conexões móveis através de paginação sob demanda dos mais de 1.500 ofícios catalogados, com busca instantânea e ordenação em memória.",
+    "date": "Outubro 2026",
+    "author": "Alison Persil",
+    "version": "v1.3.0"
+  },
+  {
+    "id": 3,
+    "title": "Sentinela de Backdrop & Sincronização Mobile (History API)",
+    "category": "Engenharia de Frontend",
+    "badge": "Resiliência",
+    "icon": "fa-mobile-screen",
+    "color": "amber",
+    "impact": "Resolução definitiva de travamentos em smartphones: limpeza imediata do backdrop ao alternar abas e sincronização da URL via History API, garantindo recarregamento fiel na Home.",
+    "date": "Outubro 2026",
+    "author": "Alison Persil",
+    "version": "v1.4.0"
+  },
+  {
+    "id": 4,
+    "title": "Sala de Operações com Agentes Autônomos (Pixel Art SVG)",
+    "category": "Inteligência Artificial & Automação",
+    "badge": "Inovação",
+    "icon": "fa-robot",
+    "color": "purple",
+    "impact": "Criação do posto virtual com 5 agentes especializados (CCO, Exati, Ofícios, QA e Book), operando em motor SVG ultraleve com despacho remoto de comandos pelo smartphone e inteligência Gemini Pro.",
+    "date": "Outubro 2026",
+    "author": "Alison Persil",
+    "version": "v2.0.0"
+  },
+  {
+    "id": 5,
+    "title": "Painel de Auditoria & QA do Site Contínuo",
+    "category": "Qualidade & Disponibilidade",
+    "badge": "Governança",
+    "icon": "fa-shield-halved",
+    "color": "blue",
+    "impact": "Supervisão automatizada de status HTTP (200 OK), latência de carregamento na Vercel e matriz de conformidade responsiva para prestação de contas à gestão pública.",
+    "date": "Outubro 2026",
+    "author": "Alison Persil",
+    "version": "v2.1.0"
+  }
+]

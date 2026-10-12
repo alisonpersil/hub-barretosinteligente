@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <script>
+        (function() {
+            try {
+                var t = localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {}
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Book de Governança • Barretos Inteligente</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- CSS Compartilhado e Específico -->
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="./book.css">
+</head>
+<body>
+    <div class="hub-layout">
+        <!-- Top Navigation Bar -->
+        <header class="navbar">
+            <div class="nav-left">
+                <button id="btnToggleSidebar" class="sidebar-toggle-btn" title="Recolher / Expandir menu lateral" aria-label="Alternar barra lateral">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="brand-logo" id="brandLogoContainer">
+                    <a href="/" class="brand-logo-link" id="mainBrandLogo" title="Barretos Inteligente - Central HUB">
+                        <img src="/img/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+                    </a>
+                    <div class="brand-divider"></div>
+                    <div class="brand-text">
+                        <span class="brand-title">Central HUB</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-right">
+                <button id="btnThemeToggle" class="nav-btn" title="Alternar tema claro / escuro" aria-label="Alternar tema">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Hub Body: Sidebar Lateral + Área Principal -->
+        <div class="hub-body-wrapper">
+            <!-- Barra Lateral Executiva -->
+            <aside class="hub-sidebar" id="hubSidebar">
+                <div class="sidebar-inner">
+                    <div class="sidebar-section-label">Módulos</div>
+
+                    <nav class="sidebar-nav" aria-label="Navegação Lateral">
+                        <!-- Início / Home -->
+                        <div class="sidebar-group">
+                            <a href="/" class="sidebar-item" id="tabBtnHome" title="Página Inicial do HUB">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-house item-icon"></i>
+                                    <span class="item-text">Início</span>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Módulo 1: Relatórios -->
+                        <div class="sidebar-group">
+                            <a href="/?tab=relatorios" class="sidebar-item" id="tabBtnRelatorios" title="Módulo de Relatórios">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-chart-pie item-icon"></i>
+                                    <span class="item-text">Relatórios</span>
+                                </div>
+                                <span class="sidebar-badge" title="3 páginas disponíveis">3</span>
+                            </a>
+
+                            <!-- Submenu com as páginas vinculadas a Relatórios -->
+                            <div class="sidebar-submenu" id="subRelatorios" style="display: none;">
+                                <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Acessar Consulta de Ofícios">
+                                    <i class="fa-solid fa-folder-open sub-icon green"></i>
+                                    <span class="sub-text">Consulta de Ofícios</span>
+                                </a>
+                                <a href="/exati" class="sidebar-subitem" id="sideLinkExati" title="Acessar Monitor Exati">
+                                    <i class="fa-solid fa-chart-line sub-icon blue"></i>
+                                    <span class="sub-text">Monitor Exati</span>
+                                </a>
+                                <a href="/qa" class="sidebar-subitem" id="sideLinkQA" title="Acessar QA do Site">
+                                    <i class="fa-solid fa-shield-halved sub-icon purple"></i>
+                                    <span class="sub-text">QA do Site</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Módulo 2: Automações -->
+                        <div class="sidebar-group">
+                            <a href="/sala-agentes" class="sidebar-item" id="tabBtnAutomacoes" title="Módulo de Automações">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-bolt item-icon"></i>
+                                    <span class="item-text">Automações</span>
+                                </div>
+                                <span class="sidebar-pill-badge">Sala de Agentes</span>
+                            </a>
+                        </div>
+
+                        <!-- Módulo 3: Book -->
+                        <div class="sidebar-group">
+                            <a href="/book" class="sidebar-item active" id="tabBtnBook" title="Módulo Book">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-book-bookmark item-icon"></i>
+                                    <span class="item-text">Book</span>
+                                </div>
+                                <span class="sidebar-pill-badge">Governança</span>
+                            </a>
+                        </div>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Área Central de Conteúdo -->
+            <div class="hub-main-area">
+                <main class="hub-main">
+                    <div class="book-container">
+                        <!-- Cabeçalho do Book -->
+                        <header class="book-header">
+                            <h1>Book de <span>Governança &amp; Inovação</span></h1>
+                            <p>Registro vivo dos marcos de engenharia de software, inovações contratuais e ganhos de eficiência da concessão Barretos Inteligente</p>
+                        </header>
+
+                        <!-- Indicadores de Governança -->
+                        <div class="book-stats-grid">
+                            <div class="book-stat-card">
+                                <div class="book-stat-number" id="totalInnovationsCount">5</div>
+                                <div class="book-stat-label">Inovações Catalogadas</div>
+                            </div>
+                            <div class="book-stat-card">
+                                <div class="book-stat-number" style="color: #10b981;">100%</div>
+                                <div class="book-stat-label">Conformidade Contratual</div>
+                            </div>
+                            <div class="book-stat-card">
+                                <div class="book-stat-number" style="color: #0ea5e9;">Agente Book</div>
+                                <div class="book-stat-label">Curador Autônomo Ativo</div>
+                            </div>
+                            <div class="book-stat-card">
+                                <div class="book-stat-number" style="color: #f59e0b;">v2.1.0</div>
+                                <div class="book-stat-label">Versão Consolidada</div>
+                            </div>
+                        </div>
+
+                        <!-- Linha do Tempo -->
+                        <h2 class="timeline-section-title">
+                            <i class="fa-solid fa-trophy" style="color: #8b5cf6;"></i>
+                            <span>Linha do Tempo de Entregas &amp; Inovações</span>
+                        </h2>
+
+                        <div class="timeline-wrapper" id="timelineContainer">
+                            <!-- Inserido dinamicamente via book.js -->
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Footer Oficial Padrão do Barretos Inteligente -->
+                <footer class="hub-footer">
+                    <div class="footer-container">
+                        <div class="footer-left">
+                            <span class="footer-brand">Barretos Inteligente</span>
+                            <span class="footer-sep">•</span>
+                            <span class="footer-tagline">Central HUB PMO &amp; CCO</span>
+                        </div>
+
+                        <div class="footer-center">
+                            <a href="https://www.linkedin.com/in/alisonviper/" target="_blank" rel="noopener noreferrer" class="footer-linkedin-btn" title="Perfil Alison Persil no LinkedIn">
+                                <i class="fa-brands fa-linkedin"></i>
+                                <span>Alison Persil</span>
+                            </a>
+                        </div>
+
+                        <div class="footer-right">
+                            <span class="footer-status-pill">
+                                <span class="footer-status-dot"></span>
+                                Sistema Operacional
+                            </span>
+                            <span class="footer-copy">© 2026 Todos os direitos reservados</span>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts Compartilhados -->
+    <script src="/js/sidebar.js"></script>
+    <script src="./book.js"></script>
+</body>
+</html>

@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <script>
+        (function() {
+            try {
+                var t = localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {}
+        })();
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Sala de Agentes • Barretos Inteligente</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- CSS Compartilhado e Específico -->
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="./agents_room.css">
+</head>
+<body>
+    <div class="hub-layout">
+        <!-- Top Navigation Bar -->
+        <header class="navbar">
+            <div class="nav-left">
+                <button id="btnToggleSidebar" class="sidebar-toggle-btn" title="Recolher / Expandir menu lateral" aria-label="Alternar barra lateral">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="brand-logo" id="brandLogoContainer">
+                    <a href="/" class="brand-logo-link" id="mainBrandLogo" title="Barretos Inteligente - Central HUB">
+                        <img src="/img/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+                    </a>
+                    <div class="brand-divider"></div>
+                    <div class="brand-text">
+                        <span class="brand-title">Central HUB</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-right">
+                <button id="btnThemeToggle" class="nav-btn" title="Alternar tema claro / escuro" aria-label="Alternar tema">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Hub Body: Sidebar Lateral + Área Principal -->
+        <div class="hub-body-wrapper">
+            <!-- Barra Lateral Executiva -->
+            <aside class="hub-sidebar" id="hubSidebar">
+                <div class="sidebar-inner">
+                    <div class="sidebar-section-label">Módulos</div>
+
+                    <nav class="sidebar-nav" aria-label="Navegação Lateral">
+                        <!-- Início / Home -->
+                        <div class="sidebar-group">
+                            <a href="/" class="sidebar-item" id="tabBtnHome" title="Página Inicial do HUB">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-house item-icon"></i>
+                                    <span class="item-text">Início</span>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Módulo 1: Relatórios -->
+                        <div class="sidebar-group">
+                            <a href="/?tab=relatorios" class="sidebar-item" id="tabBtnRelatorios" title="Módulo de Relatórios">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-chart-pie item-icon"></i>
+                                    <span class="item-text">Relatórios</span>
+                                </div>
+                                <span class="sidebar-badge" title="3 páginas disponíveis">3</span>
+                            </a>
+
+                            <!-- Submenu com as páginas vinculadas a Relatórios -->
+                            <div class="sidebar-submenu" id="subRelatorios" style="display: none;">
+                                <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Acessar Consulta de Ofícios">
+                                    <i class="fa-solid fa-folder-open sub-icon green"></i>
+                                    <span class="sub-text">Consulta de Ofícios</span>
+                                </a>
+                                <a href="/exati" class="sidebar-subitem" id="sideLinkExati" title="Acessar Monitor Exati">
+                                    <i class="fa-solid fa-chart-line sub-icon blue"></i>
+                                    <span class="sub-text">Monitor Exati</span>
+                                </a>
+                                <a href="/qa" class="sidebar-subitem" id="sideLinkQA" title="Acessar QA do Site">
+                                    <i class="fa-solid fa-shield-halved sub-icon purple"></i>
+                                    <span class="sub-text">QA do Site</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Módulo 2: Automações -->
+                        <div class="sidebar-group">
+                            <a href="/sala-agentes" class="sidebar-item active" id="tabBtnAutomacoes" title="Módulo de Automações">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-bolt item-icon"></i>
+                                    <span class="item-text">Automações</span>
+                                </div>
+                                <span class="sidebar-pill-badge">Sala de Agentes</span>
+                            </a>
+                        </div>
+
+                        <!-- Módulo 3: Book -->
+                        <div class="sidebar-group">
+                            <a href="/book" class="sidebar-item" id="tabBtnBook" title="Módulo Book">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-book-bookmark item-icon"></i>
+                                    <span class="item-text">Book</span>
+                                </div>
+                                <span class="sidebar-pill-badge">Governança</span>
+                            </a>
+                        </div>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Área Central de Conteúdo -->
+            <div class="hub-main-area">
+                <main class="hub-main">
+                    <div class="room-dashboard">
+                        <!-- Topo da Sala -->
+                        <div class="room-header">
+                            <div class="room-title-box">
+                                <h1>Sala de Operações • <span>Agentes Autônomos</span></h1>
+                                <p>Centro de inteligência e despacho autônomo de tarefas operacionais, auditoria e governança</p>
+                            </div>
+                            <div class="room-status-badge">
+                                <span class="pulse-dot"></span>
+                                <span>5 Agentes Online • Gemini Pro Ready</span>
+                            </div>
+                        </div>
+
+                        <!-- Barra de Comandos Rápidos Mobile / Desktop -->
+                        <div class="quick-actions-bar">
+                            <button class="btn-quick-action" onclick="window.dispatchTask('qa')">
+                                <i class="fa-solid fa-shield-halved"></i>
+                                <span>Auditar Rotas Mobile &amp; QA</span>
+                            </button>
+                            <button class="btn-quick-action" onclick="window.dispatchTask('exati')">
+                                <i class="fa-solid fa-chart-line"></i>
+                                <span>Verificar Status Exati</span>
+                            </button>
+                            <button class="btn-quick-action" onclick="window.dispatchTask('oficios')">
+                                <i class="fa-solid fa-folder-open"></i>
+                                <span>Auditar Base de Ofícios</span>
+                            </button>
+                            <button class="btn-quick-action" onclick="window.dispatchTask('book')">
+                                <i class="fa-solid fa-book-bookmark"></i>
+                                <span>Curadoria do Book</span>
+                            </button>
+                            <button class="btn-quick-action" onclick="window.dispatchTask('cco')">
+                                <i class="fa-solid fa-headset"></i>
+                                <span>Checkup Geral CCO</span>
+                            </button>
+                        </div>
+
+                        <!-- Viewport Gráfico da Sala (Office Stage) -->
+                        <div class="room-viewport-container">
+                            <div class="viewport-toolbar">
+                                <div class="toolbar-left">
+                                    <i class="fa-solid fa-building"></i>
+                                    <span>CCO Virtual • Posto de Operações Barretos</span>
+                                </div>
+                                <div class="toolbar-right">
+                                    <span><i class="fa-solid fa-arrows-rotate"></i> Atualização em tempo real</span>
+                                    <span><i class="fa-solid fa-mouse-pointer"></i> Clique num posto para inspecionar</span>
+                                </div>
+                            </div>
+                            <div class="office-stage" id="officeStage">
+                                <svg id="stageSvg" class="stage-svg" viewBox="0 0 750 480" preserveAspectRatio="xMidYMid meet"></svg>
+                            </div>
+                        </div>
+
+                        <!-- Grid Inferior: Roster dos Agentes + Terminal de Despacho -->
+                        <div class="room-bottom-grid">
+                            <!-- Roster dos 5 Agentes -->
+                            <div class="agents-roster">
+                                <div class="roster-title">
+                                    <i class="fa-solid fa-users" style="color: #10b981;"></i>
+                                    <span>Equipe de Inteligência Ativa</span>
+                                </div>
+                                <div class="agents-list">
+                                    <div class="agent-item" onclick="window.selectAgent('cco')">
+                                        <div class="agent-item-left">
+                                            <div class="agent-avatar-icon cco"><i class="fa-solid fa-headset"></i></div>
+                                            <div class="agent-meta">
+                                                <h4>Agente CCO</h4>
+                                                <span>Supervisor Geral &amp; Despacho Remoto</span>
+                                            </div>
+                                        </div>
+                                        <span class="agent-status-pill" id="rosterStatus-cco">Operacional</span>
+                                    </div>
+
+                                    <div class="agent-item" onclick="window.selectAgent('exati')">
+                                        <div class="agent-item-left">
+                                            <div class="agent-avatar-icon exati"><i class="fa-solid fa-bolt"></i></div>
+                                            <div class="agent-meta">
+                                                <h4>Agente Exati</h4>
+                                                <span>Monitor de Operações &amp; Planilhas</span>
+                                            </div>
+                                        </div>
+                                        <span class="agent-status-pill" id="rosterStatus-exati">Operacional</span>
+                                    </div>
+
+                                    <div class="agent-item" onclick="window.selectAgent('oficios')">
+                                        <div class="agent-item-left">
+                                            <div class="agent-avatar-icon oficios"><i class="fa-solid fa-folder-open"></i></div>
+                                            <div class="agent-meta">
+                                                <h4>Agente Ofícios</h4>
+                                                <span>Auditor Documental &amp; Prazos</span>
+                                            </div>
+                                        </div>
+                                        <span class="agent-status-pill" id="rosterStatus-oficios">Operacional</span>
+                                    </div>
+
+                                    <div class="agent-item" onclick="window.selectAgent('qa')">
+                                        <div class="agent-item-left">
+                                            <div class="agent-avatar-icon qa"><i class="fa-solid fa-shield-halved"></i></div>
+                                            <div class="agent-meta">
+                                                <h4>Agente QA</h4>
+                                                <span>Sentinela de Layout &amp; Rotas</span>
+                                            </div>
+                                        </div>
+                                        <span class="agent-status-pill" id="rosterStatus-qa">Operacional</span>
+                                    </div>
+
+                                    <div class="agent-item" onclick="window.selectAgent('book')">
+                                        <div class="agent-item-left">
+                                            <div class="agent-avatar-icon book"><i class="fa-solid fa-book-bookmark"></i></div>
+                                            <div class="agent-meta">
+                                                <h4>Agente Book</h4>
+                                                <span>Curador de Inovação &amp; Governança</span>
+                                            </div>
+                                        </div>
+                                        <span class="agent-status-pill" id="rosterStatus-book">Operacional</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Terminal de Dispatch & Logs -->
+                            <div class="terminal-card">
+                                <div class="terminal-header">
+                                    <div class="terminal-dots">
+                                        <div class="terminal-dot dot-red"></div>
+                                        <div class="terminal-dot dot-yellow"></div>
+                                        <div class="terminal-dot dot-green"></div>
+                                    </div>
+                                    <div class="terminal-title">operations-room@barretos-cco:~$</div>
+                                    <div style="font-size: 11px; color: #64748b;"><i class="fa-solid fa-wifi"></i> 100% Online</div>
+                                </div>
+                                <div class="terminal-body" id="terminalLogs">
+                                    <!-- Entradas de log em tempo real -->
+                                </div>
+                                <div class="terminal-input-bar">
+                                    <i class="fa-solid fa-chevron-right" style="color: #10b981; font-size: 12px;"></i>
+                                    <input type="text" id="cmdInput" placeholder="Digite uma instrução para os agentes (ex: Auditar ofícios 2026)..." autocomplete="off">
+                                    <button class="btn-send-command" id="btnSendCmd" title="Despachar comando">
+                                        <span>Despachar</span>
+                                        <i class="fa-solid fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- Footer Oficial Padrão do Barretos Inteligente -->
+                <footer class="hub-footer">
+                    <div class="footer-container">
+                        <div class="footer-left">
+                            <span class="footer-brand">Barretos Inteligente</span>
+                            <span class="footer-sep">•</span>
+                            <span class="footer-tagline">Central HUB PMO &amp; CCO</span>
+                        </div>
+
+                        <div class="footer-center">
+                            <a href="https://www.linkedin.com/in/alisonviper/" target="_blank" rel="noopener noreferrer" class="footer-linkedin-btn" title="Perfil Alison Persil no LinkedIn">
+                                <i class="fa-brands fa-linkedin"></i>
+                                <span>Alison Persil</span>
+                            </a>
+                        </div>
+
+                        <div class="footer-right">
+                            <span class="footer-status-pill">
+                                <span class="footer-status-dot"></span>
+                                Sistema Operacional
+                            </span>
+                            <span class="footer-copy">© 2026 Todos os direitos reservados</span>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts Compartilhados -->
+    <script src="/js/sidebar.js"></script>
+    <script src="./agents_room.js"></script>
+</body>
+</html>

@@ -46,6 +46,20 @@ EXATI_DIR = resolve_dir(
     os.path.join(BASE_DIR, "Relatorios", "02 - Monitor Exati"),
     os.path.join(BASE_DIR, "02 - Monitor Exati")
 )
+QA_DIR = resolve_dir(
+    os.path.join(BASE_DIR, "01 - Relatórios", "03 - QA do Site"),
+    os.path.join(BASE_DIR, "01 - Relatorios", "03 - QA do Site"),
+    os.path.join(BASE_DIR, "Relatórios", "03 - QA do Site")
+)
+SALA_DIR = resolve_dir(
+    os.path.join(BASE_DIR, "02 - Automações", "01 - Sala de Agentes"),
+    os.path.join(BASE_DIR, "02 - Automacoes", "01 - Sala de Agentes"),
+    os.path.join(BASE_DIR, "Automações", "01 - Sala de Agentes")
+)
+BOOK_DIR = resolve_dir(
+    os.path.join(BASE_DIR, "03 - Book"),
+    os.path.join(BASE_DIR, "Book")
+)
 
 DOCS_DIR = os.path.join(OFICIOS_DIR, "Base de dados Ofícios")
 OFICIOS_STATIC_DIR = os.path.join(OFICIOS_DIR, "static")
@@ -518,6 +532,59 @@ def fallback_xlsx_js():
 def fallback_logo_horizontal():
     """Fallback caso a logo horizontal seja solicitada na raiz."""
     return send_from_directory(EXATI_DIR, "logo-ipbarretos-horizontal-alta.png")
+
+# ==============================================================================
+# Rotas: 03 - QA do Site (/qa)
+# ==============================================================================
+@app.route("/qa")
+@app.route("/qa/")
+def qa_index():
+    """Serve a página de Auditoria & QA do Site."""
+    index_path = os.path.join(QA_DIR, "index.html")
+    if os.path.exists(index_path):
+        return send_file(index_path)
+    return "Página de QA em configuração.", 404
+
+@app.route("/qa/<path:filename>")
+def serve_qa_file(filename):
+    """Serve assets da página de QA."""
+    return send_from_directory(QA_DIR, filename)
+
+# ==============================================================================
+# Rotas: 02 - Automações / Sala de Agentes (/sala-agentes, /automacoes)
+# ==============================================================================
+@app.route("/sala-agentes")
+@app.route("/sala-agentes/")
+@app.route("/automacoes")
+@app.route("/automacoes/")
+def sala_agentes_index():
+    """Serve o painel executivo da Sala de Agentes Autônomos."""
+    index_path = os.path.join(SALA_DIR, "index.html")
+    if os.path.exists(index_path):
+        return send_file(index_path)
+    return "Sala de Agentes em configuração.", 404
+
+@app.route("/sala-agentes/<path:filename>")
+def serve_sala_file(filename):
+    """Serve assets da Sala de Agentes."""
+    return send_from_directory(SALA_DIR, filename)
+
+# ==============================================================================
+# Rotas: 03 - Book de Governança (/book)
+# ==============================================================================
+@app.route("/book")
+@app.route("/book/")
+def book_index():
+    """Serve o Livro de Governança & Inovações (Book)."""
+    index_path = os.path.join(BOOK_DIR, "index.html")
+    if os.path.exists(index_path):
+        return send_file(index_path)
+    return "Book de Governança em configuração.", 404
+
+@app.route("/book/<path:filename>")
+def serve_book_file(filename):
+    """Serve assets do Book de Governança."""
+    return send_from_directory(BOOK_DIR, filename)
 
 # ==============================================================================
 # Inicialização Local do Servidor
