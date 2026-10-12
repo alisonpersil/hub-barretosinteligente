@@ -1,312 +1,176 @@
-<!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<!doctype html>
+<html lang="pt-BR">
 <head>
-    <script>
-        (function() {
-            try {
-                var t = localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'light';
-                document.documentElement.setAttribute('data-theme', t);
-            } catch (e) {}
-        })();
-    </script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Sala de Agentes • Barretos Inteligente</title>
-    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Operations Room • Barretos Inteligente</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/img/favicon.png">
-    <link rel="apple-touch-icon" href="/img/favicon.png">
-
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome Icons 6 -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
-    <!-- CSS Compartilhado e Específico -->
-    <link rel="stylesheet" href="/css/sidebar.css">
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="./agents_room.css">
+    
+    <!-- CSS Oficial de AiOperationsRoom -->
+    <link rel="stylesheet" href="/sala-agentes/styles.css">
+    <link rel="stylesheet" href="/sala-agentes/pixel.css">
+    <link rel="stylesheet" href="/sala-agentes/office.css">
 </head>
 <body>
-    <div class="hub-layout">
-        <!-- Top Navigation Bar -->
-        <header class="navbar">
-            <div class="nav-left">
-                <button id="btnToggleSidebar" class="sidebar-toggle-btn" title="Recolher / Expandir menu lateral" aria-label="Alternar barra lateral">
-                    <i class="fa-solid fa-bars"></i>
-                </button>
-                <div class="brand-logo" id="brandLogoContainer">
-                    <a href="/" class="brand-logo-link" id="mainBrandLogo" title="Barretos Inteligente - Central HUB">
-                        <img src="/img/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
-                    </a>
-                    <div class="brand-divider"></div>
-                    <div class="brand-text">
-                        <span class="brand-title">Central HUB</span>
+    <!-- Trilho Lateral de Navegação Executiva (Rail) -->
+    <aside class="trilho trilho-principal" aria-label="Navegação principal">
+        <a href="/" class="trilho-marca" title="Voltar ao Central HUB Barretos" aria-label="Central HUB"></a>
+        <nav class="trilho-nav">
+            <!-- Escritório / Sala de Agentes -->
+            <a class="nav active" href="/sala-agentes" aria-label="Escritório de Operações" title="Escritório de Operações">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19v-5m4 5V9m4 10v-8m4 8V5"/></svg>
+            </a>
+            <!-- Central HUB -->
+            <a class="nav" href="/" aria-label="Central HUB" title="Voltar à Central HUB">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+            </a>
+            <!-- Consulta de Ofícios -->
+            <a class="nav" href="/oficios" aria-label="Consulta de Ofícios" title="Consulta de Ofícios">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5a2 2 0 0 1 2-2h5l2 2H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 10h18"/></svg>
+            </a>
+            <!-- Monitor Exati -->
+            <a class="nav" href="/exati" aria-label="Monitor Exati" title="Monitor Exati">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </a>
+            <!-- QA do Site -->
+            <a class="nav" href="/qa" aria-label="QA do Site" title="QA do Site">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </a>
+            <!-- Book de Governança -->
+            <a class="nav" href="/book" aria-label="Book de Governança" title="Book de Governança">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.7 9a2.45 2.45 0 1 1 4.4 1.48c-.8 1.04-2.1 1.32-2.1 2.78"/><path d="M12 16.7h.01"/></svg>
+            </a>
+        </nav>
+    </aside>
+
+    <header class="topbar">
+        <div class="brand"><span class="brand-mark" aria-hidden="true"></span>AI Operations Room</div>
+        <nav aria-label="Navegação">
+            <button class="nav active" data-view="room">Sala</button>
+            <button class="nav" data-view="projects">Projetos</button>
+        </nav>
+        <span id="connection" class="connection">Atualizando</span>
+    </header>
+
+    <main class="container">
+        <p id="notice" class="notice" role="status" hidden></p>
+        
+        <div id="office-root">
+            <section id="office-view">
+                <div class="linha-titulo ops-titulo">
+                    <div>
+                        <div class="ops-nome">
+                            <span class="ops-marca" aria-hidden="true"></span>
+                            <h1>AI Operations Room</h1>
+                        </div>
+                        <p class="ops-tagline">Seus agentes em atividade, por projeto e em tempo real.</p>
+                    </div>
+
+                    <div class="alternador" aria-label="Modo de visualização">
+                        <button class="botao-mini" type="button" data-mode="panel">Painel</button>
+                        <button class="botao-mini ativo" type="button" data-mode="office">Escritório</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="nav-right">
-                <button id="btnThemeToggle" class="nav-btn" title="Alternar tema claro / escuro" aria-label="Alternar tema">
-                    <i class="fa-solid fa-moon"></i>
-                </button>
-            </div>
-        </header>
+                <!-- Resumo dos 4 KPIs Principais -->
+                <div id="office-summary" class="kpis" aria-label="Resumo de estados"></div>
 
-        <!-- Hub Body: Sidebar Lateral + Área Principal -->
-        <div class="hub-body-wrapper">
-            <!-- Barra Lateral Executiva -->
-            <aside class="hub-sidebar" id="hubSidebar">
-                <div class="sidebar-inner">
-                    <div class="sidebar-section-label">Módulos</div>
+                <!-- Bloco da Cena do Escritório Pixel Art -->
+                <section class="bloco cena-bloco">
+                    <div id="operation-bar" class="barra-operacao"></div>
+                    <section id="office-room" class="cena" aria-label="Escritório de operações"></section>
+                </section>
 
-                    <nav class="sidebar-nav" aria-label="Navegação Lateral">
-                        <!-- Início / Home -->
-                        <div class="sidebar-group">
-                            <a href="/" class="sidebar-item" id="tabBtnHome" title="Página Inicial do HUB">
-                                <div class="item-left">
-                                    <i class="fa-solid fa-house item-icon"></i>
-                                    <span class="item-text">Início</span>
-                                </div>
-                            </a>
-                        </div>
-
-                        <!-- Módulo 1: Relatórios -->
-                        <div class="sidebar-group">
-                            <a href="/?tab=relatorios" class="sidebar-item" id="tabBtnRelatorios" title="Módulo de Relatórios">
-                                <div class="item-left">
-                                    <i class="fa-solid fa-chart-pie item-icon"></i>
-                                    <span class="item-text">Relatórios</span>
-                                </div>
-                                <span class="sidebar-badge" title="3 páginas disponíveis">3</span>
-                            </a>
-
-                            <!-- Submenu com as páginas vinculadas a Relatórios -->
-                            <div class="sidebar-submenu" id="subRelatorios" style="display: none;">
-                                <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Acessar Consulta de Ofícios">
-                                    <i class="fa-solid fa-folder-open sub-icon green"></i>
-                                    <span class="sub-text">Consulta de Ofícios</span>
-                                </a>
-                                <a href="/exati" class="sidebar-subitem" id="sideLinkExati" title="Acessar Monitor Exati">
-                                    <i class="fa-solid fa-chart-line sub-icon blue"></i>
-                                    <span class="sub-text">Monitor Exati</span>
-                                </a>
-                                <a href="/qa" class="sidebar-subitem" id="sideLinkQA" title="Acessar QA do Site">
-                                    <i class="fa-solid fa-shield-halved sub-icon purple"></i>
-                                    <span class="sub-text">QA do Site</span>
-                                </a>
-                            </div>
-                        </div>
-
-                        <!-- Módulo 2: Automações -->
-                        <div class="sidebar-group">
-                            <a href="/sala-agentes" class="sidebar-item active" id="tabBtnAutomacoes" title="Módulo de Automações">
-                                <div class="item-left">
-                                    <i class="fa-solid fa-bolt item-icon"></i>
-                                    <span class="item-text">Automações</span>
-                                </div>
-                                <span class="sidebar-pill-badge">Sala de Agentes</span>
-                            </a>
-                        </div>
-
-                        <!-- Módulo 3: Book -->
-                        <div class="sidebar-group">
-                            <a href="/book" class="sidebar-item" id="tabBtnBook" title="Módulo Book">
-                                <div class="item-left">
-                                    <i class="fa-solid fa-book-bookmark item-icon"></i>
-                                    <span class="item-text">Book</span>
-                                </div>
-                                <span class="sidebar-pill-badge">Governança</span>
-                            </a>
-                        </div>
-                    </nav>
+                <!-- Legenda de Estados -->
+                <div class="legenda-agentes">
+                    <span><i class="ponto verde"></i>trabalhando</span>
+                    <span><i class="ponto laranja"></i>aguardando</span>
+                    <span><i class="ponto azul"></i>delegando</span>
+                    <span><i class="ponto cinza"></i>concluída</span>
+                    <span><i class="ponto vermelho"></i>órfã</span>
+                    <span class="legenda-chave">marcador e placa = estado</span>
+                    <span class="legenda-chave">a posição na sala não define o estado</span>
+                    <span class="legenda-chave">! = órfã</span>
+                    <span class="legenda-uso">clique em um agente para ver os detalhes</span>
                 </div>
-            </aside>
-
-            <!-- Área Central de Conteúdo -->
-            <div class="hub-main-area">
-                <main class="hub-main">
-                    <div class="room-dashboard">
-                        <!-- Topo da Sala -->
-                        <div class="room-header">
-                            <div class="room-title-box">
-                                <h1>Sala de Operações • <span>Agentes Autônomos</span></h1>
-                                <p>Centro de inteligência e despacho autônomo de tarefas operacionais, auditoria e governança</p>
-                            </div>
-                            <div class="room-status-badge">
-                                <span class="pulse-dot"></span>
-                                <span>5 Agentes Online • Gemini Pro Ready</span>
-                            </div>
-                        </div>
-
-                        <!-- Barra de Comandos Rápidos Mobile / Desktop -->
-                        <div class="quick-actions-bar">
-                            <button class="btn-quick-action" onclick="window.dispatchTask('qa')">
-                                <i class="fa-solid fa-shield-halved"></i>
-                                <span>Auditar Rotas Mobile &amp; QA</span>
-                            </button>
-                            <button class="btn-quick-action" onclick="window.dispatchTask('exati')">
-                                <i class="fa-solid fa-chart-line"></i>
-                                <span>Verificar Status Exati</span>
-                            </button>
-                            <button class="btn-quick-action" onclick="window.dispatchTask('oficios')">
-                                <i class="fa-solid fa-folder-open"></i>
-                                <span>Auditar Base de Ofícios</span>
-                            </button>
-                            <button class="btn-quick-action" onclick="window.dispatchTask('book')">
-                                <i class="fa-solid fa-book-bookmark"></i>
-                                <span>Curadoria do Book</span>
-                            </button>
-                            <button class="btn-quick-action" onclick="window.dispatchTask('cco')">
-                                <i class="fa-solid fa-headset"></i>
-                                <span>Checkup Geral CCO</span>
-                            </button>
-                        </div>
-
-                        <!-- Viewport Gráfico da Sala (Office Stage) -->
-                        <div class="room-viewport-container">
-                            <div class="viewport-toolbar">
-                                <div class="toolbar-left">
-                                    <i class="fa-solid fa-building"></i>
-                                    <span>CCO Virtual • Posto de Operações Barretos</span>
-                                </div>
-                                <div class="toolbar-right">
-                                    <span><i class="fa-solid fa-arrows-rotate"></i> Atualização em tempo real</span>
-                                    <span><i class="fa-solid fa-mouse-pointer"></i> Clique num posto para inspecionar</span>
-                                </div>
-                            </div>
-                            <div class="office-stage" id="officeStage">
-                                <svg id="stageSvg" class="stage-svg" viewBox="0 0 750 480" preserveAspectRatio="xMidYMid meet"></svg>
-                            </div>
-                        </div>
-
-                        <!-- Grid Inferior: Roster dos Agentes + Terminal de Despacho -->
-                        <div class="room-bottom-grid">
-                            <!-- Roster dos 5 Agentes -->
-                            <div class="agents-roster">
-                                <div class="roster-title">
-                                    <i class="fa-solid fa-users" style="color: #10b981;"></i>
-                                    <span>Equipe de Inteligência Ativa</span>
-                                </div>
-                                <div class="agents-list">
-                                    <div class="agent-item" onclick="window.selectAgent('cco')">
-                                        <div class="agent-item-left">
-                                            <div class="agent-avatar-icon cco"><i class="fa-solid fa-headset"></i></div>
-                                            <div class="agent-meta">
-                                                <h4>Agente CCO</h4>
-                                                <span>Supervisor Geral &amp; Despacho Remoto</span>
-                                            </div>
-                                        </div>
-                                        <span class="agent-status-pill" id="rosterStatus-cco">Operacional</span>
-                                    </div>
-
-                                    <div class="agent-item" onclick="window.selectAgent('exati')">
-                                        <div class="agent-item-left">
-                                            <div class="agent-avatar-icon exati"><i class="fa-solid fa-bolt"></i></div>
-                                            <div class="agent-meta">
-                                                <h4>Agente Exati</h4>
-                                                <span>Monitor de Operações &amp; Planilhas</span>
-                                            </div>
-                                        </div>
-                                        <span class="agent-status-pill" id="rosterStatus-exati">Operacional</span>
-                                    </div>
-
-                                    <div class="agent-item" onclick="window.selectAgent('oficios')">
-                                        <div class="agent-item-left">
-                                            <div class="agent-avatar-icon oficios"><i class="fa-solid fa-folder-open"></i></div>
-                                            <div class="agent-meta">
-                                                <h4>Agente Ofícios</h4>
-                                                <span>Auditor Documental &amp; Prazos</span>
-                                            </div>
-                                        </div>
-                                        <span class="agent-status-pill" id="rosterStatus-oficios">Operacional</span>
-                                    </div>
-
-                                    <div class="agent-item" onclick="window.selectAgent('qa')">
-                                        <div class="agent-item-left">
-                                            <div class="agent-avatar-icon qa"><i class="fa-solid fa-shield-halved"></i></div>
-                                            <div class="agent-meta">
-                                                <h4>Agente QA</h4>
-                                                <span>Sentinela de Layout &amp; Rotas</span>
-                                            </div>
-                                        </div>
-                                        <span class="agent-status-pill" id="rosterStatus-qa">Operacional</span>
-                                    </div>
-
-                                    <div class="agent-item" onclick="window.selectAgent('book')">
-                                        <div class="agent-item-left">
-                                            <div class="agent-avatar-icon book"><i class="fa-solid fa-book-bookmark"></i></div>
-                                            <div class="agent-meta">
-                                                <h4>Agente Book</h4>
-                                                <span>Curador de Inovação &amp; Governança</span>
-                                            </div>
-                                        </div>
-                                        <span class="agent-status-pill" id="rosterStatus-book">Operacional</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Terminal de Dispatch & Logs -->
-                            <div class="terminal-card">
-                                <div class="terminal-header">
-                                    <div class="terminal-dots">
-                                        <div class="terminal-dot dot-red"></div>
-                                        <div class="terminal-dot dot-yellow"></div>
-                                        <div class="terminal-dot dot-green"></div>
-                                    </div>
-                                    <div class="terminal-title">operations-room@barretos-cco:~$</div>
-                                    <div style="font-size: 11px; color: #64748b;"><i class="fa-solid fa-wifi"></i> 100% Online</div>
-                                </div>
-                                <div class="terminal-body" id="terminalLogs">
-                                    <!-- Entradas de log em tempo real -->
-                                </div>
-                                <div class="terminal-input-bar">
-                                    <i class="fa-solid fa-chevron-right" style="color: #10b981; font-size: 12px;"></i>
-                                    <input type="text" id="cmdInput" placeholder="Digite uma instrução para os agentes (ex: Auditar ofícios 2026)..." autocomplete="off">
-                                    <button class="btn-send-command" id="btnSendCmd" title="Despachar comando">
-                                        <span>Despachar</span>
-                                        <i class="fa-solid fa-paper-plane"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </main>
-
-                <!-- Footer Oficial Padrão do Barretos Inteligente -->
-                <footer class="hub-footer">
-                    <div class="footer-container">
-                        <div class="footer-left">
-                            <span class="footer-brand">Barretos Inteligente</span>
-                            <span class="footer-sep">•</span>
-                            <span class="footer-tagline">Central HUB PMO &amp; CCO</span>
-                        </div>
-
-                        <div class="footer-center">
-                            <a href="https://www.linkedin.com/in/alisonviper/" target="_blank" rel="noopener noreferrer" class="footer-linkedin-btn" title="Perfil Alison Persil no LinkedIn">
-                                <i class="fa-brands fa-linkedin"></i>
-                                <span>Alison Persil</span>
-                            </a>
-                        </div>
-
-                        <div class="footer-right">
-                            <span class="footer-status-pill">
-                                <span class="footer-status-dot"></span>
-                                Sistema Operacional
-                            </span>
-                            <span class="footer-copy">© 2026 Todos os direitos reservados</span>
-                        </div>
-                    </div>
-                </footer>
-            </div>
+            </section>
         </div>
-    </div>
 
-    <!-- Scripts Compartilhados -->
-    <script src="/js/sidebar.js"></script>
-    <script src="./agents_room.js"></script>
+        <section id="room-view" hidden>
+            <div class="page-head">
+                <div>
+                    <p class="eyebrow">CENTRO DE OPERAÇÕES</p>
+                    <h1>Sala de operações</h1>
+                    <p class="intro">Acompanhe as sessões e os subagentes que estão em execução.</p>
+                </div>
+                <div id="summary" class="summary" aria-label="Resumo de estados"></div>
+            </div>
+            <div class="room-layout">
+                <section id="room" class="room" aria-label="Sala de operações"></section>
+                <aside class="details">
+                    <p class="eyebrow">DETALHES</p>
+                    <div id="details">
+                        <h2>Selecione uma execução</h2>
+                        <p>Os eventos e agentes da sessão aparecem aqui.</p>
+                    </div>
+                </aside>
+            </div>
+        </section>
+
+        <section id="projects-view" hidden>
+            <div class="page-head">
+                <div>
+                    <p class="eyebrow">CONFIGURAÇÃO LOCAL</p>
+                    <h1>Projetos</h1>
+                    <p class="intro">Associe as pastas das sessões aos nomes exibidos na sala.</p>
+                </div>
+                <button class="primary" id="new-project" type="button">Novo projeto</button>
+            </div>
+            <section class="panel">
+                <div class="section-head">
+                    <div>
+                        <h2>Sem projeto <span id="unmapped-count" class="count">0</span></h2>
+                        <p>Caminhos recebidos que ainda não têm mapeamento.</p>
+                    </div>
+                </div>
+                <div id="unmapped-list" class="list"></div>
+            </section>
+            <section class="panel">
+                <div class="section-head">
+                    <div>
+                        <h2>Projetos cadastrados <span id="project-count" class="count">0</span></h2>
+                        <p>O caminho mais específico identifica a sessão.</p>
+                    </div>
+                    <label class="toggle"><input id="show-archived" type="checkbox"> Mostrar arquivados</label>
+                </div>
+                <div id="project-list" class="list"></div>
+            </section>
+        </section>
+    </main>
+
+    <!-- Modal Flutuante de Detalhes do Agente ao Clicar -->
+    <dialog id="details-dialog" aria-labelledby="details-title">
+        <div id="details-modal"></div>
+        <form method="dialog"><button class="secondary" type="submit">Fechar</button></form>
+    </dialog>
+
+    <dialog id="project-dialog" aria-labelledby="dialog-title">
+        <form id="project-form">
+            <h2 id="dialog-title">Projeto</h2>
+            <p id="dialog-help" class="dialog-help"></p>
+            <label>Nome do projeto<input id="project-name" name="nome" required maxlength="120" autocomplete="off"></label>
+            <label>Pasta local<input id="project-path" name="caminho_local" required autocomplete="off" spellcheck="false"></label>
+            <p class="hint">Use um caminho absoluto. Pastas dentro desta pasta também serão associadas.</p>
+            <div class="dialog-actions">
+                <button id="cancel-dialog" type="button" class="secondary">Cancelar</button>
+                <button class="primary" type="submit">Salvar</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- Scripts Oficiais do AiOperationsRoom -->
+    <script src="/sala-agentes/pixel.js" defer></script>
+    <script src="/sala-agentes/app.js" defer></script>
 </body>
 </html>

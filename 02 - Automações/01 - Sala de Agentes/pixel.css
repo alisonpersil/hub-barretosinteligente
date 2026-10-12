@@ -1,0 +1,29 @@
+#room { display:block; padding:16px; overflow:auto; }
+.cena.escritorio.pixel { --cinza:#6b6b75; --verde:#22c55e; --azul:#4f7bd9; --laranja:#f59e0b; --vermelho:#ef4444; --roxo-claro:#a469ff; display:block; width:100%; height:auto; min-height:480px; shape-rendering:crispEdges; }
+.cena.escritorio.pixel text { font-family:Inter,system-ui,sans-serif; shape-rendering:auto; }
+.pixel .pp-arte { pointer-events:none; }
+.pixel .pp-sala { transition:opacity .6s ease; }
+.pixel .pp-sala.nascendo,.pixel .pp-sala.sumindo { opacity:0; }
+.pixel .pp-contorno { fill:none; stroke:#3a3550; stroke-width:1; }
+.pixel .pp-sala.ativa .pp-contorno { stroke:rgba(164,105,255,.7); }
+.pixel .pp-sala.ativa .led { fill:var(--verde); animation:pp-pisca 2s steps(1) infinite; }
+.pixel .pp-sala .led { fill:var(--cinza); }
+.pixel .pp-sala .sala-nome { fill:#f4f2fa; font-size:15px; font-weight:600; }
+.pixel .pp-sala .sala-sub { fill:#8f8a9e; font-size:11px; }
+.pixel .pp-area { fill:rgba(255,255,255,.26); font-size:9px; letter-spacing:.1em; pointer-events:none; }
+.pixel .pp-tela .pp-vidro,.pixel .pp-tela .pp-linha { fill:transparent; }
+.pixel .pp-tela .pp-luz { fill:rgba(164,105,255,.14); opacity:0; }
+.pixel .pp-tela.ligada .pp-vidro { fill:#4b22a0; animation:pp-vidro 2.4s steps(1) infinite; }
+.pixel .pp-tela.ligada .pp-linha { fill:#d9c7ff; }
+.pixel .pp-tela.ligada .pp-linha.l1 { animation:pp-linha-1 1.6s steps(6) infinite; }
+.pixel .pp-tela.ligada .pp-linha.l2 { animation:pp-linha-2 2.2s steps(8) infinite .5s; }
+.pixel .pp-tela.ligada .pp-luz { opacity:1; }
+.pp-pele { fill:var(--pele); }.pp-pele-s { fill:var(--pele-s); }.pp-cabelo { fill:var(--cabelo); }.pp-cabelo-s { fill:var(--cabelo-s); }.pp-camisa { fill:var(--camisa); }.pp-camisa-s { fill:var(--camisa-s); }.pp-calca { fill:var(--calca); }
+.pixel .pessoa { --estado:var(--cinza); transition:opacity 1.2s ease; cursor:pointer; }.pixel .pessoa.trabalhando { --estado:var(--verde); }.pixel .pessoa.delegando { --estado:var(--azul); }.pixel .pessoa.aguardando { --estado:var(--laranja); }.pixel .pessoa.orfa { --estado:var(--vermelho); }.pixel .pessoa.surgindo,.pixel .pessoa.sumindo { opacity:0; }.pixel .pessoa.concluida { opacity:.78; }.pixel .pessoa .pp-sombra { fill:rgba(0,0,0,.4); }.pixel .pessoa:hover .pp-sombra,.pixel .pessoa:focus .pp-sombra { fill:rgba(164,105,255,.5); }
+.pixel .pessoa .pp-q1 { visibility:hidden; }.pixel .pessoa.anim-andar .pp-q0,.pixel .pessoa.anim-digitar .pp-q0,.pixel .pessoa.anim-digitar-lento .pp-q0,.pixel .pessoa.anim-piscar .pp-q0 { animation:pp-quadro-a .44s steps(1) infinite; }.pixel .pessoa.anim-andar .pp-q1,.pixel .pessoa.anim-digitar .pp-q1,.pixel .pessoa.anim-digitar-lento .pp-q1,.pixel .pessoa.anim-piscar .pp-q1 { animation:pp-quadro-b .44s steps(1) infinite; }
+.pixel .pp-marca-borda { fill:#1a1520; }.pixel .pp-marca-miolo { fill:var(--estado); }.pixel .pessoa.trabalhando .pp-marca,.pixel .pessoa.delegando .pp-marca { animation:pp-flutua 1.6s steps(1) infinite; }.pixel .pessoa.concluida .pp-marca-borda { fill:#6b6b75; }.pixel .pessoa.concluida .pp-marca-miolo { fill:#1a1520; }.pixel .pessoa.orfa .pp-marca { display:none; }
+.pixel .pp-alerta { display:none; }.pixel .pessoa.orfa .pp-alerta { display:inline; animation:pp-pisca 2.4s steps(1) infinite; }.pixel .pp-balao-borda { fill:#1a1520; }.pixel .pp-balao { fill:#ef4444; }.pixel .pp-exclamacao { fill:#fff; }
+.pixel .pessoa .pp-placa-fundo { fill:rgba(11,10,16,.9); stroke:var(--estado); stroke-width:1.5; }.pixel .pessoa.concluida .pp-placa-fundo { stroke-dasharray:3 3; }.pixel .pessoa .nome { fill:#edebf5; font-size:9px; font-weight:500; }.pixel .pessoa .tempo { fill:#8f8a9e; font-size:8.5px; }.pixel .pessoa:hover .pp-placa-fundo,.pixel .pessoa:focus .pp-placa-fundo { stroke-width:2.5; fill:#1b1530; }
+.pixel .laco.halo { stroke:rgba(164,105,255,.22); stroke-width:8; fill:none; }.pixel .laco.ativo { stroke:#a469ff; stroke-width:2; stroke-linecap:butt; stroke-dasharray:6 6; fill:none; animation:pp-traco .8s linear infinite; }.pixel .laco.pulso { stroke:#fff; stroke-width:1; fill:none; stroke-linecap:butt; stroke-dasharray:2 10; animation:pp-traco .55s linear infinite; }
+@keyframes pp-vidro { 0%,100% { fill:#4b22a0; } 50% { fill:#5b2bb0; } } @keyframes pp-linha-1 { 0% { width:3px; } 100% { width:21px; } } @keyframes pp-linha-2 { 0% { width:3px; } 100% { width:27px; } } @keyframes pp-quadro-a { 0% { visibility:visible; } 50% { visibility:hidden; } } @keyframes pp-quadro-b { 0% { visibility:hidden; } 50% { visibility:visible; } } @keyframes pp-pisca { 0%,100% { opacity:1; } 50% { opacity:.45; } } @keyframes pp-flutua { 0%,100% { transform:translate(0,-78px); } 50% { transform:translate(0,-81px); } } @keyframes pp-traco { to { stroke-dashoffset:-12; } }
+@media (prefers-reduced-motion:reduce) { .pixel .pessoa *, .pixel .pp-tela *, .pixel .laco,.pixel .pp-sala .led { animation:none!important; } }

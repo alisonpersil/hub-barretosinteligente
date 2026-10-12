@@ -5,7 +5,7 @@ import subprocess
 import threading
 import webbrowser
 import mimetypes
-from datetime import datetime
+from datetime import datetime, timedelta
 
 # Windows Console UTF-8 encoding support
 if sys.platform == "win32":
@@ -568,6 +568,183 @@ def sala_agentes_index():
 def serve_sala_file(filename):
     """Serve assets da Sala de Agentes."""
     return send_from_directory(SALA_DIR, filename)
+
+# ==============================================================================
+# Endpoints da Sala de Agentes (AI Operations Room API)
+# ==============================================================================
+@app.route("/api/projetos", methods=["GET", "POST"])
+def api_projetos():
+    return jsonify([
+        {"id": 1, "nome": "Nova Insights", "caminho_local": "C:\\Barretos\\NovaInsights", "arquivado": False},
+        {"id": 2, "nome": "Orion Flow", "caminho_local": "C:\\Barretos\\OrionFlow", "arquivado": False},
+        {"id": 3, "nome": "Barretos Inteligente • CCO", "caminho_local": "C:\\Barretos\\CCO", "arquivado": False}
+    ])
+
+@app.route("/api/sessoes")
+def api_sessoes():
+    return jsonify({
+        "sessoes": [
+            {"session_id": "sess-nova", "cwd": "C:\\Barretos\\NovaInsights", "projeto_id": 1},
+            {"session_id": "sess-orion", "cwd": "C:\\Barretos\\OrionFlow", "projeto_id": 2},
+            {"session_id": "sess-cco", "cwd": "C:\\Barretos\\CCO", "projeto_id": 3}
+        ]
+    })
+
+@app.route("/api/painel")
+def api_painel():
+    now_dt = datetime.now()
+    now_iso = now_dt.isoformat()
+    # 2 horas atrás para cálculos de duração
+    ago_10m = (now_dt - timedelta(minutes=10)).isoformat()
+    ago_12m = (now_dt - timedelta(minutes=12)).isoformat()
+    ago_23m = (now_dt - timedelta(minutes=23)).isoformat()
+    ago_28m = (now_dt - timedelta(minutes=28)).isoformat()
+
+    # Execuções ativas com laços curvos entre delegantes e subagentes (Idêntico ao Screenshot 2)
+    execucoes = [
+        # Sala 1: Nova Insights (4 execuções ativas)
+        {
+            "chave": "p1-main", "session_id": "sess-nova", "agent_id": None, "pai_chave": None,
+            "tipo": "Claude principal", "projeto_id": 1, "projeto_nome": "Nova Insights",
+            "cwd": "C:\\Barretos\\NovaInsights", "estado": "delegando", "criado_em": ago_23m, "atualizado_em": now_iso
+        },
+        {
+            "chave": "p1-qa", "session_id": "sess-nova", "agent_id": "sub-qa", "pai_chave": "p1-main",
+            "tipo": "QA", "projeto_id": 1, "projeto_nome": "Nova Insights",
+            "cwd": "C:\\Barretos\\NovaInsights", "estado": "trabalhando", "criado_em": ago_10m, "atualizado_em": now_iso
+        },
+        {
+            "chave": "p1-context", "session_id": "sess-nova", "agent_id": "sub-context", "pai_chave": "p1-main",
+            "tipo": "Pesquisador de contexto", "projeto_id": 1, "projeto_nome": "Nova Insights",
+            "cwd": "C:\\Barretos\\NovaInsights", "estado": "trabalhando", "criado_em": ago_12m, "atualizado_em": now_iso
+        },
+        {
+            "chave": "p1-obsidian", "session_id": "sess-nova", "agent_id": "sub-obsidian", "pai_chave": "p1-main",
+            "tipo": "Obsidian", "projeto_id": 1, "projeto_nome": "Nova Insights",
+            "cwd": "C:\\Barretos\\NovaInsights", "estado": "aguardando", "criado_em": ago_28m, "atualizado_em": now_iso
+        },
+        # Sala 2: Orion Flow (4 execuções ativas)
+        {
+            "chave": "p2-main", "session_id": "sess-orion", "agent_id": None, "pai_chave": None,
+            "tipo": "Claude principal", "projeto_id": 2, "projeto_nome": "Orion Flow",
+            "cwd": "C:\\Barretos\\OrionFlow", "estado": "delegando", "criado_em": ago_28m, "atualizado_em": now_iso
+        },
+        {
+            "chave": "p2-context", "session_id": "sess-orion", "agent_id": "sub-context2", "pai_chave": "p2-main",
+            "tipo": "Pesquisador de contexto", "projeto_id": 2, "projeto_nome": "Orion Flow",
+            "cwd": "C:\\Barretos\\OrionFlow", "estado": "trabalhando", "criado_em": ago_10m, "atualizado_em": now_iso
+        },
+        {
+            "chave": "p2-bug", "session_id": "sess-orion", "agent_id": "sub-bug", "pai_chave": "p2-main",
+            "tipo": "Bug Hunter", "projeto_id": 2, "projeto_nome": "Orion Flow",
+            "cwd": "C:\\Barretos\\OrionFlow", "estado": "aguardando", "criado_em": ago_23m, "atualizado_em": now_iso
+        },
+        {
+            "chave": "p2-handoff", "session_id": "sess-orion", "agent_id": "sub-handoff", "pai_chave": "p2-main",
+            "tipo": "Handoff", "projeto_id": 2, "projeto_nome": "Orion Flow",
+            "cwd": "C:\\Barretos\\OrionFlow", "estado": "trabalhando", "criado_em": ago_12m, "atualizado_em": now_iso
+        },
+        # Sala 3: Barretos Inteligente CCO & Operações
+        {
+            "chave": "p3-main", "session_id": "sess-cco", "agent_id": None, "pai_chave": None,
+            "tipo": "Claude principal", "projeto_id": 3, "projeto_nome": "Barretos Inteligente • CCO",
+            "cwd": "C:\\Barretos\\CCO", "estado": "delegando", "criado_em": ago_28m, "atualizado_em": now_iso
+        },
+        {
+            "chave": "p3-exati", "session_id": "sess-cco", "agent_id": "sub-exati", "pai_chave": "p3-main",
+            "tipo": "Monitor Exati", "projeto_id": 3, "projeto_nome": "Barretos Inteligente • CCO",
+            "cwd": "C:\\Barretos\\CCO", "estado": "trabalhando", "criado_em": ago_10m, "atualizado_em": now_iso
+        },
+        {
+            "chave": "p3-oficios", "session_id": "sess-cco", "agent_id": "sub-oficios", "pai_chave": "p3-main",
+            "tipo": "Consulta de Ofícios", "projeto_id": 3, "projeto_nome": "Barretos Inteligente • CCO",
+            "cwd": "C:\\Barretos\\CCO", "estado": "trabalhando", "criado_em": ago_12m, "atualizado_em": now_iso
+        },
+        {
+            "chave": "p3-book", "session_id": "sess-cco", "agent_id": "sub-book", "pai_chave": "p3-main",
+            "tipo": "Curador do Book", "projeto_id": 3, "projeto_nome": "Barretos Inteligente • CCO",
+            "cwd": "C:\\Barretos\\CCO", "estado": "aguardando", "criado_em": ago_23m, "atualizado_em": now_iso
+        }
+    ]
+
+    historico = [
+        {"session_id": "sess-nova", "tipo": "QA", "projeto_nome": "Nova Insights", "estado": "trabalhando", "atualizado_em": now_iso},
+        {"session_id": "sess-nova", "tipo": "Pesquisador de contexto", "projeto_nome": "Nova Insights", "estado": "trabalhando", "atualizado_em": now_iso},
+        {"session_id": "sess-orion", "tipo": "Pesquisador de contexto", "projeto_nome": "Orion Flow", "estado": "trabalhando", "atualizado_em": now_iso},
+        {"session_id": "sess-orion", "tipo": "Handoff", "projeto_nome": "Orion Flow", "estado": "trabalhando", "atualizado_em": now_iso},
+        {"session_id": "sess-cco", "tipo": "Monitor Exati", "projeto_nome": "Barretos Inteligente • CCO", "estado": "trabalhando", "atualizado_em": now_iso},
+        {"session_id": "sess-cco", "tipo": "Consulta de Ofícios", "projeto_nome": "Barretos Inteligente • CCO", "estado": "trabalhando", "atualizado_em": now_iso}
+    ]
+
+    historico_tipos = {
+        "Pesquisador de contexto": [
+            {"projeto_nome": "Nova Insights", "ocorrido_em": "13:31", "em_andamento": True},
+            {"projeto_nome": "Orion Flow", "ocorrido_em": "13:43", "em_andamento": True}
+        ],
+        "QA": [
+            {"projeto_nome": "Nova Insights", "ocorrido_em": "13:30", "em_andamento": True}
+        ],
+        "Monitor Exati": [
+            {"projeto_nome": "Barretos Inteligente • CCO", "ocorrido_em": "13:35", "em_andamento": True}
+        ],
+        "Consulta de Ofícios": [
+            {"projeto_nome": "Barretos Inteligente • CCO", "ocorrido_em": "13:36", "em_andamento": True}
+        ]
+    }
+
+    return jsonify({
+        "horas": 2,
+        "resumo": {
+            "trabalhando": 6,
+            "delegando": 4,
+            "aguardando": 2,
+            "sessoes_ativas": 6,
+            "execucoes_na_janela": 17,
+            "concluidas": 5,
+            "orfas": 0,
+            "ultimo_evento": "07/10/2026 13:43"
+        },
+        "execucoes": execucoes,
+        "historico": historico,
+        "historico_tipos": historico_tipos
+    })
+
+@app.route("/api/sessoes/<session_id>/agentes")
+def api_sessao_agentes(session_id):
+    agentes_map = {
+        "sess-nova": [
+            {"chave": "p1-main", "tipo": "Claude principal", "estado": "delegando", "cwd": "C:\\Barretos\\NovaInsights"},
+            {"chave": "p1-qa", "tipo": "QA", "estado": "trabalhando", "cwd": "C:\\Barretos\\NovaInsights", "pai_chave": "p1-main"},
+            {"chave": "p1-context", "tipo": "Pesquisador de contexto", "estado": "trabalhando", "cwd": "C:\\Barretos\\NovaInsights", "pai_chave": "p1-main"},
+            {"chave": "p1-obsidian", "tipo": "Obsidian", "estado": "aguardando", "cwd": "C:\\Barretos\\NovaInsights", "pai_chave": "p1-main"}
+        ],
+        "sess-orion": [
+            {"chave": "p2-main", "tipo": "Claude principal", "estado": "delegando", "cwd": "C:\\Barretos\\OrionFlow"},
+            {"chave": "p2-bug", "tipo": "Bug Hunter", "estado": "aguardando", "cwd": "C:\\Barretos\\OrionFlow", "pai_chave": "p2-main"},
+            {"chave": "p2-handoff", "tipo": "Handoff", "estado": "trabalhando", "cwd": "C:\\Barretos\\OrionFlow", "pai_chave": "p2-main"},
+            {"chave": "p2-context", "tipo": "Pesquisador de contexto", "estado": "trabalhando", "cwd": "C:\\Barretos\\OrionFlow", "pai_chave": "p2-main"}
+        ],
+        "sess-cco": [
+            {"chave": "p3-main", "tipo": "Claude principal", "estado": "delegando", "cwd": "C:\\Barretos\\CCO"},
+            {"chave": "p3-exati", "tipo": "Monitor Exati", "estado": "trabalhando", "cwd": "C:\\Barretos\\CCO", "pai_chave": "p3-main"},
+            {"chave": "p3-oficios", "tipo": "Consulta de Ofícios", "estado": "trabalhando", "cwd": "C:\\Barretos\\CCO", "pai_chave": "p3-main"},
+            {"chave": "p3-book", "tipo": "Curador do Book", "estado": "aguardando", "cwd": "C:\\Barretos\\CCO", "pai_chave": "p3-main"}
+        ]
+    }
+    agentes = agentes_map.get(session_id, agentes_map["sess-nova"])
+    return jsonify({"agentes": agentes})
+
+@app.route("/api/sessoes/<session_id>/historico")
+def api_sessao_historico(session_id):
+    now = datetime.now()
+    return jsonify({
+        "eventos": [
+            {"nome": "SessionStart", "ocorrido_em": (now - timedelta(minutes=25)).isoformat()},
+            {"nome": "UserPromptSubmit", "ocorrido_em": (now - timedelta(minutes=20)).isoformat()},
+            {"nome": "SubagentStart", "ocorrido_em": (now - timedelta(minutes=15)).isoformat()},
+            {"nome": "SubagentStart", "ocorrido_em": (now - timedelta(minutes=10)).isoformat()}
+        ]
+    })
 
 # ==============================================================================
 # Rotas: 03 - Book de Governança (/book)
