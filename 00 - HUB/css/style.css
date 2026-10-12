@@ -1116,12 +1116,20 @@ body {
     }
     .hub-sidebar {
         position: fixed;
-        top: 62px;
+        top: 0;
         bottom: 0;
         left: 0;
-        z-index: 1000;
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100vh;
+        max-height: 100dvh;
+        z-index: 90;
         transform: translateX(-100%);
         box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+        padding-top: calc(62px + env(safe-area-inset-top, 0px));
+        box-sizing: border-box;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     .hub-sidebar.mobile-open {
         transform: translateX(0);
@@ -1147,7 +1155,8 @@ body {
 /* Telas Mobile Smartphones (iPhone & Android <= 600px) */
 @media (max-width: 600px) {
     .navbar {
-        height: 56px;
+        height: 60px;
+        min-height: 60px;
         padding: 0 12px;
     }
     .brand-logo {

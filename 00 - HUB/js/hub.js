@@ -158,12 +158,19 @@
         document.body.appendChild(backdrop);
     }
 
+    function closeMobileSidebar() {
+        if (hubSidebar) hubSidebar.classList.remove('mobile-open');
+        if (backdrop) backdrop.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
     if (btnToggleSidebar && hubSidebar) {
         btnToggleSidebar.addEventListener('click', (e) => {
             e.stopPropagation();
             if (window.innerWidth <= 860) {
                 const isOpen = hubSidebar.classList.toggle('mobile-open');
                 if (backdrop) backdrop.classList.toggle('active', isOpen);
+                document.body.style.overflow = isOpen ? 'hidden' : '';
             } else {
                 hubSidebar.classList.toggle('collapsed');
                 const isCollapsed = hubSidebar.classList.contains('collapsed');
@@ -175,10 +182,7 @@
     }
 
     if (backdrop) {
-        backdrop.addEventListener('click', () => {
-            if (hubSidebar) hubSidebar.classList.remove('mobile-open');
-            backdrop.classList.remove('active');
-        });
+        backdrop.addEventListener('click', closeMobileSidebar);
     }
 
     initSidebarState();

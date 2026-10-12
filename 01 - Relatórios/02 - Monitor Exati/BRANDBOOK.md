@@ -63,7 +63,10 @@ O ecossistema **Barretos Inteligente** foi concebido para entregar portais e fer
   * `Automações` (`fa-bolt`): Badge *"Em breve"*.
   * `Book` (`fa-book-bookmark`): Badge *"Em breve"*.
 * **Persistência de Estado:** Gravada automaticamente no `localStorage ('hub_sidebar_collapsed')`. Ao navegar entre HUB, Ofícios e Exati, o estado escolhido é mantido.
-* **Modo Mobile (≤ 860px):** Transforma-se em gaveta deslizante (`drawer`) com backdrop escurecido (`.sidebar-backdrop`), abrindo via botão hamburguer e fechando ao clicar fora.
+* **Modo Mobile (≤ 860px) & Safe Area:** Transforma-se em gaveta deslizante (`drawer`) com backdrop escurecido (`.sidebar-backdrop`), abrindo via botão hamburguer e fechando ao clicar fora.
+  * **Prevenção de Corte de Texto:** A gaveta ocupa altura total (`top: 0; bottom: 0; height: 100dvh;`) com preenchimento superior seguro `padding-top: calc(62px + env(safe-area-inset-top, 0px))` e `z-index: 90` sob a navbar (`z-index: 100`).
+  * O rótulo "MÓDULOS" e todos os itens permanecem 100% visíveis, legíveis e com espaçamento executivo em qualquer smartphone (iOS com Dynamic Island/notch e Android).
+  * Enquanto aberta, a rolagem da página de fundo é bloqueada (`overflow: hidden`), impedindo descompassos visuais.
 
 ### 2.4 Endbar Oficial no Rodapé (Footer Corporativo • `.hub-footer`)
 * **Presença Obrigatória:** Rodapé executivo idêntico em todas as páginas do portal.

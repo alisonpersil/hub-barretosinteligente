@@ -5115,21 +5115,42 @@ canvas {
     opacity: 1;
 }
 
-/* Responsivo */
+/* Responsivo Mobile para Barra Lateral Executiva */
 @media (max-width: 860px) {
     .hub-sidebar {
         position: fixed;
-        top: 62px;
+        top: 0;
         bottom: 0;
         left: 0;
-        height: calc(100vh - 62px);
-        max-height: calc(100vh - 62px);
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100vh;
+        max-height: 100dvh;
         z-index: 90;
         transform: translateX(-100%);
         box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+        padding-top: calc(62px + env(safe-area-inset-top, 0px));
+        box-sizing: border-box;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
     .hub-sidebar.mobile-open {
         transform: translateX(0);
+    }
+    .sidebar-inner {
+        padding: 18px 14px 32px 14px;
+        min-height: auto;
+    }
+    .sidebar-section-label {
+        display: block !important;
+        opacity: 1 !important;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.9px;
+        color: var(--text-muted, #64748b);
+        padding: 4px 12px 12px 12px;
+        margin: 0;
     }
 }
 
