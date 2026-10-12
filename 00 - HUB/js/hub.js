@@ -147,7 +147,7 @@
     };
     const subRelatorios = document.getElementById('subRelatorios');
 
-    function switchTab(tabId) {
+    function switchTab(tabId, updateUrl = true) {
         if (!tabPanels[tabId]) tabId = 'home';
 
         // Atualiza estado ativo dos botões da sidebar
@@ -174,6 +174,20 @@
         // Controla exibição do submenu de relatórios
         if (subRelatorios) {
             subRelatorios.style.display = (tabId === 'relatorios') ? 'flex' : 'none';
+        }
+
+        // Sincroniza a URL do navegador em tempo real com a tela visível:
+        // - Ao estar em 'home', limpa query string (?tab=...) e hashes para evitar recarregamento em outra aba
+        // - Ao estar em outra aba, reflete ?tab=nome para navegação precisa
+        if (updateUrl && window.history && window.history.replaceState) {
+            try {
+                const cleanPath = window.location.pathname || '/';
+                if (tabId === 'home') {
+                    window.history.replaceState(null, '', cleanPath);
+                } else {
+                    window.history.replaceState(null, '', `${cleanPath}?tab=${tabId}`);
+                }
+            } catch (_) {}
         }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -270,16 +284,31 @@
         }
     }
 
+    // Suporte ao botão voltar/avançar do navegador (mobile e desktop)
+    window.addEventListener('popstate', () => {
+        try {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tabParam = urlParams.get('tab') || window.location.hash.replace('#', '') || 'home';
+            switchTab(tabParam, false);
+        } catch (_) {
+            switchTab('home', false);
+        }
+    });
+
     document.addEventListener('DOMContentLoaded', () => {
         setupModuleLinks();
 
-        // Ativação direta de aba via parâmetro URL ou hash (ex: /?tab=relatorios ou /#automacoes)
+        // Ativação direta de aba via parâmetro URL ou hash (ex: /?tab=relatorios)
         try {
             const urlParams = new URLSearchParams(window.location.search);
             const tabParam = urlParams.get('tab') || window.location.hash.replace('#', '');
-            if (tabParam && tabPanels[tabParam]) {
-                switchTab(tabParam);
+            if (tabParam && tabPanels[tabParam] && tabParam !== 'home') {
+                switchTab(tabParam, false);
+            } else {
+                switchTab('home', true);
             }
-        } catch (_) {}
+        } catch (_) {
+            switchTab('home', true);
+        }
     });
 })();
