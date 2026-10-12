@@ -43,7 +43,7 @@
                     </a>
                     <div class="brand-divider"></div>
                     <div class="brand-text">
-                        <span class="brand-title">Central HUB</span>
+                        <span class="brand-title" id="hubBrandTitle">Central HUB</span>
                     </div>
                 </div>
             </div>
@@ -107,8 +107,16 @@
                                     <i class="fa-solid fa-bolt item-icon"></i>
                                     <span class="item-text">Automações</span>
                                 </div>
-                                <span class="sidebar-pill-badge">Sala de Agentes</span>
+                                <span class="sidebar-badge" title="1 ferramenta disponível">1</span>
                             </button>
+
+                            <!-- Submenu com as ferramentas de Automações -->
+                            <div class="sidebar-submenu" id="subAutomacoes" style="display: none;">
+                                <a href="/sala-agentes" class="sidebar-subitem" id="sideLinkSala" title="Sala de Agentes Autônomos">
+                                    <i class="fa-solid fa-robot sub-icon purple"></i>
+                                    <span class="sub-text">Sala de Agentes</span>
+                                </a>
+                            </div>
                         </div>
 
                         <!-- Módulo 3: Book -->
@@ -118,7 +126,6 @@
                                     <i class="fa-solid fa-book-bookmark item-icon"></i>
                                     <span class="item-text">Book</span>
                                 </div>
-                                <span class="sidebar-pill-badge">Governança</span>
                             </button>
                         </div>
                     </nav>
@@ -131,6 +138,7 @@
                     <!-- PAINEL 0: INÍCIO (Primeira Página - Exibe os 3 Módulos) -->
                     <section class="hub-tab-panel active" id="panelHome">
                         <div class="hub-container">
+
                             <header class="hub-header">
                                 <h1 class="hub-title">Módulos do <span>Sistema</span></h1>
                                 <p class="hub-subtitle">Selecione uma área para acessar os painéis e ferramentas operacionais</p>
@@ -262,7 +270,6 @@
                                         <i class="fa-solid fa-robot"></i>
                                     </div>
                                     <h2 class="portal-name">Sala de Agentes Autônomos</h2>
-                                    <p style="font-size: 13.5px; color: var(--text-secondary); margin: 8px 0 16px 0; line-height: 1.5;">Posto virtual em Pixel Art com 5 agentes (CCO, Exati, Ofícios, QA e Book), orquestração de tarefas e despacho remoto via celular.</p>
                                     <div class="portal-action-btn green" id="btnOpenSala">
                                         <span>Entrar na Sala de Agentes</span>
                                         <i class="fa-solid fa-arrow-right"></i>
@@ -294,7 +301,6 @@
                                         <i class="fa-solid fa-book-bookmark"></i>
                                     </div>
                                     <h2 class="portal-name">Book de Governança &amp; Inovação</h2>
-                                    <p style="font-size: 13.5px; color: var(--text-secondary); margin: 8px 0 16px 0; line-height: 1.5;">Registro executivo de marcos de engenharia e melhorias de software catalogadas dinamicamente pelo Agente Book.</p>
                                     <div class="portal-action-btn purple" id="btnOpenBookPortal">
                                         <span>Acessar Livro de Governança</span>
                                         <i class="fa-solid fa-arrow-right"></i>
@@ -323,7 +329,8 @@
         </div>
     </div>
 
-    <!-- Script de Inicialização -->
+    <!-- Script de Inicialização e Rádio Global -->
+    <script src="/js/radio.js" defer></script>
     <script src="./js/hub.js"></script>
 </body>
 </html>

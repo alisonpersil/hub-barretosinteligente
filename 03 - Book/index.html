@@ -1,26 +1,26 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="light">
+<html lang="pt-BR" data-theme="dark">
 <head>
     <script>
         (function() {
             try {
-                var t = localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'light';
+                var t = localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'dark';
                 document.documentElement.setAttribute('data-theme', t);
             } catch (e) {}
         })();
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Book de Governança • Barretos Inteligente</title>
+    <title>Book de Governança &amp; Inovação • Barretos Inteligente</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/img/favicon.png">
     <link rel="apple-touch-icon" href="/img/favicon.png">
 
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Montserrat & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:ital,wght@0,700;0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">
 
     <!-- Font Awesome Icons 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -28,11 +28,14 @@
     <!-- CSS Compartilhado e Específico -->
     <link rel="stylesheet" href="/css/sidebar.css">
     <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="./book.css">
+    <link rel="stylesheet" href="/book/book.css">
 </head>
 <body>
     <div class="hub-layout">
-        <!-- Top Navigation Bar -->
+        <!-- Background Neon Mesh -->
+        <div class="book-ambient-mesh"></div>
+
+        <!-- Top Navigation Bar (Padronizada) -->
         <header class="navbar">
             <div class="nav-left">
                 <button id="btnToggleSidebar" class="sidebar-toggle-btn" title="Recolher / Expandir menu lateral" aria-label="Alternar barra lateral">
@@ -44,7 +47,7 @@
                     </a>
                     <div class="brand-divider"></div>
                     <div class="brand-text">
-                        <span class="brand-title">Central HUB</span>
+                        <span class="brand-title">Book</span>
                     </div>
                 </div>
             </div>
@@ -108,8 +111,16 @@
                                     <i class="fa-solid fa-bolt item-icon"></i>
                                     <span class="item-text">Automações</span>
                                 </div>
-                                <span class="sidebar-pill-badge">Sala de Agentes</span>
+                                <span class="sidebar-badge" title="1 ferramenta disponível">1</span>
                             </a>
+
+                            <!-- Submenu com as ferramentas de Automações -->
+                            <div class="sidebar-submenu" id="subAutomacoes" style="display: none;">
+                                <a href="/sala-agentes" class="sidebar-subitem" id="sideLinkSala" title="Sala de Agentes Autônomos">
+                                    <i class="fa-solid fa-robot sub-icon purple"></i>
+                                    <span class="sub-text">Sala de Agentes</span>
+                                </a>
+                            </div>
                         </div>
 
                         <!-- Módulo 3: Book -->
@@ -119,7 +130,6 @@
                                     <i class="fa-solid fa-book-bookmark item-icon"></i>
                                     <span class="item-text">Book</span>
                                 </div>
-                                <span class="sidebar-pill-badge">Governança</span>
                             </a>
                         </div>
                     </nav>
@@ -130,75 +140,153 @@
             <div class="hub-main-area">
                 <main class="hub-main">
                     <div class="book-container">
-                        <!-- Cabeçalho do Book -->
-                        <header class="book-header">
-                            <h1>Book de <span>Governança &amp; Inovação</span></h1>
-                            <p>Registro vivo dos marcos de engenharia de software, inovações contratuais e ganhos de eficiência da concessão Barretos Inteligente</p>
-                        </header>
 
-                        <!-- Indicadores de Governança -->
-                        <div class="book-stats-grid">
-                            <div class="book-stat-card">
-                                <div class="book-stat-number" id="totalInnovationsCount">5</div>
-                                <div class="book-stat-label">Inovações Catalogadas</div>
+
+                        <!-- Notícia Especial em Destaque • Barretos FM & Agentes (Estilo GTA VI / Rockstar) -->
+                        <section class="book-radio-news-banner" id="radioNewsBanner">
+                            <div class="radio-news-ambient-glow"></div>
+                            
+                            <div class="radio-news-grid">
+                                <div class="radio-news-content">
+                                    <div class="radio-news-top-brand">
+                                        <span class="news-brand-tag"><i class="fa-solid fa-tower-broadcast"></i> BARRETOS FM</span>
+                                        <span class="news-brand-divider">•</span>
+                                        <span class="news-brand-sub">Música &amp; Automação</span>
+                                    </div>
+                                    
+                                    <h1 class="radio-news-title">Nossos Robôs ouvem Rádio</h1>
+                                    
+                                    <p class="radio-news-text">
+                                        Já está disponível a visualização dos agentes na página de Automações. É por lá que conseguimos ver eles trabalhando no site e criando automações próprias. E isso não seria possível sem uma área para tomar café e uma boa música. A rádio Barretos Inteligente toca algumas das músicas mais famosas e extraordinárias. São mais de 4h de música.
+                                    </p>
+                                    
+                                    <div class="radio-news-actions">
+                                        <button type="button" class="btn-ouvir-estacao" id="btnOuvirEstacaoBook" title="Sintonizar rádio oficial em transmissão linear contínua">
+                                            <i class="fa-solid fa-play" id="btnOuvirEstacaoIcon"></i>
+                                            <span id="btnOuvirEstacaoText">Ouvir estação</span>
+                                            <span class="live-dot-indicator"></span>
+                                        </button>
+                                        <a href="/sala-agentes" class="btn-visitar-sala" title="Visitar sala de operações dos agentes">
+                                            <i class="fa-solid fa-robot"></i> Ir para a Sala de Agentes
+                                        </a>
+                                    </div>
+                                </div>
+                                
+                                <div class="radio-news-artwork-wrapper">
+                                    <img src="/book/banner_radio_noticia.svg" alt="Barretos Inteligente FM" class="radio-news-artwork-img" loading="eager" onerror="this.onerror=null; this.src='/banner_radio_noticia.svg';">
+                                </div>
                             </div>
-                            <div class="book-stat-card">
-                                <div class="book-stat-number" style="color: #10b981;">100%</div>
-                                <div class="book-stat-label">Conformidade Contratual</div>
+                        </section>
+
+                        <!-- Barra de Controles e Filtros -->
+                        <section class="book-controls-bar">
+                            <div class="book-search-box">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="bookSearchInput" class="book-search-input" placeholder="Buscar por missão, autor, impacto..." autocomplete="off">
                             </div>
-                            <div class="book-stat-card">
-                                <div class="book-stat-number" style="color: #0ea5e9;">Agente Book</div>
-                                <div class="book-stat-label">Curador Autônomo Ativo</div>
+
+                            <div class="book-filter-pills">
+                                <button type="button" class="filter-pill active" data-category="all">Todas as Missões</button>
+                                <button type="button" class="filter-pill" data-category="IA">IA &amp; Automação</button>
+                                <button type="button" class="filter-pill" data-category="Design">Design &amp; Imersão</button>
+                                <button type="button" class="filter-pill" data-category="Performance">Performance</button>
+                                <button type="button" class="filter-pill" data-category="Governança">Governança</button>
                             </div>
-                            <div class="book-stat-card">
-                                <div class="book-stat-number" style="color: #f59e0b;">v2.1.0</div>
-                                <div class="book-stat-label">Versão Consolidada</div>
+
+                            <div class="book-action-btns">
+                                <button type="button" class="btn-book-audio" id="btnAudioToggle" title="Alternar efeitos sonoros retro synth">
+                                    <i class="fa-solid fa-volume-high"></i> Audio FX: ON
+                                </button>
+                                <button type="button" class="btn-book-primary" id="btnOpenAddModal">
+                                    <i class="fa-solid fa-plus"></i> Novo Marco
+                                </button>
                             </div>
+                        </section>
+
+                        <!-- Cabeçalho da Lista de Missões -->
+                        <div class="book-section-title">
+                            <div class="book-section-title-left">
+                                <i class="fa-solid fa-flag-checkered" style="color: #ff2a85;"></i>
+                                <span>Linha do Tempo de Entregas &amp; Inovações</span>
+                            </div>
+                            <span class="book-section-badge">Dossiê Operacional</span>
                         </div>
 
-                        <!-- Linha do Tempo -->
-                        <h2 class="timeline-section-title">
-                            <i class="fa-solid fa-trophy" style="color: #8b5cf6;"></i>
-                            <span>Linha do Tempo de Entregas &amp; Inovações</span>
-                        </h2>
-
-                        <div class="timeline-wrapper" id="timelineContainer">
-                            <!-- Inserido dinamicamente via book.js -->
+                        <!-- Lista de Missões Inseridas Dinamicamente -->
+                        <div class="book-timeline-list" id="timelineContainer">
+                            <!-- Preenchido dinamicamente via book.js -->
                         </div>
                     </div>
                 </main>
 
-                <!-- Footer Oficial Padrão do Barretos Inteligente -->
+                <!-- Footer Oficial no Rodapé da Página (Padrão 100% Unificado PMO / CCO) -->
                 <footer class="hub-footer">
-                    <div class="footer-container">
-                        <div class="footer-left">
-                            <span class="footer-brand">Barretos Inteligente</span>
-                            <span class="footer-sep">•</span>
-                            <span class="footer-tagline">Central HUB PMO &amp; CCO</span>
-                        </div>
-
-                        <div class="footer-center">
-                            <a href="https://www.linkedin.com/in/alisonviper/" target="_blank" rel="noopener noreferrer" class="footer-linkedin-btn" title="Perfil Alison Persil no LinkedIn">
-                                <i class="fa-brands fa-linkedin"></i>
-                                <span>Alison Persil</span>
-                            </a>
-                        </div>
-
-                        <div class="footer-right">
-                            <span class="footer-status-pill">
-                                <span class="footer-status-dot"></span>
-                                Sistema Operacional
-                            </span>
-                            <span class="footer-copy">© 2026 Todos os direitos reservados</span>
-                        </div>
+                    <div class="footer-left">
+                        <span>&copy; 2026 Barretos Inteligente</span>
+                    </div>
+                    <div class="footer-center">
+                        <a href="https://www.linkedin.com/in/alisonviper/" target="_blank" rel="noopener noreferrer" class="footer-linkedin-link" title="LinkedIn • Alison Persil" aria-label="Perfil do LinkedIn de Alison Persil">
+                            <i class="fa-brands fa-linkedin"></i>
+                        </a>
+                    </div>
+                    <div class="footer-links">
+                        <span>hub.barretosinteligente.com.br</span>
                     </div>
                 </footer>
             </div>
         </div>
     </div>
 
-    <!-- Scripts Compartilhados -->
+    <!-- Modal de Criação de Novo Marco -->
+    <div class="book-modal-overlay" id="bookModalOverlay">
+        <div class="book-modal-card">
+            <div class="modal-header-book">
+                <h3><i class="fa-solid fa-trophy"></i> Catalogar Novo Marco no Book</h3>
+                <button type="button" class="btn-close-modal" id="btnCloseModal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="formAddInnovation">
+                <div class="modal-form-group">
+                    <label for="newMarcoTitle">Título do Marco / Inovação</label>
+                    <input type="text" id="newMarcoTitle" class="modal-form-input" placeholder="Ex: Auditoria de Telegestão com Visão Computacional" required>
+                </div>
+
+                <div class="modal-form-group">
+                    <label for="newMarcoCategory">Categoria Estratégica</label>
+                    <select id="newMarcoCategory" class="modal-form-select">
+                        <option value="Inteligência Artificial & Automação">Inteligência Artificial &amp; Automação</option>
+                        <option value="Design System & Imersão">Design System &amp; Imersão</option>
+                        <option value="Performance & Dados">Performance &amp; Dados</option>
+                        <option value="Engenharia de Frontend">Engenharia de Frontend</option>
+                        <option value="Governança & Conformidade">Governança &amp; Conformidade</option>
+                    </select>
+                </div>
+
+                <div class="modal-form-group">
+                    <label for="newMarcoImpact">Impacto Operacional &amp; Ganho de Eficiência</label>
+                    <textarea id="newMarcoImpact" class="modal-form-textarea" placeholder="Descreva os ganhos quantitativos e operacionais para a Concessão..." required></textarea>
+                </div>
+
+                <div class="modal-form-group">
+                    <label for="newMarcoAuthor">Responsável / Agente</label>
+                    <input type="text" id="newMarcoAuthor" class="modal-form-input" value="Alison Persil" placeholder="Autor ou Agente">
+                </div>
+
+                <div class="modal-footer-btns">
+                    <button type="button" class="btn-modal-cancel" id="btnCancelModal">Cancelar</button>
+                    <button type="submit" class="btn-book-primary">
+                        <i class="fa-solid fa-check"></i> Registrar Marco
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts Compartilhados e Específico -->
     <script src="/js/sidebar.js"></script>
-    <script src="./book.js"></script>
+    <script src="/js/radio.js" defer></script>
+    <script src="/book/book.js"></script>
 </body>
 </html>

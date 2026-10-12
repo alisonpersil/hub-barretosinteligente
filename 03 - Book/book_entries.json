@@ -1,12 +1,37 @@
 [
   {
+    "id": 8,
+    "title": "Nossos Robôs ouvem Rádio",
+    "category": "IA & Automação",
+    "badge": "Notícia Oficial",
+    "icon": "fa-tower-broadcast",
+    "color": "pink",
+    "impact": "Já está disponível a visualização dos agentes na página de Automações. É por lá que conseguimos ver eles trabalhando no site e criando automações próprias. E isso não seria possível sem uma área para tomar café e uma boa música. A rádio Barretos Inteligente toca algumas das músicas mais famosas e extraordinárias. São mais de 4h de música",
+    "date": "Outubro 2026",
+    "author": "Agente Sentinela & Alison Persil",
+    "version": "v2.4.0",
+    "hasRadioBtn": true
+  },
+  {
+    "id": 7,
+    "title": "Tratamento de Falhas & Homologação de Resiliência no Ecossistema",
+    "category": "Governança & Resiliência",
+    "badge": "Novo Comunicado",
+    "icon": "fa-shield-halved",
+    "color": "pink",
+    "impact": "Comunicado oficial no Book confirmando o tratamento integral e resolução de falhas no ecossistema, validação de rotas, estabilidade dos postos da Sala de Agentes e homologação contínua no HUB.",
+    "date": "Outubro 2026",
+    "author": "Agente Curador do Book & Alison Persil",
+    "version": "v2.3.0"
+  },
+  {
     "id": 1,
-    "title": "Arquitetura Bimodal CCO & PMO (Light/Dark Mode)",
+    "title": "Arquitetura Bimodal (Light/Dark Mode)",
     "category": "UX & Acessibilidade",
     "badge": "Design System",
     "icon": "fa-moon",
     "color": "blue",
-    "impact": "Alternância instantânea de tema (modo corporativo diurno e modo escuro CCO) com persistência no LocalStorage e sincronização entre todas as aplicações do ecossistema.",
+    "impact": "Alternância instantânea de tema (modo corporativo diurno e modo escuro) com persistência no LocalStorage e sincronização entre todas as aplicações do ecossistema.",
     "date": "Outubro 2026",
     "author": "Alison Persil",
     "version": "v1.2.0"
@@ -42,7 +67,7 @@
     "badge": "Inovação",
     "icon": "fa-robot",
     "color": "purple",
-    "impact": "Criação do posto virtual com 5 agentes especializados (CCO, Exati, Ofícios, QA e Book), operando em motor SVG ultraleve com despacho remoto de comandos pelo smartphone e inteligência Gemini Pro.",
+    "impact": "Criação do posto virtual com 5 agentes especializados (Chefe, Exati, Ofícios, QA e Book), operando em motor SVG ultraleve com despacho remoto de comandos pelo smartphone e inteligência Gemini Pro.",
     "date": "Outubro 2026",
     "author": "Alison Persil",
     "version": "v2.0.0"
@@ -58,5 +83,17 @@
     "date": "Outubro 2026",
     "author": "Alison Persil",
     "version": "v2.1.0"
+  },
+  {
+    "id": 6,
+    "title": "Redesign Cinematográfico do Book de Governança & Inovações",
+    "category": "Design System & Imersão",
+    "badge": "Design System",
+    "icon": "fa-award",
+    "color": "pink",
+    "impact": "Transformação completa da interface de governança com gradientes fluidos executivos, cards em glassmorphism fosco, HUD de indicadores de alta precisão e catalogação dinâmica de entregas homologada com IA Gemini.",
+    "date": "Outubro 2026",
+    "author": "Agente Sentinela & Alison Persil",
+    "version": "v2.2.0"
   }
 ]

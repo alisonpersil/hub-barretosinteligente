@@ -4982,20 +4982,7 @@ canvas {
 }
 
 .sidebar-pill-badge {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 9999px;
-    background: var(--badge-bg, rgba(0, 0, 0, 0.05));
-    color: var(--text-muted, #64748b);
-    border: 1px solid var(--border-color, #e2e8f0);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-[data-theme="dark"] .sidebar-pill-badge {
-    background: var(--badge-bg, #1e293b);
-    border-color: var(--border-color, #1e2d4a);
+    display: none !important;
 }
 
 /* Submenu de páginas vinculadas */

@@ -121,8 +121,16 @@
                                     <i class="fa-solid fa-bolt item-icon"></i>
                                     <span class="item-text">Automações</span>
                                 </div>
-                                <span class="sidebar-pill-badge">Sala de Agentes</span>
+                                <span class="sidebar-badge" title="1 ferramenta disponível">1</span>
                             </a>
+
+                            <!-- Submenu com as ferramentas de Automações -->
+                            <div class="sidebar-submenu" id="subAutomacoes" style="display: none;">
+                                <a href="/sala-agentes" class="sidebar-subitem" id="sideLinkSala" title="Sala de Agentes Autônomos">
+                                    <i class="fa-solid fa-robot sub-icon purple"></i>
+                                    <span class="sub-text">Sala de Agentes</span>
+                                </a>
+                            </div>
                         </div>
 
                         <!-- Módulo 3: Book -->
@@ -132,7 +140,6 @@
                                     <i class="fa-solid fa-book-bookmark item-icon"></i>
                                     <span class="item-text">Book</span>
                                 </div>
-                                <span class="sidebar-pill-badge">Governança</span>
                             </a>
                         </div>
                     </nav>
@@ -538,7 +545,8 @@
             initApp();
         }
     </script>
-    <!-- Shared Sidebar Controller -->
+    <!-- Shared Sidebar Controller & Rádio Global -->
     <script src="/js/sidebar.js"></script>
+    <script src="/js/radio.js" defer></script>
 </body>
 </html>

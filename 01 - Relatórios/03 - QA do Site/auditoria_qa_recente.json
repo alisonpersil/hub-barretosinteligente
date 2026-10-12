@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-10-12T15:00:48.468724",
+  "executor": "Agente Sentinela de QA & Rotas",
+  "rotas_testadas": [
+    {
+      "rota": "/",
+      "status": 200,
+      "latencia_ms": 14,
+      "estado": "OK"
+    },
+    {
+      "rota": "/oficios",
+      "status": 200,
+      "latencia_ms": 18,
+      "estado": "OK"
+    },
+    {
+      "rota": "/exati/",
+      "status": 200,
+      "latencia_ms": 22,
+      "estado": "OK"
+    },
+    {
+      "rota": "/book/",
+      "status": 200,
+      "latencia_ms": 15,
+      "estado": "OK"
+    },
+    {
+      "rota": "/sala-agentes",
+      "status": 200,
+      "latencia_ms": 16,
+      "estado": "OK"
+    }
+  ],
+  "auditoria_mobile": "Backdrop limpo, sem sangramento de sombras, viewport 360-412px validado.",
+  "homologado": true
+}

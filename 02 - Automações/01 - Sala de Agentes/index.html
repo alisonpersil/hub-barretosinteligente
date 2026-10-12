@@ -60,10 +60,10 @@
                     <span id="agentsStatusText">Agentes ativos</span>
                 </div>
 
-                <!-- Botão de Despacho Rápido Global -->
-                <button id="btnOpenGlobalDispatch" class="btn-dispatch-nav" title="Despachar nova tarefa para um agente">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span>Despachar Tarefa</span>
+                <!-- Botão de Criação de Tarefas Global -->
+                <button id="btnOpenGlobalDispatch" class="btn-dispatch-nav" title="Criar nova tarefa para um agente">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    <span>Criar tarefa</span>
                 </button>
 
                 <!-- Botão Alternar Tema Claro/Escuro -->
@@ -102,7 +102,7 @@
                             </a>
 
                             <!-- Submenu com as páginas de Relatórios -->
-                            <div class="sidebar-submenu" id="subRelatorios" style="display: flex;">
+                            <div class="sidebar-submenu" id="subRelatorios" style="display: none;">
                                 <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Consulta de Ofícios">
                                     <i class="fa-solid fa-folder-open sub-icon green"></i>
                                     <span class="sub-text">Consulta de Ofícios</span>
@@ -144,7 +144,6 @@
                                     <i class="fa-solid fa-book-bookmark item-icon"></i>
                                     <span class="item-text">Book</span>
                                 </div>
-                                <span class="sidebar-pill-badge">Governança</span>
                             </a>
                         </div>
                     </nav>
@@ -173,8 +172,42 @@
                                 </div>
                             </div>
 
-                            <!-- Resumo dos 4 KPIs Principais -->
-                            <div id="office-summary" class="kpis" aria-label="Resumo de estados"></div>
+                            <!-- Resumo dos 4 KPIs Principais + Card Rádio Barretos FM -->
+                            <div id="office-summary" class="kpis" aria-label="Resumo de estados">
+                                <article class="kpi">
+                                    <span class="kpi-rotulo"><i class="ponto verde"></i>Trabalhando</span>
+                                    <strong class="kpi-valor">0</strong>
+                                </article>
+                                <article class="kpi">
+                                    <span class="kpi-rotulo"><i class="ponto azul"></i>Delegando</span>
+                                    <strong class="kpi-valor">2</strong>
+                                </article>
+                                <article class="kpi">
+                                    <span class="kpi-rotulo"><i class="ponto laranja"></i>Aguardando</span>
+                                    <strong class="kpi-valor">10</strong>
+                                </article>
+                                <article class="kpi">
+                                    <span class="kpi-rotulo"><i class="ponto roxo"></i>Projetos ativos</span>
+                                    <strong class="kpi-valor">3</strong>
+                                </article>
+                                <article class="kpi kpi-radio-card" id="cardRadioBarretos" role="button" tabindex="0" title="Barretos Inteligente FM • Clique para ouvir (Transmissão global contínua)">
+                                    <div class="kpi-radio-inner">
+                                        <img src="/banner_radio_barretos_inteligente_quadrado.svg" alt="Barretos Inteligente FM" class="kpi-radio-banner" draggable="false" />
+                                        <div class="kpi-radio-badge">
+                                            <i class="radio-live-dot"></i>
+                                            <span class="radio-badge-text">AO VIVO</span>
+                                        </div>
+                                        <div class="kpi-radio-eq" title="Equalizador FM">
+                                            <span class="eq-bar"></span>
+                                            <span class="eq-bar"></span>
+                                            <span class="eq-bar"></span>
+                                        </div>
+                                        <div class="kpi-radio-footer">
+                                            <span class="kpi-radio-track-title">Sintonizar Rádio</span>
+                                        </div>
+                                    </div>
+                                </article>
+                            </div>
 
                             <!-- Bloco da Cena do Escritório Pixel Art -->
                             <section class="bloco cena-bloco">
@@ -278,12 +311,12 @@
                 </div>
                 <div>
                     <h2 class="drawer-agent-name" id="drawerAgentName">Monitor Exati</h2>
-                    <p class="drawer-agent-sub" id="drawerAgentSub">Barretos Inteligente &bull; CCO</p>
+                    <p class="drawer-agent-sub" id="drawerAgentSub" style="display: none;"></p>
                 </div>
             </div>
             <div style="display: flex; align-items: center; gap: 8px;">
                 <span class="drawer-status-pill" id="drawerStatusPill">Trabalhando</span>
-                <button class="drawer-close-btn" id="btnCloseDrawer" title="Fechar painel">&times;</button>
+                <button class="drawer-close-btn" id="btnCloseDrawer" title="Fechar painel"><i class="fa-solid fa-xmark"></i></button>
             </div>
         </div>
 
@@ -296,6 +329,7 @@
         </nav>
 
         <div class="drawer-content">
+
             <!-- ABA 1: TAREFA ATUAL -->
             <div class="drawer-pane active" id="paneLiveTask">
                 <div id="liveTaskContainer">
@@ -350,14 +384,14 @@
                             <label class="mode-card active">
                                 <input type="radio" name="drawerDispatchMode" value="agora" checked>
                                 <div class="mode-text">
-                                    <strong>⚡ Executar Agora</strong>
+                                    <strong><i class="fa-solid fa-bolt" style="color: #a855f7; margin-right: 6px;"></i> Executar Agora</strong>
                                     <small>Assume prioridade máxima e senta na mesa</small>
                                 </div>
                             </label>
                             <label class="mode-card">
                                 <input type="radio" name="drawerDispatchMode" value="fila">
                                 <div class="mode-text">
-                                    <strong>📥 Adicionar à Fila</strong>
+                                    <strong><i class="fa-solid fa-inbox" style="color: #60a5fa; margin-right: 6px;"></i> Adicionar à Fila</strong>
                                     <small>Executa após terminar a tarefa atual</small>
                                 </div>
                             </label>
@@ -366,7 +400,7 @@
 
                     <div class="drawer-form-actions">
                         <button type="submit" class="btn-dispatch-submit">
-                            <i class="fa-solid fa-paper-plane"></i> Despachar para o Agente
+                            <i class="fa-solid fa-plus"></i> Criar Tarefa
                         </button>
                     </div>
                 </form>
@@ -375,28 +409,28 @@
     </aside>
 
     <!-- ===================================================================== -->
-    <!-- MODAL GLOBAL DE DESPACHO DE TAREFAS (BOTÃO DO TOPO) -->
+    <!-- MODAL GLOBAL DE CRIAÇÃO DE TAREFAS (BOTÃO DO TOPO) -->
     <!-- ===================================================================== -->
     <div class="global-modal-backdrop" id="globalModalBackdrop"></div>
     <dialog id="globalTaskModal" class="global-task-modal">
         <div class="modal-card-inner">
             <div class="modal-card-header">
                 <div>
-                    <h2><i class="fa-solid fa-paper-plane" style="color: #a469ff; margin-right: 8px;"></i> Central de Despacho de Tarefas</h2>
-                    <p>Atribua uma nova missão para qualquer agente do CCO ou adicione à fila</p>
+                    <h2><i class="fa-solid fa-plus-circle" style="color: #a469ff; margin-right: 8px;"></i> Central de Criação de Tarefas</h2>
+                    <p>Atribua uma nova missão para qualquer agente do HUB ou adicione à fila</p>
                 </div>
-                <button type="button" class="modal-close-x" id="btnCloseGlobalModal">&times;</button>
+                <button type="button" class="modal-close-x" id="btnCloseGlobalModal"><i class="fa-solid fa-xmark"></i></button>
             </div>
 
             <form id="formGlobalDispatch" class="modal-form">
                 <div class="form-group">
                     <label for="globalSelectAgent">Agente Responsável:</label>
                     <select id="globalSelectAgent" class="form-select" required>
-                        <option value="p3-exati">Monitor Exati (Operações &amp; Planilhas)</option>
-                        <option value="p3-oficios">Auditor de Ofícios (Prazos &amp; Conformidade)</option>
-                        <option value="p1-qa">Agente QA (Layout &amp; Rotas)</option>
-                        <option value="p3-book">Curador do Book (Governança &amp; Inovações)</option>
-                        <option value="p3-main">Supervisor Geral CCO (Coordenação Geral)</option>
+                        <option value="p3-main" selected>O chefe</option>
+                        <option value="p3-exati">Monitor Exati</option>
+                        <option value="p3-oficios">Consulta de Ofícios</option>
+                        <option value="p1-qa">QA do Site</option>
+                        <option value="p3-book">Curador do Book</option>
                     </select>
                 </div>
 
@@ -409,6 +443,8 @@
                 <div class="quick-templates">
                     <span class="quick-title">Ações Rápidas Operacionais:</span>
                     <div class="quick-pills">
+                        <button type="button" class="quick-pill" data-target="p3-main" data-title="Auditar integridade e sincronização do repositório">Chefe: Auditoria de Código</button>
+                        <button type="button" class="quick-pill" data-target="p3-main" data-title="Criar branch de homologação e validar status">Chefe: Criar Branch Teste</button>
                         <button type="button" class="quick-pill" data-target="p3-exati" data-title="Auditar chamados pendentes com SLA > 7 dias">Exati: SLA &gt; 7 dias</button>
                         <button type="button" class="quick-pill" data-target="p3-exati" data-title="Cruzar reincidência de lâmpadas no Cristiano de Carvalho">Exati: Reincidência Bairro</button>
                         <button type="button" class="quick-pill" data-target="p3-oficios" data-title="Auditar prazos de resposta de documentos e ofícios">Ofícios: Prazos 2026</button>
@@ -428,14 +464,14 @@
                         <label class="mode-card active">
                             <input type="radio" name="globalDispatchMode" value="agora" checked>
                             <div class="mode-text">
-                                <strong>⚡ Executar Agora</strong>
+                                <strong><i class="fa-solid fa-bolt" style="color: #a855f7; margin-right: 6px;"></i> Executar Agora</strong>
                                 <small>Inicia imediatamente na mesa</small>
                             </div>
                         </label>
                         <label class="mode-card">
                             <input type="radio" name="globalDispatchMode" value="fila">
                             <div class="mode-text">
-                                <strong>📥 Adicionar à Fila</strong>
+                                <strong><i class="fa-solid fa-inbox" style="color: #60a5fa; margin-right: 6px;"></i> Adicionar à Fila</strong>
                                 <small>Fica na espera após a atual</small>
                             </div>
                         </label>
@@ -445,7 +481,7 @@
                 <div class="modal-form-actions">
                     <button type="button" class="btn-cancel" id="btnCancelGlobalModal">Cancelar</button>
                     <button type="submit" class="btn-dispatch-submit">
-                        <i class="fa-solid fa-paper-plane"></i> Despachar Agora
+                        <i class="fa-solid fa-plus-circle"></i> Criar Tarefa
                     </button>
                 </div>
             </form>
@@ -469,6 +505,7 @@
 
     <!-- Scripts Oficiais do Sistema -->
     <script src="/js/sidebar.js"></script>
+    <script src="/js/radio.js" defer></script>
     <script src="/sala-agentes/pixel.js" defer></script>
     <script src="/sala-agentes/app.js" defer></script>
 </body>

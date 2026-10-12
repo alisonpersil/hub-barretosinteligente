@@ -1,0 +1,12 @@
+{
+  "api_keys": {
+    "p3-main": "app-SGldvJFNrPlyRctixLHR3Uqw",
+    "p0-chefe": "app-SGldvJFNrPlyRctixLHR3Uqw",
+    "p3-exati": "app-4xlHg7cNNgVnPaNCXofk6fmq",
+    "p3-book": "app-LZJBvyvKQY7xffLDwR6S73ek",
+    "p3-oficios": "app-Ywqs8r7cQT1kmiEBvnA3cSlh",
+    "p1-qa": "app-43pZFk3t9bbAHJ5RBaaCZiHA"
+  },
+  "default_api_key": "app-SGldvJFNrPlyRctixLHR3Uqw",
+  "github_repo": "alisonpersil/hub-barretosinteligente"
+}

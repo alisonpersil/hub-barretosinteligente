@@ -146,6 +146,26 @@
         book: document.getElementById('panelBook')
     };
     const subRelatorios = document.getElementById('subRelatorios');
+    const subAutomacoes = document.getElementById('subAutomacoes');
+
+    const TAB_INFO = {
+        home: {
+            title: 'Central HUB',
+            docTitle: 'Central HUB • Barretos Inteligente'
+        },
+        relatorios: {
+            title: 'Relatórios',
+            docTitle: 'Relatórios • Barretos Inteligente'
+        },
+        automacoes: {
+            title: 'Automações',
+            docTitle: 'Automações • Barretos Inteligente'
+        },
+        book: {
+            title: 'Book',
+            docTitle: 'Book • Barretos Inteligente'
+        }
+    };
 
     function switchTab(tabId, updateUrl = true) {
         if (!tabPanels[tabId]) tabId = 'home';
@@ -159,6 +179,14 @@
             }
         });
 
+        // Atualiza o título na barra superior (Topbar) e no título da página
+        const brandTitleEl = document.getElementById('hubBrandTitle') || document.querySelector('.brand-title');
+        const tabInfo = TAB_INFO[tabId] || TAB_INFO.home;
+        if (brandTitleEl) {
+            brandTitleEl.textContent = tabInfo.title;
+        }
+        document.title = tabInfo.docTitle;
+
         // Alterna os painéis de conteúdo
         Object.keys(tabPanels).forEach(key => {
             const panel = tabPanels[key];
@@ -171,9 +199,12 @@
             }
         });
 
-        // Controla exibição do submenu de relatórios
+        // Controla exibição dos submenus de relatórios e automações
         if (subRelatorios) {
             subRelatorios.style.display = (tabId === 'relatorios') ? 'flex' : 'none';
+        }
+        if (subAutomacoes) {
+            subAutomacoes.style.display = (tabId === 'automacoes') ? 'flex' : 'none';
         }
 
         // Sincroniza a URL do navegador em tempo real com a tela visível:
@@ -243,58 +274,7 @@
         });
     }
 
-    // =========================================================================
-    // 5. Resolução Dinâmica de Links dos Módulos
-    // =========================================================================
-    function getModuleUrls() {
-        const isFileProtocol = window.location.protocol === 'file:';
-        if (isFileProtocol) {
-            return {
-                oficios: '../01 - Consulta de Ofícios/index.html',
-                exati: '../02 - Monitor Exati/index.html',
-                qa: '../01 - Relatórios/03 - QA do Site/index.html',
-                sala: '../02 - Automações/01 - Sala de Agentes/index.html',
-                book: '../03 - Book/index.html',
-                home: './index.html'
-            };
-        }
-        return {
-            oficios: '/oficios',
-            exati: '/exati',
-            qa: '/qa',
-            sala: '/sala-agentes',
-            book: '/book',
-            home: '/'
-        };
-    }
-
-    function setupModuleLinks() {
-        const urls = getModuleUrls();
-        
-        const sideLinkOficios = document.getElementById('sideLinkOficios');
-        const sideLinkExati = document.getElementById('sideLinkExati');
-        const sideLinkQA = document.getElementById('sideLinkQA');
-        const cardOficios = document.getElementById('cardOficios');
-        const cardExati = document.getElementById('cardExati');
-        const cardQA = document.getElementById('cardQA');
-        const cardSalaAgentes = document.getElementById('cardSalaAgentes');
-        const cardBookPortal = document.getElementById('cardBookPortal');
-
-        if (sideLinkOficios) sideLinkOficios.href = urls.oficios;
-        if (sideLinkExati) sideLinkExati.href = urls.exati;
-        if (sideLinkQA) sideLinkQA.href = urls.qa;
-        if (cardOficios) cardOficios.href = urls.oficios;
-        if (cardExati) cardExati.href = urls.exati;
-        if (cardQA) cardQA.href = urls.qa;
-        if (cardSalaAgentes) cardSalaAgentes.href = urls.sala;
-        if (cardBookPortal) cardBookPortal.href = urls.book;
-
-        if (mainBrandLogo && !window.location.protocol.startsWith('http')) {
-            mainBrandLogo.href = urls.home;
-        }
-    }
-
-    // Suporte ao botão voltar/avançar do navegador (mobile e desktop)
+    // Suporte ao botão voltar/avançar do navegador para abas
     window.addEventListener('popstate', () => {
         try {
             const urlParams = new URLSearchParams(window.location.search);
@@ -306,8 +286,6 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-        setupModuleLinks();
-
         // Ativação direta de aba via parâmetro URL ou hash (ex: /?tab=relatorios)
         try {
             const urlParams = new URLSearchParams(window.location.search);
@@ -315,10 +293,10 @@
             if (tabParam && tabPanels[tabParam] && tabParam !== 'home') {
                 switchTab(tabParam, false);
             } else {
-                switchTab('home', true);
+                switchTab('home', false);
             }
         } catch (_) {
-            switchTab('home', true);
+            switchTab('home', false);
         }
     });
 })();

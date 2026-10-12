@@ -28,9 +28,15 @@ const visualRuns = new Map();
 // Estado do Agente Selecionado para a Gaveta
 let currentDrawerAgentKey = null;
 let currentDrawerAgentData = null;
+let currentDrawerActiveTab = 'live-task';
 
 // Presets de Sugestões Rápidas por Agente
 const AGENT_TEMPLATES = {
+  'p0-chefe': [
+    { title: 'Auditar commits recentes e integridade do repositório', desc: 'Verificação do histórico de commits e branches do repositório.' },
+    { title: 'Criar branch de homologação e validar status do código', desc: 'Comando executivo de versionamento para testar automação do agente.' },
+    { title: 'Inspecionar pendências operacionais e coordenar os agentes', desc: 'Diretriz geral do Chefe para a malha operacional do HUB.' }
+  ],
   'p3-exati': [
     { title: 'Auditar chamados pendentes com SLA > 7 dias', desc: 'Cruzamento de dados entre abertura e encerramento para identificação de gargalos.' },
     { title: 'Cruzar reincidência de lâmpadas no Cristiano de Carvalho', desc: 'Identificação de logradouros com múltiplas ordens de serviço no mesmo poste nos últimos 30 dias.' },
@@ -52,17 +58,19 @@ const AGENT_TEMPLATES = {
     { title: 'Auditar alinhamento visual com o Brandbook Barretos', desc: 'Conferência de paletas HSL, tipografia Inter e proporções de cards corporativos.' }
   ],
   'p3-main': [
-    { title: 'Supervisão e despacho das diretrizes de iluminação pública CCO', desc: 'Alinhamento geral de prioridades com a liderança de campo e coordenação de equipes.' },
-    { title: 'Auditoria de integridade da malha de agentes autônomos', desc: 'Verificação periódica de conexões com APIs do GitHub, Exati e banco de dados.' }
+    { title: 'Auditar commits recentes e integridade do repositório', desc: 'Verificação do histórico de commits e branches do repositório.' },
+    { title: 'Criar branch de homologação e validar status do código', desc: 'Comando executivo de versionamento para testar automação do agente.' },
+    { title: 'Inspecionar pendências operacionais e coordenar os agentes', desc: 'Diretriz geral do Chefe para a malha operacional do HUB.' }
   ]
 };
 
 const AGENT_ICONS = {
+  'p0-chefe': 'fa-solid fa-user-tie',
+  'p3-main': 'fa-solid fa-user-tie',
   'p3-exati': 'fa-solid fa-chart-line',
   'p3-oficios': 'fa-solid fa-folder-open',
   'p1-qa': 'fa-solid fa-shield-halved',
   'p3-book': 'fa-solid fa-book-bookmark',
-  'p3-main': 'fa-solid fa-network-wired',
   'p1-main': 'fa-solid fa-diagram-project',
   'p2-main': 'fa-solid fa-diagram-project',
   'default': 'fa-solid fa-robot'
@@ -134,12 +142,53 @@ function renderRoom() {
 
   const summaryEl = $('#office-summary');
   if (summaryEl) {
-    summaryEl.innerHTML = metrics.map(([color, label, value]) => `
+    const radioCard = $('#cardRadioBarretos');
+    const metricsHtml = metrics.map(([color, label, value]) => `
       <article class="kpi">
         <span class="kpi-rotulo"><i class="ponto ${color}"></i>${label}</span>
         <strong class="kpi-valor">${value}</strong>
       </article>
     `).join('');
+
+    if (!radioCard) {
+      summaryEl.innerHTML = metricsHtml + `
+        <article class="kpi kpi-radio-card" id="cardRadioBarretos" role="button" tabindex="0" title="Barretos Inteligente FM • Clique para ouvir (Transmissão global contínua)">
+          <div class="kpi-radio-inner">
+            <img src="/banner_radio_barretos_inteligente_quadrado.svg" alt="Barretos Inteligente FM" class="kpi-radio-banner" draggable="false" />
+            <div class="kpi-radio-badge">
+              <i class="radio-live-dot"></i>
+              <span class="radio-badge-text">AO VIVO</span>
+            </div>
+            <div class="kpi-radio-eq" title="Equalizador FM">
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+              <span class="eq-bar"></span>
+            </div>
+            <div class="kpi-radio-footer">
+              <span class="kpi-radio-track-title">Sintonizar Rádio</span>
+            </div>
+          </div>
+        </article>
+      `;
+
+      const newRadioCard = $('#cardRadioBarretos');
+      if (newRadioCard) {
+        newRadioCard.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          if (window.RadioBarretos) {
+            window.RadioBarretos.toggle();
+          }
+        });
+      }
+    } else {
+      const cards = summaryEl.querySelectorAll('.kpi:not(.kpi-radio-card)');
+      if (cards.length === metrics.length) {
+        metrics.forEach(([color, label, value], idx) => {
+          const valEl = cards[idx].querySelector('.kpi-valor');
+          if (valEl) valEl.textContent = value;
+        });
+      }
+    }
   }
 
   const concluidas = counts.concluidas ?? 5;
@@ -226,6 +275,9 @@ function renderRoom() {
 
 /* ------------------------------------------------------------- Gestão Drawer */
 async function openAgentTaskDrawer(agentKey) {
+  if (currentDrawerAgentKey !== agentKey) {
+    currentDrawerActiveTab = 'live-task';
+  }
   currentDrawerAgentKey = agentKey;
   const drawer = $('#agentTaskDrawer');
   const backdrop = $('#drawerBackdrop');
@@ -236,6 +288,7 @@ async function openAgentTaskDrawer(agentKey) {
     const data = await request('GET', `/agentes/${encodeURIComponent(agentKey)}/tarefas`);
     currentDrawerAgentData = data;
     renderDrawerContent(data);
+    switchDrawerTab(currentDrawerActiveTab || 'live-task');
     drawer.classList.add('open');
     backdrop.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -264,8 +317,16 @@ function renderDrawerContent(agent) {
 
   const iconClass = AGENT_ICONS[agent.chave] || AGENT_ICONS.default;
   if (avatarEl) avatarEl.innerHTML = `<i class="${iconClass}"></i>`;
-  if (nameEl) nameEl.textContent = agent.nome || agent.tipo;
-  if (subEl) subEl.textContent = `${agent.projeto_nome || 'Barretos Inteligente'} • ${agent.tipo}`;
+  
+  // Nome limpo sem (Dify AI)
+  const cleanName = (agent.nome || agent.tipo || '').replace(/\s*\((?:Dify AI(?: & GitHub)?|Dify)\)/gi, '').trim();
+  if (nameEl) nameEl.textContent = cleanName;
+  
+  // Oculta completamente o subtítulo abaixo do nome
+  if (subEl) {
+    subEl.textContent = '';
+    subEl.style.display = 'none';
+  }
   
   if (statusEl) {
     statusEl.textContent = states[agent.estado] || agent.estado;
@@ -286,6 +347,9 @@ function renderDrawerContent(agent) {
 
   // ABA 4: Sugestões na Nova Tarefa
   renderNewTaskTemplates(agent.chave);
+
+  // Mantém a aba que o usuário está visualizando no momento
+  switchDrawerTab(currentDrawerActiveTab || 'live-task');
 }
 
 function renderLiveTaskPane(agent) {
@@ -333,6 +397,12 @@ function renderLiveTaskPane(agent) {
         <div class="progress-bar-wrap">
           <div class="progress-bar-fill" style="width: ${progress}%;"></div>
         </div>
+        ${t.etapa ? `
+          <div style="margin-top: 10px; font-size: 12px; color: #c499ff; display: flex; align-items: center; gap: 8px; background: rgba(164,105,255,0.08); padding: 7px 11px; border-radius: 7px; border: 1px solid rgba(164,105,255,0.2);">
+            <i class="fa-solid fa-gear fa-spin" style="font-size: 11px; color: #a469ff;"></i>
+            <span>${esc(t.etapa)}</span>
+          </div>
+        ` : ''}
       </div>
 
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
@@ -342,9 +412,35 @@ function renderLiveTaskPane(agent) {
         </div>
         <div style="background: rgba(255,255,255,0.03); padding: 10px 14px; border-radius: 9px; border: 1px solid rgba(255,255,255,0.05);">
           <span style="display: block; color: #8f8a9e; font-size: 11px; font-weight: 600; margin-bottom: 3px;">PREVISÃO RESTANTE</span>
-          <strong style="color: #4ade80; font-size: 14px;">~${t.previsao_min || 3} min</strong>
+          <strong style="color: #4ade80; font-size: 14px;">~${(t.previsao_min || 0) > 0 ? t.previsao_min + ' min' : '< 1 min'}</strong>
         </div>
       </div>
+
+      ${t.resultado_ia ? `
+        <div style="background: rgba(125,54,236,0.1); border: 1px solid rgba(164,105,255,0.3); border-radius: 10px; padding: 13px; margin-bottom: 18px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px;">
+            <span style="color: #d8b4fe; font-size: 11.5px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
+              <i class="fa-solid fa-sparkles" style="color: #a469ff;"></i> Parecer do Agente (${esc(t.modelo_ia || 'Gemini Flash')})
+            </span>
+            <span style="font-size: 10.5px; background: rgba(34,197,94,0.15); color: #4ade80; padding: 1px 7px; border-radius: 4px; font-weight: 600;">
+              Resolvido com IA
+            </span>
+          </div>
+          <p style="color: #e6e3f0; font-size: 13px; line-height: 1.5; margin: 0; white-space: pre-wrap;">${esc(t.resultado_ia)}</p>
+          <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+            ${(agent.chave === 'p3-book' || (t.titulo && t.titulo.toLowerCase().includes('book'))) ? `
+              <a href="/book/" target="_blank" style="background: rgba(255,42,133,0.16); color: #ff66aa; border: 1px solid rgba(255,42,133,0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 7px; font-weight: 700; font-size: 11.5px;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver Alteração ao Vivo no Book
+              </a>
+            ` : ''}
+            ${(agent.chave === 'p1-qa' || (t.titulo && t.titulo.toLowerCase().includes('qa'))) ? `
+              <a href="/qa" target="_blank" style="background: rgba(164,105,255,0.16); color: #c499ff; border: 1px solid rgba(164,105,255,0.4); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 7px; font-weight: 700; font-size: 11.5px;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Ver no Painel de QA
+              </a>
+            ` : ''}
+          </div>
+        </div>
+      ` : ''}
 
       <div class="task-actions-row">
         <button type="button" class="btn-task-action pause" id="btnDrawerTogglePause">
@@ -483,10 +579,27 @@ function renderTaskHistoryPane(agent) {
         <span class="history-status-badge">
           <i class="fa-solid fa-circle-check"></i> ${esc(item.status === 'concluido' ? 'CONCLUÍDO' : item.status.toUpperCase())}
         </span>
-        <span class="history-time"><i class="fa-regular fa-clock"></i> ${esc(item.concluido_em)} (${esc(item.duracao || '5 min')})</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          ${item.modelo ? `<span style="font-size: 11px; background: rgba(164,105,255,0.14); color: #c499ff; padding: 2px 7px; border-radius: 4px; font-weight: 600;"><i class="fa-solid fa-sparkles"></i> ${esc(item.modelo)}</span>` : ''}
+          <span class="history-time"><i class="fa-regular fa-clock"></i> ${esc(item.concluido_em)} (${esc(item.duracao || '5 min')})</span>
+        </div>
       </div>
       <h4 class="history-item-title">${esc(item.titulo)}</h4>
-      <p class="history-result-text">${esc(item.resultado || 'Execução homologada pelo CCO.')}</p>
+      <div class="history-result-text" style="white-space: pre-wrap; line-height: 1.5; color: #d0cddb;">${esc(item.resultado || 'Execução homologada pelo CCO.')}</div>
+      ${(agent.chave === 'p3-book' || item.titulo.toLowerCase().includes('book')) ? `
+        <div style="margin-top: 10px;">
+          <a href="/book/" target="_blank" style="background: rgba(255,42,133,0.14); color: #ff66aa; border: 1px solid rgba(255,42,133,0.35); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 11.5px;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir Entrega no Book
+          </a>
+        </div>
+      ` : ''}
+      ${(agent.chave === 'p1-qa' || item.titulo.toLowerCase().includes('qa') || item.titulo.toLowerCase().includes('auditoria')) ? `
+        <div style="margin-top: 10px;">
+          <a href="/qa" target="_blank" style="background: rgba(168,85,247,0.14); color: #c499ff; border: 1px solid rgba(168,85,247,0.35); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 11.5px;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir Auditoria &amp; QA do Site
+          </a>
+        </div>
+      ` : ''}
     </div>
   `).join('');
 }
@@ -512,7 +625,9 @@ function renderNewTaskTemplates(agentKey) {
 }
 
 function switchDrawerTab(tabName) {
-  $$('.drawer-tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === tabName));
+  if (tabName) currentDrawerActiveTab = tabName;
+  const activeTab = currentDrawerActiveTab || 'live-task';
+  $$('.drawer-tab').forEach((b) => b.classList.toggle('active', b.dataset.tab === activeTab));
   const panes = {
     'live-task': $('#paneLiveTask'),
     'task-queue': $('#paneTaskQueue'),
@@ -520,7 +635,7 @@ function switchDrawerTab(tabName) {
     'new-task': $('#paneNewTask')
   };
   Object.entries(panes).forEach(([k, el]) => {
-    if (el) el.classList.toggle('active', k === tabName);
+    if (el) el.classList.toggle('active', k === activeTab);
   });
 }
 
@@ -575,7 +690,7 @@ function setupDrawerEvents() {
       $('#drawerTaskTitle').value = '';
       $('#drawerTaskDesc').value = '';
 
-      notice(res.mensagem || 'Tarefa despachada com sucesso!');
+      notice(res.mensagem || 'Tarefa criada com sucesso!');
       await refresh();
       await openAgentTaskDrawer(currentDrawerAgentKey);
 
@@ -656,7 +771,7 @@ function setupGlobalModalEvents() {
       $('#globalTaskTitle').value = '';
       $('#globalTaskDesc').value = '';
 
-      notice(res.mensagem || 'Tarefa despachada globalmente com sucesso!');
+      notice(res.mensagem || 'Tarefa criada com sucesso!');
       await refresh();
       // Abre a gaveta do agente para mostrar a tarefa em execução
       openAgentTaskDrawer(agente_chave);
@@ -829,5 +944,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   refresh();
-  setInterval(refresh, 4000);
+  setInterval(refresh, 2500);
 });

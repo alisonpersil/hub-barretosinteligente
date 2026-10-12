@@ -5,8 +5,7 @@
 
 (function () {
     'use strict';
-
-    function setupSidebar() {
+function setupSidebar() {
         const btnToggleSidebar = document.getElementById('btnToggleSidebar');
         const hubSidebar = document.getElementById('hubSidebar');
         const SIDEBAR_STATE_KEY = 'hub_sidebar_collapsed';
@@ -89,6 +88,7 @@
         if (window.location.protocol === 'file:') {
             const sideLinkOficios = document.getElementById('sideLinkOficios');
             const sideLinkExati = document.getElementById('sideLinkExati');
+            const sideLinkSala = document.getElementById('sideLinkSala');
             const tabBtnHome = document.getElementById('tabBtnHome');
             const mainBrandLogo = document.getElementById('mainBrandLogo');
 
@@ -98,12 +98,22 @@
                 if (mainBrandLogo) mainBrandLogo.href = '../../00 - HUB/index.html';
                 if (sideLinkOficios) sideLinkOficios.href = './index.html';
                 if (sideLinkExati) sideLinkExati.href = '../../02 - Monitor Exati/index.html';
+                if (sideLinkSala) sideLinkSala.href = '../../02 - Automações/01 - Sala de Agentes/index.html';
             } else if (currentPath.includes('02 - Monitor Exati')) {
                 if (tabBtnHome) tabBtnHome.href = '../00 - HUB/index.html';
                 if (mainBrandLogo) mainBrandLogo.href = '../00 - HUB/index.html';
                 if (sideLinkOficios) sideLinkOficios.href = '../01 - Consulta de Ofícios/templates/index.html';
                 if (sideLinkExati) sideLinkExati.href = './index.html';
+                if (sideLinkSala) sideLinkSala.href = '../02 - Automações/01 - Sala de Agentes/index.html';
             }
+        }
+
+        // Garante carregamento da Rádio Barretos FM em todo o ecossistema
+        if (!window.RadioBarretos && !document.querySelector('script[src*="radio.js"]')) {
+            const radioScript = document.createElement('script');
+            radioScript.src = '/js/radio.js';
+            radioScript.defer = true;
+            document.head.appendChild(radioScript);
         }
 
         initSidebarState();

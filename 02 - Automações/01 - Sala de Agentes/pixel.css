@@ -27,3 +27,188 @@
 .pixel .laco.halo { stroke:rgba(164,105,255,.22); stroke-width:8; fill:none; }.pixel .laco.ativo { stroke:#a469ff; stroke-width:2; stroke-linecap:butt; stroke-dasharray:6 6; fill:none; animation:pp-traco .8s linear infinite; }.pixel .laco.pulso { stroke:#fff; stroke-width:1; fill:none; stroke-linecap:butt; stroke-dasharray:2 10; animation:pp-traco .55s linear infinite; }
 @keyframes pp-vidro { 0%,100% { fill:#4b22a0; } 50% { fill:#5b2bb0; } } @keyframes pp-linha-1 { 0% { width:3px; } 100% { width:21px; } } @keyframes pp-linha-2 { 0% { width:3px; } 100% { width:27px; } } @keyframes pp-quadro-a { 0% { visibility:visible; } 50% { visibility:hidden; } } @keyframes pp-quadro-b { 0% { visibility:hidden; } 50% { visibility:visible; } } @keyframes pp-pisca { 0%,100% { opacity:1; } 50% { opacity:.45; } } @keyframes pp-flutua { 0%,100% { transform:translate(0,-78px); } 50% { transform:translate(0,-81px); } } @keyframes pp-traco { to { stroke-dashoffset:-12; } }
 @media (prefers-reduced-motion:reduce) { .pixel .pessoa *, .pixel .pp-tela *, .pixel .laco,.pixel .pp-sala .led { animation:none!important; } }
+
+/* ==================== RÁDIO BARRETOS EASTER EGG ==================== */
+.btn-radio-barretos {
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.25s ease;
+}
+.btn-radio-barretos:hover {
+    transform: scale(1.08);
+    filter: brightness(1.2) drop-shadow(0 0 10px rgba(244, 63, 94, 0.5));
+}
+.btn-radio-barretos:active {
+    transform: scale(0.96);
+}
+.btn-radio-barretos .radio-bg {
+    fill: #14131A;
+    stroke: rgba(255, 255, 255, 0.15);
+    stroke-width: 1;
+    transition: stroke 0.3s ease, fill 0.3s ease;
+}
+.btn-radio-barretos.tocando .radio-bg {
+    stroke: #10b981;
+    fill: #064e3b;
+}
+.btn-radio-barretos.tocando {
+    filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.7)) drop-shadow(0 0 20px rgba(236, 72, 153, 0.5));
+    animation: radioPulsar 2s infinite ease-in-out;
+}
+@keyframes radioPulsar {
+    0%, 100% { filter: drop-shadow(0 0 8px rgba(16, 185, 129, 0.5)) drop-shadow(0 0 14px rgba(236, 72, 153, 0.3)); }
+    50% { filter: drop-shadow(0 0 14px rgba(16, 185, 129, 0.9)) drop-shadow(0 0 24px rgba(236, 72, 153, 0.6)); }
+}
+.btn-radio-barretos .radio-eq {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+.btn-radio-barretos.tocando .radio-eq {
+    opacity: 1;
+}
+@keyframes eqBarBounce1 {
+    0%, 100% { height: 4px; y: 9px; }
+    50% { height: 13px; y: 0px; }
+}
+@keyframes eqBarBounce2 {
+    0%, 100% { height: 12px; y: 1px; }
+    50% { height: 4px; y: 9px; }
+}
+@keyframes eqBarBounce3 {
+    0%, 100% { height: 6px; y: 7px; }
+    50% { height: 14px; y: -1px; }
+}
+.btn-radio-barretos.tocando .eq-b1 {
+    animation: eqBarBounce1 0.7s ease-in-out infinite alternate;
+}
+.btn-radio-barretos.tocando .eq-b2 {
+    animation: eqBarBounce2 0.5s ease-in-out infinite alternate 0.2s;
+}
+.btn-radio-barretos.tocando .eq-b3 {
+    animation: eqBarBounce3 0.6s ease-in-out infinite alternate 0.4s;
+}
+
+/* Toast de status da Rádio Barretos */
+.radio-toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: rgba(15, 23, 42, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(16, 185, 129, 0.45);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55), 0 0 20px rgba(16, 185, 129, 0.25);
+    color: #f8fafc;
+    border-radius: 9999px;
+    padding: 7px 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12.5px;
+    font-weight: 500;
+    z-index: 999999;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    user-select: none;
+}
+.radio-toast.visivel {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+.radio-toast.mutado {
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+}
+.radio-toast-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    font-size: 12px;
+}
+.radio-toast.mutado .radio-toast-icon {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+.radio-toast-text {
+    font-size: 12px;
+    font-weight: 600;
+    color: #f1f5f9;
+    white-space: nowrap;
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.radio-toast-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 2px;
+}
+.radio-toast-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: #e2e8f0;
+    cursor: pointer;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    transition: all 0.18s ease;
+}
+.radio-toast-btn:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.08);
+}
+.radio-toast-btn.mute-btn:hover {
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+@media (max-width: 640px) {
+    .radio-toast {
+        left: 12px !important;
+        right: 12px !important;
+        bottom: calc(14px + env(safe-area-inset-bottom, 0px)) !important;
+        width: auto !important;
+        max-width: calc(100vw - 24px) !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 8px 14px !important;
+        border-radius: 9999px !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(16, 185, 129, 0.3) !important;
+    }
+    .radio-toast-icon {
+        flex-shrink: 0 !important;
+        width: 26px !important;
+        height: 26px !important;
+    }
+    .radio-toast-text {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        font-size: 11.5px !important;
+        padding: 0 8px !important;
+    }
+    .radio-toast-btn {
+        flex-shrink: 0 !important;
+        width: 28px !important;
+        height: 28px !important;
+    }
+}

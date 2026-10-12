@@ -253,7 +253,7 @@
     const W = Math.floor(largura / P);
     const ativos = contagem.ativos || 0;
     const total = Math.max(contagem.total || 0, ativos);
-    const linhasMesa = Math.max(2, Math.ceil((ativos + 1) / 3));
+    const linhasMesa = Math.max(2, Math.ceil((total + 1) / 3));
     let linhasCafe = 1;
     let linhasEstar = 2;
     while (2 + 2 * linhasCafe + 3 * linhasEstar < total + 2) {
@@ -748,20 +748,22 @@
   const VELOCIDADE = 26; // pixels de arte por segundo
   const PERMANENCIA = { mesa: [24000, 55000], cafe: [9000, 20000], estar: [14000, 36000] };
   const PLACA_MAX = 99; // unidades: duas placas vizinhas nunca se encostam
-  const ROTULOS = { principal: 'Claude principal', desconhecido: 'agente desconhecido' };
+  const ROTULOS = { principal: 'O chefe', 'Claude principal': 'O chefe', dify: 'O chefe', chefe: 'O chefe', desconhecido: 'agente desconhecido' };
   const rotulo = (tipo) => ROTULOS[tipo] || tipo || '?';
   const esc = (v) =>
     String(v === null || v === undefined ? '' : v).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const reduzido = () => raiz.matchMedia && raiz.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const FAMILIAS = [
-    ['principal', /^principal$/i], ['pesquisa', /^(explore|pesquisador|general-purpose|claude-code-guide)/i],
+    ['chefe', /^(chefe|o chefe|dify|principal|claude principal)/i],
+    ['pesquisa', /^(explore|pesquisador|general-purpose|claude-code-guide)/i],
     ['plano', /^plan$/i], ['revisao', /^(revisor|code-review|simplify)/i],
     ['qa', /^(verificador|diagnostico|security)/i], ['dados', /^analista/i],
     ['conhecimento', /^(curador|radar|entrega)/i],
   ];
   const familiaDe = (tipo) => (FAMILIAS.find(([, pattern]) => pattern.test(String(tipo || ''))) || ['outro'])[0];
   const GLIFOS = {
-    principal: '<path class="glifo cheio" d="M0 -4.2 L1.3 -1.3 L4.2 0 L1.3 1.3 L0 4.2 L-1.3 1.3 L-4.2 0 L-1.3 -1.3 Z"/>',
+    chefe: '<path class="glifo cheio" d="M-4.5 2.5 L-4.5 -1.5 L-2 0.5 L0 -3.5 L2 0.5 L4.5 -1.5 L4.5 2.5 Z" fill="#F59E0B"/>',
+    principal: '<path class="glifo cheio" d="M-4.5 2.5 L-4.5 -1.5 L-2 0.5 L0 -3.5 L2 0.5 L4.5 -1.5 L4.5 2.5 Z" fill="#F59E0B"/>',
     pesquisa: '<circle class="glifo" cx="-1.2" cy="-1.2" r="2.7"/><path class="glifo" d="M0.8 0.8 L4 4"/>',
     plano: '<path class="glifo" d="M-4 -3 H4 M-4 0 H2 M-4 3 H3"/>',
     revisao: '<path class="glifo" d="M-4 0.2 L-1.2 3 L4 -3"/>',
@@ -769,7 +771,7 @@
     dados: '<path class="glifo" d="M-3.5 4 V0 M0 4 V-4 M3.5 4 V-1.5"/>',
     conhecimento: '<path class="glifo" d="M-4 -3.5 H-0.3 V3.8 H-4 Z M0.3 -3.5 H4 V3.8 H0.3 Z"/>',
   };
-  const glifoDe = (tipo) => GLIFOS[familiaDe(tipo)] || `<text class="glifo-letra" y="3.4" text-anchor="middle">${esc(tipo === 'principal' ? 'C' : String(tipo || '?').slice(0, 1).toUpperCase())}</text>`;
+  const glifoDe = (tipo) => GLIFOS[familiaDe(tipo)] || `<text class="glifo-letra" y="3.4" text-anchor="middle">${esc(tipo === 'principal' ? '👑' : String(tipo || '?').slice(0, 1).toUpperCase())}</text>`;
 
   function svgEl(nome, atributos, classe) {
     const el = document.createElementNS(NS, nome);
@@ -940,6 +942,8 @@
     const resumo = svgEl('text', { x: plano.largura - 12, y: 22, 'text-anchor': 'end' }, 'sala-sub direita');
     resumo.setAttribute('data-papel', 'resumo');
     g.appendChild(resumo);
+
+
     [['Estações de trabalho', X.trabalho[0] + 16], ['Café', X.cafe[0] + 3], ['Sala de estar', X.estar[0] + 3]].forEach(([texto, x]) => {
       g.appendChild(svgEl('text', { x: x * P, y: plano.altura - 15 }, 'pp-area')).textContent = texto;
     });
@@ -991,7 +995,11 @@
       n.orfa && `${n.orfa} órfã(s)`,
       n.concluida && `${n.concluida} encerrada(s) · até 12 h`,
     ].filter(Boolean);
-    sala.estatico.querySelector('[data-papel="resumo"]').textContent = partes.join(' · ') || 'sala vazia';
+    const textoResumo = partes.join(' · ') || 'sala vazia';
+    sala.estatico.querySelector('[data-papel="resumo"]').textContent = textoResumo;
+
+
+
     const ativos = n.trabalhando + n.delegando + n.aguardando;
     sala.el.classList.toggle('ativa', n.trabalhando + n.delegando > 0);
     sala.el.classList.toggle('vazia', ativos === 0);
@@ -1087,9 +1095,11 @@
     el.setAttribute('aria-label', `${rotulo(e.tipo_agente)}: ${e.status}`);
     sala.gente.appendChild(el);
     ajustarPlaca(ent);
+    entidades.set(e.id, ent);
 
-    // surge direto num lugar coerente com o estado, sem entrar por porta
-    const vaga = escolherVaga(sala.plano, e.status, ocupadas(chaveSala, ent), sorteio(), null);
+    // Surge direto no seu posto estável e determinístico:
+    // mesa se trabalhando/delegando, ou convivência (sofá/café) se aguardando/concluída
+    const vaga = vagaAlvoAgente(sala, ent);
     if (vaga) {
       ent.vaga = vaga;
       ent.x = vaga.x;
@@ -1098,8 +1108,6 @@
       ent.x = 150;
       ent.y = sala.plano.H - 12;
     }
-    ent.proxima = performance.now() + (e.status === 'orfa' ? Infinity : entre(permanencia(ent)));
-    entidades.set(e.id, ent);
     posicionar(ent);
     atualizarPose(ent);
     ordenar(sala);
@@ -1135,15 +1143,14 @@
     ent.el.setAttribute('aria-label', `${rotulo(e.tipo_agente)}: ${e.status}`);
     ent.el.querySelector('.tempo').textContent = tempoDe(e);
     if (antes === e.status) return;
-    // mudou de estado: decide logo para onde vai. Quem encerrou ou ficou
-    // órfão sai da mesa para a convivência; os outros só reconsideram.
-    const naConvivencia = ent.vaga && CONVIVENCIA.includes(ent.vaga.zona);
-    if (e.status === 'orfa') {
-      ent.proxima = naConvivencia ? Infinity : performance.now();
-    } else if (e.status === 'concluida') {
-      ent.proxima = naConvivencia ? performance.now() + entre(permanencia(ent)) : performance.now();
-    } else {
-      ent.proxima = Math.min(ent.proxima, performance.now() + entre([600, 2500]));
+    // Se o estado mudou (ex: iniciou tarefa ou foi para standby),
+    // caminha determinística e suavemente até o novo posto correspondente
+    const sala = salas.get(ent.sala);
+    if (sala) {
+      const novoAlvo = vagaAlvoAgente(sala, ent);
+      if (novoAlvo && (!ent.vaga || ent.vaga.id !== novoAlvo.id)) {
+        irPara(ent, sala, novoAlvo);
+      }
     }
     atualizarPose(ent);
   }
@@ -1227,27 +1234,83 @@
 
   /* ------------------------------------------------------------- agenda */
 
-  /* A cada 0,7 s: quem já ficou o bastante no lugar escolhe outro e anda
-     até lá. Com movimento reduzido, ninguém circula: só muda de lugar quando
-     o estado obriga (encerrou, ficou órfão), e muda sem andar. */
+  /* ------------------------------------------------------------- agenda & postos fixos */
+
+  /* Determina o índice fixo e estável do agente na sala (0 para o líder, 1..N para subagentes).
+     Garante 100% de consistência determinística em todas as abas, dispositivos e recargas. */
+  function indiceEstavelAgente(sala, entId) {
+    const lista = ((sala.dados && sala.dados.execucoes) || []).slice().sort((a, b) => {
+      const aLider = a.tipo_agente === 'principal';
+      const bLider = b.tipo_agente === 'principal';
+      if (aLider && !bLider) return -1;
+      if (!aLider && bLider) return 1;
+      return String(a.id).localeCompare(String(b.id));
+    });
+    const idx = lista.findIndex((x) => x.id === entId);
+    return idx >= 0 ? idx : 0;
+  }
+
+  /* Posto determinístico do agente:
+     - Trabalhando ou Delegando: estação de trabalho exclusiva (mesa-0, mesa-1, mesa-2...),
+       onde o agente permanece focado, com monitor aceso e digitando.
+     - Aguardando / Concluída / Órfã: área de convivência (sofá de estar ou balcão/banqueta do café). */
+  function vagaAlvoAgente(sala, ent) {
+    if (!sala || !sala.plano || !sala.plano.vagas) return null;
+    const idx = indiceEstavelAgente(sala, ent.id);
+    const mesas = sala.plano.vagas.filter((v) => v.tipo === 'mesa');
+    const descanso = sala.plano.vagas.filter((v) => v.zona !== 'mesa');
+
+    if (ent.status === 'trabalhando' || ent.status === 'delegando') {
+      return mesas[idx % mesas.length] || mesas[0] || null;
+    } else {
+      // Standby / Intervalo / Convivência
+      return descanso[idx % descanso.length] || descanso[0] || null;
+    }
+  }
+
+  function alvosDaSala(sala) {
+    const alvos = new Map();
+    entidades.forEach((ent) => {
+      if (ent.sala === sala.chave && !ent.sumindo) {
+        const vaga = vagaAlvoAgente(sala, ent);
+        if (vaga) alvos.set(ent.id, vaga);
+      }
+    });
+    return alvos;
+  }
+
+  /* Confere periodicamente se o alvo mudou (por transição de estado da API).
+     Se a aba esteve inativa ou em segundo plano, posiciona instantaneamente. */
+  let ultimaAgenda = 0;
   function agenda() {
     if (!montado() || document.hidden) return;
-    const agora = performance.now();
-    entidades.forEach((ent) => {
-      if (ent.sumindo || ent.rota || agora < ent.proxima) return;
-      const sala = salas.get(ent.sala);
-      if (!sala) return;
-      const naConvivencia = ent.vaga && CONVIVENCIA.includes(ent.vaga.zona);
-      if (reduzido() && (naConvivencia || !['concluida', 'orfa'].includes(ent.status))) {
-        ent.proxima = agora + 60000;
-        return;
+    const agora = Date.now();
+    const saltar = reduzido() || agora - ultimaAgenda > 3000;
+    ultimaAgenda = agora;
+    salas.forEach((sala) => {
+      let mexeu = false;
+      entidades.forEach((ent) => {
+        if (ent.sala !== sala.chave || ent.sumindo) return;
+        const alvo = vagaAlvoAgente(sala, ent);
+        if (!alvo || (ent.vaga && ent.vaga.id === alvo.id)) return;
+        if (saltar) {
+          ent.vaga = alvo;
+          ent.rota = null;
+          ent.x = alvo.x;
+          ent.y = alvo.y;
+          ent.dir = 'baixo';
+          posicionar(ent);
+          atualizarPose(ent);
+          mexeu = true;
+        } else {
+          irPara(ent, sala, alvo);
+        }
+      });
+      if (mexeu) {
+        ordenar(sala);
+        atualizarMonitores(sala);
+        atualizarLinks();
       }
-      const vaga = escolherVaga(sala.plano, ent.status, ocupadas(ent.sala, ent), sorteio(), ent.vaga && ent.vaga.id);
-      if (!vaga) {
-        ent.proxima = agora + 5000;
-        return;
-      }
-      irPara(ent, sala, vaga);
     });
   }
 

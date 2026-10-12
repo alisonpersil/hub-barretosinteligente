@@ -458,15 +458,7 @@ body {
 }
 
 .sidebar-pill-badge {
-    font-size: 10px;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: var(--radius-full);
-    background: var(--badge-bg);
-    color: var(--text-muted);
-    border: 1px solid var(--border-color);
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
+    display: none !important;
 }
 
 /* Submenu de páginas vinculadas (em Relatórios) */
@@ -512,12 +504,17 @@ body {
     font-size: 13px;
 }
 
-.sidebar-subitem .sub-icon.green {
+.sidebar-subitem .sub-icon.green,
+.sidebar-subitem .sub-icon.emerald {
     color: var(--accent-emerald);
 }
 
 .sidebar-subitem .sub-icon.blue {
     color: var(--accent-blue);
+}
+
+.sidebar-subitem .sub-icon.purple {
+    color: #a855f7;
 }
 
 .sidebar-spacer {
