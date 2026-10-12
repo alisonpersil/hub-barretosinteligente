@@ -1125,14 +1125,20 @@ body {
         max-height: 100dvh;
         z-index: 90;
         transform: translateX(-100%);
-        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.4);
+        box-shadow: none;
+        visibility: hidden;
+        pointer-events: none;
         padding-top: calc(62px + env(safe-area-inset-top, 0px));
         box-sizing: border-box;
         overflow-y: auto;
         overflow-x: hidden;
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.28s ease, box-shadow 0.28s ease;
     }
     .hub-sidebar.mobile-open {
         transform: translateX(0);
+        visibility: visible;
+        pointer-events: auto;
+        box-shadow: 10px 0 30px rgba(0, 0, 0, 0.35);
     }
     .hub-title {
         font-size: 26px;
