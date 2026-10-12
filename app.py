@@ -19,11 +19,29 @@ if sys.platform == "win32":
 
 from flask import Flask, render_template, jsonify, send_file, send_from_directory, request, abort, redirect
 
-# Base Directories
+# Base Directories with Dynamic Resolution
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-HUB_DIR = os.path.join(BASE_DIR, "00 - HUB")
-OFICIOS_DIR = os.path.join(BASE_DIR, "01 - Consulta de Ofícios")
-EXATI_DIR = os.path.join(BASE_DIR, "02 - Monitor Exati")
+
+def resolve_dir(*candidates):
+    for c in candidates:
+        if os.path.exists(c):
+            return c
+    return candidates[0]
+
+HUB_DIR = resolve_dir(
+    os.path.join(BASE_DIR, "00 - HUB"),
+    os.path.join(BASE_DIR, "HUB")
+)
+OFICIOS_DIR = resolve_dir(
+    os.path.join(BASE_DIR, "Relatórios", "01 - Consulta de Ofícios"),
+    os.path.join(BASE_DIR, "Relatorios", "01 - Consulta de Ofícios"),
+    os.path.join(BASE_DIR, "01 - Consulta de Ofícios")
+)
+EXATI_DIR = resolve_dir(
+    os.path.join(BASE_DIR, "Relatórios", "02 - Monitor Exati"),
+    os.path.join(BASE_DIR, "Relatorios", "02 - Monitor Exati"),
+    os.path.join(BASE_DIR, "02 - Monitor Exati")
+)
 
 DOCS_DIR = os.path.join(OFICIOS_DIR, "Base de dados Ofícios")
 OFICIOS_STATIC_DIR = os.path.join(OFICIOS_DIR, "static")
@@ -163,7 +181,8 @@ def run_git_sync_background(commit_message="Atualização de ofícios"):
     """Run git add, commit, and push in background thread if local git repository."""
     def _sync():
         try:
-            subprocess.run(["git", "add", "01 - Consulta de Ofícios/Base de dados Ofícios"], cwd=BASE_DIR, check=False)
+            docs_rel_path = os.path.relpath(DOCS_DIR, BASE_DIR).replace("\\", "/")
+            subprocess.run(["git", "add", docs_rel_path], cwd=BASE_DIR, check=False)
             subprocess.run(["git", "commit", "-m", commit_message], cwd=BASE_DIR, check=False)
             subprocess.run(["git", "push", "origin", "main"], cwd=BASE_DIR, check=False)
         except Exception as e:
@@ -395,7 +414,8 @@ def upload_oficios():
         try:
             file_bytes = file.read()
             if is_vercel:
-                repo_path = f"01 - Consulta de Ofícios/Base de dados Ofícios/Ofícios/{filename}"
+                docs_rel_path = os.path.relpath(DOCS_DIR, BASE_DIR).replace("\\", "/")
+                repo_path = f"{docs_rel_path}/Ofícios/{filename}"
                 github_api_commit_file(
                     token=token,
                     repo_path=repo_path,
