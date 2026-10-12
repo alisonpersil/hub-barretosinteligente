@@ -1,235 +1,222 @@
 # 📘 BRANDBOOK & DESIGN SYSTEM EXECUTIVO
-## Padrão Oficial de Interfaces, Dashboards e Automações • PMO / CCO
+## Padrão Oficial do Ecossistema Barretos Inteligente • PMO / CCO
+### Central HUB • Consulta de Ofícios • Monitor Exati
 
-> **Como acionar em novos projetos:**  
-> Ao iniciar qualquer nova aplicação ou painel, basta dizer:  
-> *"Aplique o **Brandbook Executivo do PMO** em modo claro/escuro com a mesma identidade visual, paleta de cores e ergonomia de dados."*
-
----
-
-## 1. 🎯 Filosofia e Identidade Visual
-
-O **Padrão Executivo PMO** foi concebido para entregar dashboards operacionais e gerenciais de nível C-Level e diretoria. Seus pilares essenciais são:
-
-1. **Visão Executiva & Foco em Decisão:** Sem elementos supérfluos, sem grafismos infantis ou ilustrações poluentes. Cada pixel comunica um dado ou facilita uma ação.
-2. **Dados em Primeiro Lugar (Data-First):** Números em destaque com fonte tabular (`tabular-nums`), rótulos claros e métricas semânticas que eliminam ambiguidades (ex.: **SLA sempre em Dias**, nunca em horas decimais confusas).
-3. **Bimodalidade Perfeita (Light & Dark):** Alternância instantânea entre modo claro (corporativo para reuniões diurnas) e modo escuro (ultra-moderno com contraste focado para salas de comando/CCO).
-4. **Ergonomia e Portabilidade:** Feito em Vanilla HTML/CSS/JS puro, ultrarrápido (carrega em < 200ms), sem dependência de builds pesados, funcionando tanto com servidor local Python quanto 100% autônomo e estático no navegador.
+> **Como acionar em novos projetos ou solicitações:**  
+> Ao iniciar qualquer nova página, módulo ou automação, declare:  
+> *"Aplique rigorosamente o **Brandbook Executivo do PMO** em modo claro/escuro, mantendo a topbar limpa, sidebar compartilhada, endbar com LinkedIn, ícones FontAwesome e sem emojis de sistema."*
 
 ---
 
-## 2. 🎨 Paleta de Cores e Tokens de Design
+## 1. 🎯 Filosofia e Diretrizes de Design
 
-### 2.1 Cores Principais de Marca (Brand & Accent)
+O ecossistema **Barretos Inteligente** foi concebido para entregar portais e ferramentas de nível executivo C-Level e diretoria técnica. Todas as interfaces devem seguir princípios inegociáveis de excelência:
 
-| Token CSS | Cor HEX | Amostra | Aplicação |
+1. **Visão Executiva & Foco em Decisão:** Interfaces limpas, organizadas e sofisticadas. Nenhum elemento de ruído ou informação desnecessária na navegação.
+2. **Iconografia Profissional Estrita:** **Proibição absoluta de emojis nativos de sistema operacional (Windows/Segoe UI Emoji)**. 100% dos ícones devem ser vetoriais via **FontAwesome 6**, transmitindo acabamento profissional de alto padrão.
+3. **Harmonia Estrutural Unificada:** Todas as aplicações do ecossistema compartilham a mesma Top Navbar, a mesma Barra Lateral Executiva (`.hub-sidebar`) e a mesma Endbar (`.hub-footer`).
+4. **Bimodalidade Perfeita (Light & Dark):** Alternância instantânea entre modo claro (corporativo diurno) e modo escuro (azul-noturno profundo estilo Centro de Controle Operacional - CCO), com persistência em `localStorage`.
+5. **Ergonomia e Portabilidade:** Vanilla HTML/CSS/JS ultrarrápido, sem dependência de builds pesados, com funcionamento bimodal (servidor Flask/Python e cliente estático).
+
+---
+
+## 2. 🏛️ Arquitetura e Navegação do Ecossistema
+
+### 2.1 Central HUB (`00 - HUB`)
+* **Página Inicial:** A tela inicial do portal (`/`) exibe os 3 módulos estratégicos do sistema:
+  * **Relatórios:** Porta de entrada para *Consulta de Ofícios* e *Monitor Exati*.
+  * **Automações:** Módulo dedicado a rotinas automatizadas (mantido vazio com placeholder "Em desenvolvimento", sem gerar falsas expectativas).
+  * **Book:** Módulo dedicado aos livros e acervos operacionais (mantido vazio com placeholder "Em desenvolvimento").
+* **Sem Redirecionamento Compulsório:** A primeira página abre na visão dos 3 módulos, permitindo ao usuário decidir para qual área navegar.
+
+### 2.2 Top Navigation Bar (Navbar) Padronizada e Despoluída
+* **Altura Padrão:** `62px`, com `backdrop-filter: blur(8px)` e `position: sticky; top: 0; z-index: 100` (sempre no topo absoluto, nunca sendo sobreposta por elementos do corpo ou barra lateral).
+* **Lado Esquerdo (Anatomia do Brand & Título):**
+  1. Botão de alternância da barra lateral (`.sidebar-toggle-btn` com ícone `fa-bars`).
+  2. Logo institucional em alta definição (`.brand-logo-img`) envolvido exclusivamente pelo link (`.brand-logo-link`) para retornar ao HUB Central quando clicado.
+  3. Divisor vertical sutil (`.brand-divider`).
+  4. Nome da aplicação (`.brand-title` dentro de `.brand-text`): **Elemento estático não clicável** (`cursor: default; user-select: none;`). O clique no título **nunca deve redirecionar** o usuário ou tirá-lo da página atual.
+* **Regras de Visibilidade Mobile (Mandatórias):**
+  * ✅ **O título da aplicação deve SEMPRE permanecer visível no celular:** É proibido ocultar o título em telas de smartphones. No modo mobile (`max-width: 768px`), o título `.brand-title` permanece visível ao lado do logo redimensionado (`height: 24px, max-width: 95px`) e divisor, com tipografia adaptada (`font-size: 13px`) e truncamento elegante (`text-overflow: ellipsis`), garantindo que o usuário sempre saiba em qual página está.
+* **Regras de Despoluição Visual (Obrigatórias):**
+  * ❌ **Proibido itens no meio da navbar:** Não colocar botões ou links soltos no centro da barra superior (como "Monitor Exati" ou "Consulta de Ofícios"). O meio da barra deve permanecer limpo.
+  * ❌ **Proibido subtítulos de ruído:** Removidos terminantemente textos como *"PMO • Acervo Digital"* e *"PMO • Gestão Operacional"*. Apenas o nome funcional e direto da aplicação.
+* **Lado Direito:**
+  * Indicadores de sincronia / contadores contextuais (se aplicável).
+  * Botão de alternância de tema Claro/Escuro (Sol/Lua).
+
+### 2.3 Barra Lateral Compartilhada (Shared Sidebar • `.hub-sidebar`)
+* **Presença Obrigatória:** Integrada em todas as páginas do ecossistema através de `/css/sidebar.css` e `/js/sidebar.js`.
+* **Dimensões:**
+  * Aberta: `270px` de largura.
+  * Colapsada: `78px` de largura (ícones centralizados, rótulos e submenus ocultados com animação fluida).
+* **Comportamento Fixo / Travado (Sticky Lock):**
+  * A barra lateral permanece **100% visível e travada na tela** (`position: sticky; top: 62px; height: calc(100vh - 62px); max-height: calc(100vh - 62px); align-self: flex-start; z-index: 40;`) durante toda a rolagem da página.
+  * O usuário pode rolar a página livremente até o rodapé sem que a sidebar desapareça ou se desloque para fora da tela.
+  * A sidebar nunca invade ou cobre a navbar (`z-index: 40` vs `z-index: 100` da navbar).
+  * Possui `overflow-y: auto` com scrollbar ultrafina e discreta para telas de notebooks menores.
+* **Estrutura de Menus:**
+  * `Início` (`fa-house`): Redireciona para `/` (Central HUB).
+  * `Relatórios` (`fa-chart-pie`): Com badge indicativa e submenu contendo:
+    * `Consulta de Ofícios` (`fa-folder-open`, acento verde).
+    * `Monitor Exati` (`fa-chart-line`, acento azul).
+  * `Automações` (`fa-bolt`): Badge *"Em breve"*.
+  * `Book` (`fa-book-bookmark`): Badge *"Em breve"*.
+* **Persistência de Estado:** Gravada automaticamente no `localStorage ('hub_sidebar_collapsed')`. Ao navegar entre HUB, Ofícios e Exati, o estado escolhido é mantido.
+* **Modo Mobile (≤ 860px):** Transforma-se em gaveta deslizante (`drawer`) com backdrop escurecido (`.sidebar-backdrop`), abrindo via botão hamburguer e fechando ao clicar fora.
+
+### 2.4 Endbar Oficial no Rodapé (Footer Corporativo • `.hub-footer`)
+* **Presença Obrigatória:** Rodapé executivo idêntico em todas as páginas do portal.
+* **Layout em 3 Zonas Simétricas (Grid `1fr auto 1fr`):**
+  * **Esquerda:** Copyright institucional: `© 2026 Barretos Inteligente`.
+  * **Centro:** Ícone vetorial do LinkedIn (`fa-brands fa-linkedin`) com link direto para o perfil pessoal do autor:  
+    👉 **`https://www.linkedin.com/in/alisonviper/`** (`target="_blank" rel="noopener noreferrer"`).  
+    *Efeito Hover:* Transição suave para a cor oficial do LinkedIn (`#0a66c2`), leve elevação (`translateY(-2px)`) e halo suave.
+  * **Direita:** Domínio institucional: `hub.barretosinteligente.com.br`.
+* **Fixação:** Utiliza `margin-top: auto` dentro do container flexível de conteúdo (`.hub-main-area`), garantindo que o rodapé permaneça na base da página mesmo em telas com pouco conteúdo.
+* **Responsividade:** Em dispositivos móveis (`≤ 768px`), adapta-se automaticamente para layout em coluna centralizada.
+
+---
+
+## 3. 🎨 Paleta de Cores e Tokens de Design
+
+### 3.1 Cores Principais e Semânticas
+
+| Token CSS | Cor HEX | Amostra | Significado / Aplicação |
 | :--- | :--- | :---: | :--- |
-| `--primary` | `#2563eb` | 🔵 | Botões primários, links ativos, destaques principais |
-| `--primary-hover` | `#1d4ed8` | 🔷 | Estado hover de botões e links ativos |
-| `--primary-glow` | `rgba(37, 99, 235, 0.22)` | 🌐 | Efeito de foco, sombras de cards destacados e abas ativas |
-| `--brand-dark` | `#0f172a` | ⬛ | Barra superior corporativa (Navbar), elementos estruturais |
+| `--primary` | `#2563eb` | 🔵 | Botões primários, destaques principais |
+| `--accent-emerald` | `#10b981` | 🟢 | Sucesso, metas atingidas, ícone de Ofícios |
+| `--accent-blue` | `#2563eb` | 🔷 | Indicadores de operação, ícone de Exati |
+| `--accent-warning` | `#f59e0b` | 🟡 | Alertas de prazo e atenção |
+| `--accent-danger` | `#ef4444` | 🔴 | Chamados vencidos e ações destrutivas |
+| `--linkedin-color` | `#0a66c2` | 🌐 | Cor oficial da marca LinkedIn no footer |
 
-### 2.2 Cores Semânticas de Negócio (Status e Alertas)
-
-| Status | Token CSS | HEX | Significado / Regra de Uso |
-| :--- | :--- | :--- | :--- |
-| **Sucesso / No Prazo** | `--color-success` | `#10b981` | Chamados atendidos dentro do SLA, metas superadas, conformidade |
-| **Atenção / Próximo do Limite** | `--color-warning` | `#f59e0b` | Chamados com SLA restante baixo (≤ 2 dias), alertas operacionais |
-| **Crítico / Vencido** | `--color-danger` | `#ef4444` | Chamados em atraso (Vencidos), bairros com alto SLA, falhas |
-| **Informativo / Ronda** | `--color-info` | `#6366f1` | Chamados preventivos / Ronda própria, dados de suporte |
-
-### 2.3 Tokens Neutros por Tema (Light vs. Dark)
+### 3.2 Tokens Neutros por Tema (Light vs. Dark)
 
 ```css
 /* ==================== MODO CLARO (Default Corporativo) ==================== */
 :root[data-theme="light"], :root {
-  --bg-app: #f8fafc;            /* Fundo geral da página (Slate 50) */
-  --bg-card: #ffffff;           /* Fundo dos cartões e caixas */
-  --bg-card-hover: #f1f5f9;     /* Hover em linhas de tabela e botões neutros */
-  --border-card: #e2e8f0;       /* Bordas sutis dos cartões (Slate 200) */
-  --text-main: #0f172a;         /* Título e números de KPI (Slate 900) */
-  --text-muted: #475569;        /* Textos explicativos e labels (Slate 600) */
-  --text-dim: #94a3b8;          /* Rótulos pequenos, datas e rodapés (Slate 400) */
-  --nav-bg: #0f172a;            /* Barra superior sólida executiva */
-  --nav-text: #ffffff;          /* Texto do cabeçalho */
-  --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+    --bg-app: #f8fafc;            /* Fundo geral da página (Slate 50) */
+    --bg-main: #f8fafc;
+    --bg-card: #ffffff;           /* Superfície de cartões e modais */
+    --bg-card-hover: #f1f5f9;     /* Hover em listas e cards */
+    --bg-header: #ffffff;         /* Navbar e Endbar */
+    --border-color: #e2e8f0;       /* Bordas sutis dos elementos */
+    --text-primary: #0f172a;      /* Textos principais e KPIs (Slate 900) */
+    --text-secondary: #475569;    /* Subtítulos e links (Slate 600) */
+    --text-muted: #64748b;        /* Rótulos secundários (Slate 500) */
+    --badge-bg: rgba(0, 0, 0, 0.05);
 }
 
 /* ==================== MODO ESCURO (Estilo CCO / Noturno) ==================== */
-:root[data-theme="dark"] {
-  --bg-app: #0b1120;            /* Fundo azul-noturno profundo (Tailwind 950) */
-  --bg-card: #131c31;           /* Superfície dos cartões em vidro sutil */
-  --bg-card-hover: #1e293b;     /* Hover com elevação perceptível */
-  --border-card: #1e2d4a;       /* Linhas de contorno discretas */
-  --text-main: #f8fafc;         /* Leitura limpa e alto contraste */
-  --text-muted: #94a3b8;        /* Informações secundárias */
-  --text-dim: #64748b;          /* Textos de suporte e notas */
-  --nav-bg: #070d19;            /* Barra superior em tom ainda mais denso */
-  --nav-text: #f8fafc;          
-  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+[data-theme="dark"] {
+    --bg-app: #0b1120;            /* Fundo azul-noturno profundo (Tailwind 950) */
+    --bg-main: #0b1120;
+    --bg-card: #131c31;           /* Superfície de cartões em vidro azulado */
+    --bg-card-hover: #1e293b;
+    --bg-header: #0f172a;         /* Navbar e Endbar sólida escura */
+    --border-color: #1e2d4a;       /* Bordas discretas em tom noturno */
+    --text-primary: #f8fafc;      /* Texto de alto contraste (Slate 50) */
+    --text-secondary: #94a3b8;    /* Textos complementares (Slate 400) */
+    --text-muted: #64748b;
+    --badge-bg: #1e293b;
 }
 ```
 
 ---
 
-## 3. 🔤 Tipografia e Hierarquia de Texto
+## 4. 🔤 Tipografia e Iconografia
 
-* **Família Tipográfica Principal:** `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`
-* **Import Google Fonts:**
+### 4.1 Tipografia
+* **Fonte Principal:** `'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif`
+* **Import Obrigatório:**
   ```html
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   ```
+* **Números de Métricas:** Sempre com `font-variant-numeric: tabular-nums` para alinhamento vertical estável em tabelas e KPIs.
 
-### 3.1 Escala Tipográfica Padronizada
-
-| Nível | Tamanho | Peso (`font-weight`) | Aplicação |
-| :--- | :--- | :---: | :--- |
-| **KPI Display** | `2.25rem` (36px) | `800` | Números gigantes dos cartões de indicadores (`font-variant-numeric: tabular-nums`) |
-| **Título H1** | `1.5rem` (24px) | `700` | Título principal da visão / tela |
-| **Subtítulo H2** | `1.15rem` (18px) | `600` | Cabeçalho de cartões e gráficos |
-| **Corpo (Body)** | `0.88rem` (14px) | `400` / `500` | Texto corrido, linhas de tabela, descrições |
-| **Rótulo (Label)** | `0.75rem` (12px) | `600` | Títulos de colunas, categorias de chips (em caixa alta suave) |
-| **Micro (Caption)** | `0.70rem` (11px) | `500` | Metadados, horário de sincronização, rodapé |
-
----
-
-## 4. 📐 Anatomia Estrutural do Layout
-
-A estrutura padrão de qualquer página segue 5 blocos hierárquicos verticais:
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│ 1. NAVBAR SUPERIOR (Marca + Divider + Indicador de Sincronia + Ações Globais)│
-├─────────────────────────────────────────────────────────────────────────────┤
-│ 2. FAIXA DE CONTROLE TEMPORAL (Filtro por Período: 2026, Mês, Datas, Export) │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ 3. ABAS DE NAVEGAÇÃO EXECUTIVA (Visão Geral • Backlog • Histórico • etc.)  │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ 4. GRID DE CARDS KPI (Atendidos • SLA em Dias • Backlog Ativo • Vencidos)   │
-├─────────────────────────────────────────────────────────────────────────────┤
-│ 5. ÁREA DE CONTEÚDO (Gráficos Lado a Lado • Tabelas Analíticas • Diagnóstico) │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### 4.1 Barra Superior Corporativa & Abas Fixas (Sticky Navigation)
-* **Container Unificado Sticky (`.sticky-header-wrapper`):** Fixado no topo (`position: sticky; top: 0; z-index: 1000`) unificando a Barra de Título/Ações (`.navbar`) e a Barra de Abas/Chips (`.subnav-bar`), garantindo que tanto o título quanto a navegação permaneçam fixos durante a rolagem de página, com elevação dinâmica (`.is-scrolled`).
-* **Proteção Anti-Quebra do Sticky:** O `html` e `body` utilizam `overflow-x: clip` (em vez de `overflow-x: hidden`) para conter vazamentos horizontais sem quebrar o cálculo do `position: sticky` no Chromium/Safari.
-* **Logomarca com Divisor Vertical:** Logo da empresa/concessionária à esquerda, linha vertical divisora em `rgba(255,255,255,0.2)` e título do painel + subtítulo de gestão.
-* **Indicador de Sincronia Viva (`.topbar-sync-notice`):** Ponto verde pulsante (`.sync-pulse-dot`) mostrando os arquivos ou data/hora da base de dados ativa.
-* **Ações Globais à Direita:** Botão de Troca de Tema (Sol/Lua) e Botão Principal de Upload/Importação de Dados.
-
-### 4.2 Faixa de Filtro Temporal Dinâmico
-* Botões de Atalho Rápido: `Ano Atual (2026)`, `Últimos 30 Dias`, `Últimos 90 Dias`, `Todo o Histórico`.
-* Inputs de Data Inicial e Final (`<input type="date">`) com botão de confirmação e botão de **Exportar Relatório Excel**.
+### 4.2 Iconografia Vetorial FontAwesome (Regra Estrita Anti-Emoji)
+* **Import Obrigatório:**
+  ```html
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  ```
+* **Diretriz Mandatória:**
+  * ❌ **Nunca utilizar emojis do Windows ou do sistema operacional** (como 📁, 📊, ⚡, ⚙️, 🚀).
+  * ✅ **Utilizar exclusivamente ícones FontAwesome 6**:
+    * Home/Início: `<i class="fa-solid fa-house"></i>`
+    * Relatórios: `<i class="fa-solid fa-chart-pie"></i>`
+    * Ofícios: `<i class="fa-solid fa-folder-open"></i>`
+    * Exati / Monitor: `<i class="fa-solid fa-chart-line"></i>`
+    * Automações: `<i class="fa-solid fa-bolt"></i>`
+    * Book: `<i class="fa-solid fa-book-bookmark"></i>`
+    * Tema (Sol/Lua): `<i class="fa-solid fa-moon"></i>` / `<i class="fa-solid fa-sun"></i>`
+    * Menu Hambúrguer: `<i class="fa-solid fa-bars"></i>`
+    * LinkedIn: `<i class="fa-brands fa-linkedin"></i>`
 
 ---
 
-## 5. 🧩 Biblioteca de Componentes UI
+## 5. 🧩 Padrão de Botões e Componentes UI
 
-### 5.1 Card de KPI Executivo
+### 5.1 Botões Executivos Padronizados
+* Bordas suavemente arredondadas (`border-radius: 8px` a `10px`).
+* Altura confortável (`38px` a `42px`), espaçamento equilibrado (`padding: 8px 16px`).
+* Efeito hover elegante com elevação (`transform: translateY(-1px)`) e sombra suave.
+* Transição fluida de 200ms (`cubic-bezier(0.16, 1, 0.3, 1)`).
+
+### 5.2 Estrutura HTML do Footer Oficial
 ```html
-<div class="kpi-card">
-  <div class="kpi-header">
-    <span class="kpi-label">SLA MÉDIO DE ATENDIMENTO</span>
-    <span class="kpi-icon">⚡</span>
-  </div>
-  <div class="kpi-value">2.6 <span class="kpi-unit">dias</span></div>
-  <div class="kpi-footer">
-    <span class="trend-badge positive">Mediana: 1.0 dia</span>
-    <span class="kpi-subtext">Meta contratual: ≤ 3 dias</span>
-  </div>
-</div>
+<footer class="hub-footer">
+    <div class="footer-left">
+        <span>&copy; 2026 Barretos Inteligente</span>
+    </div>
+    <div class="footer-center">
+        <a href="https://www.linkedin.com/in/alisonviper/" target="_blank" rel="noopener noreferrer" class="footer-linkedin-link" title="LinkedIn • Alison Persil" aria-label="Perfil do LinkedIn de Alison Persil">
+            <i class="fa-brands fa-linkedin"></i>
+        </a>
+    </div>
+    <div class="footer-links">
+        <span>hub.barretosinteligente.com.br</span>
+    </div>
+</footer>
 ```
 
-```css
-.kpi-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-card);
-  border-radius: 10px;
-  padding: 16px 20px;
-  box-shadow: var(--card-shadow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-}
-.kpi-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--primary);
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.12);
-}
-.kpi-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-dim);
-}
-.kpi-value {
-  font-size: 2.1rem;
-  font-weight: 800;
-  color: var(--text-main);
-  font-variant-numeric: tabular-nums;
-  line-height: 1.1;
-  margin: 6px 0 4px 0;
-}
-```
-
-### 5.2 Badges & Chips Semânticos
-```css
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 3px 8px;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-.badge.success { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-.badge.warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-.badge.danger  { background: rgba(239, 68, 68, 0.15);  color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-.badge.info    { background: rgba(99, 102, 241, 0.15); color: #6366f1; border: 1px solid rgba(99, 102, 241, 0.3); }
-```
-
-### 5.3 Gráficos Chart.js (Estilo Executivo)
-Para manter todos os gráficos consistentes e elegantes:
-1. **Sem linhas de grade verticais** (`x: { grid: { display: false } }`).
-2. **Grade horizontal muito suave** (`y: { grid: { color: 'rgba(148, 163, 184, 0.12)' } }`).
-3. **Tooltips Escuros Flutuantes:** Fundo escuro semitransparente, padding generoso, sem caixas pontudas.
-4. **Barras com Cantos Arredondados:** `borderRadius: 4` a `6px`.
-5. **Legendas Ocultadas** quando o título ou o eixo já tornam a leitura óbvia.
-6. **Eixo X Temporal Hierárquico:** Rótulos mensais sempre formatados como array multilinha com o **Nome do Mês em cima** e o **Ano embaixo** (ex.: `['Janeiro', '2026']`), eliminando formatações técnicas como `2026-01`.
-7. **Drill-Down Interativo (Padrão Power BI):** Gráficos temporais executivos devem suportar alternância de nível entre **Mês** (padrão principal) e **Dia**, permitindo clicar diretamente nas barras de um mês para descer o nível diário daquele mês, com botão de subida de nível (`Subir Nível (Mês)`).
+### 5.3 Padrão de Paginação Executiva (15 Itens por Página)
+* **Objetivo:** Garantir excelente ergonomia visual, alta performance de renderização e evitar barras de rolagem verticais infinitas em listagens e acervos (como a página de Consulta de Ofícios).
+* **Densidade Fixa:** Exibição rigorosa de **15 em 15 registros** (`pageSize: 15`).
+* **Controles e Experiência do Usuário (UX):**
+  * **Contador Contextual na Toolbar:** Exibe claramente a faixa visível e o total: `Exibindo 1–15 de 47 ofícios`.
+  * **Barra de Paginação Dedicada (`.pagination-wrapper`):**
+    * Informação contextual à esquerda: `Página X de Y (Z ofícios no total)`.
+    * Controles ergonômicos à direita: Botões `[Anterior]` e `[Próxima]` com ícones vetoriais FontAwesome, acompanhados de botões numerados (`.pagination-num`).
+    * Destaque na página atual com a cor temática institucional (`.active`).
+    * Reticências dinâmicas (`...`) para acervos com dezenas de páginas.
+    * Ocultação automática quando a listagem totaliza apenas 1 página ou está vazia.
+  * **Scroll Suave Automático:** Ao navegar entre páginas, a interface rola suavemente (`behavior: 'smooth'`) para o topo da lista de resultados, oferecendo leitura imediata sem desorientação.
 
 ---
 
-## 6. ⚙️ Padrão Funcional & Regras de Negócio Obrigatórias
+## 6. ⚙️ Regras de Negócio e Indicadores Operacionais
 
-Em qualquer sistema ou dashboard deste padrão, adote sempre estas 5 regras:
-
-| Regra | Especificação Padrão |
+| Indicador / Regra | Especificação Padrão |
 | :--- | :--- |
-| **1. SLA em Dias** | Sempre exibir o prazo de resolução em **dias inteiros** (arredondado para número inteiro, ex.: `3 dias` ou `1 dia`). Nunca exibir em porcentagens em equipes, nem em horas quebradas ou casas decimais, garantindo leitura executiva imediata. |
-| **2. Backlog: Chamados vs. Pontos** | Separar sempre o volume de **Ordens/Chamados** do volume de **Pontos Físicos** (ex.: uma ordem pode conter 9 luminárias). |
-| **3. Linha do Tempo Comparativa** | Gráficos temporais de pendências devem exibir em paralelo as ocorrências **resolvidas no mesmo período**, para dar a perspectiva do trabalho realizado. |
-| **4. Identificador Dinâmico de Excel** | Ao importar planilhas do Exati/SGI, usar o resolvedor semântico com tolerância a colunas fora de ordem e caracteres corrompidos (`\ufffd`). |
-| **5. Persistência Bimodal** | Suportar upload via backend (`/api/upload`) e fallback 100% autônomo no navegador via `LocalStorage`, garantindo que o painel funcione mesmo hospedado estaticamente online. |
-| **6. Alerta de Sobrescrita Diária** | Se uma planilha da mesma categoria já tiver sido importada hoje, emitir alerta visual preventivo explícito exibindo o horário e o arquivo anterior antes de autorizar a substituição. |
+| **SLA em Dias Inteiros** | Exibir sempre o prazo de resolução em **dias inteiros** (arredondado, ex.: `3 dias` ou `1 dia`). Nunca exibir em porcentagens em equipes, nem em horas quebradas ou casas decimais. |
+| **Separação de Backlog** | Distinguir explicitamente o volume de **Chamados/Ordens** do volume de **Pontos Físicos de Iluminação**. |
+| **Módulos em Desenvolvimento** | Devem ser mantidos visíveis porém vazios, com placeholder elegante de *"Módulo em desenvolvimento"* e badge *"Em breve"*, sem gerar expectativas falsas. |
+| **Persistência de Dados Bimodal** | Suportar carregamento via backend Python e fallback no cliente com `SheetJS` e `LocalStorage`, permitindo operação em servidores ou estática. |
+| **Alerta Preventivo de Sobrescrita** | Se um arquivo da mesma categoria já tiver sido carregado na data atual, exibir aviso antes de autorizar a substituição. |
 
 ---
 
-## 7. 🚀 Template Rápido de Solicitação (Copie e Cole para Novos Chats)
-
-Quando você for iniciar um novo projeto comigo ou com outro assistente, envie apenas isto:
+## 7. 🚀 Template Rápido de Solicitação (Para Próximos Prompts)
 
 ```markdown
-Por favor, desenvolva este novo projeto utilizando rigorosamente o BRANDBOOK & DESIGN SYSTEM EXECUTIVO DO PMO (BRANDBOOK.md):
-- Tema claro e escuro (data-theme com tokens de CSS)
-- Fonte Inter e números em modo tabular
-- Navbar executiva com logo, divisor e indicador de sincronia
-- Cards de KPI com rótulo em caixa alta e números em destaque
-- Regras de negócio: SLA em dias, backlog em chamados e pontos físicos
-- Gráficos Chart.js sem poluição visual e tabelas analíticas com badges
-- Sistema de upload de planilha com identificação dinâmica de colunas do Excel
+Por favor, desenvolva esta solicitação seguindo rigorosamente o BRANDBOOK & DESIGN SYSTEM EXECUTIVO (BRANDBOOK.md):
+- Topbar limpa (sem botões no meio, sem textos decorativos "PMO • Acervo/Gestão")
+- Barra lateral compartilhada (.hub-sidebar) persistida no localStorage
+- Endbar oficial (.hub-footer) com copyright, link LinkedIn Alison Persil no centro e domínio à direita
+- Ícones 100% vetoriais FontAwesome 6 (proibido qualquer emoji nativo do Windows)
+- Bimodalidade Light / Dark sincronizada
+- Botões padronizados e elegantes
 ```
-Com este comando, o projeto já nascerá 100% alinhado ao padrão da empresa, sem gastar tokens explicando cores e layout novamente.

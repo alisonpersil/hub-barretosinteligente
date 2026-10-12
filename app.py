@@ -36,6 +36,8 @@ app = Flask(
     static_url_path="/static"
 )
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.jinja_env.auto_reload = True
 
 @app.after_request
 def add_cors_headers(response):
@@ -219,6 +221,7 @@ def github_api_commit_file(token, repo_path, file_bytes, commit_message):
 # ==============================================================================
 @app.route("/")
 @app.route("/hub")
+@app.route("/index.html")
 def hub_index():
     """Serve o Portal Executivo Central (HUB)."""
     hub_index_path = os.path.join(HUB_DIR, "index.html")

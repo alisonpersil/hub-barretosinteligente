@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
+  <script>
+    (function() {
+      try {
+        var t = localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'light';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
   <base href="/exati/">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Painel Exati &bull; PMO Gestão Operacional</title>
+  <title>Painel Exati | Barretos Inteligente</title>
   
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="/exati/favicon.png">
@@ -16,7 +24,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   
+  <!-- FontAwesome Icons (Mesmo padrão do HUB Central e Consulta de Ofícios) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
   <!-- CSS Executivo -->
+  <link rel="stylesheet" href="/css/sidebar.css">
   <link rel="stylesheet" href="/exati/app.css?v=20261010_v6">
 
   <!-- SheetJS para Upload e Exportação Direta no Navegador -->
@@ -34,41 +46,21 @@
 
   <div class="app-layout" id="app-layout">
     
-    <!-- ==================== HEADER STICKY UNIFICADO (BARRA DE TÍTULO + ABAS FIXAS) ==================== -->
-    <div class="sticky-header-wrapper" id="sticky-header-wrapper">
-      <header class="navbar">
+    <header class="navbar">
       <div class="nav-left">
-        <!-- Botão Destacado: Voltar ao HUB Central -->
-        <a href="/" class="btn-back-hub" title="Voltar ao início de tudo (Hub Central)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-          <span>Voltar ao HUB</span>
-        </a>
-        <div class="brand-divider"></div>
-        <a href="/" class="brand-logo" title="Ir para o Hub Central">
-          <img src="logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+        <button id="btnToggleSidebar" class="sidebar-toggle-btn" title="Recolher / Expandir menu lateral" aria-label="Alternar barra lateral">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="brand-logo" id="brandLogoContainer">
+          <a href="/" class="brand-logo-link" id="mainBrandLogo" title="Ir para a Central HUB">
+            <img src="logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+          </a>
           <div class="brand-divider"></div>
           <div class="brand-text">
-            <span class="brand-title">Painel Exati</span>
-            <span class="brand-subtitle">PMO &bull; Gestão Operacional</span>
+            <span class="brand-title">Monitor Exati</span>
           </div>
-        </a>
+        </div>
       </div>
-
-      <!-- Central Switcher (Navegação Rápida entre Portais) -->
-      <nav class="nav-center" aria-label="Navegação Central">
-        <a href="/" class="nav-pill" id="linkHubNav" title="Ir para o Hub Central">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-          <span>Hub Central</span>
-        </a>
-        <a href="/oficios" class="nav-pill" id="linkOficiosNav" title="Ir para Consulta de Ofícios">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
-          <span>Consulta de Ofícios</span>
-        </a>
-        <a href="/exati" class="nav-pill active" title="Você está no Monitor Exati">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-          <span>Monitor Exati</span>
-        </a>
-      </nav>
 
       <div class="nav-right">
         
@@ -86,16 +78,9 @@
         <!-- DROPDOWN DE FILTRO DE PERÍODO -->
         <div class="filter-dropdown-wrapper" id="filter-dropdown-wrapper">
           <button class="nav-btn btn-filter-trigger" id="btn-filter-trigger" title="Filtrar período ou selecionar datas">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-              <line x1="16" y1="2" x2="16" y2="6"></line>
-              <line x1="8" y1="2" x2="8" y2="6"></line>
-              <line x1="3" y1="10" x2="21" y2="10"></line>
-            </svg>
+            <i class="fa-solid fa-calendar-days"></i>
             <span id="filter-btn-label">Ano 2026</span>
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="chevron-icon">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+            <i class="fa-solid fa-chevron-down chevron-icon"></i>
           </button>
 
           <!-- Popover do Filtro -->
@@ -144,107 +129,141 @@
 
         <!-- BOTÃO IMPORTAR -->
         <button id="btn-abrir-upload" class="nav-btn btn-import" title="Importar nova planilha do Exati (.xlsx)">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-          </svg>
+          <i class="fa-solid fa-cloud-arrow-up"></i>
           <span class="btn-import-text">Importar</span>
         </button>
 
         <!-- BOTÃO EXPORTAR -->
         <button id="btn-exportar-excel" class="nav-btn" title="Baixar relatório consolidado em Excel">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>
-          </svg>
+          <i class="fa-solid fa-file-excel"></i>
           <span>Exportar</span>
         </button>
 
         <!-- BOTÃO GERAR PDF -->
         <button id="btn-imprimir-relatorio" class="nav-btn" title="Imprimir Relatório Executivo ou Salvar como PDF">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-            <rect x="6" y="14" width="12" height="8"></rect>
-          </svg>
+          <i class="fa-solid fa-file-pdf"></i>
           <span>PDF</span>
         </button>
 
         <!-- BOTÃO ALTERNAR TEMA -->
         <button id="btn-toggle-theme" class="nav-btn icon-only" title="Alternar tema claro / escuro">
-          <span id="theme-icon">🌙</span>
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
         </button>
 
       </div>
     </header>
 
-    <!-- ==================== SUBNAV BAR: CHIPS DE NAVEGAÇÃO ENTRE ABAS ==================== -->
-    <nav class="subnav-bar">
-      <div class="subnav-container">
-        <button class="subnav-chip active" data-target="tab-cockpit" data-title="Cockpit Executivo">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="7" height="9"></rect>
-            <rect x="14" y="3" width="7" height="5"></rect>
-            <rect x="14" y="12" width="7" height="9"></rect>
-            <rect x="3" y="16" width="7" height="5"></rect>
-          </svg>
-          <span>Cockpit</span>
-        </button>
+    <!-- Body Wrapper: Sidebar Lateral + Workspace Exati -->
+    <div class="hub-body-wrapper">
+      <!-- Barra Lateral Executiva -->
+      <aside class="hub-sidebar" id="hubSidebar">
+        <div class="sidebar-inner">
+          <div class="sidebar-section-label">Módulos</div>
 
-        <button class="subnav-chip" data-target="tab-simulador" data-title="Simulador Preditivo">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-          </svg>
-          <span>Simulador</span>
-          <span class="chip-badge highlight">Destaque</span>
-        </button>
+          <nav class="sidebar-nav" aria-label="Navegação Lateral">
+            <!-- Início / Home -->
+            <div class="sidebar-group">
+              <a href="/" class="sidebar-item" id="tabBtnHome" title="Página Inicial do HUB">
+                <div class="item-left">
+                  <i class="fa-solid fa-house item-icon"></i>
+                  <span class="item-text">Início</span>
+                </div>
+              </a>
+            </div>
 
-        <button class="subnav-chip" data-target="tab-backlog" data-title="Gestão do Backlog">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-          </svg>
-          <span>Backlog</span>
-          <span class="chip-badge alert" id="badge-backlog-count">11</span>
-        </button>
+            <!-- Módulo 1: Relatórios -->
+            <div class="sidebar-group">
+              <button class="sidebar-item active" id="tabBtnRelatorios" title="Módulo de Relatórios">
+                <div class="item-left">
+                  <i class="fa-solid fa-chart-pie item-icon"></i>
+                  <span class="item-text">Relatórios</span>
+                </div>
+                <span class="sidebar-badge" title="2 páginas disponíveis">2</span>
+              </button>
 
-        <button class="subnav-chip" data-target="tab-bairros" data-title="Distribuição Bairros">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>
-            <line x1="8" y1="2" x2="8" y2="18"></line>
-            <line x1="16" y1="6" x2="16" y2="22"></line>
-          </svg>
-          <span>Bairros</span>
-        </button>
+              <!-- Submenu com as páginas vinculadas a Relatórios -->
+              <div class="sidebar-submenu" id="subRelatorios" style="display: flex;">
+                <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Consulta de Ofícios">
+                  <i class="fa-solid fa-folder-open sub-icon green"></i>
+                  <span class="sub-text">Consulta de Ofícios</span>
+                </a>
+                <a href="/exati" class="sidebar-subitem active" id="sideLinkExati" title="Monitor Exati">
+                  <i class="fa-solid fa-chart-line sub-icon blue"></i>
+                  <span class="sub-text">Monitor Exati</span>
+                </a>
+              </div>
+            </div>
 
-        <button class="subnav-chip" data-target="tab-analitico" data-title="Tabela Analítica (SLA)" data-sub="Detalhamento linha a linha dos 2.796 atendimentos, tempos de resolução e SLA">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="3" y1="9" x2="21" y2="9"></line>
-            <line x1="3" y1="15" x2="21" y2="15"></line>
-            <line x1="9" y1="3" x2="9" y2="21"></line>
-          </svg>
-          <span>Tabela Analítica</span>
-          <span class="chip-badge highlight" id="badge-analitico-count">2.804</span>
-        </button>
+            <!-- Módulo 2: Automações -->
+            <div class="sidebar-group">
+              <a href="/?tab=automacoes" class="sidebar-item" id="tabBtnAutomacoes" title="Módulo de Automações">
+                <div class="item-left">
+                  <i class="fa-solid fa-bolt item-icon"></i>
+                  <span class="item-text">Automações</span>
+                </div>
+                <span class="sidebar-pill-badge">Em breve</span>
+              </a>
+            </div>
 
-        <button class="subnav-chip highlight-star" data-target="tab-pitch" data-title="Resumo do Dia • Marcela" data-sub="Síntese diária da operação e decisões estratégicas para diretoria">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="#f59e0b" stroke="#f59e0b" stroke-width="1.5">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-          </svg>
-          <span>Resumo do Dia</span>
-          <span class="chip-badge star-badge">⭐ Marcela</span>
-        </button>
+            <!-- Módulo 3: Book -->
+            <div class="sidebar-group">
+              <a href="/?tab=book" class="sidebar-item" id="tabBtnBook" title="Módulo Book">
+                <div class="item-left">
+                  <i class="fa-solid fa-book-bookmark item-icon"></i>
+                  <span class="item-text">Book</span>
+                </div>
+                <span class="sidebar-pill-badge">Em breve</span>
+              </a>
+            </div>
+          </nav>
+        </div>
+      </aside>
 
-        <button class="subnav-chip" data-target="tab-powerbi" data-title="Guia Power BI (DAX)">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 20V10M12 20V4M6 20v-6"></path>
-          </svg>
-          <span>Power BI (DAX)</span>
-        </button>
-      </div>
-    </nav>
-  </div>
+      <!-- Workspace Exati -->
+      <div class="exati-content-area" style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
+        <!-- ==================== SUBNAV BAR: CHIPS DE NAVEGAÇÃO ENTRE ABAS ==================== -->
+        <nav class="subnav-bar">
+          <div class="subnav-container">
+            <button class="subnav-chip active" data-target="tab-cockpit" data-title="Cockpit Executivo">
+              <i class="fa-solid fa-gauge-high"></i>
+              <span>Cockpit</span>
+            </button>
+
+            <button class="subnav-chip" data-target="tab-simulador" data-title="Simulador Preditivo">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Simulador</span>
+              <span class="chip-badge highlight">Destaque</span>
+            </button>
+
+            <button class="subnav-chip" data-target="tab-backlog" data-title="Gestão do Backlog">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <span>Backlog</span>
+              <span class="chip-badge alert" id="badge-backlog-count">11</span>
+            </button>
+
+            <button class="subnav-chip" data-target="tab-bairros" data-title="Distribuição Bairros">
+              <i class="fa-solid fa-map-location-dot"></i>
+              <span>Bairros</span>
+            </button>
+
+            <button class="subnav-chip" data-target="tab-analitico" data-title="Tabela Analítica (SLA)" data-sub="Detalhamento linha a linha dos 2.796 atendimentos, tempos de resolução e SLA">
+              <i class="fa-solid fa-table-list"></i>
+              <span>Tabela Analítica</span>
+              <span class="chip-badge highlight" id="badge-analitico-count">2.804</span>
+            </button>
+
+            <button class="subnav-chip highlight-star" data-target="tab-pitch" data-title="Resumo do Dia • Marcela" data-sub="Síntese diária da operação e decisões estratégicas para diretoria">
+              <i class="fa-solid fa-star"></i>
+              <span>Resumo do Dia</span>
+              <span class="chip-badge star-badge">Marcela</span>
+            </button>
+
+            <button class="subnav-chip" data-target="tab-powerbi" data-title="Guia Power BI (DAX)">
+              <i class="fa-solid fa-chart-simple"></i>
+              <span>Power BI (DAX)</span>
+            </button>
+          </div>
+        </nav>
 
     <!-- ==================== CONTAINER PRINCIPAL DAS ABAS ==================== -->
     <main class="main-container">
@@ -257,7 +276,7 @@
           </div>
           <div class="print-titles">
             <h2>Barretos Inteligente &bull; Painel Exati</h2>
-            <p>PMO &bull; Gestão Operacional de Atendimentos, SLA & Preditivo</p>
+            <p>Gestão Operacional de Atendimentos, SLA & Preditivo</p>
           </div>
         </div>
         <div class="print-meta-right">
@@ -512,7 +531,7 @@
         <div class="card col-6">
           <div class="card-header" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
             <div>
-              <h2 class="card-title">⏱️ SLA Médio (em Dias) por Ocorrência</h2>
+              <h2 class="card-title"><i class="fa-solid fa-stopwatch"></i> SLA Médio (em Dias) por Ocorrência</h2>
               <p class="card-subtitle">Tempo médio de resolução física para cada tipo de chamado reclamado</p>
             </div>
             <div class="card-actions">
@@ -523,8 +542,8 @@
             <canvas id="chartTiposSla"></canvas>
           </div>
           <div class="ocorrencias-summary-strip" id="ocorrencias-summary-strip" style="display: flex; gap: 12px; margin-top: 12px; font-size: 0.78rem; color: var(--text-dim); border-top: 1px solid var(--border-color); padding-top: 10px; flex-wrap: wrap;">
-            <span>🚨 <strong>Mais Demorados:</strong> Luminária Apagada (4d) &bull; Fio Exposto (3d)</span>
-            <span>⚡ <strong>Mais Rápidos:</strong> NOX Offline (1d) &bull; Poste Caído (2d)</span>
+            <span><i class="fa-solid fa-triangle-exclamation" style="color: var(--danger); margin-right: 4px;"></i> <strong>Mais Demorados:</strong> Luminária Apagada (4d) &bull; Fio Exposto (3d)</span>
+            <span><i class="fa-solid fa-bolt" style="color: var(--warning); margin-right: 4px;"></i> <strong>Mais Rápidos:</strong> NOX Offline (1d) &bull; Poste Caído (2d)</span>
           </div>
         </div>
 
@@ -532,7 +551,7 @@
         <div class="card col-6">
           <div class="card-header" style="justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
             <div>
-              <h2 class="card-title">🗺️ SLA por Bairro na Ocorrência Selecionada</h2>
+              <h2 class="card-title"><i class="fa-solid fa-map-location-dot" style="margin-right: 6px; color: var(--accent-blue);"></i> SLA por Bairro na Ocorrência Selecionada</h2>
               <p class="card-subtitle">Descubra a discrepância de prazo entre bairros para o mesmo defeito</p>
             </div>
             <div class="card-actions select-bairro-container" style="min-width: 250px;">
@@ -567,7 +586,7 @@
         <div class="card-header" style="margin-bottom: 8px;">
           <div>
             <h2 class="card-title" style="font-size: 1.35rem;">
-              ⚡ Simulador Preditivo de Capacidade & Regressão Linear do Backlog
+              <i class="fa-solid fa-sliders" style="margin-right: 8px; color: var(--accent-blue);"></i> Simulador Preditivo de Capacidade & Regressão Linear do Backlog
             </h2>
             <p class="card-subtitle" style="font-size: 0.9rem;">
               Dimensione a equipe em tempo real: altere a meta de atendimentos diários e veja quantos dias úteis levará para zerar o backlog sem estourar o SLA.
@@ -682,7 +701,7 @@
       <div class="grid-2">
         <div class="card col-4">
           <h3 style="font-size: 0.95rem; font-weight: 700; color: #f87171; margin-bottom: 8px;">
-            ⚠️ Cenário Crítico (5 atendimentos/dia)
+            <i class="fa-solid fa-triangle-exclamation" style="color: #f87171; margin-right: 6px;"></i> Cenário Crítico (5 atendimentos/dia)
           </h3>
           <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
             Se o ritmo cair para 5 pontos/dia, levará <strong>7 dias úteis</strong> para zerar. Consequência: <strong>100% dos 5 chamados de munícipes estourarão o SLA</strong> de 7 dias!
@@ -691,7 +710,7 @@
 
         <div class="card col-4">
           <h3 style="font-size: 0.95rem; font-weight: 700; color: #60a5fa; margin-bottom: 8px;">
-            ⚡ Cenário Atual da Base (15 atendimentos/dia)
+            <i class="fa-solid fa-circle-check" style="color: #60a5fa; margin-right: 6px;"></i> Cenário Atual da Base (15 atendimentos/dia)
           </h3>
           <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
             Mantendo a média de 15,3/dia, a equipe zera todos os 32 pontos pendentes em <strong>apenas 2 dias úteis</strong>. Todos os chamados de munícipes são solucionados dentro do prazo regulamentar.
@@ -700,7 +719,7 @@
 
         <div class="card col-4">
           <h3 style="font-size: 0.95rem; font-weight: 700; color: #34d399; margin-bottom: 8px;">
-            🚀 Cenário de Mutirão (25 atendimentos/dia)
+            <i class="fa-solid fa-rocket" style="color: #34d399; margin-right: 6px;"></i> Cenário de Mutirão (25 atendimentos/dia)
           </h3>
           <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
             Com dedicação concentrada de 2 equipes (Equipe 6 + Equipe 01), o passivo completo é eliminado em <strong>1,3 dias (cerca de 24 horas úteis)</strong>.
@@ -717,7 +736,7 @@
       <details class="insight-accordion" id="accordion-diagnostico-ronda">
         <summary class="insight-summary">
           <div class="insight-summary-left">
-            <span style="font-size: 1rem;">🚨</span>
+            <span style="font-size: 0.95rem; color: var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i></span>
             <span class="insight-summary-title">Diagnóstico Crítico: Fator "Ronda Própria" vs Call Center</span>
             <span class="insight-summary-badge">6 ordens vencidas (27 pts) na Ronda</span>
           </div>
@@ -737,7 +756,7 @@
       <div class="card" style="margin-bottom: 24px;">
         <div class="card-header" style="flex-wrap: wrap; gap: 12px; justify-content: space-between; align-items: center;">
           <div>
-            <h2 class="card-title">📈 Linha do Tempo: Backlog Pendente vs Chamados Atendidos</h2>
+            <h2 class="card-title"><i class="fa-solid fa-chart-line" style="margin-right: 6px; color: var(--accent-blue);"></i> Linha do Tempo: Backlog Pendente vs Chamados Atendidos</h2>
             <p class="card-subtitle">
               Comparativo contínuo entre os chamados resolvidos pela equipe e o passivo em aberto desde agosto (18/08). Comprova alta produtividade (452 ordens concluídas no mesmo período).
             </p>
@@ -748,7 +767,7 @@
               <button class="btn-timeline-toggle active" id="btn-tl-marcos" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; font-weight: 600; cursor: pointer; border: none; background: var(--primary); color: #fff;">Marcos do Backlog (7 datas)</button>
             </div>
             <span class="badge badge-warning" id="badge-backlog-versao">
-              📁 Última Versão: ExportacaoConsulta (1).xlsx
+              <i class="fa-solid fa-file-excel" style="margin-right: 4px;"></i> Última Versão: ExportacaoConsulta (1).xlsx
             </span>
           </div>
         </div>
@@ -791,7 +810,7 @@
           
           <div class="card-actions" style="flex-wrap: wrap;">
             <!-- Campo de Busca Reativa -->
-            <input type="text" id="input-busca-pendentes" class="search-input" placeholder="🔍 Buscar por protocolo, bairro...">
+            <input type="text" id="input-busca-pendentes" class="search-input" placeholder="Buscar por protocolo, bairro...">
 
             <!-- Filtros Rápidos -->
             <button class="btn-header filter-btn active" data-filter="todos">Todos (11)</button>
@@ -805,7 +824,7 @@
         <!-- Banner Interativo de Filtro por Clique no Gráfico -->
         <div id="banner-filtro-grafico" class="grafico-filter-banner" style="display: none;">
           <div class="grafico-filter-left">
-            <span style="font-size: 1.15rem;">🎯</span>
+            <span style="font-size: 1rem; color: var(--primary);"><i class="fa-solid fa-bullseye"></i></span>
             <div>
               <div class="grafico-filter-title">
                 Filtrado pelo ponto no gráfico: <span id="grafico-filter-data" style="color: var(--primary);">02/10</span> &bull; <span id="grafico-filter-desc">7 ordens acumuladas no backlog</span>
@@ -820,7 +839,7 @@
             </div>
           </div>
           <button id="btn-limpar-filtro-grafico" class="btn-clear-filter">
-            ✕ Limpar Filtro (Ver Todas)
+            <i class="fa-solid fa-xmark" style="margin-right: 4px;"></i> Limpar Filtro (Ver Todas)
           </button>
         </div>
 
@@ -870,7 +889,7 @@
           <div class="card bairros-info-card">
             <div class="card-header" style="margin-bottom: 10px;">
               <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-                <span style="color: #ef4444;">📍</span> Concentração de Demandas Pendentes
+                <i class="fa-solid fa-location-dot" style="color: #ef4444;"></i> Concentração de Demandas Pendentes
               </h3>
             </div>
             <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
@@ -880,7 +899,7 @@
               &bull; <strong>Pedro Cavalini:</strong> 5 pontos (Ronda 1878415/19)<br>
               &bull; <strong>Dom João Bosco e Marília:</strong> 4 pontos (Ronda 1868096/11)<br>
               <span style="display: block; margin-top: 8px; font-weight: 600; color: #2563eb;">
-                💡 Recomendação: Realizar rota geográfica agrupada por região (Sul/Leste) para economizar deslocamento.
+                <i class="fa-solid fa-lightbulb" style="color: #f59e0b; margin-right: 4px;"></i> Recomendação: Realizar rota geográfica agrupada por região (Sul/Leste) para economizar deslocamento.
               </span>
             </p>
           </div>
@@ -888,7 +907,7 @@
           <div class="card bairros-info-card">
             <div class="card-header" style="margin-bottom: 10px;">
               <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px;">
-                <span style="color: #10b981;">⚡</span> Eficiência Logística de Campo
+                <i class="fa-solid fa-bolt" style="color: #10b981;"></i> Eficiência Logística de Campo
               </h3>
             </div>
             <p style="font-size: 0.84rem; color: var(--text-secondary); line-height: 1.6; margin: 0;">
@@ -908,10 +927,8 @@
       <!-- HERO EXECUTIVE BRIEFING -->
       <div class="resumo-hero">
         <div class="resumo-hero-badge">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-          </svg>
-          ⭐ BRIEFING DIÁRIO &bull; VISÃO EXECUTIVA MARCELA
+          <i class="fa-solid fa-star"></i>
+          <span>BRIEFING DIÁRIO &bull; VISÃO EXECUTIVA MARCELA</span>
         </div>
         <h2 class="resumo-hero-title">
           Resumo do Dia &bull; Marcela
@@ -927,13 +944,13 @@
             <strong>Status Geral:</strong> Operação Saudável &amp; Sob Controle
           </span>
           <span class="resumo-pill">
-            ⚡ <strong>SLA Médio:</strong> 3 dias (Limite: até 7d)
+            <i class="fa-solid fa-clock" style="margin-right: 4px;"></i> <strong>SLA Médio:</strong> 3 dias (Limite: até 7d)
           </span>
           <span class="resumo-pill">
-            📍 <strong>Backlog Real:</strong> 32 pontos (11 ordens)
+            <i class="fa-solid fa-list-check" style="margin-right: 4px;"></i> <strong>Backlog Real:</strong> 32 pontos (11 ordens)
           </span>
           <span class="resumo-pill status-blue">
-            ⏱️ <strong>Tempo p/ Zerar:</strong> 1 a 2 dias úteis
+            <i class="fa-solid fa-stopwatch" style="margin-right: 4px;"></i> <strong>Tempo p/ Zerar:</strong> 1 a 2 dias úteis
           </span>
         </div>
       </div>
@@ -960,7 +977,7 @@
           </div>
           <div class="resumo-pillar-footer">
             <span style="color: var(--text-dim);">Conclusão Executiva</span>
-            <span style="color: var(--success); font-weight: 700;">🟢 Risco Contratual Zero</span>
+            <span style="color: var(--success); font-weight: 700;"><i class="fa-solid fa-circle-check" style="color: var(--success); margin-right: 4px;"></i> Risco Contratual Zero</span>
           </div>
         </div>
 
@@ -984,7 +1001,7 @@
           </div>
           <div class="resumo-pillar-footer">
             <span style="color: var(--text-dim);">Foco de Ação</span>
-            <span style="color: var(--danger); font-weight: 700;">🔴 Liquidar os 6 lotes de Ronda</span>
+            <span style="color: var(--danger); font-weight: 700;"><i class="fa-solid fa-circle-exclamation" style="color: var(--danger); margin-right: 4px;"></i> Liquidar os 6 lotes de Ronda</span>
           </div>
         </div>
 
@@ -1006,7 +1023,7 @@
           </div>
           <div class="resumo-pillar-footer">
             <span style="color: var(--text-dim);">Previsão de Conclusão</span>
-            <span style="color: var(--primary); font-weight: 700;">⚡ Até 48 horas úteis</span>
+            <span style="color: var(--primary); font-weight: 700;"><i class="fa-solid fa-bolt" style="color: var(--primary); margin-right: 4px;"></i> Até 48 horas úteis</span>
           </div>
         </div>
 
@@ -1030,7 +1047,7 @@
           </div>
           <div class="resumo-pillar-footer">
             <span style="color: var(--text-dim);">Ganho Operacional</span>
-            <span style="color: #8b5cf6; font-weight: 700;">🚀 +66% de Produtividade</span>
+            <span style="color: #8b5cf6; font-weight: 700;"><i class="fa-solid fa-arrow-trend-up" style="color: #8b5cf6; margin-right: 4px;"></i> +66% de Produtividade</span>
           </div>
         </div>
 
@@ -1041,7 +1058,7 @@
         <div class="card-header" style="margin-bottom: 16px;">
           <div>
             <h2 class="card-title" style="font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-              <span>🎯</span> 3 Decisões e Orientações Estratégicas para Marcela Hoje
+              <i class="fa-solid fa-bullseye" style="margin-right: 6px; color: var(--accent-blue);"></i> 3 Decisões e Orientações Estratégicas para Marcela Hoje
             </h2>
             <p class="card-subtitle">Ações executivas imediatas para blindar indicadores e manter Barretos como referência</p>
           </div>
@@ -1082,7 +1099,7 @@
       <div class="card">
         <div class="card-header">
           <div>
-            <h2 class="card-title">📘 Dicionário de Indicadores (KPIs) para a Gestão</h2>
+            <h2 class="card-title"><i class="fa-solid fa-book-bookmark" style="margin-right: 6px; color: var(--accent-blue);"></i> Dicionário de Indicadores (KPIs) para a Gestão</h2>
             <p class="card-subtitle">Conceitos, fórmulas e referências recomendadas para diretoria</p>
           </div>
         </div>
@@ -1148,18 +1165,12 @@
       <div class="card analitico-top-card" style="margin-bottom: 10px; padding: 12px 18px 14px 18px;">
         <div class="card-header" style="flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color);">
           <div>
-            <h2 class="card-title" style="font-size: 1.12rem; margin-bottom: 2px;">🔍 Explorador Analítico & Auditoria de Indicadores</h2>
+            <h2 class="card-title" style="font-size: 1.12rem; margin-bottom: 2px;"><i class="fa-solid fa-magnifying-glass-chart" style="margin-right: 6px; color: var(--accent-blue);"></i> Explorador Analítico & Auditoria de Indicadores</h2>
             <p class="card-subtitle" style="font-size: 0.76rem;">Auditoria linha a linha das 2.796 ordens de serviço executadas em 2026 &bull; SLA Médio Consolidado: 3 dias</p>
           </div>
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
             <button id="btn-exportar-analitico" class="btn-export-excel" title="Exportar todas as linhas filtradas em planilha Excel (.xlsx)">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="8" y1="13" x2="16" y2="13"></line>
-                <line x1="8" y1="17" x2="16" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
-              </svg>
+              <i class="fa-solid fa-file-excel" style="margin-right: 6px;"></i>
               <span>Exportar Linhas em Excel (.xlsx)</span>
             </button>
           </div>
@@ -1199,7 +1210,7 @@
       <details class="insight-accordion info" id="accordion-metodologia-sla" style="margin-bottom: 10px;">
         <summary class="insight-summary">
           <div class="insight-summary-left">
-            <span style="font-size: 1rem;">💡</span>
+            <span style="font-size: 0.95rem; color: var(--warning);"><i class="fa-solid fa-lightbulb"></i></span>
             <span class="insight-summary-title">Metodologia &amp; Auditoria: Como o SLA em dias é calculado linha a linha?</span>
             <span class="insight-summary-badge" id="badge-metodologia-sla">957 com chamado (Base do SLA) &bull; 1.839 rondas</span>
           </div>
@@ -1222,10 +1233,7 @@
       <div class="card analitico-filter-card" style="margin-bottom: 10px; padding: 10px 14px;">
         <div class="analitico-filter-toolbar">
           <div class="analitico-search-box">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="11" cy="11" r="8"></circle>
-              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
+            <i class="fa-solid fa-magnifying-glass" style="margin-right: 6px; color: var(--text-dim);"></i>
             <input type="text" id="busca-analitico" placeholder="Buscar OS, protocolo, bairro, equipe, defeito..." autocomplete="off">
             <button id="btn-limpar-busca" class="btn-clear" title="Limpar busca" style="display: none;">&times;</button>
           </div>
@@ -1235,9 +1243,9 @@
             <select id="filtro-analitico-sla" class="custom-select">
               <option value="todos">Todos os Status</option>
               <option value="com_rec">Munícipes (com Reclamação)</option>
-              <option value="no_prazo">✓ No Prazo (≤ 7 dias)</option>
-              <option value="atrasado">⚠️ Atrasado (> 7 dias)</option>
-              <option value="ronda">🛡️ Ronda Interna</option>
+              <option value="no_prazo">No Prazo (≤ 7 dias)</option>
+              <option value="atrasado">Atrasado (> 7 dias)</option>
+              <option value="ronda">Ronda Interna</option>
             </select>
           </div>
 
@@ -1245,10 +1253,10 @@
             <label for="filtro-analitico-tma" class="filter-label">Faixa:</label>
             <select id="filtro-analitico-tma" class="custom-select">
               <option value="todas">Todas as Faixas</option>
-              <option value="rapido">⚡ SLA Rápido (≤ 1 dia)</option>
-              <option value="padrao">⏱️ SLA Padrão (2 a 3 dias)</option>
-              <option value="limite">⚠️ SLA Limite (4 a 7 dias)</option>
-              <option value="critico">🚨 Acima do SLA (> 7 dias)</option>
+              <option value="rapido">SLA Rápido (≤ 1 dia)</option>
+              <option value="padrao">SLA Padrão (2 a 3 dias)</option>
+              <option value="limite">SLA Limite (4 a 7 dias)</option>
+              <option value="critico">Acima do SLA (> 7 dias)</option>
             </select>
           </div>
 
@@ -1263,29 +1271,30 @@
             <label for="filtro-analitico-origem" class="filter-label">Origem:</label>
             <select id="filtro-analitico-origem" class="custom-select">
               <option value="todas">Todas as Origens</option>
-              <option value="callcenter">📞 Call Center</option>
-              <option value="ronda">🛡️ Ronda (Própria / Interna)</option>
-              <option value="app">📱 App Munícipe</option>
-              <option value="internet">🌐 Internet / Web</option>
-              <option value="telegestao">📡 Telegestão (NOX)</option>
-              <option value="chatbot">🤖 Chatbot</option>
+              <option value="callcenter">Call Center</option>
+              <option value="ronda">Ronda (Própria / Interna)</option>
+              <option value="app">App Munícipe</option>
+              <option value="internet">Internet / Web</option>
+              <option value="telegestao">Telegestão (NOX)</option>
+              <option value="chatbot">Chatbot</option>
             </select>
           </div>
 
           <button id="btn-reset-analitico" class="btn-reset-analitico" title="Limpar todos os filtros">
-            <span>↺ Limpar Filtros</span>
+            <i class="fa-solid fa-rotate-left"></i>
+            <span>Limpar Filtros</span>
           </button>
         </div>
 
         <!-- Chips de 1 Clique para Filtro Imediato -->
         <div class="analitico-quick-chips">
           <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-dim); margin-right: 2px;">Atalhos rápidos:</span>
-          <button class="quick-chip" data-origem="callcenter">📞 Call Center</button>
-          <button class="quick-chip" data-origem="ronda">🛡️ Rondas</button>
-          <button class="quick-chip" data-sla="atrasado">🚨 Atrasados (> 7d)</button>
-          <button class="quick-chip" data-sla="com_rec">📞 Munícipes (Base 3d)</button>
-          <button class="quick-chip" data-tma="rapido">⚡ SLA ≤ 24h</button>
-          <button class="quick-chip active" data-reset="true">🔄 Todos (<span id="analitico-chip-total">2.796</span>)</button>
+          <button class="quick-chip" data-origem="callcenter"><i class="fa-solid fa-headset"></i> Call Center</button>
+          <button class="quick-chip" data-origem="ronda"><i class="fa-solid fa-shield-halved"></i> Rondas</button>
+          <button class="quick-chip" data-sla="atrasado"><i class="fa-solid fa-triangle-exclamation"></i> Atrasados (> 7d)</button>
+          <button class="quick-chip" data-sla="com_rec"><i class="fa-solid fa-phone"></i> Munícipes (Base 3d)</button>
+          <button class="quick-chip" data-tma="rapido"><i class="fa-solid fa-bolt"></i> SLA ≤ 24h</button>
+          <button class="quick-chip active" data-reset="true"><i class="fa-solid fa-rotate-left"></i> Todos (<span id="analitico-chip-total">2.796</span>)</button>
         </div>
       </div>
 
@@ -1353,7 +1362,7 @@
       <div class="card" style="margin-bottom: 24px;">
         <div class="card-header">
           <div>
-            <h2 class="card-title">📈 Guia de Implantação no Power BI</h2>
+            <h2 class="card-title"><i class="fa-solid fa-chart-simple" style="margin-right: 6px; color: var(--accent-blue);"></i> Guia de Implantação no Power BI</h2>
             <p class="card-subtitle">Como transformar este modelo e a base de dados em um relatório Power BI oficial</p>
           </div>
         </div>
@@ -1411,14 +1420,31 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
     </section> <!-- fim #tab-powerbi -->
 
   </main> <!-- fim .main-container -->
-</div> <!-- fim .app-layout -->
+
+        <!-- Footer Oficial no Rodapé da Página -->
+        <footer class="hub-footer">
+          <div class="footer-left">
+            <span>&copy; 2026 Barretos Inteligente</span>
+          </div>
+          <div class="footer-center">
+            <a href="https://www.linkedin.com/in/alisonviper/" target="_blank" rel="noopener noreferrer" class="footer-linkedin-link" title="LinkedIn • Alison Persil" aria-label="Perfil do LinkedIn de Alison Persil">
+              <i class="fa-brands fa-linkedin"></i>
+            </a>
+          </div>
+          <div class="footer-links">
+            <span>hub.barretosinteligente.com.br</span>
+          </div>
+        </footer>
+      </div> <!-- fim .exati-content-area -->
+    </div> <!-- fim .hub-body-wrapper -->
+  </div> <!-- fim .app-layout -->
 
   <!-- Modal de Upload de Novas Planilhas -->
   <div class="modal-overlay" id="modal-upload">
     <div class="modal-card">
       <button class="modal-close" id="modal-close">&times;</button>
       <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
-        📂 Importar Nova Planilha do Exati
+        <i class="fa-solid fa-cloud-arrow-up" style="margin-right: 6px; color: var(--accent-blue);"></i> Importar Nova Planilha do Exati
       </h3>
       <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
         Arraste uma planilha de <strong>Pendentes</strong> ou <strong>Atendidos</strong> (`.xlsx` ou `.xls`). Os dados e indicadores serão recalculados em tempo real na tela!
@@ -1428,22 +1454,20 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
       <div class="upload-category-selector">
         <label class="category-chip active" id="chip-cat-auto">
           <input type="radio" name="upload-cat" value="auto" checked>
-          <span>⚡ Detecção Automática (Nome do Arquivo)</span>
+          <span><i class="fa-solid fa-bolt" style="margin-right: 4px;"></i> Detecção Automática (Nome do Arquivo)</span>
         </label>
         <label class="category-chip" id="chip-cat-pendentes">
           <input type="radio" name="upload-cat" value="pendentes">
-          <span>📋 Chamados Pendentes (Base de dados/Pendentes)</span>
+          <span><i class="fa-solid fa-clock-rotate-left" style="margin-right: 4px;"></i> Chamados Pendentes (Base de dados/Pendentes)</span>
         </label>
         <label class="category-chip" id="chip-cat-atendidos">
           <input type="radio" name="upload-cat" value="atendidos">
-          <span>✅ Ordens Atendidas (Base de dados/Atendidos)</span>
+          <span><i class="fa-solid fa-circle-check" style="margin-right: 4px;"></i> Ordens Atendidas (Base de dados/Atendidos)</span>
         </label>
       </div>
 
       <div class="drop-zone" id="drop-zone">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" style="margin-bottom: 12px;">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
-        </svg>
+        <i class="fa-solid fa-cloud-arrow-up" style="font-size: 40px; color: var(--accent-blue); margin-bottom: 12px;"></i>
         <p style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);" id="drop-zone-main-text">
           Arraste o arquivo aqui ou <span style="color: var(--primary);">clique para selecionar</span>
         </p>
@@ -1457,21 +1481,21 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
       <div id="upload-preview-box" class="upload-preview-box" style="display: none;">
         <div class="ufile-meta-row">
           <div class="ufile-info">
-            <span class="ufile-icon">📄</span>
+            <span class="ufile-icon"><i class="fa-solid fa-file-excel"></i></span>
             <div>
               <strong id="ufile-name" style="display: block; font-size: 0.92rem; color: var(--text-main);">ExportacaoConsulta.xlsx</strong>
               <span id="ufile-size" style="font-size: 0.76rem; color: var(--text-dim);">14.2 KB</span>
             </div>
           </div>
           <span id="ufile-target" class="ufile-badge-target pendente">
-            📁 Destino: Base de dados/Pendentes
+            <i class="fa-solid fa-folder" style="margin-right: 4px;"></i> Destino: Base de dados/Pendentes
           </span>
         </div>
 
         <!-- Alerta de Sobrescrita de Atualização Feita Hoje -->
         <div id="upload-overwrite-warning" class="upload-warning-banner" style="display: none;">
           <div class="warning-icon-wrap">
-            <span class="warning-icon">⚠️</span>
+            <span class="warning-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
           </div>
           <div class="warning-content">
             <div class="warning-title" id="overwrite-warning-title">
@@ -1489,10 +1513,10 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
         <div id="column-audit-box" class="column-audit-card" style="display: none;">
           <div class="audit-stat-strip">
             <span style="font-weight: 700; font-size: 0.84rem; color: var(--text-main);">
-              🧠 Reconhecimento Inteligente de Colunas:
+              <i class="fa-solid fa-wand-magic-sparkles" style="margin-right: 4px; color: var(--accent-blue);"></i> Reconhecimento Inteligente de Colunas:
             </span>
             <span class="audit-badge success" id="audit-confidence-badge">
-              🎯 100% Mapeado
+              <i class="fa-solid fa-circle-check" style="margin-right: 4px;"></i> 100% Mapeado
             </span>
           </div>
           <p style="font-size: 0.76rem; color: var(--text-dim); margin: 4px 0 8px 0;" id="audit-summary-text">
@@ -1516,12 +1540,12 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
         </div>
 
         <button id="btn-confirm-upload" class="btn-confirm-upload">
-          <span>🚀 Confirmar &amp; Atualizar Painel</span>
+          <span><i class="fa-solid fa-check" style="margin-right: 6px;"></i> Confirmar &amp; Atualizar Painel</span>
         </button>
 
         <div style="display: flex; justify-content: center; margin-top: 8px;">
           <button id="btn-reset-original-data" type="button" style="background: transparent; border: none; color: var(--text-dim); font-size: 0.76rem; text-decoration: underline; cursor: pointer; padding: 4px 8px; transition: color 0.2s ease;">
-            ↺ Descartar cache e restaurar base original
+            <i class="fa-solid fa-rotate-left" style="margin-right: 4px;"></i> Descartar cache e restaurar base original
           </button>
         </div>
       </div>
@@ -1540,6 +1564,8 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
 
   <!-- JavaScript da Aplicação -->
   <script src="/exati/app.js?v=20261010_v3"></script>
+  <!-- Shared Sidebar Controller -->
+  <script src="/js/sidebar.js"></script>
 
 </body>
 </html>

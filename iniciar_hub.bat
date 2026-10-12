@@ -16,6 +16,6 @@ echo  [x] Para encerrar: Pressione Ctrl+C ou feche esta janela.
 echo ======================================================================
 echo.
 
-python app.py
+python "%~dp0app.py"
 
 pause

@@ -1,0 +1,110 @@
+/**
+ * Barretos Inteligente - Barra Lateral Executiva Compartilhada
+ * Padrão Oficial para HUB Central, Consulta de Ofícios e Monitor Exati
+ */
+
+(function () {
+    'use strict';
+
+    function setupSidebar() {
+        const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+        const hubSidebar = document.getElementById('hubSidebar');
+        const SIDEBAR_STATE_KEY = 'hub_sidebar_collapsed';
+
+        // Cria o backdrop mobile se não existir
+        let backdrop = document.getElementById('sidebarBackdrop');
+        if (!backdrop) {
+            backdrop = document.createElement('div');
+            backdrop.id = 'sidebarBackdrop';
+            backdrop.className = 'sidebar-backdrop';
+            document.body.appendChild(backdrop);
+        }
+
+        function initSidebarState() {
+            if (window.innerWidth > 860) {
+                const isCollapsed = localStorage.getItem(SIDEBAR_STATE_KEY) === 'true';
+                if (isCollapsed && hubSidebar) {
+                    hubSidebar.classList.add('collapsed');
+                }
+            }
+        }
+
+        function closeMobileSidebar() {
+            if (hubSidebar) hubSidebar.classList.remove('mobile-open');
+            if (backdrop) backdrop.classList.remove('active');
+        }
+
+        if (btnToggleSidebar && hubSidebar) {
+            btnToggleSidebar.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (window.innerWidth <= 860) {
+                    const isOpen = hubSidebar.classList.toggle('mobile-open');
+                    if (backdrop) {
+                        backdrop.classList.toggle('active', isOpen);
+                    }
+                } else {
+                    hubSidebar.classList.toggle('collapsed');
+                    const isCollapsed = hubSidebar.classList.contains('collapsed');
+                    try {
+                        localStorage.setItem(SIDEBAR_STATE_KEY, isCollapsed ? 'true' : 'false');
+                    } catch (_) {}
+                }
+            });
+        }
+
+        if (backdrop) {
+            backdrop.addEventListener('click', closeMobileSidebar);
+        }
+
+        // Fecha sidebar no mobile se clicar fora
+        document.addEventListener('click', (e) => {
+            if (window.innerWidth <= 860 && hubSidebar && hubSidebar.classList.contains('mobile-open')) {
+                if (!hubSidebar.contains(e.target) && btnToggleSidebar && !btnToggleSidebar.contains(e.target)) {
+                    closeMobileSidebar();
+                }
+            }
+        });
+
+        // Alternância do submenu de Relatórios fora da home
+        const tabBtnRelatorios = document.getElementById('tabBtnRelatorios');
+        const subRelatorios = document.getElementById('subRelatorios');
+        const isHubHome = window.location.pathname === '/' || window.location.pathname === '/hub' || window.location.pathname.endsWith('00 - HUB/index.html');
+        
+        if (tabBtnRelatorios && subRelatorios && !isHubHome) {
+            tabBtnRelatorios.addEventListener('click', (e) => {
+                e.preventDefault();
+                const isVisible = window.getComputedStyle(subRelatorios).display !== 'none';
+                subRelatorios.style.display = isVisible ? 'none' : 'flex';
+            });
+        }
+
+        // Resolução dinâmica de links caso esteja no file://
+        if (window.location.protocol === 'file:') {
+            const sideLinkOficios = document.getElementById('sideLinkOficios');
+            const sideLinkExati = document.getElementById('sideLinkExati');
+            const tabBtnHome = document.getElementById('tabBtnHome');
+            const mainBrandLogo = document.getElementById('mainBrandLogo');
+
+            const currentPath = window.location.pathname.replace(/\\/g, '/');
+            if (currentPath.includes('01 - Consulta de Of')) {
+                if (tabBtnHome) tabBtnHome.href = '../../00 - HUB/index.html';
+                if (mainBrandLogo) mainBrandLogo.href = '../../00 - HUB/index.html';
+                if (sideLinkOficios) sideLinkOficios.href = './index.html';
+                if (sideLinkExati) sideLinkExati.href = '../../02 - Monitor Exati/index.html';
+            } else if (currentPath.includes('02 - Monitor Exati')) {
+                if (tabBtnHome) tabBtnHome.href = '../00 - HUB/index.html';
+                if (mainBrandLogo) mainBrandLogo.href = '../00 - HUB/index.html';
+                if (sideLinkOficios) sideLinkOficios.href = '../01 - Consulta de Ofícios/templates/index.html';
+                if (sideLinkExati) sideLinkExati.href = './index.html';
+            }
+        }
+
+        initSidebarState();
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupSidebar);
+    } else {
+        setupSidebar();
+    }
+})();

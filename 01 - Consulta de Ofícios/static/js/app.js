@@ -12,7 +12,9 @@ const state = {
     currentSort: 'mtime_desc',
     currentView: 'cards', // 'cards' | 'table'
     activeModalDoc: null,
-    docToDelete: null
+    docToDelete: null,
+    currentPage: 1,
+    pageSize: 15
 };
 
 let selectedImportFiles = [];
@@ -29,6 +31,7 @@ const resultsCounter = document.getElementById('resultsCounter');
 const activeFilterTag = document.getElementById('activeFilterTag');
 const activeFilterText = document.getElementById('activeFilterText');
 const btnRemoveFilter = document.getElementById('btnRemoveFilter');
+const paginationContainer = document.getElementById('paginationContainer');
 
 const documentsCardsContainer = document.getElementById('documentsCardsContainer');
 const documentsTableContainer = document.getElementById('documentsTableContainer');
@@ -425,7 +428,10 @@ function normalizeText(text) {
         .toLowerCase();
 }
 
-function applyFiltersAndRender() {
+function applyFiltersAndRender(resetPage = true) {
+    if (resetPage) {
+        state.currentPage = 1;
+    }
     let result = [...state.allDocuments];
     const searchNormalized = normalizeText(state.searchTerm);
     const searchTokens = searchNormalized.split(/\s+/).filter(t => t.length > 0);
@@ -498,33 +504,162 @@ function getFilterLabel(filterKey) {
 }
 
 // ==========================================================================
-// Rendering Results
+// Rendering Results & Pagination (15 por página)
 // ==========================================================================
 function renderResults() {
     const total = state.allDocuments.length;
     const count = state.filteredDocuments.length;
 
-    if (resultsCounter) {
-        resultsCounter.innerHTML = `Exibindo <strong>${count}</strong> de <strong>${total}</strong> ofícios`;
-    }
-
     if (count === 0) {
+        if (resultsCounter) {
+            resultsCounter.innerHTML = `Nenhum ofício encontrado`;
+        }
         if (documentsCardsContainer) documentsCardsContainer.classList.add('hidden');
         if (documentsTableContainer) documentsTableContainer.classList.add('hidden');
         if (emptyState) emptyState.classList.remove('hidden');
+        if (paginationContainer) paginationContainer.classList.add('hidden');
         return;
     }
 
     if (emptyState) emptyState.classList.add('hidden');
 
+    const totalPages = Math.ceil(count / state.pageSize) || 1;
+    if (state.currentPage > totalPages) {
+        state.currentPage = totalPages;
+    }
+    if (state.currentPage < 1) {
+        state.currentPage = 1;
+    }
+
+    const startIndex = (state.currentPage - 1) * state.pageSize;
+    const endIndex = Math.min(startIndex + state.pageSize, count);
+    const pagedDocuments = state.filteredDocuments.slice(startIndex, endIndex);
+
+    if (resultsCounter) {
+        resultsCounter.innerHTML = `Exibindo <strong>${startIndex + 1}–${endIndex}</strong> de <strong>${count}</strong> ofícios`;
+    }
+
     if (state.currentView === 'cards') {
-        renderCardsView();
+        renderCardsView(pagedDocuments);
         if (documentsCardsContainer) documentsCardsContainer.classList.remove('hidden');
         if (documentsTableContainer) documentsTableContainer.classList.add('hidden');
     } else {
-        renderTableView();
+        renderTableView(pagedDocuments);
         if (documentsTableContainer) documentsTableContainer.classList.remove('hidden');
         if (documentsCardsContainer) documentsCardsContainer.classList.add('hidden');
+    }
+
+    renderPagination(totalPages, count, startIndex + 1, endIndex);
+}
+
+function renderPagination(totalPages, totalItems, fromItem, toItem) {
+    if (!paginationContainer) return;
+
+    if (totalPages <= 1) {
+        paginationContainer.classList.add('hidden');
+        paginationContainer.innerHTML = '';
+        return;
+    }
+
+    paginationContainer.classList.remove('hidden');
+
+    const infoHtml = `
+        <div class="pagination-info">
+            Página <strong>${state.currentPage}</strong> de <strong>${totalPages}</strong>
+            <span>(${totalItems} ofícios no total)</span>
+        </div>
+    `;
+
+    let controlsHtml = '<div class="pagination-controls">';
+
+    const prevDisabled = state.currentPage === 1 ? 'disabled' : '';
+    controlsHtml += `
+        <button class="pagination-btn" id="btnPagePrev" ${prevDisabled} title="Página anterior" aria-label="Página anterior">
+            <i class="fa-solid fa-chevron-left"></i>
+            <span>Anterior</span>
+        </button>
+    `;
+
+    controlsHtml += '<div class="pagination-pages">';
+    const pages = getPaginationPageNumbers(state.currentPage, totalPages);
+    pages.forEach(p => {
+        if (p === '...') {
+            controlsHtml += `<span class="pagination-num ellipsis">&hellip;</span>`;
+        } else {
+            const isActive = p === state.currentPage ? 'active' : '';
+            controlsHtml += `
+                <button class="pagination-num ${isActive}" data-page="${p}" title="Ir para a página ${p}" aria-label="Página ${p}">
+                    ${p}
+                </button>
+            `;
+        }
+    });
+    controlsHtml += '</div>';
+
+    const nextDisabled = state.currentPage === totalPages ? 'disabled' : '';
+    controlsHtml += `
+        <button class="pagination-btn" id="btnPageNext" ${nextDisabled} title="Próxima página" aria-label="Próxima página">
+            <span>Próxima</span>
+            <i class="fa-solid fa-chevron-right"></i>
+        </button>
+    `;
+
+    controlsHtml += '</div>';
+
+    paginationContainer.innerHTML = infoHtml + controlsHtml;
+
+    const btnPrev = paginationContainer.querySelector('#btnPagePrev');
+    if (btnPrev && !prevDisabled) {
+        btnPrev.addEventListener('click', () => goToPage(state.currentPage - 1));
+    }
+
+    const btnNext = paginationContainer.querySelector('#btnPageNext');
+    if (btnNext && !nextDisabled) {
+        btnNext.addEventListener('click', () => goToPage(state.currentPage + 1));
+    }
+
+    paginationContainer.querySelectorAll('.pagination-num[data-page]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const targetPage = parseInt(e.currentTarget.getAttribute('data-page'), 10);
+            if (targetPage && targetPage !== state.currentPage) {
+                goToPage(targetPage);
+            }
+        });
+    });
+}
+
+function getPaginationPageNumbers(currentPage, totalPages) {
+    if (totalPages <= 7) {
+        return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    const pages = [];
+    if (currentPage <= 4) {
+        for (let i = 1; i <= 5; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+    } else if (currentPage >= totalPages - 3) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+    } else {
+        pages.push(1);
+        pages.push('...');
+        pages.push(currentPage - 1);
+        pages.push(currentPage);
+        pages.push(currentPage + 1);
+        pages.push('...');
+        pages.push(totalPages);
+    }
+    return pages;
+}
+
+function goToPage(page) {
+    state.currentPage = page;
+    renderResults();
+    const target = document.querySelector('.results-toolbar') || document.querySelector('.results-section');
+    if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 }
 
@@ -549,12 +684,12 @@ function escapeHtml(str) {
 }
 
 // Render Cards View
-function renderCardsView() {
+function renderCardsView(documents = state.filteredDocuments) {
     if (!documentsCardsContainer) return;
     documentsCardsContainer.innerHTML = '';
     const fragment = document.createDocumentFragment();
 
-    state.filteredDocuments.forEach(doc => {
+    documents.forEach(doc => {
         const card = document.createElement('div');
         card.className = 'doc-card';
 
@@ -620,12 +755,12 @@ function renderCardsView() {
 }
 
 // Render Table View
-function renderTableView() {
+function renderTableView(documents = state.filteredDocuments) {
     if (!documentsTableBody) return;
     documentsTableBody.innerHTML = '';
     const fragment = document.createDocumentFragment();
 
-    state.filteredDocuments.forEach(doc => {
+    documents.forEach(doc => {
         const tr = document.createElement('tr');
         const fileIconClass = doc.is_pdf ? 'fa-solid fa-file-pdf' : 'fa-solid fa-file-lines';
         const highlightedTitle = highlightText(doc.name, state.searchTerm);
@@ -1113,19 +1248,33 @@ function setViewMode(mode) {
     renderResults();
 }
 
-// Theme handling (Default: Light/White)
+// Theme handling (Default: Light/White com sincronização global)
 function initTheme() {
-    const savedTheme = localStorage.getItem('pmo_theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
+    const savedTheme = localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'light';
+    applyTheme(savedTheme);
+
+    window.addEventListener('storage', function(e) {
+        if (e.key === 'pmo_theme' || e.key === 'theme') {
+            if (e.newValue && (e.newValue === 'light' || e.newValue === 'dark')) {
+                applyTheme(e.newValue);
+            }
+        }
+    });
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    try {
+        localStorage.setItem('pmo_theme', theme);
+        localStorage.setItem('theme', theme);
+    } catch (_) {}
+    updateThemeIcon(theme);
 }
 
 function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', newTheme);
-    localStorage.setItem('pmo_theme', newTheme);
-    updateThemeIcon(newTheme);
+    applyTheme(newTheme);
 }
 
 function updateThemeIcon(theme) {

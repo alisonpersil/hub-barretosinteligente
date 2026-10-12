@@ -117,9 +117,9 @@ function updateSyncNotice() {
     const gerado = meta.gerado_em || 'Recente';
 
     badgeEl.title = `Sincronização das Bases Exati:\n\n` +
-      `✔ Atendidos (SGI): ${atArq}\n   ↳ Atualizado em: ${atFull}\n\n` +
-      `✔ Pendentes (Consulta): ${peArq}\n   ↳ Atualizado em: ${peFull}\n\n` +
-      `⚡ Painel consolidado em: ${gerado}\n(Clique para detalhes)`;
+      `• Atendidos (SGI): ${atArq}\n  ↳ Atualizado em: ${atFull}\n\n` +
+      `• Pendentes (Consulta): ${peArq}\n  ↳ Atualizado em: ${peFull}\n\n` +
+      `• Painel consolidado em: ${gerado}\n(Clique para detalhes)`;
   }
 }
 
@@ -141,16 +141,33 @@ function initTheme() {
       rebuildChartsForTheme();
     });
   }
+
+  // Sincronização em tempo real entre abas abertas
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'pmo_theme' || e.key === 'theme') {
+      if (e.newValue && (e.newValue === 'light' || e.newValue === 'dark')) {
+        document.documentElement.setAttribute('data-theme', e.newValue);
+        updateThemeIcon(e.newValue);
+        rebuildChartsForTheme();
+      }
+    }
+  });
 }
 
 function updateThemeIcon(theme) {
   const icon = document.getElementById('theme-icon');
   const btn = document.getElementById('btn-toggle-theme');
   if (theme === 'dark') {
-    if (icon) icon.textContent = '☀️';
+    if (icon) {
+      icon.className = 'fa-solid fa-sun';
+      icon.textContent = '';
+    }
     if (btn) btn.title = 'Alternar para Modo Claro';
   } else {
-    if (icon) icon.textContent = '🌙';
+    if (icon) {
+      icon.className = 'fa-solid fa-moon';
+      icon.textContent = '';
+    }
     if (btn) btn.title = 'Alternar para Modo Escuro';
   }
 }
@@ -1235,20 +1252,20 @@ function updateFilteredCharts(series) {
               },
               label: function(context) {
                 if (context.dataset.label && context.dataset.label.includes('SLA')) {
-                  return `⚡ SLA: ${Math.round(Number(context.raw))} dias`;
+                  return `SLA Médio: ${Math.round(Number(context.raw))} dias`;
                 }
                 if (context.dataset.label && context.dataset.label.includes('Backlog')) {
                   const pts = pendentesPontosData ? pendentesPontosData[context.dataIndex] : context.raw;
                   if (context.raw === 0) {
-                    return `🔴 Backlog Pendente: 0 ordens (100% concluído no prazo)`;
+                    return `Backlog Pendente: 0 ordens (100% concluído no prazo)`;
                   }
-                  return `🔴 Backlog Pendente: ${context.raw} ordem${context.raw !== 1 ? 'ns' : ''} (${pts} ponto${pts !== 1 ? 's físicos' : ' físico'})`;
+                  return `Backlog Pendente: ${context.raw} ordem${context.raw !== 1 ? 'ns' : ''} (${pts} ponto${pts !== 1 ? 's físicos' : ' físico'})`;
                 }
-                return `✓ ${context.dataset.label}: ${Number(context.raw).toLocaleString('pt-BR')} OS`;
+                return `${context.dataset.label}: ${Number(context.raw).toLocaleString('pt-BR')} OS`;
               },
               afterBody: function(items) {
                 if (!series.evolucao.isDaily) {
-                  return ['', '💡 Dica: Clique na barra para descer o nível (Power BI)'];
+                  return ['', 'Dica: Clique na barra para descer o nível (Power BI)'];
                 }
                 return [];
               }
@@ -1266,7 +1283,7 @@ function updateFilteredCharts(series) {
               renderCharts();
               const [y, m] = monthKey.split('-');
               const mesNome = mesesNomesPt[m] || m;
-              showToast(`🔍 Nível descido: detalhando ${mesNome} de ${y} dia a dia`);
+              showToast(`Nível descido: detalhando ${mesNome} de ${y} dia a dia`, 'fa-magnifying-glass');
             }
           }
         },
@@ -1758,7 +1775,13 @@ function renderChartEvolucaoPendentes() {
 
   const setTVal = (id, val) => {
     const el = document.getElementById(id);
-    if (el) el.textContent = val;
+    if (el) {
+      if (typeof val === 'string' && val.includes('<')) {
+        el.innerHTML = val;
+      } else {
+        el.textContent = val;
+      }
+    }
   };
 
   const kpis = dashboardData.kpis || {};
@@ -1775,7 +1798,7 @@ function renderChartEvolucaoPendentes() {
   setTVal('tkpi-chamados-atual', `${totChamados} ordens ativas`);
   setTVal('tkpi-ronda-pts', `${rondaPts} pts (${rondaPct}%)`);
   setTVal('tkpi-callcenter-pts', `${callPts} pts (${callPct}%)`);
-  setTVal('badge-backlog-versao', `📁 Versão Ativa: ${evol.ultima_versao_arquivo || 'Última Planilha'}`);
+  setTVal('badge-backlog-versao', `<i class="fa-solid fa-folder-open"></i> Versão Ativa: ${evol.ultima_versao_arquivo || 'Última Planilha'}`);
   setTVal('tkpi-atendidos-periodo', `${totAtendidosPeriodo.toLocaleString('pt-BR')} ordens`);
   setTVal('tkpi-dias-operacao', `${labels.length} marcos/dias desde 18/08`);
 
@@ -1911,22 +1934,22 @@ function renderChartEvolucaoPendentes() {
             label: function(context) {
               const val = context.raw;
               if (context.dataset.type === 'bar') {
-                return `✓ Atendidos Concluídos no Dia: ${val} ordem${val !== 1 ? 'ns' : ''}`;
+                return `Atendidos Concluídos no Dia: ${val} ordem${val !== 1 ? 'ns' : ''}`;
               }
               if (context.datasetIndex === 1) {
-                return `🔴 Passivo Físico Pendente: ${val} ponto${val !== 1 ? 's' : ''}`;
+                return `Passivo Físico Pendente: ${val} ponto${val !== 1 ? 's' : ''}`;
               }
               if (context.datasetIndex === 2) {
-                return `🔵 Ordens Pendentes em Aberto: ${val} chamado${val !== 1 ? 's' : ''}`;
+                return `Ordens Pendentes em Aberto: ${val} chamado${val !== 1 ? 's' : ''}`;
               }
-              return `⚠️ Ordens Vencidas: ${val} chamado${val !== 1 ? 's' : ''}`;
+              return `Ordens Vencidas: ${val} chamado${val !== 1 ? 's' : ''}`;
             },
             afterBody: function(contexts) {
               const first = contexts && contexts[0];
               if (first && first.dataset && first.dataset.type === 'bar') {
-                return ['👉 Clique nesta coluna para filtrar as ordens atendidas no dia'];
+                return ['Dica: Clique nesta coluna para filtrar as ordens atendidas no dia'];
               }
-              return ['👉 Clique nesta linha para filtrar o passivo pendente no backlog'];
+              return ['Dica: Clique nesta linha para filtrar o passivo pendente no backlog'];
             }
           }
         }
@@ -2010,11 +2033,11 @@ function handleBacklogChartClick(label, datasetIndex, dataset, index) {
       btnDia.classList.add('active');
     }
     if (btnLimpar) {
-      btnLimpar.textContent = '✕ Limpar Filtro (Voltar ao Backlog)';
+      btnLimpar.innerHTML = '<i class="fa-solid fa-xmark"></i> Limpar Filtro (Voltar ao Backlog)';
     }
 
     renderPendentesTable();
-    showToast(`✅ Exibindo ${atendidosNoDia.length} atendimentos concluídos em ${cleanDate}`);
+    showToast(`Exibindo ${atendidosNoDia.length} atendimentos concluídos em ${cleanDate}`, 'fa-circle-check');
   } else {
     // CASO 2: CLIQUE NAS LINHAS DO BACKLOG PENDENTE
     const lista = dashboardData.pendentes_lista || [];
@@ -2057,7 +2080,7 @@ function handleBacklogChartClick(label, datasetIndex, dataset, index) {
       btnDia.classList.remove('active');
     }
     if (btnLimpar) {
-      btnLimpar.textContent = '✕ Limpar Filtro (Ver Todas)';
+      btnLimpar.innerHTML = '<i class="fa-solid fa-xmark"></i> Limpar Filtro (Ver Todas)';
     }
 
     if (isVencidosLine) {
@@ -2067,7 +2090,7 @@ function handleBacklogChartClick(label, datasetIndex, dataset, index) {
     }
 
     renderPendentesTable();
-    showToast(`🎯 Tabela de Backlog filtrada por ${cleanDate}: ${acumuladas} ordens exibidas`);
+    showToast(`Tabela de Backlog filtrada por ${cleanDate}: ${acumuladas} ordens exibidas`, 'fa-filter');
   }
 
   // Scroll suave até a tabela para visualizar imediatamente os chamados
@@ -3076,7 +3099,7 @@ function renderAnaliticoTable() {
     tbody.innerHTML = `
       <tr>
         <td colspan="10" style="text-align: center; padding: 40px 20px; color: var(--text-dim);">
-          <div style="font-size: 1.8rem; margin-bottom: 8px;">🔍</div>
+          <div style="font-size: 1.8rem; margin-bottom: 8px;"><i class="fa-solid fa-magnifying-glass"></i></div>
           <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">Nenhum chamado encontrado para os filtros selecionados.</div>
           <div style="font-size: 0.8rem; margin-top: 4px;">Tente alterar os termos da busca ou clique em <strong>Limpar Filtros</strong>.</div>
         </td>
@@ -3090,19 +3113,19 @@ function renderAnaliticoTable() {
     let origemBadge = '';
     const orig = (r.origem || '').toLowerCase();
     if (orig.includes('call center')) {
-      origemBadge = `<span class="badge badge-info" style="font-weight: 600; font-size: 0.74rem;"><span style="margin-right: 3px;">📞</span>Call Center</span>`;
+      origemBadge = `<span class="badge badge-info" style="font-weight: 600; font-size: 0.74rem;"><i class="fa-solid fa-headset" style="margin-right: 4px;"></i>Call Center</span>`;
     } else if (orig.includes('ronda própria') || orig.includes('ronda propria')) {
-      origemBadge = `<span class="badge badge-warning" style="font-weight: 600; font-size: 0.74rem;"><span style="margin-right: 3px;">🛡️</span>Ronda Própria</span>`;
+      origemBadge = `<span class="badge badge-warning" style="font-weight: 600; font-size: 0.74rem;"><i class="fa-solid fa-shield-halved" style="margin-right: 4px;"></i>Ronda Própria</span>`;
     } else if (orig.includes('ronda')) {
-      origemBadge = `<span class="badge badge-secondary" style="font-weight: 600; font-size: 0.74rem;"><span style="margin-right: 3px;">🛡️</span>Ronda Interna</span>`;
+      origemBadge = `<span class="badge badge-secondary" style="font-weight: 600; font-size: 0.74rem;"><i class="fa-solid fa-shield-halved" style="margin-right: 4px;"></i>Ronda Interna</span>`;
     } else if (orig.includes('telegest')) {
-      origemBadge = `<span class="badge" style="background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); font-weight: 600; font-size: 0.74rem;"><span style="margin-right: 3px;">📡</span>Telegestão</span>`;
+      origemBadge = `<span class="badge" style="background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.3); font-weight: 600; font-size: 0.74rem;"><i class="fa-solid fa-tower-broadcast" style="margin-right: 4px;"></i>Telegestão</span>`;
     } else if (orig.includes('app')) {
-      origemBadge = `<span class="badge" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); font-weight: 600; font-size: 0.74rem;"><span style="margin-right: 3px;">📱</span>App</span>`;
+      origemBadge = `<span class="badge" style="background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); font-weight: 600; font-size: 0.74rem;"><i class="fa-solid fa-mobile-screen" style="margin-right: 4px;"></i>App</span>`;
     } else if (orig.includes('internet')) {
-      origemBadge = `<span class="badge" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.3); font-weight: 600; font-size: 0.74rem;"><span style="margin-right: 3px;">🌐</span>Internet</span>`;
+      origemBadge = `<span class="badge" style="background: rgba(14, 165, 233, 0.15); color: #38bdf8; border: 1px solid rgba(14, 165, 233, 0.3); font-weight: 600; font-size: 0.74rem;"><i class="fa-solid fa-globe" style="margin-right: 4px;"></i>Internet</span>`;
     } else if (orig.includes('chatbot')) {
-      origemBadge = `<span class="badge" style="background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); font-weight: 600; font-size: 0.74rem;"><span style="margin-right: 3px;">🤖</span>Chatbot</span>`;
+      origemBadge = `<span class="badge" style="background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); font-weight: 600; font-size: 0.74rem;"><i class="fa-solid fa-robot" style="margin-right: 4px;"></i>Chatbot</span>`;
     } else {
       origemBadge = `<span class="badge badge-secondary" style="font-size: 0.74rem;">${escapeHtml(r.origem || 'Não Informada')}</span>`;
     }
@@ -3110,29 +3133,29 @@ function renderAnaliticoTable() {
     // Badge SLA em Dias (arredondado para número inteiro)
     let tmaBadge = '';
     if (r.dias === null || r.dias === undefined) {
-      tmaBadge = `<span class="badge badge-secondary" title="Atendimento originado em ronda interna">🛡️ Ronda</span>`;
+      tmaBadge = `<span class="badge badge-secondary" title="Atendimento originado em ronda interna"><i class="fa-solid fa-shield-halved"></i> Ronda</span>`;
     } else {
       const dInt = Math.round(r.dias);
       const hInt = r.horas ? Math.round(r.horas) : Math.round(r.dias * 24);
       if (r.dias <= 1.0) {
-        tmaBadge = `<span class="tma-badge tma-badge-quick" title="SLA cumprido em até 24h">⚡ ${dInt}d <small>(${hInt}h)</small></span>`;
+        tmaBadge = `<span class="tma-badge tma-badge-quick" title="SLA cumprido em até 24h"><i class="fa-solid fa-bolt"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
       } else if (r.dias <= 3.0) {
-        tmaBadge = `<span class="tma-badge tma-badge-ontime" title="SLA dentro da meta normal">⏱️ ${dInt}d <small>(${hInt}h)</small></span>`;
+        tmaBadge = `<span class="tma-badge tma-badge-ontime" title="SLA dentro da meta normal"><i class="fa-solid fa-stopwatch"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
       } else if (r.dias <= 7.0) {
-        tmaBadge = `<span class="tma-badge tma-badge-warning" title="SLA no limite contratual (≤ 7d)">⚠️ ${dInt}d <small>(${hInt}h)</small></span>`;
+        tmaBadge = `<span class="tma-badge tma-badge-warning" title="SLA no limite contratual (≤ 7d)"><i class="fa-solid fa-triangle-exclamation"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
       } else {
-        tmaBadge = `<span class="tma-badge tma-badge-danger" title="Acima do prazo limite (> 7d)">🚨 ${dInt}d <small>(${hInt}h)</small></span>`;
+        tmaBadge = `<span class="tma-badge tma-badge-danger" title="Acima do prazo limite (> 7d)"><i class="fa-solid fa-circle-exclamation"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
       }
     }
 
     // Badge SLA
     let slaBadge = '';
     if (r.sla === 'No Prazo') {
-      slaBadge = `<span class="badge badge-success">✓ No Prazo</span>`;
+      slaBadge = `<span class="badge badge-success"><i class="fa-solid fa-check"></i> No Prazo</span>`;
     } else if (r.sla === 'Atrasado') {
-      slaBadge = `<span class="badge badge-danger">⚠️ Atrasado</span>`;
+      slaBadge = `<span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> Atrasado</span>`;
     } else {
-      slaBadge = `<span class="badge badge-secondary">🛡️ Ronda</span>`;
+      slaBadge = `<span class="badge badge-secondary"><i class="fa-solid fa-shield-halved"></i> Ronda</span>`;
     }
 
     const protoText = r.proto ? `<span style="font-size:0.75rem; color:var(--text-dim); display:block;">Prot: ${escapeHtml(r.proto)}</span>` : '<span style="font-size:0.75rem; color:var(--text-dim); display:block;">Sem protocolo</span>';
@@ -3307,7 +3330,7 @@ function setupEventListeners() {
       const peHora = meta.pendentes_data_hora || '08/10/2026 09:55';
       const atArq = meta.atendidos_arquivo || 'Planilha SGI (Atendidos)';
       const peArq = meta.pendentes_arquivo || 'Planilha Backlog (Pendentes)';
-      showToast(`📊 Atendidos: ${atHora} (${atArq}) | ⏳ Pendentes: ${peHora} (${peArq})`);
+      showToast(`Atendidos: ${atHora} (${atArq}) | Pendentes: ${peHora} (${peArq})`, 'fa-circle-info');
     });
   }
 
@@ -3388,7 +3411,7 @@ function setupEventListeners() {
       evolucaoGranularidade = 'mes';
       evolucaoDrillMonth = null;
       renderCharts();
-      showToast('📅 Visualização consolidada por Mês (Padrão)');
+      showToast('Visualização consolidada por Mês (Padrão)', 'fa-calendar-days');
     });
   }
 
@@ -3396,7 +3419,7 @@ function setupEventListeners() {
     btnDrillDia.addEventListener('click', () => {
       evolucaoGranularidade = 'dia';
       renderCharts();
-      showToast('⬇ Nível descido: visualizando atendimentos por Dia');
+      showToast('Nível descido: visualizando atendimentos por Dia', 'fa-arrow-down');
     });
   }
 
@@ -3405,7 +3428,7 @@ function setupEventListeners() {
       evolucaoGranularidade = 'mes';
       evolucaoDrillMonth = null;
       renderCharts();
-      showToast('⬆ Subiu de nível: retornando à visão consolidada por Mês');
+      showToast('Subiu de nível: retornando à visão consolidada por Mês', 'fa-arrow-up');
     });
   }
 
@@ -3559,7 +3582,7 @@ function renderBairroOcorrenciaSlaChart() {
 
     diagBox.innerHTML = `
       <div style="display: flex; gap: 8px; align-items: flex-start;">
-        <span style="font-size: 1.15rem; line-height: 1.2;">💡</span>
+        <i class="fa-solid fa-lightbulb" style="color: var(--warning, #f59e0b); font-size: 1.15rem; margin-top: 2px;"></i>
         <div>
           <div style="font-weight: 700; color: var(--text-main); margin-bottom: 3px;">
             Diagnóstico de Variação de Prazo • <em>${selectedOcorrenciaBairro}</em>
@@ -4095,7 +4118,7 @@ function setupUploadModal() {
     if (warningBanner) warningBanner.style.display = 'none';
     if (btnConfirm) {
       btnConfirm.classList.remove('overwrite');
-      btnConfirm.innerHTML = '<span>🚀 Confirmar &amp; Atualizar Painel</span>';
+      btnConfirm.innerHTML = '<span><i class="fa-solid fa-cloud-arrow-up"></i> Confirmar &amp; Atualizar Painel</span>';
     }
     if (loadingBar) loadingBar.style.display = 'none';
     if (dropZone) dropZone.style.display = 'flex';
@@ -4142,10 +4165,10 @@ function setupUploadModal() {
         // Atualizar crachá de destino
         if (ufileTarget) {
           if (detectedType === 'atendidos') {
-            ufileTarget.textContent = '📁 Destino: Base de dados / Atendidos (Histórico Operacional)';
+            ufileTarget.innerHTML = '<i class="fa-solid fa-folder-open"></i> Destino: Base de dados / Atendidos (Histórico Operacional)';
             ufileTarget.className = 'ufile-badge-target atendido';
           } else {
-            ufileTarget.textContent = '📁 Destino: Base de dados / Pendentes (Backlog Ativo)';
+            ufileTarget.innerHTML = '<i class="fa-solid fa-folder-open"></i> Destino: Base de dados / Pendentes (Backlog Ativo)';
             ufileTarget.className = 'ufile-badge-target pendente';
           }
         }
@@ -4158,20 +4181,20 @@ function setupUploadModal() {
           warningBanner.style.display = 'flex';
           const catLabel = detectedType === 'pendentes' ? 'Chamados Pendentes (Backlog)' : 'Chamados Atendidos (Histórico)';
           if (warningTitle) {
-            warningTitle.innerHTML = `<span>⚠️ Base de ${catLabel} já atualizada hoje!</span>`;
+            warningTitle.innerHTML = `<span><i class="fa-solid fa-triangle-exclamation"></i> Base de ${catLabel} já atualizada hoje!</span>`;
           }
           if (warningDesc) {
             warningDesc.innerHTML = `O painel já foi atualizado hoje às <strong>${overwriteInfo.time}</strong> com a planilha <strong>'${overwriteInfo.filename}'</strong>.<br>Você pretende atualizar com os dados atuais? <em>Isso substituirá a atualização feita hoje.</em>`;
           }
           if (btnConfirm) {
             btnConfirm.classList.add('overwrite');
-            btnConfirm.innerHTML = `<span>⚠️ Substituir Atualização de Hoje &amp; Atualizar</span>`;
+            btnConfirm.innerHTML = `<span><i class="fa-solid fa-triangle-exclamation"></i> Substituir Atualização de Hoje &amp; Atualizar</span>`;
           }
         } else {
           if (warningBanner) warningBanner.style.display = 'none';
           if (btnConfirm) {
             btnConfirm.classList.remove('overwrite');
-            btnConfirm.innerHTML = `<span>🚀 Confirmar &amp; Atualizar Painel</span>`;
+            btnConfirm.innerHTML = '<span><i class="fa-solid fa-cloud-arrow-up"></i> Confirmar &amp; Atualizar Painel</span>';
           }
         }
 
@@ -4182,13 +4205,13 @@ function setupUploadModal() {
           // Badge de confiança
           if (resolution.confidence >= 90) {
             auditConfidenceBadge.className = 'audit-badge ok';
-            auditConfidenceBadge.textContent = `🎯 ${resolution.confidence}% de Confiança - Mapeamento Automático Perfeito`;
+            auditConfidenceBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${resolution.confidence}% de Confiança - Mapeamento Automático Perfeito`;
           } else if (resolution.confidence >= 70) {
             auditConfidenceBadge.className = 'audit-badge warn';
-            auditConfidenceBadge.textContent = `⚠️ ${resolution.confidence}% de Confiança - Algumas colunas não foram localizadas`;
+            auditConfidenceBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${resolution.confidence}% de Confiança - Algumas colunas não foram localizadas`;
           } else {
             auditConfidenceBadge.className = 'audit-badge danger';
-            auditConfidenceBadge.textContent = `❌ ${resolution.confidence}% de Confiança - Estrutura divergente`;
+            auditConfidenceBadge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${resolution.confidence}% de Confiança - Estrutura divergente`;
           }
 
           const catName = detectedType === 'pendentes' ? 'Chamados Pendentes (Backlog)' : 'Chamados Atendidos (Histórico)';
@@ -4206,9 +4229,9 @@ function setupUploadModal() {
 
             let statusBadge = '';
             if (item.status === 'matched') {
-              statusBadge = `<span class="audit-badge ok">Identificado ✅</span>`;
+              statusBadge = `<span class="audit-badge ok"><i class="fa-solid fa-check"></i> Identificado</span>`;
             } else if (item.is_required) {
-              statusBadge = `<span class="audit-badge danger">Obrigatória Ausente ⚠️</span>`;
+              statusBadge = `<span class="audit-badge danger"><i class="fa-solid fa-triangle-exclamation"></i> Obrigatória Ausente</span>`;
             } else {
               statusBadge = `<span class="audit-badge warn">Opcional</span>`;
             }
@@ -4271,7 +4294,7 @@ function setupUploadModal() {
       const overwriteInfo = checkCategoryUpdatedToday(targetCat);
       if (overwriteInfo.updatedToday) {
         const catLabel = targetCat === 'pendentes' ? 'Pendentes (Backlog)' : 'Atendidos (Histórico)';
-        const confirmMsg = `⚠️ Confirmação de Substituição:\n\nO painel já foi atualizado hoje às ${overwriteInfo.time} com a planilha '${overwriteInfo.filename}'.\n\nVocê pretende atualizar com os dados atuais?\nIsso substituirá a atualização de ${catLabel} feita hoje.\n\nDeseja continuar?`;
+        const confirmMsg = `Confirmação de Substituição:\n\nO painel já foi atualizado hoje às ${overwriteInfo.time} com a planilha '${overwriteInfo.filename}'.\n\nVocê pretende atualizar com os dados atuais?\nIsso substituirá a atualização de ${catLabel} feita hoje.\n\nDeseja continuar?`;
         if (!confirm(confirmMsg)) {
           return;
         }
@@ -4316,9 +4339,9 @@ function setupUploadModal() {
 
           modal.classList.remove('active');
           const successToast = overwriteInfo.updatedToday
-            ? `✅ Planilha '${selectedFile.name}' salva! A atualização anterior de hoje foi substituída com sucesso.`
-            : `✅ Planilha '${selectedFile.name}' salva com sucesso em 'Base de dados/${result.folder}' e painel 100% atualizado!`;
-          showToast(successToast);
+            ? `Planilha '${selectedFile.name}' salva! A atualização anterior de hoje foi substituída com sucesso.`
+            : `Planilha '${selectedFile.name}' salva com sucesso em 'Base de dados/${result.folder}' e painel 100% atualizado!`;
+          showToast(successToast, 'fa-circle-check');
           return;
         }
       } catch (err) {
@@ -4577,7 +4600,7 @@ function processarArquivoUploadLocal(file, analysis) {
       document.getElementById('modal-upload').classList.remove('active');
       const rowCount = rawRows.length;
       recordUploadHistory(targetCat, file.name);
-      showToast(`✅ Planilha '${file.name}' analisada dinamicamente com sucesso! ${rowCount} registros processados e painel recalculado.`);
+      showToast(`Planilha '${file.name}' analisada dinamicamente com sucesso! ${rowCount} registros processados e painel recalculado.`, 'fa-circle-check');
 
     } catch (err) {
       console.error('Erro ao processar arquivo no navegador:', err);
@@ -4589,7 +4612,7 @@ function processarArquivoUploadLocal(file, analysis) {
 }
 
 
-function showToast(msg) {
+function showToast(msg, icon = 'fa-circle-info') {
   let toast = document.getElementById('app-toast');
   if (!toast) {
     toast = document.createElement('div');
@@ -4597,7 +4620,27 @@ function showToast(msg) {
     toast.className = 'toast';
     document.body.appendChild(toast);
   }
-  toast.textContent = msg;
+  let icClass = icon;
+  let cleanMsg = typeof msg === 'string' ? msg : String(msg);
+  if (cleanMsg.startsWith('✅') || cleanMsg.toLowerCase().includes('sucesso') || cleanMsg.toLowerCase().includes('salva')) {
+    icClass = 'fa-circle-check';
+  } else if (cleanMsg.startsWith('⚠️') || cleanMsg.toLowerCase().includes('atenção') || cleanMsg.toLowerCase().includes('aviso')) {
+    icClass = 'fa-triangle-exclamation';
+  } else if (cleanMsg.startsWith('🔍')) {
+    icClass = 'fa-magnifying-glass';
+  } else if (cleanMsg.startsWith('🎯')) {
+    icClass = 'fa-filter';
+  } else if (cleanMsg.startsWith('📅')) {
+    icClass = 'fa-calendar-days';
+  } else if (cleanMsg.startsWith('📊')) {
+    icClass = 'fa-chart-simple';
+  } else if (cleanMsg.startsWith('⬇')) {
+    icClass = 'fa-arrow-down';
+  } else if (cleanMsg.startsWith('⬆')) {
+    icClass = 'fa-arrow-up';
+  }
+  cleanMsg = cleanMsg.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').trim();
+  toast.innerHTML = `<i class="fa-solid ${icClass}" style="font-size: 1.05rem;"></i><span>${cleanMsg}</span>`;
   toast.classList.add('show');
   setTimeout(() => toast.classList.remove('show'), 3500);
 }

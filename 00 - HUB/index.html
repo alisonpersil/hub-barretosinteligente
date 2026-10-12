@@ -1,9 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
 <head>
+    <script>
+        (function() {
+            try {
+                var t = localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {}
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>HUB Central • Barretos Inteligente | PMO & CCO</title>
+    <title>Central HUB • Barretos Inteligente</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="./img/favicon.png">
@@ -17,119 +25,263 @@
     <!-- Font Awesome Icons 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- CSS Oficial do HUB (Brandbook Padrão Ofícios) -->
+    <!-- CSS Oficial do HUB -->
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="./css/sidebar.css">
 </head>
 <body>
     <div class="hub-layout">
-        <!-- Top Navigation Bar (Header Unificado) -->
+        <!-- Top Navigation Bar -->
         <header class="navbar">
             <div class="nav-left">
-                <a href="./index.html" class="brand-logo" title="Barretos Inteligente - Hub Central">
-                    <img src="./img/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+                <button id="btnToggleSidebar" class="sidebar-toggle-btn" title="Recolher / Expandir menu lateral" aria-label="Alternar barra lateral">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="brand-logo" id="brandLogoContainer">
+                    <a href="/" class="brand-logo-link" id="mainBrandLogo" title="Barretos Inteligente - Central HUB">
+                        <img src="./img/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+                    </a>
                     <div class="brand-divider"></div>
                     <div class="brand-text">
-                        <span class="brand-title">Central HUB <span class="hub-tag">PMO</span></span>
-                        <span class="brand-subtitle">Gestão Integrada & Governança</span>
+                        <span class="brand-title">Central HUB</span>
                     </div>
-                </a>
+                </div>
             </div>
 
-            <!-- Central Switcher (Navegação Rápida entre Portais) -->
-            <nav class="nav-center" aria-label="Navegação Central">
-                <a href="./index.html" class="nav-pill active" title="Você está no Hub Central">
-                    <i class="fa-solid fa-house"></i>
-                    <span>Hub Central</span>
-                </a>
-                <a href="/oficios" class="nav-pill" id="linkOficiosNav" title="Ir para Consulta de Ofícios">
-                    <i class="fa-solid fa-folder-open"></i>
-                    <span>Consulta de Ofícios</span>
-                </a>
-                <a href="/exati" class="nav-pill" id="linkExatiNav" title="Ir para Monitor Exati">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>Monitor Exati</span>
-                </a>
-            </nav>
-
             <div class="nav-right">
-                <div class="system-status-pill" title="Status de conexão com servidores">
-                    <span class="pulse-dot"></span>
-                    <span id="systemStatusText">Sistemas Operacionais</span>
-                </div>
-
-                <button id="btnThemeToggle" class="nav-btn" title="Alternar tema claro / escuro">
+                <button id="btnThemeToggle" class="nav-btn" title="Alternar tema claro / escuro" aria-label="Alternar tema">
                     <i class="fa-solid fa-moon"></i>
                 </button>
             </div>
         </header>
 
-        <!-- Main Content: Central Launchpad -->
-        <main class="hub-main">
-            <div class="hub-container">
-                <header class="hub-header">
-                    <div class="hub-header-badge">
-                        <i class="fa-solid fa-layer-group"></i>
-                        <span>Central de Automações PMO & CCO</span>
-                    </div>
-                    <h1 class="hub-title">Selecione o <span>Sistema</span></h1>
-                    <p class="hub-subtitle">Acesso direto e unificado aos portais de inteligência documental e operações</p>
-                </header>
+        <!-- Hub Body: Sidebar Lateral + Área Principal -->
+        <div class="hub-body-wrapper">
+            <!-- Barra Lateral Executiva -->
+            <aside class="hub-sidebar" id="hubSidebar">
+                <div class="sidebar-inner">
+                    <div class="sidebar-section-label">Módulos</div>
 
-                <div class="portal-grid">
-                    <!-- Card 1: Consulta de Ofícios -->
-                    <a href="/oficios" class="portal-card oficios-card" id="cardOficios" title="Acessar Consulta de Ofícios">
-                        <div class="portal-card-glow"></div>
-                        <div class="portal-icon-box">
-                            <i class="fa-solid fa-folder-open"></i>
+                    <nav class="sidebar-nav" aria-label="Navegação Lateral">
+                        <!-- Início / Home -->
+                        <div class="sidebar-group">
+                            <button class="sidebar-item active" data-tab="home" id="tabBtnHome" title="Página Inicial do HUB">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-house item-icon"></i>
+                                    <span class="item-text">Início</span>
+                                </div>
+                            </button>
                         </div>
-                        <span class="portal-badge">
-                            <i class="fa-solid fa-circle"></i> Acervo Digital
-                        </span>
-                        <h2 class="portal-name">Consulta de Ofícios</h2>
-                        <p class="portal-metric">
-                            <span class="metric-tag" id="metricDocCount">47 Documentos Indexados</span>
-                        </p>
-                        <div class="portal-action-btn" id="btnOpenOficios">
-                            <span>Acessar Painel de Ofícios</span>
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </div>
-                    </a>
 
-                    <!-- Card 2: Monitor Exati -->
-                    <a href="/exati" class="portal-card exati-card" id="cardExati" title="Acessar Monitor Exati">
-                        <div class="portal-card-glow"></div>
-                        <div class="portal-icon-box">
-                            <i class="fa-solid fa-chart-line"></i>
+                        <!-- Módulo 1: Relatórios -->
+                        <div class="sidebar-group">
+                            <button class="sidebar-item" data-tab="relatorios" id="tabBtnRelatorios" title="Módulo de Relatórios">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-chart-pie item-icon"></i>
+                                    <span class="item-text">Relatórios</span>
+                                </div>
+                                <span class="sidebar-badge" title="2 páginas disponíveis">2</span>
+                            </button>
+
+                            <!-- Submenu com as páginas vinculadas a Relatórios -->
+                            <div class="sidebar-submenu" id="subRelatorios" style="display: none;">
+                                <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Acessar Consulta de Ofícios">
+                                    <i class="fa-solid fa-folder-open sub-icon green"></i>
+                                    <span class="sub-text">Consulta de Ofícios</span>
+                                </a>
+                                <a href="/exati" class="sidebar-subitem" id="sideLinkExati" title="Acessar Monitor Exati">
+                                    <i class="fa-solid fa-chart-line sub-icon blue"></i>
+                                    <span class="sub-text">Monitor Exati</span>
+                                </a>
+                            </div>
                         </div>
-                        <span class="portal-badge blue">
-                            <i class="fa-solid fa-circle"></i> Gestão Operacional
-                        </span>
-                        <h2 class="portal-name">Monitor Exati</h2>
-                        <p class="portal-metric">
-                            <span class="metric-tag" id="metricExatiAtendidos">2.804 Atendimentos</span> &bull; SLA <span id="metricExatiSla">3.0 dias</span>
-                        </p>
-                        <div class="portal-action-btn blue" id="btnOpenExati">
-                            <span>Acessar Monitor Exati</span>
-                            <i class="fa-solid fa-arrow-right"></i>
+
+                        <!-- Módulo 2: Automações -->
+                        <div class="sidebar-group">
+                            <button class="sidebar-item" data-tab="automacoes" id="tabBtnAutomacoes" title="Módulo de Automações">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-bolt item-icon"></i>
+                                    <span class="item-text">Automações</span>
+                                </div>
+                                <span class="sidebar-pill-badge">Em breve</span>
+                            </button>
                         </div>
-                    </a>
+
+                        <!-- Módulo 3: Book -->
+                        <div class="sidebar-group">
+                            <button class="sidebar-item" data-tab="book" id="tabBtnBook" title="Módulo Book">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-book-bookmark item-icon"></i>
+                                    <span class="item-text">Book</span>
+                                </div>
+                                <span class="sidebar-pill-badge">Em breve</span>
+                            </button>
+                        </div>
+                    </nav>
                 </div>
-            </div>
-        </main>
+            </aside>
 
-        <!-- Footer Oficial -->
-        <footer class="hub-footer">
-            <div class="footer-left">
-                <span>&copy; 2026 Barretos Inteligente &bull; Consórcio de Iluminação Pública &bull; PMO / CCO</span>
+            <!-- Área Central de Conteúdo -->
+            <div class="hub-main-area">
+                <main class="hub-main">
+                    <!-- PAINEL 0: INÍCIO (Primeira Página - Exibe os 3 Módulos) -->
+                    <section class="hub-tab-panel active" id="panelHome">
+                        <div class="hub-container">
+                            <header class="hub-header">
+                                <h1 class="hub-title">Módulos do <span>Sistema</span></h1>
+                                <p class="hub-subtitle">Selecione uma área para acessar os painéis e ferramentas operacionais</p>
+                            </header>
+
+                            <div class="modules-home-grid">
+                                <!-- Card 1: Relatórios -->
+                                <div class="module-home-card relatorios-card" data-tab-target="relatorios">
+                                    <div class="portal-card-glow"></div>
+                                    <div class="portal-icon-box">
+                                        <i class="fa-solid fa-chart-pie"></i>
+                                    </div>
+                                    <h2 class="portal-name">Relatórios</h2>
+                                    <p class="module-home-desc">Consulta de Ofícios e Monitor Exati</p>
+                                    <div class="portal-action-btn">
+                                        <span>Acessar Módulo</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Card 2: Automações -->
+                                <div class="module-home-card automacoes-card" data-tab-target="automacoes">
+                                    <div class="portal-card-glow glow-amber"></div>
+                                    <div class="portal-icon-box amber">
+                                        <i class="fa-solid fa-bolt"></i>
+                                    </div>
+                                    <h2 class="portal-name">Automações</h2>
+                                    <p class="module-home-desc">Integrações e rotinas de sistema</p>
+                                    <div class="portal-action-btn amber">
+                                        <span>Acessar Módulo</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Card 3: Book -->
+                                <div class="module-home-card book-card" data-tab-target="book">
+                                    <div class="portal-card-glow glow-purple"></div>
+                                    <div class="portal-icon-box purple">
+                                        <i class="fa-solid fa-book-bookmark"></i>
+                                    </div>
+                                    <h2 class="portal-name">Book</h2>
+                                    <p class="module-home-desc">Governança e indicadores contratuais</p>
+                                    <div class="portal-action-btn purple">
+                                        <span>Acessar Módulo</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- PAINEL 1: RELATÓRIOS (Contém Consulta de Ofícios e Monitor Exati) -->
+                    <section class="hub-tab-panel" id="panelRelatorios">
+                        <div class="hub-container">
+                            <div class="back-nav-bar">
+                                <button class="btn-back-home" data-tab-back="home">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                    <span>Voltar aos Módulos</span>
+                                </button>
+                            </div>
+
+                            <header class="hub-header">
+                                <h1 class="hub-title">Módulo de <span>Relatórios</span></h1>
+                                <p class="hub-subtitle">Painéis de inteligência documental e operações</p>
+                            </header>
+
+                            <div class="portal-grid">
+                                <!-- Card 1: Consulta de Ofícios -->
+                                <a href="/oficios" class="portal-card oficios-card" id="cardOficios" title="Acessar Consulta de Ofícios">
+                                    <div class="portal-card-glow"></div>
+                                    <div class="portal-icon-box">
+                                        <i class="fa-solid fa-folder-open"></i>
+                                    </div>
+                                    <h2 class="portal-name">Consulta de Ofícios</h2>
+                                    <div class="portal-action-btn" id="btnOpenOficios">
+                                        <span>Acessar Painel de Ofícios</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                </a>
+
+                                <!-- Card 2: Monitor Exati -->
+                                <a href="/exati" class="portal-card exati-card" id="cardExati" title="Acessar Monitor Exati">
+                                    <div class="portal-card-glow"></div>
+                                    <div class="portal-icon-box">
+                                        <i class="fa-solid fa-chart-line"></i>
+                                    </div>
+                                    <h2 class="portal-name">Monitor Exati</h2>
+                                    <div class="portal-action-btn blue" id="btnOpenExati">
+                                        <span>Acessar Monitor Exati</span>
+                                        <i class="fa-solid fa-arrow-right"></i>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- PAINEL 2: AUTOMAÇÕES (Vazio para não gerar expectativa) -->
+                    <section class="hub-tab-panel" id="panelAutomacoes">
+                        <div class="hub-container">
+                            <div class="back-nav-bar">
+                                <button class="btn-back-home" data-tab-back="home">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                    <span>Voltar aos Módulos</span>
+                                </button>
+                            </div>
+
+                            <header class="hub-header">
+                                <h1 class="hub-title">Módulo de <span>Automações</span></h1>
+                            </header>
+
+                            <div class="empty-module-placeholder">
+                                <i class="fa-solid fa-circle-notch"></i>
+                                <p>Módulo em desenvolvimento</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- PAINEL 3: BOOK (Vazio para não gerar expectativa) -->
+                    <section class="hub-tab-panel" id="panelBook">
+                        <div class="hub-container">
+                            <div class="back-nav-bar">
+                                <button class="btn-back-home" data-tab-back="home">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                    <span>Voltar aos Módulos</span>
+                                </button>
+                            </div>
+
+                            <header class="hub-header">
+                                <h1 class="hub-title">Módulo <span>Book</span></h1>
+                            </header>
+
+                            <div class="empty-module-placeholder">
+                                <i class="fa-solid fa-circle-notch"></i>
+                                <p>Módulo em desenvolvimento</p>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+
+                <!-- Footer Oficial no Rodapé da Página -->
+                <footer class="hub-footer">
+                    <div class="footer-left">
+                        <span>&copy; 2026 Barretos Inteligente</span>
+                    </div>
+                    <div class="footer-center">
+                        <a href="https://www.linkedin.com/in/alisonviper/" target="_blank" rel="noopener noreferrer" class="footer-linkedin-link" title="LinkedIn • Alison Persil" aria-label="Perfil do LinkedIn de Alison Persil">
+                            <i class="fa-brands fa-linkedin"></i>
+                        </a>
+                    </div>
+                    <div class="footer-links">
+                        <span>hub.barretosinteligente.com.br</span>
+                    </div>
+                </footer>
             </div>
-            <div class="footer-links">
-                <a href="/oficios">Consulta de Ofícios</a>
-                <span>&bull;</span>
-                <a href="/exati">Monitor Exati</a>
-                <span>&bull;</span>
-                <span>hub.barretosinteligente.com.br</span>
-            </div>
-        </footer>
+        </div>
     </div>
 
     <!-- Script de Inicialização -->

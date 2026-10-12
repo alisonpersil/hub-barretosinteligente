@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="light">
 <head>
+    <script>
+        (function() {
+            try {
+                var t = localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'light';
+                document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {}
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Consulta de Ofícios | PMO</title>
@@ -14,6 +22,7 @@
     <!-- FontAwesome Icons for clean UI -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Custom CSS (Inlined for instant rendering & cloud resilience) -->
+    <link rel="stylesheet" href="/css/sidebar.css">
     {% if inline_css %}
     <style>
         {{ inline_css | safe }}
@@ -27,37 +36,19 @@
         <!-- Top Navigation Bar -->
         <header class="navbar">
             <div class="nav-left">
-                <!-- Botão Destacado: Voltar ao HUB Central -->
-                <a href="/" class="btn-back-hub" title="Voltar ao início de tudo (Hub Central)">
-                    <i class="fa-solid fa-arrow-left"></i>
-                    <span>Voltar ao HUB</span>
-                </a>
-                <div class="brand-divider"></div>
-                <a href="/" class="brand-logo" title="Ir para o Hub Central">
-                    <img src="/static/img/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+                <button id="btnToggleSidebar" class="sidebar-toggle-btn" title="Recolher / Expandir menu lateral" aria-label="Alternar barra lateral">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="brand-logo" id="brandLogoContainer">
+                    <a href="/" class="brand-logo-link" id="mainBrandLogo" title="Ir para a Central HUB">
+                        <img src="/static/img/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+                    </a>
                     <div class="brand-divider"></div>
                     <div class="brand-text">
                         <span class="brand-title">Consulta de Ofícios</span>
-                        <span class="brand-subtitle">PMO &bull; Acervo Digital</span>
                     </div>
-                </a>
+                </div>
             </div>
-
-            <!-- Central Switcher (Navegação Rápida entre Portais) -->
-            <nav class="nav-center" aria-label="Navegação Central">
-                <a href="/" class="nav-pill" id="linkHubNav" title="Ir para o Hub Central">
-                    <i class="fa-solid fa-house"></i>
-                    <span>Hub Central</span>
-                </a>
-                <a href="/oficios" class="nav-pill active" title="Você está na Consulta de Ofícios">
-                    <i class="fa-solid fa-folder-open"></i>
-                    <span>Consulta de Ofícios</span>
-                </a>
-                <a href="/exati" class="nav-pill" id="linkExatiNav" title="Ir para Monitor Exati">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>Monitor Exati</span>
-                </a>
-            </nav>
 
             <div class="nav-right">
                 <div class="stat-pill" title="Total de ofícios indexados no sistema">
@@ -78,8 +69,75 @@
             </div>
         </header>
 
-        <!-- Main Content Area (ChatGPT Style) -->
-        <main class="main-container">
+        <!-- Body Wrapper: Sidebar Lateral + Área Principal -->
+        <div class="hub-body-wrapper">
+            <!-- Barra Lateral Executiva -->
+            <aside class="hub-sidebar" id="hubSidebar">
+                <div class="sidebar-inner">
+                    <div class="sidebar-section-label">Módulos</div>
+
+                    <nav class="sidebar-nav" aria-label="Navegação Lateral">
+                        <!-- Início / Home -->
+                        <div class="sidebar-group">
+                            <a href="/" class="sidebar-item" id="tabBtnHome" title="Página Inicial do HUB">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-house item-icon"></i>
+                                    <span class="item-text">Início</span>
+                                </div>
+                            </a>
+                        </div>
+
+                        <!-- Módulo 1: Relatórios -->
+                        <div class="sidebar-group">
+                            <button class="sidebar-item active" id="tabBtnRelatorios" title="Módulo de Relatórios">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-chart-pie item-icon"></i>
+                                    <span class="item-text">Relatórios</span>
+                                </div>
+                                <span class="sidebar-badge" title="2 páginas disponíveis">2</span>
+                            </button>
+
+                            <!-- Submenu com as páginas vinculadas a Relatórios -->
+                            <div class="sidebar-submenu" id="subRelatorios" style="display: flex;">
+                                <a href="/oficios" class="sidebar-subitem active" id="sideLinkOficios" title="Consulta de Ofícios">
+                                    <i class="fa-solid fa-folder-open sub-icon green"></i>
+                                    <span class="sub-text">Consulta de Ofícios</span>
+                                </a>
+                                <a href="/exati" class="sidebar-subitem" id="sideLinkExati" title="Monitor Exati">
+                                    <i class="fa-solid fa-chart-line sub-icon blue"></i>
+                                    <span class="sub-text">Monitor Exati</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Módulo 2: Automações -->
+                        <div class="sidebar-group">
+                            <a href="/?tab=automacoes" class="sidebar-item" id="tabBtnAutomacoes" title="Módulo de Automações">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-bolt item-icon"></i>
+                                    <span class="item-text">Automações</span>
+                                </div>
+                                <span class="sidebar-pill-badge">Em breve</span>
+                            </a>
+                        </div>
+
+                        <!-- Módulo 3: Book -->
+                        <div class="sidebar-group">
+                            <a href="/?tab=book" class="sidebar-item" id="tabBtnBook" title="Módulo Book">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-book-bookmark item-icon"></i>
+                                    <span class="item-text">Book</span>
+                                </div>
+                                <span class="sidebar-pill-badge">Em breve</span>
+                            </a>
+                        </div>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Main Content Area (ChatGPT Style) -->
+            <div class="hub-main-area">
+                <main class="main-container">
             <!-- Hero & AI Chat Prompt Section -->
             <section class="chat-hero">
                 <div class="ai-avatar-badge">
@@ -234,8 +292,28 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Controles de Paginação Executiva (15 por página) -->
+                <div id="paginationContainer" class="pagination-wrapper hidden"></div>
             </section>
         </main>
+
+        <!-- Footer Oficial no Rodapé da Página -->
+        <footer class="hub-footer">
+            <div class="footer-left">
+                <span>&copy; 2026 Barretos Inteligente</span>
+            </div>
+            <div class="footer-center">
+                <a href="https://www.linkedin.com/in/alisonviper/" target="_blank" rel="noopener noreferrer" class="footer-linkedin-link" title="LinkedIn • Alison Persil" aria-label="Perfil do LinkedIn de Alison Persil">
+                    <i class="fa-brands fa-linkedin"></i>
+                </a>
+            </div>
+            <div class="footer-links">
+                <span>hub.barretosinteligente.com.br</span>
+            </div>
+        </footer>
+        </div> <!-- /.hub-main-area -->
+        </div> <!-- /.hub-body-wrapper -->
 
         <!-- PDF Preview Modal -->
         <div id="previewModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
@@ -456,5 +534,7 @@
             initApp();
         }
     </script>
+    <!-- Shared Sidebar Controller -->
+    <script src="/js/sidebar.js"></script>
 </body>
 </html>
