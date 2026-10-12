@@ -1,160 +1,452 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="dark">
 <head>
+    <script>
+        (function() {
+            try {
+                var t = localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'dark';
+                document.documentElement.setAttribute('data-theme', t);
+            } catch (e) {}
+        })();
+    </script>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>AI Operations Room • Barretos Inteligente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>Sala de Agentes • Barretos Inteligente</title>
+    
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/img/favicon.png">
-    
-    <!-- CSS Oficial de AiOperationsRoom -->
+    <link rel="apple-touch-icon" href="/img/favicon.png">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome Icons 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- CSS Padrão do Barretos Inteligente (Layout Unificado) -->
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/sidebar.css">
+
+    <!-- CSS da Sala de Agentes & Pixel Art Engine -->
     <link rel="stylesheet" href="/sala-agentes/styles.css">
     <link rel="stylesheet" href="/sala-agentes/pixel.css">
     <link rel="stylesheet" href="/sala-agentes/office.css">
 </head>
 <body>
-    <!-- Trilho Lateral de Navegação Executiva (Rail) -->
-    <aside class="trilho trilho-principal" aria-label="Navegação principal">
-        <a href="/" class="trilho-marca" title="Voltar ao Central HUB Barretos" aria-label="Central HUB"></a>
-        <nav class="trilho-nav">
-            <!-- Escritório / Sala de Agentes -->
-            <a class="nav active" href="/sala-agentes" aria-label="Escritório de Operações" title="Escritório de Operações">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19v-5m4 5V9m4 10v-8m4 8V5"/></svg>
-            </a>
-            <!-- Central HUB -->
-            <a class="nav" href="/" aria-label="Central HUB" title="Voltar à Central HUB">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
-            </a>
-            <!-- Consulta de Ofícios -->
-            <a class="nav" href="/oficios" aria-label="Consulta de Ofícios" title="Consulta de Ofícios">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7.5a2 2 0 0 1 2-2h5l2 2H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M3 10h18"/></svg>
-            </a>
-            <!-- Monitor Exati -->
-            <a class="nav" href="/exati" aria-label="Monitor Exati" title="Monitor Exati">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            </a>
-            <!-- QA do Site -->
-            <a class="nav" href="/qa" aria-label="QA do Site" title="QA do Site">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </a>
-            <!-- Book de Governança -->
-            <a class="nav" href="/book" aria-label="Book de Governança" title="Book de Governança">
-                <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M9.7 9a2.45 2.45 0 1 1 4.4 1.48c-.8 1.04-2.1 1.32-2.1 2.78"/><path d="M12 16.7h.01"/></svg>
-            </a>
-        </nav>
-    </aside>
+    <div class="hub-layout">
+        <!-- Top Navigation Bar Oficial do Barretos Inteligente -->
+        <header class="navbar">
+            <div class="nav-left">
+                <button id="btnToggleSidebar" class="sidebar-toggle-btn" title="Recolher / Expandir menu lateral" aria-label="Alternar barra lateral">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="brand-logo" id="brandLogoContainer">
+                    <a href="/" class="brand-logo-link" id="mainBrandLogo" title="Ir para a Central HUB">
+                        <img src="/img/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="brand-logo-img">
+                    </a>
+                    <div class="brand-divider"></div>
+                    <div class="brand-text">
+                        <span class="brand-title">Sala de Agentes Autônomos</span>
+                    </div>
+                </div>
+            </div>
 
-    <header class="topbar">
-        <div class="brand"><span class="brand-mark" aria-hidden="true"></span>AI Operations Room</div>
-        <nav aria-label="Navegação">
-            <button class="nav active" data-view="room">Sala</button>
-            <button class="nav" data-view="projects">Projetos</button>
-        </nav>
-        <span id="connection" class="connection">Atualizando</span>
-    </header>
+            <div class="nav-right">
+                <!-- Status da Malha de Agentes CCO -->
+                <div class="topbar-sync-notice" id="topbar-sync-notice" title="Status da Sala de Operações">
+                    <span class="sync-pulse-dot" style="background: #22c55e; box-shadow: 0 0 10px #22c55e;"></span>
+                    <div class="sync-notice-text">
+                        <span class="sync-notice-val" style="color: #4ade80; font-weight: 600;">CCO Online &bull; 5 Agentes Ativos</span>
+                    </div>
+                </div>
 
-    <main class="container">
-        <p id="notice" class="notice" role="status" hidden></p>
-        
-        <div id="office-root">
-            <section id="office-view">
-                <div class="linha-titulo ops-titulo">
-                    <div>
-                        <div class="ops-nome">
-                            <span class="ops-marca" aria-hidden="true"></span>
-                            <h1>AI Operations Room</h1>
+                <!-- Botão de Despacho Rápido Global -->
+                <button id="btnOpenGlobalDispatch" class="nav-btn btn-import" style="background: linear-gradient(135deg, #7d36ec, #a469ff); color: #fff; border: 1px solid rgba(255,255,255,0.15); font-weight: 600; padding: 7px 14px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; box-shadow: 0 4px 14px rgba(125,54,236,0.35);" title="Despachar nova tarefa para um agente">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Despachar Tarefa</span>
+                </button>
+
+                <!-- Botão Alternar Tema Claro/Escuro -->
+                <button id="btnThemeToggle" class="nav-btn icon-only" title="Alternar tema claro / escuro" aria-label="Alternar tema">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Hub Body Wrapper: Sidebar Oficial + Área Principal da Sala -->
+        <div class="hub-body-wrapper">
+            <!-- Barra Lateral Executiva Oficial (hub-sidebar) -->
+            <aside class="hub-sidebar" id="hubSidebar">
+                <div class="sidebar-inner">
+                    <div class="sidebar-section-label">Módulos</div>
+
+                    <nav class="sidebar-nav" aria-label="Navegação Lateral">
+                        <!-- Início / Home -->
+                        <div class="sidebar-group">
+                            <a href="/" class="sidebar-item" id="tabBtnHome" title="Página Inicial do HUB">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-house item-icon"></i>
+                                    <span class="item-text">Início</span>
+                                </div>
+                            </a>
                         </div>
-                        <p class="ops-tagline">Seus agentes em atividade, por projeto e em tempo real.</p>
+
+                        <!-- Módulo 1: Relatórios -->
+                        <div class="sidebar-group">
+                            <button class="sidebar-item" id="tabBtnRelatorios" title="Módulo de Relatórios">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-chart-pie item-icon"></i>
+                                    <span class="item-text">Relatórios</span>
+                                </div>
+                                <span class="sidebar-badge" title="3 páginas disponíveis">3</span>
+                            </button>
+
+                            <!-- Submenu com as páginas de Relatórios -->
+                            <div class="sidebar-submenu" id="subRelatorios" style="display: none;">
+                                <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Consulta de Ofícios">
+                                    <i class="fa-solid fa-folder-open sub-icon green"></i>
+                                    <span class="sub-text">Consulta de Ofícios</span>
+                                </a>
+                                <a href="/exati" class="sidebar-subitem" id="sideLinkExati" title="Monitor Exati">
+                                    <i class="fa-solid fa-chart-line sub-icon blue"></i>
+                                    <span class="sub-text">Monitor Exati</span>
+                                </a>
+                                <a href="/qa" class="sidebar-subitem" id="sideLinkQA" title="QA do Site">
+                                    <i class="fa-solid fa-shield-halved sub-icon purple"></i>
+                                    <span class="sub-text">QA do Site</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Módulo 2: Automações (Ativo) -->
+                        <div class="sidebar-group">
+                            <a href="/sala-agentes" class="sidebar-item active" id="tabBtnAutomacoes" title="Sala de Operações dos Agentes">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-bolt item-icon"></i>
+                                    <span class="item-text">Automações</span>
+                                </div>
+                                <span class="sidebar-pill-badge" style="background: rgba(125,54,236,0.2); color: #c499ff; border: 1px solid rgba(125,54,236,0.4);">Sala de Agentes</span>
+                            </a>
+                        </div>
+
+                        <!-- Módulo 3: Book -->
+                        <div class="sidebar-group">
+                            <a href="/book" class="sidebar-item" id="tabBtnBook" title="Livro de Governança">
+                                <div class="item-left">
+                                    <i class="fa-solid fa-book-bookmark item-icon"></i>
+                                    <span class="item-text">Book</span>
+                                </div>
+                                <span class="sidebar-pill-badge">Governança</span>
+                            </a>
+                        </div>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- Área Central com o Canvas do Escritório Pixel Art & Endbar -->
+            <div class="hub-main-area" style="background: radial-gradient(900px 420px at 8% -10%, rgba(125, 54, 236, 0.16), transparent 70%), var(--fundo, #0a0a0d); overflow-y: auto;">
+                <main class="container">
+                    <p id="notice" class="notice" role="status" hidden></p>
+                    
+                    <div id="office-root">
+                        <section id="office-view">
+                            <div class="linha-titulo ops-titulo">
+                                <div>
+                                    <div class="ops-nome">
+                                        <span class="ops-marca" aria-hidden="true"></span>
+                                        <h1>AI Operations Room</h1>
+                                    </div>
+                                    <p class="ops-tagline">Seus agentes em atividade, por projeto e em tempo real. Clique num agente para ver o que ele está fazendo, gerenciar a fila ou atribuir tarefas.</p>
+                                </div>
+
+                                <div class="alternador" aria-label="Modo de visualização">
+                                    <button class="botao-mini" type="button" data-mode="panel">Painel</button>
+                                    <button class="botao-mini ativo" type="button" data-mode="office">Escritório</button>
+                                </div>
+                            </div>
+
+                            <!-- Resumo dos 4 KPIs Principais -->
+                            <div id="office-summary" class="kpis" aria-label="Resumo de estados"></div>
+
+                            <!-- Bloco da Cena do Escritório Pixel Art -->
+                            <section class="bloco cena-bloco">
+                                <div id="operation-bar" class="barra-operacao"></div>
+                                <section id="office-room" class="cena" aria-label="Escritório de operações"></section>
+                            </section>
+
+                            <!-- Legenda de Estados & Dica Interativa -->
+                            <div class="legenda-agentes">
+                                <span><i class="ponto verde"></i>trabalhando</span>
+                                <span><i class="ponto azul"></i>delegando</span>
+                                <span><i class="ponto laranja"></i>aguardando</span>
+                                <span><i class="ponto cinza"></i>concluída</span>
+                                <span><i class="ponto vermelho"></i>órfã</span>
+                                <span class="legenda-chave">marcador e placa = estado</span>
+                                <span class="legenda-chave">a posição na sala não define o estado</span>
+                                <span class="legenda-uso" style="color: #a469ff; font-weight: 600;"><i class="fa-solid fa-hand-pointer"></i> Clique em qualquer agente para ver tarefas, fila e despachar instruções</span>
+                            </div>
+                        </section>
                     </div>
 
-                    <div class="alternador" aria-label="Modo de visualização">
-                        <button class="botao-mini" type="button" data-mode="panel">Painel</button>
-                        <button class="botao-mini ativo" type="button" data-mode="office">Escritório</button>
+                    <section id="room-view" hidden>
+                        <div class="page-head">
+                            <div>
+                                <p class="eyebrow">CENTRO DE OPERAÇÕES</p>
+                                <h1>Sala de operações</h1>
+                                <p class="intro">Acompanhe as sessões e os subagentes que estão em execução.</p>
+                            </div>
+                            <div id="summary" class="summary" aria-label="Resumo de estados"></div>
+                        </div>
+                        <div class="room-layout">
+                            <section id="room" class="room" aria-label="Sala de operações"></section>
+                            <aside class="details">
+                                <p class="eyebrow">DETALHES</p>
+                                <div id="details">
+                                    <h2>Selecione uma execução</h2>
+                                    <p>Os eventos e agentes da sessão aparecem aqui.</p>
+                                </div>
+                            </aside>
+                        </div>
+                    </section>
+
+                    <section id="projects-view" hidden>
+                        <div class="page-head">
+                            <div>
+                                <p class="eyebrow">CONFIGURAÇÃO LOCAL</p>
+                                <h1>Projetos</h1>
+                                <p class="intro">Associe as pastas das sessões aos nomes exibidos na sala.</p>
+                            </div>
+                            <button class="primary" id="new-project" type="button">Novo projeto</button>
+                        </div>
+                        <section class="panel">
+                            <div class="section-head">
+                                <div>
+                                    <h2>Sem projeto <span id="unmapped-count" class="count">0</span></h2>
+                                    <p>Caminhos recebidos que ainda não têm mapeamento.</p>
+                                </div>
+                            </div>
+                            <div id="unmapped-list" class="list"></div>
+                        </section>
+                        <section class="panel">
+                            <div class="section-head">
+                                <div>
+                                    <h2>Projetos cadastrados <span id="project-count" class="count">0</span></h2>
+                                    <p>O caminho mais específico identifica a sessão.</p>
+                                </div>
+                                <label class="toggle"><input id="show-archived" type="checkbox"> Mostrar arquivados</label>
+                            </div>
+                            <div id="project-list" class="list"></div>
+                        </section>
+                    </section>
+                </main>
+
+                <!-- Footer Oficial / Endbar Padrão do Barretos Inteligente -->
+                <footer class="hub-footer">
+                    <div class="footer-left">
+                        <span>&copy; 2026 Barretos Inteligente &bull; CCO &amp; PMO Concessão</span>
                     </div>
+                    <div class="footer-center">
+                        <a href="https://www.linkedin.com/in/alisonviper/" target="_blank" rel="noopener noreferrer" class="footer-linkedin-link" title="LinkedIn • Alison Persil" aria-label="Perfil do LinkedIn de Alison Persil">
+                            <i class="fa-brands fa-linkedin"></i>
+                        </a>
+                    </div>
+                    <div class="footer-links">
+                        <span>hub.barretosinteligente.com.br</span>
+                    </div>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- GAVETA LATERAL DE GESTÃO DO AGENTE (PAINEL DE TAREFAS, FILA E CONTROLE) -->
+    <!-- ===================================================================== -->
+    <div class="agent-drawer-backdrop" id="drawerBackdrop"></div>
+    <aside class="agent-drawer" id="agentTaskDrawer" aria-label="Painel de Tarefas do Agente">
+        <div class="drawer-header">
+            <div class="drawer-agent-info">
+                <div class="drawer-avatar" id="drawerAgentAvatar">
+                    <i class="fa-solid fa-robot"></i>
                 </div>
-
-                <!-- Resumo dos 4 KPIs Principais -->
-                <div id="office-summary" class="kpis" aria-label="Resumo de estados"></div>
-
-                <!-- Bloco da Cena do Escritório Pixel Art -->
-                <section class="bloco cena-bloco">
-                    <div id="operation-bar" class="barra-operacao"></div>
-                    <section id="office-room" class="cena" aria-label="Escritório de operações"></section>
-                </section>
-
-                <!-- Legenda de Estados -->
-                <div class="legenda-agentes">
-                    <span><i class="ponto verde"></i>trabalhando</span>
-                    <span><i class="ponto laranja"></i>aguardando</span>
-                    <span><i class="ponto azul"></i>delegando</span>
-                    <span><i class="ponto cinza"></i>concluída</span>
-                    <span><i class="ponto vermelho"></i>órfã</span>
-                    <span class="legenda-chave">marcador e placa = estado</span>
-                    <span class="legenda-chave">a posição na sala não define o estado</span>
-                    <span class="legenda-chave">! = órfã</span>
-                    <span class="legenda-uso">clique em um agente para ver os detalhes</span>
+                <div>
+                    <h2 class="drawer-agent-name" id="drawerAgentName">Monitor Exati</h2>
+                    <p class="drawer-agent-sub" id="drawerAgentSub">Barretos Inteligente &bull; CCO</p>
                 </div>
-            </section>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="drawer-status-pill" id="drawerStatusPill">Trabalhando</span>
+                <button class="drawer-close-btn" id="btnCloseDrawer" title="Fechar painel">&times;</button>
+            </div>
         </div>
 
-        <section id="room-view" hidden>
-            <div class="page-head">
-                <div>
-                    <p class="eyebrow">CENTRO DE OPERAÇÕES</p>
-                    <h1>Sala de operações</h1>
-                    <p class="intro">Acompanhe as sessões e os subagentes que estão em execução.</p>
-                </div>
-                <div id="summary" class="summary" aria-label="Resumo de estados"></div>
-            </div>
-            <div class="room-layout">
-                <section id="room" class="room" aria-label="Sala de operações"></section>
-                <aside class="details">
-                    <p class="eyebrow">DETALHES</p>
-                    <div id="details">
-                        <h2>Selecione uma execução</h2>
-                        <p>Os eventos e agentes da sessão aparecem aqui.</p>
-                    </div>
-                </aside>
-            </div>
-        </section>
+        <!-- Abas do Painel do Agente -->
+        <nav class="drawer-nav">
+            <button class="drawer-tab active" data-tab="live-task"><i class="fa-solid fa-bolt"></i> Tarefa Atual</button>
+            <button class="drawer-tab" data-tab="task-queue"><i class="fa-solid fa-list-check"></i> Fila (<span id="drawerQueueCount">0</span>)</button>
+            <button class="drawer-tab" data-tab="task-history"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button>
+            <button class="drawer-tab" data-tab="new-task"><i class="fa-solid fa-plus"></i> Nova Tarefa</button>
+        </nav>
 
-        <section id="projects-view" hidden>
-            <div class="page-head">
-                <div>
-                    <p class="eyebrow">CONFIGURAÇÃO LOCAL</p>
-                    <h1>Projetos</h1>
-                    <p class="intro">Associe as pastas das sessões aos nomes exibidos na sala.</p>
+        <div class="drawer-content">
+            <!-- ABA 1: TAREFA ATUAL -->
+            <div class="drawer-pane active" id="paneLiveTask">
+                <div id="liveTaskContainer">
+                    <!-- Preenchido via JavaScript -->
                 </div>
-                <button class="primary" id="new-project" type="button">Novo projeto</button>
             </div>
-            <section class="panel">
-                <div class="section-head">
-                    <div>
-                        <h2>Sem projeto <span id="unmapped-count" class="count">0</span></h2>
-                        <p>Caminhos recebidos que ainda não têm mapeamento.</p>
-                    </div>
-                </div>
-                <div id="unmapped-list" class="list"></div>
-            </section>
-            <section class="panel">
-                <div class="section-head">
-                    <div>
-                        <h2>Projetos cadastrados <span id="project-count" class="count">0</span></h2>
-                        <p>O caminho mais específico identifica a sessão.</p>
-                    </div>
-                    <label class="toggle"><input id="show-archived" type="checkbox"> Mostrar arquivados</label>
-                </div>
-                <div id="project-list" class="list"></div>
-            </section>
-        </section>
-    </main>
 
-    <!-- Modal Flutuante de Detalhes do Agente ao Clicar -->
-    <dialog id="details-dialog" aria-labelledby="details-title">
-        <div id="details-modal"></div>
-        <form method="dialog"><button class="secondary" type="submit">Fechar</button></form>
+            <!-- ABA 2: FILA DE TAREFAS -->
+            <div class="drawer-pane" id="paneTaskQueue">
+                <div class="pane-header-row">
+                    <h3>Fila de Espera do Agente</h3>
+                    <small>Tarefas a serem processadas sequencialmente</small>
+                </div>
+                <div id="taskQueueList" class="task-queue-list">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </div>
+
+            <!-- ABA 3: HISTÓRICO DE CONCLUSÕES -->
+            <div class="drawer-pane" id="paneTaskHistory">
+                <div class="pane-header-row">
+                    <h3>Histórico de Tarefas Concluídas</h3>
+                    <small>Relatório de execuções anteriores deste agente</small>
+                </div>
+                <div id="taskHistoryList" class="task-history-list">
+                    <!-- Preenchido via JavaScript -->
+                </div>
+            </div>
+
+            <!-- ABA 4: ATRIBUIR / DESPACHAR NOVA TAREFA -->
+            <div class="drawer-pane" id="paneNewTask">
+                <form id="formDrawerNewTask" class="new-task-form">
+                    <div class="form-group">
+                        <label for="drawerTaskTitle">Título da Tarefa / Comando:</label>
+                        <input type="text" id="drawerTaskTitle" class="form-input" placeholder="Ex: Auditar chamados com SLA > 7 dias" required autocomplete="off">
+                    </div>
+
+                    <!-- Sugestões Rápidas de 1 Clique -->
+                    <div class="quick-templates">
+                        <span class="quick-title">Sugestões rápidas para este agente:</span>
+                        <div id="drawerQuickPills" class="quick-pills"></div>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 14px;">
+                        <label for="drawerTaskDesc">Detalhes / Escopo Operacional:</label>
+                        <textarea id="drawerTaskDesc" class="form-textarea" rows="3" placeholder="Instrução adicional ou parâmetros específicos..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Modo de Despacho:</label>
+                        <div class="dispatch-mode-group">
+                            <label class="mode-card active">
+                                <input type="radio" name="drawerDispatchMode" value="agora" checked>
+                                <div class="mode-text">
+                                    <strong>⚡ Executar Agora</strong>
+                                    <small>Assume prioridade máxima e senta na mesa</small>
+                                </div>
+                            </label>
+                            <label class="mode-card">
+                                <input type="radio" name="drawerDispatchMode" value="fila">
+                                <div class="mode-text">
+                                    <strong>📥 Adicionar à Fila</strong>
+                                    <small>Executa após terminar a tarefa atual</small>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="drawer-form-actions">
+                        <button type="submit" class="btn-dispatch-submit">
+                            <i class="fa-solid fa-paper-plane"></i> Despachar para o Agente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ===================================================================== -->
+    <!-- MODAL GLOBAL DE DESPACHO DE TAREFAS (BOTÃO DO TOPO) -->
+    <!-- ===================================================================== -->
+    <div class="global-modal-backdrop" id="globalModalBackdrop"></div>
+    <dialog id="globalTaskModal" class="global-task-modal">
+        <div class="modal-card-inner">
+            <div class="modal-card-header">
+                <div>
+                    <h2><i class="fa-solid fa-paper-plane" style="color: #a469ff; margin-right: 8px;"></i> Central de Despacho de Tarefas</h2>
+                    <p>Atribua uma nova missão para qualquer agente do CCO ou adicione à fila</p>
+                </div>
+                <button type="button" class="modal-close-x" id="btnCloseGlobalModal">&times;</button>
+            </div>
+
+            <form id="formGlobalDispatch" class="modal-form">
+                <div class="form-group">
+                    <label for="globalSelectAgent">Agente Responsável:</label>
+                    <select id="globalSelectAgent" class="form-select" required>
+                        <option value="p3-exati">Monitor Exati (Operações &amp; Planilhas)</option>
+                        <option value="p3-oficios">Auditor de Ofícios (Prazos &amp; Conformidade)</option>
+                        <option value="p1-qa">Agente QA (Layout &amp; Rotas)</option>
+                        <option value="p3-book">Curador do Book (Governança &amp; Inovações)</option>
+                        <option value="p3-main">Supervisor Geral CCO (Coordenação Geral)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="globalTaskTitle">Título da Tarefa:</label>
+                    <input type="text" id="globalTaskTitle" class="form-input" placeholder="Ex: Auditar inconsistências nos ofícios de 2026" required autocomplete="off">
+                </div>
+
+                <!-- Modelos Prontos por Módulo -->
+                <div class="quick-templates">
+                    <span class="quick-title">Ações Rápidas Operacionais:</span>
+                    <div class="quick-pills">
+                        <button type="button" class="quick-pill" data-target="p3-exati" data-title="Auditar chamados pendentes com SLA > 7 dias">Exati: SLA &gt; 7 dias</button>
+                        <button type="button" class="quick-pill" data-target="p3-exati" data-title="Cruzar reincidência de lâmpadas no Cristiano de Carvalho">Exati: Reincidência Bairro</button>
+                        <button type="button" class="quick-pill" data-target="p3-oficios" data-title="Auditar prazos de resposta de documentos e ofícios">Ofícios: Prazos 2026</button>
+                        <button type="button" class="quick-pill" data-target="p1-qa" data-title="Executar checklist de QA mobile e desktop">QA: Checklist Mobile</button>
+                        <button type="button" class="quick-pill" data-target="p3-book" data-title="Catalogar marco tecnológico no Book de Governança">Book: Catalogar Marco</button>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 14px;">
+                    <label for="globalTaskDesc">Descrição / Instrução:</label>
+                    <textarea id="globalTaskDesc" class="form-textarea" rows="2" placeholder="Instruções complementares para a execução do agente..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Execução:</label>
+                    <div class="dispatch-mode-group">
+                        <label class="mode-card active">
+                            <input type="radio" name="globalDispatchMode" value="agora" checked>
+                            <div class="mode-text">
+                                <strong>⚡ Executar Agora</strong>
+                                <small>Inicia imediatamente na mesa</small>
+                            </div>
+                        </label>
+                        <label class="mode-card">
+                            <input type="radio" name="globalDispatchMode" value="fila">
+                            <div class="mode-text">
+                                <strong>📥 Adicionar à Fila</strong>
+                                <small>Fica na espera após a atual</small>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="modal-form-actions">
+                    <button type="button" class="btn-cancel" id="btnCancelGlobalModal">Cancelar</button>
+                    <button type="submit" class="btn-dispatch-submit">
+                        <i class="fa-solid fa-paper-plane"></i> Despachar Agora
+                    </button>
+                </div>
+            </form>
+        </div>
     </dialog>
 
+    <!-- Dialog de Projeto Original (Mantido para compatibilidade) -->
     <dialog id="project-dialog" aria-labelledby="dialog-title">
         <form id="project-form">
             <h2 id="dialog-title">Projeto</h2>
@@ -169,7 +461,8 @@
         </form>
     </dialog>
 
-    <!-- Scripts Oficiais do AiOperationsRoom -->
+    <!-- Scripts Oficiais do Sistema -->
+    <script src="/js/sidebar.js"></script>
     <script src="/sala-agentes/pixel.js" defer></script>
     <script src="/sala-agentes/app.js" defer></script>
 </body>

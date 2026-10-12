@@ -580,92 +580,417 @@ def api_projetos():
         {"id": 3, "nome": "Barretos Inteligente • CCO", "caminho_local": "C:\\Barretos\\CCO", "arquivado": False}
     ])
 
-@app.route("/api/sessoes")
-def api_sessoes():
-    return jsonify({
-        "sessoes": [
-            {"session_id": "sess-nova", "cwd": "C:\\Barretos\\NovaInsights", "projeto_id": 1},
-            {"session_id": "sess-orion", "cwd": "C:\\Barretos\\OrionFlow", "projeto_id": 2},
-            {"session_id": "sess-cco", "cwd": "C:\\Barretos\\CCO", "projeto_id": 3}
+# ==============================================================================
+# Sistema Dinâmico de Tarefas e Gestão de Agentes Autônomos
+# ==============================================================================
+AGENTS_TASKS = {
+    "p3-main": {
+        "chave": "p3-main",
+        "tipo": "Claude principal",
+        "nome": "Supervisor Geral CCO",
+        "session_id": "sess-cco",
+        "projeto_id": 3,
+        "projeto_nome": "Barretos Inteligente • CCO",
+        "cwd": "C:\\Barretos\\CCO",
+        "estado": "delegando",
+        "pai_chave": None,
+        "agent_id": None,
+        "tarefa_atual": {
+            "id": "tsk-cco-01",
+            "titulo": "Supervisão e despacho autônomo da sala de operações",
+            "descricao": "Monitoramento central de fluxos, delegação de auditorias de dados para Exati e Ofícios, e governança de alertas municipais.",
+            "progresso": 82,
+            "iniciado_em": "2026-10-11T22:39:00",
+            "duracao_min": 28,
+            "previsao_min": 5,
+            "prioridade": "Alta"
+        },
+        "fila": [
+            {
+                "id": "tsk-cco-f1",
+                "titulo": "Auditar sincronização das réplicas de leitura com o banco cloud",
+                "descricao": "Garantir consistência entre os dados locais e a nuvem Vercel.",
+                "adicionado_em": "23:05",
+                "prioridade": "Normal"
+            }
+        ],
+        "historico": [
+            {
+                "id": "tsk-cco-h1",
+                "titulo": "Inicialização da malha de telemetria e agentes do CCO",
+                "concluido_em": "22:38",
+                "duracao": "3 min",
+                "status": "concluido",
+                "resultado": "Todos os 5 agentes operacionais conectados com sucesso."
+            }
         ]
-    })
+    },
+    "p3-exati": {
+        "chave": "p3-exati",
+        "tipo": "Monitor Exati",
+        "nome": "Agente Operacional Exati",
+        "session_id": "sess-cco",
+        "projeto_id": 3,
+        "projeto_nome": "Barretos Inteligente • CCO",
+        "cwd": "C:\\Barretos\\CCO",
+        "estado": "trabalhando",
+        "pai_chave": "p3-main",
+        "agent_id": "sub-exati",
+        "tarefa_atual": {
+            "id": "tsk-exati-01",
+            "titulo": "Auditoria de chamados pendentes com SLA excedido (>7 dias)",
+            "descricao": "Identificação de 6 ordens pendentes críticas da Ronda Própria abertas desde Agosto/Setembro e geração de matriz de criticidade.",
+            "progresso": 75,
+            "iniciado_em": "2026-10-11T22:57:00",
+            "duracao_min": 10,
+            "previsao_min": 3,
+            "prioridade": "Crítica"
+        },
+        "fila": [
+            {
+                "id": "tsk-exati-f1",
+                "titulo": "Cruzamento de reincidência de lâmpadas no bairro Cristiano de Carvalho",
+                "descricao": "Verificação de histórico de trocas de luminárias nos últimos 90 dias.",
+                "adicionado_em": "23:10",
+                "prioridade": "Alta"
+            },
+            {
+                "id": "tsk-exati-f2",
+                "titulo": "Simulação de capacidade preditiva para queima de backlog em 48h",
+                "descricao": "Execução do modelo de regressão linear para dimensionamento de equipes.",
+                "adicionado_em": "23:18",
+                "prioridade": "Normal"
+            }
+        ],
+        "historico": [
+            {
+                "id": "tsk-exati-h1",
+                "titulo": "Importação e consolidação da planilha ExportacaoConsulta (1).xlsx",
+                "concluido_em": "22:55",
+                "duracao": "4 min",
+                "status": "concluido",
+                "resultado": "2.804 atendimentos processados e indicadores atualizados."
+            },
+            {
+                "id": "tsk-exati-h2",
+                "titulo": "Cálculo de produtividade diária por equipe (Equipe 6 vs Equipe 01)",
+                "concluido_em": "22:40",
+                "duracao": "2 min",
+                "status": "concluido",
+                "resultado": "Média de 15 ordens/dia validada sem desvios operacionais."
+            }
+        ]
+    },
+    "p3-oficios": {
+        "chave": "p3-oficios",
+        "tipo": "Consulta de Ofícios",
+        "nome": "Agente Auditor de Ofícios",
+        "session_id": "sess-cco",
+        "projeto_id": 3,
+        "projeto_nome": "Barretos Inteligente • CCO",
+        "cwd": "C:\\Barretos\\CCO",
+        "estado": "trabalhando",
+        "pai_chave": "p3-main",
+        "agent_id": "sub-oficios",
+        "tarefa_atual": {
+            "id": "tsk-oficios-01",
+            "titulo": "Auditoria de prazos de resposta de documentos e ofícios de 2026",
+            "descricao": "Varredura na base de dados indexada de 454 ofícios para detectar termos de garantia e respostas vencendo nos próximos 15 dias.",
+            "progresso": 88,
+            "iniciado_em": "2026-10-11T22:55:00",
+            "duracao_min": 12,
+            "previsao_min": 2,
+            "prioridade": "Alta"
+        },
+        "fila": [
+            {
+                "id": "tsk-oficios-f1",
+                "titulo": "Indexação e extração OCR de novos anexos adicionados ao repositório",
+                "descricao": "Extração de metadados de páginas escaneadas e conferência de numeração.",
+                "adicionado_em": "23:12",
+                "prioridade": "Normal"
+            }
+        ],
+        "historico": [
+            {
+                "id": "tsk-oficios-h1",
+                "titulo": "Checagem de integridade de links e busca textual sem acentos",
+                "concluido_em": "22:50",
+                "duracao": "5 min",
+                "status": "concluido",
+                "resultado": "Zero PDFs corrompidos encontrados; 454 arquivos validados."
+            }
+        ]
+    },
+    "p1-qa": {
+        "chave": "p1-qa",
+        "tipo": "QA",
+        "nome": "Agente Sentinela de QA & Rotas",
+        "session_id": "sess-nova",
+        "projeto_id": 1,
+        "projeto_nome": "Nova Insights",
+        "cwd": "C:\\Barretos\\NovaInsights",
+        "estado": "trabalhando",
+        "pai_chave": "p1-main",
+        "agent_id": "sub-qa",
+        "tarefa_atual": {
+            "id": "tsk-qa-01",
+            "titulo": "Varredura de responsividade mobile, gaveta lateral e rotas",
+            "descricao": "Testes automatizados simulando viewport de smartphones (360x640 até 412x915) e verificação de corte de texto e sombras laterais.",
+            "progresso": 64,
+            "iniciado_em": "2026-10-11T22:58:00",
+            "duracao_min": 9,
+            "previsao_min": 5,
+            "prioridade": "Normal"
+        },
+        "fila": [
+            {
+                "id": "tsk-qa-f1",
+                "titulo": "Checkup de renderização da tabela analítica do Monitor Exati",
+                "descricao": "Conferência de scroll horizontal e renderização de badges em celulares.",
+                "adicionado_em": "23:14",
+                "prioridade": "Normal"
+            }
+        ],
+        "historico": [
+            {
+                "id": "tsk-qa-h1",
+                "titulo": "Inspeção do corte de texto na barra lateral sob a navbar",
+                "concluido_em": "22:45",
+                "duracao": "3 min",
+                "status": "concluido",
+                "resultado": "Aprovado: padding-top adicionado, texto 100% legível."
+            }
+        ]
+    },
+    "p3-book": {
+        "chave": "p3-book",
+        "tipo": "Curador do Book",
+        "nome": "Agente Curador do Book",
+        "session_id": "sess-cco",
+        "projeto_id": 3,
+        "projeto_nome": "Barretos Inteligente • CCO",
+        "cwd": "C:\\Barretos\\CCO",
+        "estado": "aguardando",
+        "pai_chave": "p3-main",
+        "agent_id": "sub-book",
+        "tarefa_atual": None,
+        "fila": [
+            {
+                "id": "tsk-book-f1",
+                "titulo": "Catalogação do marco da Sala de Agentes Autônomos no Book de Governança",
+                "descricao": "Registro da entrega com fotos, arquitetura e impacto operacional no Livro de Inovações.",
+                "adicionado_em": "23:15",
+                "prioridade": "Alta"
+            }
+        ],
+        "historico": [
+            {
+                "id": "tsk-book-h1",
+                "titulo": "Registro executivo dos 2.804 atendimentos de iluminação pública",
+                "concluido_em": "22:30",
+                "duracao": "4 min",
+                "status": "concluido",
+                "resultado": "Capítulo de Eficiência Operacional atualizado no Book."
+            }
+        ]
+    },
+    "p1-main": {
+        "chave": "p1-main",
+        "tipo": "Claude principal",
+        "nome": "Líder Nova Insights",
+        "session_id": "sess-nova",
+        "projeto_id": 1,
+        "projeto_nome": "Nova Insights",
+        "cwd": "C:\\Barretos\\NovaInsights",
+        "estado": "delegando",
+        "pai_chave": None,
+        "agent_id": None,
+        "tarefa_atual": {
+            "id": "tsk-nov-01",
+            "titulo": "Coordenação de testes e mapeamento de contexto da concessão",
+            "descricao": "Distribuição de sub-rotinas de checagem para QA e pesquisa semântica.",
+            "progresso": 78,
+            "iniciado_em": "2026-10-11T22:39:00",
+            "duracao_min": 23,
+            "previsao_min": 6,
+            "prioridade": "Alta"
+        },
+        "fila": [],
+        "historico": []
+    },
+    "p1-context": {
+        "chave": "p1-context",
+        "tipo": "Pesquisador de contexto",
+        "nome": "Pesquisador de Contexto",
+        "session_id": "sess-nova",
+        "projeto_id": 1,
+        "projeto_nome": "Nova Insights",
+        "cwd": "C:\\Barretos\\NovaInsights",
+        "estado": "trabalhando",
+        "pai_chave": "p1-main",
+        "agent_id": "sub-context",
+        "tarefa_atual": {
+            "id": "tsk-ctx-01",
+            "titulo": "Mapeamento semântico de contratos de concessão e aditivos",
+            "descricao": "Cruzamento de cláusulas contratuais de modernização luminotécnica com relatórios de entrega.",
+            "progresso": 70,
+            "iniciado_em": "2026-10-11T22:56:00",
+            "duracao_min": 12,
+            "previsao_min": 4,
+            "prioridade": "Normal"
+        },
+        "fila": [],
+        "historico": [
+            {
+                "id": "tsk-ctx-h1",
+                "titulo": "Análise de aditivo do parque luminotécnico de Barretos",
+                "concluido_em": "22:10",
+                "duracao": "6 min",
+                "status": "concluido",
+                "resultado": "Cláusulas de garantia e metas de telegestão mapeadas."
+            }
+        ]
+    },
+    "p1-obsidian": {
+        "chave": "p1-obsidian",
+        "tipo": "Obsidian",
+        "nome": "Agente Obsidian Notas",
+        "session_id": "sess-nova",
+        "projeto_id": 1,
+        "projeto_nome": "Nova Insights",
+        "cwd": "C:\\Barretos\\NovaInsights",
+        "estado": "aguardando",
+        "pai_chave": "p1-main",
+        "agent_id": "sub-obsidian",
+        "tarefa_atual": None,
+        "fila": [],
+        "historico": []
+    },
+    "p2-main": {
+        "chave": "p2-main",
+        "tipo": "Claude principal",
+        "nome": "Líder Orion Flow",
+        "session_id": "sess-orion",
+        "projeto_id": 2,
+        "projeto_nome": "Orion Flow",
+        "cwd": "C:\\Barretos\\OrionFlow",
+        "estado": "delegando",
+        "pai_chave": None,
+        "agent_id": None,
+        "tarefa_atual": {
+            "id": "tsk-orn-01",
+            "titulo": "Gestão de filas assíncronas e handoff de tarefas",
+            "descricao": "Orquestração contínua dos processos em segundo plano da infraestrutura.",
+            "progresso": 90,
+            "iniciado_em": "2026-10-11T22:34:00",
+            "duracao_min": 28,
+            "previsao_min": 2,
+            "prioridade": "Alta"
+        },
+        "fila": [],
+        "historico": []
+    },
+    "p2-context": {
+        "chave": "p2-context",
+        "tipo": "Pesquisador de contexto",
+        "nome": "Pesquisador Orion",
+        "session_id": "sess-orion",
+        "projeto_id": 2,
+        "projeto_nome": "Orion Flow",
+        "cwd": "C:\\Barretos\\OrionFlow",
+        "estado": "trabalhando",
+        "pai_chave": "p2-main",
+        "agent_id": "sub-context2",
+        "tarefa_atual": {
+            "id": "tsk-ctx2-01",
+            "titulo": "Varredura de dependências e atualização de bibliotecas",
+            "descricao": "Auditoria de integridade de pacotes e tempos de resposta de rede.",
+            "progresso": 55,
+            "iniciado_em": "2026-10-11T22:58:00",
+            "duracao_min": 10,
+            "previsao_min": 6,
+            "prioridade": "Normal"
+        },
+        "fila": [],
+        "historico": []
+    },
+    "p2-bug": {
+        "chave": "p2-bug",
+        "tipo": "Bug Hunter",
+        "nome": "Agente Bug Hunter",
+        "session_id": "sess-orion",
+        "projeto_id": 2,
+        "projeto_nome": "Orion Flow",
+        "cwd": "C:\\Barretos\\OrionFlow",
+        "estado": "aguardando",
+        "pai_chave": "p2-main",
+        "agent_id": "sub-bug",
+        "tarefa_atual": None,
+        "fila": [],
+        "historico": []
+    },
+    "p2-handoff": {
+        "chave": "p2-handoff",
+        "tipo": "Handoff",
+        "nome": "Agente Handoff",
+        "session_id": "sess-orion",
+        "projeto_id": 2,
+        "projeto_nome": "Orion Flow",
+        "cwd": "C:\\Barretos\\OrionFlow",
+        "estado": "trabalhando",
+        "pai_chave": "p2-main",
+        "agent_id": "sub-handoff",
+        "tarefa_atual": {
+            "id": "tsk-hnd-01",
+            "titulo": "Sincronização de relatórios de campo com o painel do CCO",
+            "descricao": "Transmissão segura de dados de ronda e fechamento de ordens de serviço.",
+            "progresso": 85,
+            "iniciado_em": "2026-10-11T22:55:00",
+            "duracao_min": 12,
+            "previsao_min": 2,
+            "prioridade": "Alta"
+        },
+        "fila": [],
+        "historico": []
+    }
+}
 
 @app.route("/api/painel")
 def api_painel():
     now_dt = datetime.now()
     now_iso = now_dt.isoformat()
-    # 2 horas atrás para cálculos de duração
-    ago_10m = (now_dt - timedelta(minutes=10)).isoformat()
-    ago_12m = (now_dt - timedelta(minutes=12)).isoformat()
-    ago_23m = (now_dt - timedelta(minutes=23)).isoformat()
-    ago_28m = (now_dt - timedelta(minutes=28)).isoformat()
 
-    # Execuções ativas com laços curvos entre delegantes e subagentes (Idêntico ao Screenshot 2)
-    execucoes = [
-        # Sala 1: Nova Insights (4 execuções ativas)
-        {
-            "chave": "p1-main", "session_id": "sess-nova", "agent_id": None, "pai_chave": None,
-            "tipo": "Claude principal", "projeto_id": 1, "projeto_nome": "Nova Insights",
-            "cwd": "C:\\Barretos\\NovaInsights", "estado": "delegando", "criado_em": ago_23m, "atualizado_em": now_iso
-        },
-        {
-            "chave": "p1-qa", "session_id": "sess-nova", "agent_id": "sub-qa", "pai_chave": "p1-main",
-            "tipo": "QA", "projeto_id": 1, "projeto_nome": "Nova Insights",
-            "cwd": "C:\\Barretos\\NovaInsights", "estado": "trabalhando", "criado_em": ago_10m, "atualizado_em": now_iso
-        },
-        {
-            "chave": "p1-context", "session_id": "sess-nova", "agent_id": "sub-context", "pai_chave": "p1-main",
-            "tipo": "Pesquisador de contexto", "projeto_id": 1, "projeto_nome": "Nova Insights",
-            "cwd": "C:\\Barretos\\NovaInsights", "estado": "trabalhando", "criado_em": ago_12m, "atualizado_em": now_iso
-        },
-        {
-            "chave": "p1-obsidian", "session_id": "sess-nova", "agent_id": "sub-obsidian", "pai_chave": "p1-main",
-            "tipo": "Obsidian", "projeto_id": 1, "projeto_nome": "Nova Insights",
-            "cwd": "C:\\Barretos\\NovaInsights", "estado": "aguardando", "criado_em": ago_28m, "atualizado_em": now_iso
-        },
-        # Sala 2: Orion Flow (4 execuções ativas)
-        {
-            "chave": "p2-main", "session_id": "sess-orion", "agent_id": None, "pai_chave": None,
-            "tipo": "Claude principal", "projeto_id": 2, "projeto_nome": "Orion Flow",
-            "cwd": "C:\\Barretos\\OrionFlow", "estado": "delegando", "criado_em": ago_28m, "atualizado_em": now_iso
-        },
-        {
-            "chave": "p2-context", "session_id": "sess-orion", "agent_id": "sub-context2", "pai_chave": "p2-main",
-            "tipo": "Pesquisador de contexto", "projeto_id": 2, "projeto_nome": "Orion Flow",
-            "cwd": "C:\\Barretos\\OrionFlow", "estado": "trabalhando", "criado_em": ago_10m, "atualizado_em": now_iso
-        },
-        {
-            "chave": "p2-bug", "session_id": "sess-orion", "agent_id": "sub-bug", "pai_chave": "p2-main",
-            "tipo": "Bug Hunter", "projeto_id": 2, "projeto_nome": "Orion Flow",
-            "cwd": "C:\\Barretos\\OrionFlow", "estado": "aguardando", "criado_em": ago_23m, "atualizado_em": now_iso
-        },
-        {
-            "chave": "p2-handoff", "session_id": "sess-orion", "agent_id": "sub-handoff", "pai_chave": "p2-main",
-            "tipo": "Handoff", "projeto_id": 2, "projeto_nome": "Orion Flow",
-            "cwd": "C:\\Barretos\\OrionFlow", "estado": "trabalhando", "criado_em": ago_12m, "atualizado_em": now_iso
-        },
-        # Sala 3: Barretos Inteligente CCO & Operações
-        {
-            "chave": "p3-main", "session_id": "sess-cco", "agent_id": None, "pai_chave": None,
-            "tipo": "Claude principal", "projeto_id": 3, "projeto_nome": "Barretos Inteligente • CCO",
-            "cwd": "C:\\Barretos\\CCO", "estado": "delegando", "criado_em": ago_28m, "atualizado_em": now_iso
-        },
-        {
-            "chave": "p3-exati", "session_id": "sess-cco", "agent_id": "sub-exati", "pai_chave": "p3-main",
-            "tipo": "Monitor Exati", "projeto_id": 3, "projeto_nome": "Barretos Inteligente • CCO",
-            "cwd": "C:\\Barretos\\CCO", "estado": "trabalhando", "criado_em": ago_10m, "atualizado_em": now_iso
-        },
-        {
-            "chave": "p3-oficios", "session_id": "sess-cco", "agent_id": "sub-oficios", "pai_chave": "p3-main",
-            "tipo": "Consulta de Ofícios", "projeto_id": 3, "projeto_nome": "Barretos Inteligente • CCO",
-            "cwd": "C:\\Barretos\\CCO", "estado": "trabalhando", "criado_em": ago_12m, "atualizado_em": now_iso
-        },
-        {
-            "chave": "p3-book", "session_id": "sess-cco", "agent_id": "sub-book", "pai_chave": "p3-main",
-            "tipo": "Curador do Book", "projeto_id": 3, "projeto_nome": "Barretos Inteligente • CCO",
-            "cwd": "C:\\Barretos\\CCO", "estado": "aguardando", "criado_em": ago_23m, "atualizado_em": now_iso
-        }
-    ]
+    execucoes = []
+    trabalhando_cnt = 0
+    delegando_cnt = 0
+    aguardando_cnt = 0
+
+    for chave, ag in AGENTS_TASKS.items():
+        dur_min = (ag["tarefa_atual"]["duracao_min"] if ag["tarefa_atual"] else 20)
+        criado_em = (now_dt - timedelta(minutes=dur_min)).isoformat()
+        estado = ag["estado"]
+        
+        if estado == "trabalhando":
+            trabalhando_cnt += 1
+        elif estado == "delegando":
+            delegando_cnt += 1
+        else:
+            aguardando_cnt += 1
+
+        execucoes.append({
+            "chave": chave,
+            "session_id": ag["session_id"],
+            "agent_id": ag["agent_id"],
+            "pai_chave": ag["pai_chave"],
+            "tipo": ag["tipo"],
+            "projeto_id": ag["projeto_id"],
+            "projeto_nome": ag["projeto_nome"],
+            "cwd": ag["cwd"],
+            "estado": estado,
+            "criado_em": criado_em,
+            "atualizado_em": now_iso
+        })
 
     historico = [
         {"session_id": "sess-nova", "tipo": "QA", "projeto_nome": "Nova Insights", "estado": "trabalhando", "atualizado_em": now_iso},
@@ -695,9 +1020,9 @@ def api_painel():
     return jsonify({
         "horas": 2,
         "resumo": {
-            "trabalhando": 6,
-            "delegando": 4,
-            "aguardando": 2,
+            "trabalhando": trabalhando_cnt,
+            "delegando": delegando_cnt,
+            "aguardando": aguardando_cnt,
             "sessoes_ativas": 6,
             "execucoes_na_janela": 17,
             "concluidas": 5,
@@ -709,29 +1034,215 @@ def api_painel():
         "historico_tipos": historico_tipos
     })
 
+# ==============================================================================
+# Endpoints de Gestão Interativa de Tarefas dos Agentes
+# ==============================================================================
+@app.route("/api/agentes/tarefas")
+def api_agentes_todas_tarefas():
+    """Retorna todas as tarefas, filas e históricos de todos os agentes."""
+    return jsonify(AGENTS_TASKS)
+
+@app.route("/api/agentes/<chave>/tarefas")
+def api_agente_tarefas(chave):
+    """Retorna a tarefa atual, fila e histórico de um agente específico."""
+    ag = AGENTS_TASKS.get(chave)
+    if not ag:
+        # Fallback de busca por tipo
+        for k, a in AGENTS_TASKS.items():
+            if a["tipo"].lower() == chave.lower():
+                return jsonify(a)
+        return jsonify({"error": "Agente não encontrado"}), 404
+    return jsonify(ag)
+
+@app.route("/api/agentes/tarefas/criar", methods=["POST"])
+def api_criar_tarefa():
+    """Cria uma nova tarefa para um agente (executar agora ou enfileirar)."""
+    data = request.get_json(force=True, silent=True) or {}
+    agente_chave = data.get("agente_chave")
+    titulo = data.get("titulo", "").strip()
+    descricao = data.get("descricao", "").strip()
+    modo = data.get("modo", "agora")  # 'agora' ou 'fila'
+    prioridade = data.get("prioridade", "Alta")
+
+    if not agente_chave or not titulo:
+        return jsonify({"success": False, "error": "Agente e título são obrigatórios."}), 400
+
+    ag = AGENTS_TASKS.get(agente_chave)
+    if not ag:
+        for k, a in AGENTS_TASKS.items():
+            if a["tipo"].lower() == agente_chave.lower():
+                ag = a
+                agente_chave = k
+                break
+    if not ag:
+        return jsonify({"success": False, "error": "Agente não encontrado."}), 404
+
+    now = datetime.now()
+    task_id = f"tsk-{int(now.timestamp())}"
+    nova_tarefa = {
+        "id": task_id,
+        "titulo": titulo,
+        "descricao": descricao or f"Instrução personalizada despachada via sala de operações.",
+        "progresso": 5,
+        "iniciado_em": now.isoformat(),
+        "duracao_min": 1,
+        "previsao_min": 5,
+        "prioridade": prioridade
+    }
+
+    if modo == "agora":
+        # Se já tiver tarefa em andamento, empurra para o histórico ou fila
+        if ag["tarefa_atual"]:
+            ag["fila"].insert(0, {
+                "id": ag["tarefa_atual"]["id"],
+                "titulo": ag["tarefa_atual"]["titulo"],
+                "descricao": ag["tarefa_atual"]["descricao"],
+                "adicionado_em": now.strftime("%H:%M"),
+                "prioridade": ag["tarefa_atual"]["prioridade"]
+            })
+        ag["tarefa_atual"] = nova_tarefa
+        ag["estado"] = "trabalhando"
+    else:
+        # Enfileira
+        ag["fila"].append({
+            "id": task_id,
+            "titulo": titulo,
+            "descricao": descricao,
+            "adicionado_em": now.strftime("%H:%M"),
+            "prioridade": prioridade
+        })
+
+    return jsonify({"success": True, "agente": ag, "mensagem": f"Tarefa {'iniciada imediatamente' if modo == 'agora' else 'adicionada à fila'} com sucesso!"})
+
+@app.route("/api/agentes/tarefas/pausar", methods=["POST"])
+def api_pausar_tarefa():
+    """Pausa a tarefa do agente e o coloca em estado aguardando."""
+    data = request.get_json(force=True, silent=True) or {}
+    agente_chave = data.get("agente_chave")
+    ag = AGENTS_TASKS.get(agente_chave)
+    if not ag:
+        return jsonify({"success": False, "error": "Agente não encontrado."}), 404
+
+    ag["estado"] = "aguardando"
+    return jsonify({"success": True, "agente": ag, "mensagem": "Agente pausado com sucesso."})
+
+@app.route("/api/agentes/tarefas/concluir", methods=["POST"])
+def api_concluir_tarefa():
+    """Conclui a tarefa atual, move para o histórico e puxa a próxima da fila."""
+    data = request.get_json(force=True, silent=True) or {}
+    agente_chave = data.get("agente_chave")
+    ag = AGENTS_TASKS.get(agente_chave)
+    if not ag:
+        return jsonify({"success": False, "error": "Agente não encontrado."}), 404
+
+    now = datetime.now()
+    if ag["tarefa_atual"]:
+        concluida = ag["tarefa_atual"]
+        ag["historico"].insert(0, {
+            "id": concluida["id"],
+            "titulo": concluida["titulo"],
+            "concluido_em": now.strftime("%H:%M"),
+            "duracao": f"{concluida.get('duracao_min', 5)} min",
+            "status": "concluido",
+            "resultado": "Execução concluída e homologada pelo CCO."
+        })
+        ag["tarefa_atual"] = None
+
+    # Se tiver fila, assume a próxima
+    if ag["fila"]:
+        prox = ag["fila"].pop(0)
+        ag["tarefa_atual"] = {
+            "id": prox["id"],
+            "titulo": prox["titulo"],
+            "descricao": prox["descricao"],
+            "progresso": 10,
+            "iniciado_em": now.isoformat(),
+            "duracao_min": 1,
+            "previsao_min": 4,
+            "prioridade": prox.get("prioridade", "Normal")
+        }
+        ag["estado"] = "trabalhando"
+    else:
+        ag["estado"] = "aguardando"
+
+    return jsonify({"success": True, "agente": ag, "mensagem": "Tarefa concluída com sucesso!"})
+
+@app.route("/api/agentes/tarefas/remover-fila", methods=["POST"])
+def api_remover_fila():
+    data = request.get_json(force=True, silent=True) or {}
+    agente_chave = data.get("agente_chave")
+    task_id = data.get("task_id")
+    ag = AGENTS_TASKS.get(agente_chave)
+    if not ag:
+        return jsonify({"success": False, "error": "Agente não encontrado."}), 404
+
+    ag["fila"] = [t for t in ag["fila"] if t["id"] != task_id]
+    return jsonify({"success": True, "agente": ag})
+
+@app.route("/api/agentes/tarefas/promover-fila", methods=["POST"])
+def api_promover_fila():
+    data = request.get_json(force=True, silent=True) or {}
+    agente_chave = data.get("agente_chave")
+    task_id = data.get("task_id")
+    ag = AGENTS_TASKS.get(agente_chave)
+    if not ag:
+        return jsonify({"success": False, "error": "Agente não encontrado."}), 404
+
+    target = None
+    nova_fila = []
+    for t in ag["fila"]:
+        if t["id"] == task_id:
+            target = t
+        else:
+            nova_fila.append(t)
+    ag["fila"] = nova_fila
+
+    if target:
+        now = datetime.now()
+        if ag["tarefa_atual"]:
+            ag["fila"].insert(0, {
+                "id": ag["tarefa_atual"]["id"],
+                "titulo": ag["tarefa_atual"]["titulo"],
+                "descricao": ag["tarefa_atual"]["descricao"],
+                "adicionado_em": now.strftime("%H:%M"),
+                "prioridade": ag["tarefa_atual"]["prioridade"]
+            })
+        ag["tarefa_atual"] = {
+            "id": target["id"],
+            "titulo": target["titulo"],
+            "descricao": target["descricao"],
+            "progresso": 10,
+            "iniciado_em": now.isoformat(),
+            "duracao_min": 1,
+            "previsao_min": 4,
+            "prioridade": target.get("prioridade", "Alta")
+        }
+        ag["estado"] = "trabalhando"
+
+    return jsonify({"success": True, "agente": ag})
+
+@app.route("/api/sessoes")
+def api_sessoes():
+    return jsonify({
+        "sessoes": [
+            {"id": "sess-cco", "projeto_id": 3, "cwd": "C:\\Barretos\\CCO"},
+            {"id": "sess-nova", "projeto_id": 1, "cwd": "C:\\Barretos\\NovaInsights"},
+            {"id": "sess-orion", "projeto_id": 2, "cwd": "C:\\Barretos\\OrionFlow"}
+        ]
+    })
+
 @app.route("/api/sessoes/<session_id>/agentes")
 def api_sessao_agentes(session_id):
-    agentes_map = {
-        "sess-nova": [
-            {"chave": "p1-main", "tipo": "Claude principal", "estado": "delegando", "cwd": "C:\\Barretos\\NovaInsights"},
-            {"chave": "p1-qa", "tipo": "QA", "estado": "trabalhando", "cwd": "C:\\Barretos\\NovaInsights", "pai_chave": "p1-main"},
-            {"chave": "p1-context", "tipo": "Pesquisador de contexto", "estado": "trabalhando", "cwd": "C:\\Barretos\\NovaInsights", "pai_chave": "p1-main"},
-            {"chave": "p1-obsidian", "tipo": "Obsidian", "estado": "aguardando", "cwd": "C:\\Barretos\\NovaInsights", "pai_chave": "p1-main"}
-        ],
-        "sess-orion": [
-            {"chave": "p2-main", "tipo": "Claude principal", "estado": "delegando", "cwd": "C:\\Barretos\\OrionFlow"},
-            {"chave": "p2-bug", "tipo": "Bug Hunter", "estado": "aguardando", "cwd": "C:\\Barretos\\OrionFlow", "pai_chave": "p2-main"},
-            {"chave": "p2-handoff", "tipo": "Handoff", "estado": "trabalhando", "cwd": "C:\\Barretos\\OrionFlow", "pai_chave": "p2-main"},
-            {"chave": "p2-context", "tipo": "Pesquisador de contexto", "estado": "trabalhando", "cwd": "C:\\Barretos\\OrionFlow", "pai_chave": "p2-main"}
-        ],
-        "sess-cco": [
-            {"chave": "p3-main", "tipo": "Claude principal", "estado": "delegando", "cwd": "C:\\Barretos\\CCO"},
-            {"chave": "p3-exati", "tipo": "Monitor Exati", "estado": "trabalhando", "cwd": "C:\\Barretos\\CCO", "pai_chave": "p3-main"},
-            {"chave": "p3-oficios", "tipo": "Consulta de Ofícios", "estado": "trabalhando", "cwd": "C:\\Barretos\\CCO", "pai_chave": "p3-main"},
-            {"chave": "p3-book", "tipo": "Curador do Book", "estado": "aguardando", "cwd": "C:\\Barretos\\CCO", "pai_chave": "p3-main"}
-        ]
-    }
-    agentes = agentes_map.get(session_id, agentes_map["sess-nova"])
+    agentes = []
+    for chave, ag in AGENTS_TASKS.items():
+        if ag["session_id"] == session_id:
+            agentes.append({
+                "chave": chave,
+                "tipo": ag["tipo"],
+                "estado": ag["estado"],
+                "cwd": ag["cwd"],
+                "pai_chave": ag["pai_chave"]
+            })
     return jsonify({"agentes": agentes})
 
 @app.route("/api/sessoes/<session_id>/historico")
