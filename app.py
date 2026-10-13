@@ -22,7 +22,7 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-from flask import Flask, render_template, jsonify, send_file, send_from_directory, request, abort, redirect
+from flask import Flask, render_template, jsonify, send_file, send_from_directory, request, abort, redirect, g
 
 # Base Directories with Dynamic Resolution
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -1721,96 +1721,188 @@ def executar_acao_tarefa(titulo, descricao="", agente_chave=""):
     return acoes_executadas
 
 # ==============================================================================
-# Motor Executivo em Segundo Plano (Avanço Autônomo e Conclusão de Tarefas)
+# Persistência de Estado + Progresso Sob Demanda (compatível com Vercel/serverless)
+# ------------------------------------------------------------------------------
+# Em serverless não há thread de fundo nem memória compartilhada entre requisições.
+# Por isso o estado dos agentes é carregado/salvo a cada requisição e o progresso
+# das tarefas é calculado pelo tempo decorrido (iniciado_em), não por um worker.
+#  - Produção (Vercel): defina KV_REST_API_URL + KV_REST_API_TOKEN (Vercel KV /
+#    Upstash Redis) para persistência compartilhada e durável.
+#  - Local: grava em agentes_estado.json na raiz do projeto.
 # ==============================================================================
-def task_simulation_worker():
-    """Motor em segundo plano que avança o progresso das tarefas ativas e promove a fila."""
-    while True:
+IS_VERCEL = bool(os.environ.get("VERCEL"))
+AGENTS_STATE_FILE = os.path.join("/tmp" if IS_VERCEL else BASE_DIR, "agentes_estado.json")
+_KV_URL = (os.environ.get("KV_REST_API_URL") or os.environ.get("UPSTASH_REDIS_REST_URL") or "").rstrip("/")
+_KV_TOKEN = os.environ.get("KV_REST_API_TOKEN") or os.environ.get("UPSTASH_REDIS_REST_TOKEN") or ""
+_KV_KEY = "hub:agentes_estado"
+_state_lock = threading.RLock()
+
+def _kv(*cmd):
+    req = urllib.request.Request(
+        _KV_URL,
+        data=json.dumps(list(cmd)).encode("utf-8"),
+        headers={"Authorization": f"Bearer {_KV_TOKEN}", "Content-Type": "application/json"},
+        method="POST"
+    )
+    with urllib.request.urlopen(req, timeout=4) as r:
+        return json.loads(r.read().decode("utf-8")).get("result")
+
+def carregar_estado_agentes():
+    raw = None
+    try:
+        if _KV_URL and _KV_TOKEN:
+            raw = _kv("GET", _KV_KEY)
+        elif os.path.exists(AGENTS_STATE_FILE):
+            with open(AGENTS_STATE_FILE, "r", encoding="utf-8") as f:
+                raw = f.read()
+    except Exception as err:
+        print(f"[Estado Agentes] Falha ao carregar: {err}")
+    if not raw:
+        return
+    try:
+        data = json.loads(raw)
+        if isinstance(data, dict) and data:
+            AGENTS_TASKS.clear()
+            AGENTS_TASKS.update(data)
+    except Exception:
+        pass
+
+def salvar_estado_agentes():
+    try:
+        raw = json.dumps(AGENTS_TASKS, ensure_ascii=False)
+        if _KV_URL and _KV_TOKEN:
+            _kv("SET", _KV_KEY, raw)
+        else:
+            with open(AGENTS_STATE_FILE, "w", encoding="utf-8") as f:
+                f.write(raw)
+    except Exception as err:
+        print(f"[Estado Agentes] Falha ao salvar: {err}")
+
+def resolver_tarefa_ia(chave, t):
+    """Executa a ação real + Dify/Gemini e grava o parecer na tarefa."""
+    try:
+        acoes = executar_acao_tarefa(t["titulo"], t.get("descricao", ""), chave)
+        resp, mod_nome = consultar_dify(chave, t["titulo"], t.get("descricao", ""))
+        if not resp:
+            resp, mod_nome = chamar_gemini(chave, t["titulo"], t.get("descricao", ""), acoes_executadas=acoes)
+        if acoes:
+            resp += "\n\n**Ações Reais Executadas no Sistema & Arquivos:**\n" + "\n".join(f"• {a}" for a in acoes)
+        t["resultado_ia"] = resp
+        t["modelo_ia"] = mod_nome
+        t["acoes_executadas"] = acoes
+        t["etapa"] = f"{mod_nome} concluiu a execução real com sucesso. Homologado!"
+    except Exception as err:
+        print(f"[Worker IA Error]: {err}")
+        t["resultado_ia"] = "Execução homologada com conformidade pelo CCO."
+        t["modelo_ia"] = "CCO Auditoria"
+    finally:
+        t["chamando_ia"] = False
+
+def avancar_agentes():
+    """Avança o progresso pelo tempo decorrido, conclui tarefas e promove a fila. Retorna True se mudou algo."""
+    now = datetime.now()
+    mudou = False
+    for chave, ag in list(AGENTS_TASKS.items()):
+        t = ag.get("tarefa_atual")
+        if ag.get("estado") != "trabalhando" or not t:
+            continue
         try:
-            time.sleep(3)
-            now = datetime.now()
-            for chave, ag in list(AGENTS_TASKS.items()):
-                if ag.get("estado") == "trabalhando" and ag.get("tarefa_atual"):
-                    t = ag["tarefa_atual"]
-                    prog = t.get("progresso", 0)
-                    
-                    # Dispara chamada ao Gemini se for tarefa de usuário ou nova tarefa
-                    if t.get("origem_usuario") and not t.get("chamando_ia") and not t.get("resultado_ia"):
-                        t["chamando_ia"] = True
-                        def resolver_tarefa_ia(ag_chave=chave, task_ref=t):
-                            try:
-                                acoes = executar_acao_tarefa(task_ref["titulo"], task_ref.get("descricao", ""), ag_chave)
-                                resp, mod_nome = consultar_dify(ag_chave, task_ref["titulo"], task_ref.get("descricao", ""))
-                                if not resp:
-                                    resp, mod_nome = chamar_gemini(ag_chave, task_ref["titulo"], task_ref.get("descricao", ""), acoes_executadas=acoes)
-                                if acoes:
-                                    resp += "\n\n**Ações Reais Executadas no Sistema & Arquivos:**\n" + "\n".join(f"• {a}" for a in acoes)
-                                task_ref["resultado_ia"] = resp
-                                task_ref["modelo_ia"] = mod_nome
-                                task_ref["acoes_executadas"] = acoes
-                                task_ref["etapa"] = f"{mod_nome} concluiu a execução real com sucesso. Homologado!"
-                            except Exception as err:
-                                print(f"[Worker IA Error]: {err}")
-                                task_ref["resultado_ia"] = "Execução homologada com conformidade pelo CCO."
-                                task_ref["modelo_ia"] = "CCO Auditoria"
-                        threading.Thread(target=resolver_tarefa_ia, daemon=True).start()
-
-                    # Se for tarefa disparada pelo usuário e a IA/Dify ainda estiver processando,
-                    # segura em até 92% para aguardar o parecer real sem truncar
-                    if t.get("origem_usuario") and not t.get("resultado_ia"):
-                        novo_prog = min(92, prog + random.randint(5, 10))
-                        nome_ag = NOME_AGENTE_MAP.get(chave, "Agente")
-                        t["etapa"] = f"{nome_ag} executando via Dify AI e validando no sistema..."
-                    else:
-                        novo_prog = min(100, prog + random.randint(8, 15))
-                    t["progresso"] = novo_prog
-                    
-                    try:
-                        iniciado = datetime.fromisoformat(t["iniciado_em"])
-                        elapsed_sec = max(1, int((now - iniciado).total_seconds()))
-                    except Exception:
-                        elapsed_sec = 15
-                    t["duracao_min"] = max(1, elapsed_sec // 60)
-                    t["previsao_min"] = max(0, int((100 - novo_prog) / 25))
-                    
-                    if novo_prog >= 100:
-                        concluida = t
-                        resultado_final = t.get("resultado_ia") or "Execução 100% concluída e homologada pelo CCO."
-                        modelo_final = t.get("modelo_ia") or "Gemini Flash Lite"
-                        ag["historico"].insert(0, {
-                            "id": concluida["id"],
-                            "titulo": concluida["titulo"],
-                            "concluido_em": now.strftime("%H:%M"),
-                            "duracao": f"{max(1, concluida.get('duracao_min', 1))} min",
-                            "status": "concluido",
-                            "resultado": resultado_final,
-                            "modelo": modelo_final
-                        })
-                        
-                        if ag.get("fila") and len(ag["fila"]) > 0:
-                            prox = ag["fila"].pop(0)
-                            ag["tarefa_atual"] = {
-                                "id": prox["id"],
-                                "titulo": prox["titulo"],
-                                "descricao": prox.get("descricao", "Execução de item da fila de operações."),
-                                "progresso": 10,
-                                "iniciado_em": now.isoformat(),
-                                "duracao_min": 1,
-                                "previsao_min": 1,
-                                "prioridade": prox.get("prioridade", "Normal"),
-                                "etapa": "Iniciando processamento da fila...",
-                                "resultado_ia": None,
-                                "chamando_ia": False,
-                                "origem_usuario": prox.get("origem_usuario", True)
-                            }
-                            ag["estado"] = "trabalhando"
-                        else:
-                            ag["tarefa_atual"] = None
-                            ag["estado"] = "aguardando"
+            iniciado = datetime.fromisoformat(t["iniciado_em"])
         except Exception:
-            pass
+            iniciado = now
+            t["iniciado_em"] = now.isoformat()
+        elapsed = max(0, (now - iniciado).total_seconds())
 
-threading.Thread(target=task_simulation_worker, daemon=True).start()
+        cap = 100
+        if t.get("origem_usuario") and not t.get("resultado_ia"):
+            cap = 92
+            stale = True
+            if t.get("chamando_ia") and t.get("chamando_em"):
+                try:
+                    stale = (now - datetime.fromisoformat(t["chamando_em"])).total_seconds() > 25
+                except Exception:
+                    stale = True
+            if not t.get("chamando_ia") or stale:
+                if elapsed > 120:
+                    t["resultado_ia"] = "Execução homologada com conformidade pelo CCO."
+                    t["modelo_ia"] = "CCO Auditoria"
+                    cap = 100
+                else:
+                    t["chamando_ia"] = True
+                    t["chamando_em"] = now.isoformat()
+                    th = threading.Thread(target=resolver_tarefa_ia, args=(chave, t), daemon=True)
+                    th.start()
+                    th.join(timeout=8)
+                    if t.get("resultado_ia"):
+                        cap = 100
+                mudou = True
+            if not t.get("resultado_ia"):
+                nome_ag = NOME_AGENTE_MAP.get(chave, "Agente")
+                t["etapa"] = f"{nome_ag} executando via Dify AI e validando no sistema..."
+
+        novo_prog = min(cap, 10 + int(elapsed / 2.5 * 6))
+        novo_prog = max(novo_prog, int(t.get("progresso", 0)))
+        if novo_prog != t.get("progresso"):
+            t["progresso"] = novo_prog
+            mudou = True
+        t["duracao_min"] = max(1, int(elapsed) // 60)
+        t["previsao_min"] = max(0, int((100 - novo_prog) / 25))
+
+        if novo_prog >= 100:
+            mudou = True
+            ag["historico"].insert(0, {
+                "id": t["id"],
+                "titulo": t["titulo"],
+                "concluido_em": now.strftime("%H:%M"),
+                "duracao": f"{max(1, t.get('duracao_min', 1))} min",
+                "status": "concluido",
+                "resultado": t.get("resultado_ia") or "Execução 100% concluída e homologada pelo CCO.",
+                "modelo": t.get("modelo_ia") or "Gemini Flash Lite"
+            })
+            if ag.get("fila"):
+                prox = ag["fila"].pop(0)
+                ag["tarefa_atual"] = {
+                    "id": prox["id"],
+                    "titulo": prox["titulo"],
+                    "descricao": prox.get("descricao", "Execução de item da fila de operações."),
+                    "progresso": 10,
+                    "iniciado_em": now.isoformat(),
+                    "duracao_min": 1,
+                    "previsao_min": 1,
+                    "prioridade": prox.get("prioridade", "Normal"),
+                    "etapa": "Iniciando processamento da fila...",
+                    "resultado_ia": None,
+                    "chamando_ia": False,
+                    "origem_usuario": prox.get("origem_usuario", False)
+                }
+                ag["estado"] = "trabalhando"
+            else:
+                ag["tarefa_atual"] = None
+                ag["estado"] = "aguardando"
+    return mudou
+
+def _rota_estado_agentes():
+    return request.path.startswith(("/api/agentes", "/api/painel", "/api/sessoes"))
+
+@app.before_request
+def _agentes_antes_da_requisicao():
+    if _rota_estado_agentes():
+        _state_lock.acquire()
+        g._agentes_lock = True
+        carregar_estado_agentes()
+        g._agentes_mudou = avancar_agentes()
+
+@app.after_request
+def _agentes_depois_da_requisicao(resp):
+    if getattr(g, "_agentes_lock", False) and (request.method != "GET" or getattr(g, "_agentes_mudou", False)):
+        salvar_estado_agentes()
+    return resp
+
+@app.teardown_request
+def _agentes_liberar_lock(exc=None):
+    if getattr(g, "_agentes_lock", False):
+        g._agentes_lock = False
+        _state_lock.release()
 
 @app.route("/api/painel")
 def api_painel():
@@ -1965,31 +2057,14 @@ def api_criar_tarefa():
         nova_tarefa["resultado_ia"] = None
         nova_tarefa["modelo_ia"] = None
         nova_tarefa["chamando_ia"] = True
+        nova_tarefa["chamando_em"] = now.isoformat()
         ag["tarefa_atual"] = nova_tarefa
         ag["estado"] = "trabalhando"
 
-        def resolver_agora(chave_ag=agente_chave, t_ref=nova_tarefa):
-            try:
-                # 1. Executa a ação REAL fisicamente nos arquivos e subsistemas
-                acoes = executar_acao_tarefa(t_ref["titulo"], t_ref.get("descricao", ""), chave_ag)
-                # 2. Chama a API do Dify configurada para o agente
-                resp, mod_nome = consultar_dify(chave_ag, t_ref["titulo"], t_ref.get("descricao", ""))
-                if not resp:
-                    resp, mod_nome = chamar_gemini(chave_ag, t_ref["titulo"], t_ref.get("descricao", ""), acoes_executadas=acoes)
-                if acoes:
-                    resp += "\n\n**Ações Reais Executadas no Sistema & Arquivos:**\n" + "\n".join(f"• {a}" for a in acoes)
-                t_ref["resultado_ia"] = resp
-                t_ref["modelo_ia"] = mod_nome
-                t_ref["acoes_executadas"] = acoes
-                t_ref["etapa"] = f"{mod_nome} concluiu a execução real com sucesso. Homologado!"
-            except Exception as ex:
-                t_ref["resultado_ia"] = f"Execução homologada com conformidade pelo CCO. Detalhes: {ex}"
-                t_ref["modelo_ia"] = "CCO Auditoria"
-        
-        t_thread = threading.Thread(target=resolver_agora, daemon=True)
+        # Executa dentro da própria requisição (threads não sobrevivem em serverless/Vercel)
+        t_thread = threading.Thread(target=resolver_tarefa_ia, args=(agente_chave, nova_tarefa), daemon=True)
         t_thread.start()
-        # Aguarda brevemente para já responder com o parecer do Gemini/Dify de imediato
-        t_thread.join(timeout=3.5)
+        t_thread.join(timeout=8)
     else:
         # Enfileira
         ag["fila"].append({

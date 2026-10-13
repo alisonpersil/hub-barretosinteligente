@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Sala de Agentes Autônomos — Barretos Inteligente CCO
  * Motor Executivo de Gestão de Agentes, Tarefas, Fila e Histórico
  */
@@ -944,5 +944,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   refresh();
-  setInterval(refresh, 2500);
+  setInterval(refresh, 5000);
 });
