@@ -85,6 +85,18 @@
         if (!entries || !entries.length) {
             entries = [
                 {
+                    id: 9,
+                    title: "Auditoria de Backlog & Selo 'Detectado Exclusão' no Monitor Exati",
+                    category: "Governança & Automação",
+                    badge: "Integridade CCO",
+                    icon: "fa-shield-halved",
+                    color: "pink",
+                    impact: "Reconciliação multi-planilhas no Monitor Exati: chamados omitidos em novas extrações sem conclusão na base de 'Atendidos' são preservados no backlog ativo com o selo dinâmico 'Detectado Exclusão', ícone informativo e pop-up flutuante explicativo ao passar o mouse. Cada upload no painel dispara captura automática e despacho seguro para o backlog do agente Chefe.",
+                    date: "Outubro 2026",
+                    author: "Alison Persil & Antigravity AI",
+                    version: "v2.5.0"
+                },
+                {
                     id: 8,
                     title: "Nossos Robôs ouvem Rádio",
                     category: "IA & Automação",
