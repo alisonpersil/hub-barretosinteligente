@@ -53,14 +53,16 @@ let evolucaoDrillMonth = null;     // '2026-08' quando o usuário clicar para de
 document.addEventListener('DOMContentLoaded', async () => {
   initTheme();
 
+  let serverDataLoaded = false;
   // Tenta sincronizar com dashboard_data.json atualizado
   try {
-    const res = await fetch('./dashboard_data.json');
+    const res = await fetch('./dashboard_data.json?t=' + Date.now());
     if (res.ok) {
       const data = await res.json();
       if (data && data.kpis) {
         dashboardData = data;
         Object.assign(originalDashboardData, JSON.parse(JSON.stringify(data)));
+        serverDataLoaded = true;
       }
     }
   } catch (e) {
@@ -68,14 +70,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // Tenta carregar dados customizados salvos em LocalStorage pelo navegador
+  // APENAS se o servidor não estiver acessível ou se o cache local for comprovadamente mais recente
   try {
     const savedCustom = localStorage.getItem('exati_custom_dashboard_data');
     if (savedCustom) {
       const customData = JSON.parse(savedCustom);
       if (customData && customData.kpis) {
-        dashboardData = customData;
-        Object.assign(originalDashboardData, JSON.parse(JSON.stringify(customData)));
-        console.log("Base customizada carregada do LocalStorage com sucesso.");
+        let useCustom = !serverDataLoaded;
+        if (serverDataLoaded && customData.metadata && customData.metadata.gerado_em && dashboardData.metadata && dashboardData.metadata.gerado_em) {
+          const parseGerado = (str) => {
+            const p = parseExatiDate(str);
+            return p ? p.getTime() : 0;
+          };
+          if (parseGerado(dashboardData.metadata.gerado_em) >= parseGerado(customData.metadata.gerado_em)) {
+            useCustom = false;
+            try { localStorage.removeItem('exati_custom_dashboard_data'); } catch (_) {}
+            console.log("Base do servidor é mais recente ou igual. Cache local antigo descartado.");
+          }
+        } else if (serverDataLoaded) {
+          useCustom = false;
+          try { localStorage.removeItem('exati_custom_dashboard_data'); } catch (_) {}
+        }
+
+        if (useCustom) {
+          dashboardData = customData;
+          Object.assign(originalDashboardData, JSON.parse(JSON.stringify(customData)));
+          console.log("Base customizada carregada do LocalStorage com sucesso.");
+        }
       }
     }
   } catch (e) {
@@ -4566,6 +4587,11 @@ function setupUploadModal() {
           const result = await response.json();
           recordUploadHistory(targetCat, selectedFile.name);
 
+          // Limpar qualquer cache desatualizado no localStorage para priorizar os dados recalculados pelo servidor
+          try {
+            localStorage.removeItem('exati_custom_dashboard_data');
+          } catch (e) {}
+
           // Recarregar dashboard_data.json atualizado gerado pelo servidor
           const resData = await fetch('./dashboard_data.json?t=' + Date.now());
           if (resData.ok) {
@@ -4814,6 +4840,50 @@ function processarArquivoUploadLocal(file, analysis) {
             sla_dias: sortedTipos.map(t => t.slaMedio),
             sla_mediana: sortedTipos.map(t => t.slaMediana)
           };
+
+          // Reconstruir daily_records para sincronizar filtros temporais e métricas MoM (mês atual vs anterior)
+          const dailyMap = {};
+          rows2026.forEach(r => {
+            const d = r.data_iso;
+            if (!dailyMap[d]) {
+              dailyMap[d] = {
+                d: d,
+                tot: 0,
+                ok: 0,
+                late: 0,
+                ronda: 0,
+                ts: 0.0,
+                tc: 0,
+                eq: {},
+                tip: {},
+                br: {}
+              };
+            }
+            const item = dailyMap[d];
+            item.tot++;
+            const isRonda = (r.origem || '').toLowerCase().includes('ronda');
+            if (isRonda) {
+              item.ronda++;
+            } else if (r.dias !== null && r.dias <= 5) {
+              item.ok++;
+            } else {
+              item.late++;
+            }
+            if (r.dias !== null) {
+              item.ts += Number(r.dias);
+              item.tc++;
+            }
+            const eqKey = r.equipe || 'Equipe Operacional';
+            item.eq[eqKey] = (item.eq[eqKey] || 0) + 1;
+            const tipKey = r.tipo || 'Outros';
+            item.tip[tipKey] = (item.tip[tipKey] || 0) + 1;
+            const brKey = r.bairro || 'Barretos';
+            item.br[brKey] = (item.br[brKey] || 0) + 1;
+          });
+
+          const prevDaily = (originalDashboardData.daily_records || []).filter(dr => dr.d < '2026-01-01');
+          const newDaily2026 = Object.keys(dailyMap).sort().map(k => dailyMap[k]);
+          dashboardData.daily_records = [...prevDaily, ...newDaily2026];
         }
 
         dashboardData.metadata.atendidos_arquivo = file.name;

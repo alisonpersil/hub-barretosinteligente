@@ -520,6 +520,75 @@ def serve_exati_file(filename):
     """Serve arquivos estáticos e assets do Monitor Exati."""
     return send_from_directory(EXATI_DIR, filename)
 
+@app.route("/api/upload", methods=["POST"])
+@app.route("/exati/api/upload", methods=["POST"])
+def api_upload_exati():
+    """Recebe planilhas de Pendentes ou Atendidos do Monitor Exati e sincroniza os dados."""
+    try:
+        raw_filename = request.headers.get("X-Filename", "")
+        category = request.headers.get("X-Category", "auto").lower()
+
+        filename = urllib.parse.unquote(raw_filename) if raw_filename else "planilha_importada.xlsx"
+        filename = os.path.basename(filename)
+
+        file_bytes = request.get_data()
+        if not file_bytes:
+            return jsonify({"success": False, "error": "Nenhum dado recebido"}), 400
+
+        temp_dir = os.path.join(EXATI_DIR, "Base de dados", "_temp")
+        os.makedirs(temp_dir, exist_ok=True)
+        temp_path = os.path.join(temp_dir, filename)
+        with open(temp_path, "wb") as f:
+            f.write(file_bytes)
+
+        if EXATI_DIR not in sys.path:
+            sys.path.insert(0, EXATI_DIR)
+        from exati_column_resolver import detect_dataset_type, resolve_columns
+        try:
+            import pandas as pd
+            df_sample = pd.read_excel(temp_path, nrows=2)
+            cols = list(df_sample.columns)
+        except Exception:
+            cols = []
+
+        if category == "auto":
+            target_category = detect_dataset_type(cols, filename)
+        elif category in ("atendidos", "pendentes"):
+            target_category = category
+        else:
+            target_category = detect_dataset_type(cols, filename)
+
+        mapping, audit = resolve_columns(cols, target_category) if cols else ({}, {})
+
+        subfolder = "Atendidos" if target_category == "atendidos" else "Pendentes"
+        dest_dir = os.path.join(EXATI_DIR, "Base de dados", subfolder)
+        os.makedirs(dest_dir, exist_ok=True)
+        dest_path = os.path.join(dest_dir, filename)
+
+        if os.path.exists(dest_path):
+            try:
+                os.remove(dest_path)
+            except Exception:
+                pass
+        import shutil
+        shutil.move(temp_path, dest_path)
+
+        cmd = [sys.executable, os.path.join(EXATI_DIR, "build_dashboard_data.py")]
+        proc = subprocess.run(cmd, cwd=EXATI_DIR, capture_output=True, text=True)
+
+        return jsonify({
+            "success": proc.returncode == 0,
+            "filename": filename,
+            "category": target_category,
+            "folder": subfolder,
+            "audit": audit,
+            "message": f"Planilha '{filename}' identificada ({target_category.upper()}) com sucesso e sincronizada!",
+            "stdout": proc.stdout[-300:] if proc.stdout else "",
+            "stderr": proc.stderr[-300:] if proc.stderr else ""
+        }), (200 if proc.returncode == 0 else 500)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
 @app.route("/dashboard_data.json")
 def serve_dashboard_data_root():
     """Fallback para carregar dashboard_data.json na raiz se solicitado."""

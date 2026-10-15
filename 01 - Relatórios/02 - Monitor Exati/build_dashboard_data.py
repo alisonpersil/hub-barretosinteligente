@@ -7,8 +7,26 @@ import numpy as np
 
 from exati_column_resolver import resolve_columns, detect_dataset_type, get_col_val
 
-base_dir = r"c:\Users\CCO1\Desktop\PMO\06 - Automações\05 - Monitor Exati\Base de dados"
-output_dir = r"c:\Users\CCO1\Desktop\PMO\06 - Automações\05 - Monitor Exati"
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+base_dir = os.path.join(SCRIPT_DIR, "Base de dados")
+output_dir = SCRIPT_DIR
+
+def read_excel_smart_header(file_path, max_rows_scan=10):
+    """Lê a planilha procurando dinamicamente a linha onde estão os cabeçalhos reais."""
+    try:
+        df_raw = pd.read_excel(file_path, header=None, nrows=max_rows_scan)
+        header_idx = 0
+        for idx, row in df_raw.iterrows():
+            row_str = " ".join([str(v).lower() for v in row if pd.notna(v)])
+            if any(k in row_str for k in ['solicita', 'atendimento', 'protocolo', 'ocorrencia', 'bairro', 'data', 'reclamac']):
+                header_idx = idx
+                break
+        df = pd.read_excel(file_path, header=header_idx)
+        return df.dropna(how='all')
+    except Exception as e:
+        print(f"Erro lendo {file_path}: {e}")
+        return pd.DataFrame()
+
 
 print("1. Lendo base de Pendentes...")
 pendentes_files = glob.glob(os.path.join(base_dir, "Pendentes", "*.xlsx")) + glob.glob(os.path.join(base_dir, "Pendentes", "*.xls"))
@@ -18,11 +36,7 @@ pendentes_files_sorted = sorted(pendentes_files, key=os.path.getmtime, reverse=T
 latest_pendentes_file = pendentes_files_sorted[0] if pendentes_files_sorted else None
 if latest_pendentes_file:
     print(f"Versão mais recente de Pendentes: {os.path.basename(latest_pendentes_file)}")
-    try:
-        df_p = pd.read_excel(latest_pendentes_file)
-    except Exception as e:
-        print(f"Erro ao ler última planilha {latest_pendentes_file}: {e}")
-        df_p = pd.DataFrame()
+    df_p = read_excel_smart_header(latest_pendentes_file)
 else:
     df_p = pd.DataFrame()
 
@@ -45,7 +59,7 @@ for pf in sorted(pendentes_files, key=os.path.getmtime):
     fname = os.path.basename(pf)
     try:
         mtime = datetime.fromtimestamp(os.path.getmtime(pf))
-        df_s = pd.read_excel(pf)
+        df_s = read_excel_smart_header(pf)
         s_map, _ = resolve_columns(df_s.columns, 'pendentes') if not df_s.empty else ({}, {})
         col_pt = s_map.get('pontos')
         col_tr = s_map.get('tempo_restante')
@@ -150,8 +164,9 @@ else:
     for af in atendidos_files:
         print(f"Lendo {os.path.basename(af)}...")
         try:
-            df_tmp = pd.read_excel(af)
-            df_atendidos_list.append(df_tmp)
+            df_tmp = read_excel_smart_header(af)
+            if not df_tmp.empty:
+                df_atendidos_list.append(df_tmp)
         except Exception as e:
             print(f"Erro lendo {af}: {e}")
 
@@ -349,18 +364,23 @@ pendentes_ts_short = pe_mtime.strftime("%d/%m %H:%M")
 
 # 2.1 Linha do Tempo Integrada: Backlog Pendente & Atendimentos Concluídos
 col_dt_s = p_map.get('data_solicitacao', 'Data de Solicitação')
+col_pt = p_map.get('pontos', 'Pontos')
+col_tr = p_map.get('tempo_restante', 'Tempo restante')
+
 df_p_valid = df_p.dropna(subset=[col_dt_s]).copy() if not df_p.empty and col_dt_s in df_p.columns else pd.DataFrame()
 if not df_p_valid.empty:
     df_p_valid['dt_s'] = pd.to_datetime(df_p_valid[col_dt_s], dayfirst=True, errors='coerce')
     min_backlog_date = df_p_valid['dt_s'].min().date() if df_p_valid['dt_s'].notna().any() else date(2026, 8, 18)
 else:
     min_backlog_date = date(2026, 8, 18)
+    df_p_valid['dt_s'] = pd.Series(dtype='datetime64[ns]')
 
-max_ref_date = date(2026, 10, 8)
-df_a_timeline = df_a[(df_a['dt_fim'].dt.date >= min_backlog_date) & (df_a['dt_fim'].dt.date <= max_ref_date)].copy()
-daily_atend_counts = df_a_timeline.groupby(df_a_timeline['dt_fim'].dt.date).size()
+max_ref_date = df_a['dt_fim'].max().date() if ('dt_fim' in df_a.columns and df_a['dt_fim'].notna().any()) else date.today()
+df_a_timeline = df_a[(df_a['dt_fim'].dt.date >= min_backlog_date) & (df_a['dt_fim'].dt.date <= max_ref_date)].copy() if 'dt_fim' in df_a.columns else pd.DataFrame()
+daily_atend_counts = df_a_timeline.groupby(df_a_timeline['dt_fim'].dt.date).size() if not df_a_timeline.empty else pd.Series(dtype=int)
 
-active_dates_sorted = sorted(list(set(daily_atend_counts.index).union(set(df_p_valid['dt_s'].dt.date.dropna()))))
+valid_pend_dates = set(df_p_valid['dt_s'].dt.date.dropna()) if ('dt_s' in df_p_valid.columns and df_p_valid['dt_s'].notna().any()) else set()
+active_dates_sorted = sorted(list(set(daily_atend_counts.index).union(valid_pend_dates)))
 
 tl_diaria_labels = []
 tl_diaria_atendidos = []
@@ -371,19 +391,19 @@ tl_diaria_vencidos = []
 for d in active_dates_sorted:
     tl_diaria_labels.append(d.strftime('%d/%m'))
     tl_diaria_atendidos.append(int(daily_atend_counts.get(d, 0)))
-    sub_p = df_p_valid[df_p_valid['dt_s'].dt.date <= d]
+    sub_p = df_p_valid[df_p_valid['dt_s'].dt.date <= d] if ('dt_s' in df_p_valid.columns and df_p_valid['dt_s'].notna().any()) else pd.DataFrame()
     tl_diaria_chamados.append(int(len(sub_p)))
-    tl_diaria_pontos.append(int(sub_p['Pontos de solicitação'].sum()) if 'Pontos de solicitação' in sub_p.columns else len(sub_p))
-    venc_cnt = sum(1 for _, r in sub_p.iterrows() if 'Vencido' in str(r.get('Tempo restante', '')))
+    tl_diaria_pontos.append(int(sub_p[col_pt].sum()) if col_pt and col_pt in sub_p.columns else len(sub_p))
+    venc_cnt = sum(1 for _, r in sub_p.iterrows() if 'Vencido' in str(r.get(col_tr, '')))
     tl_diaria_vencidos.append(int(venc_cnt))
 
-hoje_d = date(2026, 10, 8)
+hoje_d = max_ref_date
 if hoje_d not in active_dates_sorted:
-    tl_diaria_labels.append('08/10 (Atual)')
+    tl_diaria_labels.append(hoje_d.strftime('%d/%m') + ' (Atual)')
     tl_diaria_atendidos.append(0)
     tl_diaria_chamados.append(len(df_p))
-    tl_diaria_pontos.append(int(df_p['Pontos de solicitação'].sum()) if 'Pontos de solicitação' in df_p.columns else len(df_p))
-    tl_diaria_vencidos.append(int(sum(1 for _, r in df_p.iterrows() if 'Vencido' in str(r.get('Tempo restante', '')))))
+    tl_diaria_pontos.append(int(df_p[col_pt].sum()) if col_pt and col_pt in df_p.columns else len(df_p))
+    tl_diaria_vencidos.append(int(sum(1 for _, r in df_p.iterrows() if 'Vencido' in str(r.get(col_tr, '')))))
 
 # Marcos de abertura do backlog
 tl_marcos_labels = []
@@ -392,7 +412,7 @@ tl_marcos_pontos = []
 tl_marcos_chamados = []
 tl_marcos_vencidos = []
 
-marcos_dates = sorted(df_p_valid['dt_s'].dt.date.dropna().unique())
+marcos_dates = sorted(df_p_valid['dt_s'].dt.date.dropna().unique()) if ('dt_s' in df_p_valid.columns and df_p_valid['dt_s'].notna().any()) else []
 for md in marcos_dates:
     tl_marcos_labels.append(md.strftime('%d/%m'))
     tl_marcos_atendidos.append(int(daily_atend_counts.get(md, 0)))
