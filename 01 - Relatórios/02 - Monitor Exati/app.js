@@ -2634,7 +2634,14 @@ function renderPendentesTable() {
       : `<span class="badge badge-info">Call Center</span>`;
 
     let badgeAuditoria = item.alerta_auditoria
-      ? `<span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); margin-left: 6px; font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;" title="Ordem auditada: recuperada e preservada no backlog CCO"><i class="fa-solid fa-shield-halved"></i> Preservado CCO</span>`
+      ? `<span class="badge-exclusao" title="Detectado Exclusão: Essa solicitação não se enconta na base de itens pendentes e ela não foi migrada para para itens concluídos, o sistema mantém essa solicitação até ela entrar no status de concluído.">
+          <span>Detectado Exclusão</span>
+          <span class="badge-info-icon"><i class="fa-solid fa-circle-info"></i></span>
+          <div class="badge-tooltip-popup">
+            <strong><i class="fa-solid fa-circle-info"></i> Detectado Exclusão</strong>
+            Essa solicitação não se enconta na base de itens pendentes e ela não foi migrada para para itens concluídos, o sistema mantém essa solicitação até ela entrar no status de concluído.
+          </div>
+        </span>`
       : '';
 
     tr.innerHTML = `

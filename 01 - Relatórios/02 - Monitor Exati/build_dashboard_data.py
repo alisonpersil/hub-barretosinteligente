@@ -219,7 +219,7 @@ for pf in pendentes_files_sorted:
             audit_nota = "Ativo no extrato recente Exati"
             if fname != latest_fname:
                 origem_alerta = True
-                audit_nota = f"⚠️ Pendência histórica preservada (presente em '{fname}', omitida na última extração)"
+                audit_nota = "Detectado Exclusão: Essa solicitação não se enconta na base de itens pendentes e ela não foi migrada para para itens concluídos, o sistema mantém essa solicitação até ela entrar no status de concluído."
 
             if chave in merged_pendentes:
                 item = merged_pendentes[chave]
