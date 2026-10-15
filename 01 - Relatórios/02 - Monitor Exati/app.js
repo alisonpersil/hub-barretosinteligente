@@ -3667,10 +3667,11 @@ const ExatiColumnResolver = {
         label: 'Data de Abertura / Solicitação',
         is_required: true,
         synonyms: [
+          'data inicial atendimento', 'data inicial', 'dt inicial', 'hora inicio', 'data inicio', 'dt inicio',
           'data de solicitacao', 'data da solicitacao', 'data solicitacao',
           'data da ocorrencia', 'data de ocorrencia', 'data ocorrencia',
           'data atendimento', 'data de atendimento', 'data da abertura', 'data de abertura', 'data abertura',
-          'dt atendimento', 'dt solicitacao', 'dt abertura', 'dt ocorrencia', 'dt inicio', 'data inicio',
+          'dt atendimento', 'dt solicitacao', 'dt abertura', 'dt ocorrencia',
           'data cadastro', 'data e hora', 'data hora', 'data/hora', 'data', 'dt', 'abertura'
         ]
       },
@@ -3680,7 +3681,7 @@ const ExatiColumnResolver = {
         synonyms: [
           'data conclusao atendimento', 'data conclusao', 'conclusao atendimento', 'conclusao',
           'dt conclusao', 'finalizacao', 'data finalizacao', 'data encerramento', 'data fim',
-          'dt fim', 'termino atendimento', 'data termino'
+          'dt fim', 'termino atendimento', 'data termino', 'hora fim'
         ]
       },
       tipo_ocorrencia: {
@@ -3715,7 +3716,7 @@ const ExatiColumnResolver = {
       prazo_sla: {
         label: 'Prazo Limite / SLA',
         is_required: false,
-        synonyms: ['prazo atendimento', 'prazo sla', 'sla', 'tempo limite', 'prazo limite', 'status sla']
+        synonyms: ['prazo atendimento', 'prazo de atendimento', 'prazo sla', 'sla', 'tempo limite', 'prazo limite', 'status sla', 'atraso']
       }
     },
     pendentes: {
@@ -3753,7 +3754,7 @@ const ExatiColumnResolver = {
       },
       pontos: {
         label: 'Pontos de Solicitação',
-        is_required: true,
+        is_required: false,
         synonyms: [
           'pontos de solicitacao', 'pontos da solicitacao', 'pontos solicitacao',
           'pontos', 'quantidade pontos', 'quantidade de pontos', 'qtd pontos',
@@ -3799,9 +3800,36 @@ const ExatiColumnResolver = {
     }
   },
 
-  detectDatasetType(rawHeaders) {
+  detectDatasetType(rawHeaders, fileName = '') {
+    const fLower = String(fileName || '').toLowerCase();
+    if (fLower.includes('atendido') || fLower.includes('sgi') || fLower.includes('historico') || fLower.includes('concluido')) {
+      return 'atendidos';
+    }
+    if (fLower.includes('pendente') || fLower.includes('backlog') || (fLower.includes('consulta') && !fLower.includes('atendido'))) {
+      return 'pendentes';
+    }
+
     const normHeaders = rawHeaders.map(h => this.normalizeHeader(h));
     const strippedHeaders = normHeaders.map(h => this.stripStopWords(h));
+
+    // Indicadores definitivos e exclusivos de Atendidos (SGI / Histórico)
+    const hasConclusao = normHeaders.some(nh => nh.includes('conclusao') || nh.includes('termino') || nh.includes('finalizacao') || nh.includes('hora fim'));
+    const hasDataInicialAtendimento = normHeaders.some(nh => nh.includes('data inicial') || nh.includes('dt inicial'));
+    const hasSolucao = normHeaders.some(nh => nh.includes('solucao') || nh.includes('motivo'));
+    const hasAtendimentoExclusivo = normHeaders.some(nh => nh === 'atendimento' || nh === 'os' || nh === 'numero os');
+
+    if (hasConclusao || hasSolucao || (hasDataInicialAtendimento && hasAtendimentoExclusivo)) {
+      return 'atendidos';
+    }
+
+    // Indicadores fortes de Pendentes (Backlog)
+    const hasTempoRestante = normHeaders.some(nh => nh.includes('tempo restante') || nh.includes('prazo restante') || nh.includes('sla restante'));
+    const hasPontosSolicitacao = normHeaders.some(nh => nh.includes('pontos de solicitacao') || nh.includes('pontos solicitacao'));
+    const hasIdSolicitacao = normHeaders.some(nh => nh === 'id solicitacao' || nh === 'id da solicitacao');
+
+    if (hasTempoRestante || hasPontosSolicitacao || hasIdSolicitacao) {
+      return 'pendentes';
+    }
 
     const checkScore = (schema) => {
       let score = 0;
@@ -3824,12 +3852,6 @@ const ExatiColumnResolver = {
 
     const scoreAtendidos = checkScore(this.schemas.atendidos);
     const scorePendentes = checkScore(this.schemas.pendentes);
-
-    const hasConclusao = normHeaders.some(nh => nh.includes('conclusao'));
-    const hasTempoRestante = normHeaders.some(nh => nh.includes('tempo restante') || nh.includes('prazo restante'));
-
-    if (hasTempoRestante && scorePendentes >= scoreAtendidos) return 'pendentes';
-    if (hasConclusao && scoreAtendidos >= scorePendentes) return 'atendidos';
 
     return scoreAtendidos >= scorePendentes ? 'atendidos' : 'pendentes';
   },
@@ -4283,7 +4305,7 @@ function setupUploadModal() {
 
         let detectedType = selectedCategory !== 'auto'
           ? selectedCategory
-          : ExatiColumnResolver.detectDatasetType(headers);
+          : ExatiColumnResolver.detectDatasetType(headers, file ? file.name : '');
 
         const resolution = ExatiColumnResolver.resolveColumns(headers, detectedType);
 
@@ -4295,7 +4317,19 @@ function setupUploadModal() {
           resolution: resolution
         };
 
-        // Atualizar crachá de destino
+        // Atualizar crachá de destino e seleção visual do chip
+        if (selectedCategory === 'auto' && categoryChips) {
+          categoryChips.forEach(c => {
+            const rad = c.querySelector('input');
+            if (rad && rad.value === detectedType) {
+              c.classList.add('active');
+              rad.checked = true;
+            } else if (rad && rad.value !== 'auto') {
+              c.classList.remove('active');
+            }
+          });
+        }
+
         if (ufileTarget) {
           if (detectedType === 'atendidos') {
             ufileTarget.innerHTML = '<i class="fa-solid fa-folder-open"></i> Destino: Base de dados / Atendidos (Histórico Operacional)';
@@ -4599,7 +4633,7 @@ function processarArquivoUploadLocal(file, analysis) {
       const sheet = workbook.Sheets[firstSheetName];
 
       const { headerRowIdx, headers } = findHeaderRow(sheet);
-      const targetCat = (analysis && analysis.category) ? analysis.category : ExatiColumnResolver.detectDatasetType(headers);
+      const targetCat = (analysis && analysis.category) ? analysis.category : ExatiColumnResolver.detectDatasetType(headers, file ? file.name : '');
       const resolution = (analysis && analysis.resolution) ? analysis.resolution : ExatiColumnResolver.resolveColumns(headers, targetCat);
 
       // Ler linhas respeitando a linha onde o cabeçalho foi detectado
