@@ -182,7 +182,7 @@
     if (!wrapper) {
       wrapper = document.createElement('div');
       wrapper.id = 'youtubeRadioWrapper';
-      wrapper.style.cssText = 'position:fixed;bottom:0;right:0;width:200px;height:120px;opacity:0.04;z-index:1;pointer-events:none;overflow:hidden;transform:translateZ(0);';
+      wrapper.style.cssText = 'position:fixed;bottom:0;right:0;width:1px;height:1px;opacity:0.0001;z-index:-9999;pointer-events:none;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);transform:translateZ(0);';
       document.body.appendChild(wrapper);
     }
     return wrapper;
@@ -204,10 +204,10 @@
     if (!iframe) {
       iframe = document.createElement('iframe');
       iframe.id = 'youtubeRadioIframe';
-      iframe.width = '200';
-      iframe.height = '120';
+      iframe.width = '1';
+      iframe.height = '1';
       iframe.allow = 'autoplay; encrypted-media; picture-in-picture';
-      iframe.style.cssText = 'width:200px;height:120px;border:0;';
+      iframe.style.cssText = 'width:1px;height:1px;border:0;opacity:0;pointer-events:none;';
       iframe.src = embedUrl;
       wrapper.appendChild(iframe);
     } else {

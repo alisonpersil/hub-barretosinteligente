@@ -517,6 +517,11 @@ body {
     color: #a855f7;
 }
 
+.sidebar-subitem .sub-icon.amber,
+.sidebar-subitem .sub-icon.yellow {
+    color: #f59e0b;
+}
+
 .sidebar-spacer {
     flex: 1;
 }
@@ -740,6 +745,16 @@ body {
     box-shadow: var(--shadow-hover-blue);
 }
 
+.portal-card.bi-card:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 12px 28px -6px rgba(245, 158, 11, 0.35);
+}
+
+.portal-card.qa-card:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 12px 28px -6px rgba(139, 92, 246, 0.35);
+}
+
 /* Icon Box Compacto */
 .portal-icon-box {
     width: 56px;
@@ -835,6 +850,18 @@ body {
 .portal-card.exati-card:hover .portal-action-btn.blue {
     background: var(--accent-blue-hover);
     box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+}
+
+.portal-card.bi-card:hover .portal-action-btn,
+.portal-card.bi-card:hover .portal-action-btn.amber {
+    background: #d97706;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
+}
+
+.portal-card.qa-card:hover .portal-action-btn,
+.portal-card.qa-card:hover .portal-action-btn.purple {
+    background: #7c3aed;
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
 }
 
 .module-home-card.automacoes-card:hover .portal-action-btn.amber {

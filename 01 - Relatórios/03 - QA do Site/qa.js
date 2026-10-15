@@ -10,6 +10,8 @@
         { name: "Central HUB (Home)", path: "/", category: "Core", target: 200 },
         { name: "Consulta de Ofícios", path: "/oficios", category: "Relatórios", target: 200 },
         { name: "Monitor Exati CCO", path: "/exati/", category: "Relatórios", target: 200 },
+        { name: "BI Estoque (Power BI)", path: "/bi-estoque", category: "Relatórios", target: 302 },
+        { name: "QA do Site", path: "/qa", category: "Relatórios", target: 200 },
         { name: "Sala de Agentes Autônomos", path: "/sala-agentes", category: "Automações", target: 200 },
         { name: "Book de Governança", path: "/book/", category: "Book", target: 200 },
         { name: "API Status & Nuvem", path: "/api/system/status", category: "Backend", target: 200 },
@@ -27,7 +29,7 @@
 
     // Inicialização do tema e toggle
     function initTheme() {
-        const cur = document.documentElement.getAttribute('data-theme') || localStorage.getItem('pmo_theme') || 'dark';
+        const cur = document.documentElement.getAttribute('data-theme') || localStorage.getItem('pmo_theme') || 'light';
         document.documentElement.setAttribute('data-theme', cur);
         if (btnThemeToggle) {
             const icon = btnThemeToggle.querySelector('i');

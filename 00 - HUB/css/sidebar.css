@@ -648,6 +648,11 @@
     color: #a855f7;
 }
 
+.sidebar-subitem .sub-icon.amber,
+.sidebar-subitem .sub-icon.yellow {
+    color: #f59e0b;
+}
+
 /* Colapsado */
 .hub-sidebar.collapsed .item-text,
 .hub-sidebar.collapsed .sidebar-badge,

@@ -554,6 +554,19 @@ def fallback_logo_horizontal():
     return send_from_directory(EXATI_DIR, "logo-ipbarretos-horizontal-alta.png")
 
 # ==============================================================================
+# Rotas: BI Estoque (Redirecionamento Power BI)
+# ==============================================================================
+POWER_BI_ESTOQUE_URL = "https://app.powerbi.com/links/31OdxYhV_S?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare"
+
+@app.route("/bi-estoque")
+@app.route("/bi-estoque/")
+@app.route("/bi")
+@app.route("/bi/")
+def bi_estoque_redirect():
+    """Redireciona para o painel oficial do BI Estoque no Power BI."""
+    return redirect(POWER_BI_ESTOQUE_URL, code=302)
+
+# ==============================================================================
 # Rotas: 03 - QA do Site (/qa)
 # ==============================================================================
 @app.route("/qa")

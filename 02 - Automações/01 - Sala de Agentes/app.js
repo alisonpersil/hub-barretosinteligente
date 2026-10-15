@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Sala de Agentes Autônomos — Barretos Inteligente CCO
  * Motor Executivo de Gestão de Agentes, Tarefas, Fila e Histórico
  */
@@ -788,11 +788,18 @@ function setupThemeToggle() {
   function updateIcon(theme) {
     const icon = btn.querySelector('i');
     if (icon) {
-      icon.className = theme === 'dark' ? 'fa-solid fa-moon' : 'fa-solid fa-sun';
+      if (theme === 'dark') {
+        icon.className = 'fa-solid fa-sun';
+        btn.title = 'Alternar para tema claro';
+      } else {
+        icon.className = 'fa-solid fa-moon';
+        btn.title = 'Alternar para tema escuro';
+      }
     }
   }
 
-  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  const currentTheme = document.documentElement.getAttribute('data-theme') || localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'light';
+  document.documentElement.setAttribute('data-theme', currentTheme);
   updateIcon(currentTheme);
 
   btn.addEventListener('click', () => {
@@ -804,6 +811,15 @@ function setupThemeToggle() {
       localStorage.setItem('theme', nextTheme);
     } catch (_) {}
     updateIcon(nextTheme);
+  });
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'pmo_theme' || e.key === 'theme') {
+      if (e.newValue && (e.newValue === 'light' || e.newValue === 'dark')) {
+        document.documentElement.setAttribute('data-theme', e.newValue);
+        updateIcon(e.newValue);
+      }
+    }
   });
 }
 
