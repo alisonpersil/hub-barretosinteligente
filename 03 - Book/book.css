@@ -21,10 +21,13 @@
 
 [data-theme="light"] {
     --book-bg-base: #f8fafc;
-    --book-bg-elevated: rgba(255, 255, 255, 0.92);
-    --book-bg-card: rgba(255, 255, 255, 0.88);
-    --book-border: rgba(255, 42, 133, 0.3);
-    --book-border-cyan: rgba(0, 180, 216, 0.35);
+    --book-bg-elevated: #ffffff;
+    --book-bg-card: #ffffff;
+    --book-border: #e2e8f0;
+    --book-border-cyan: #0ea5e9;
+    --book-text-primary: #0f172a;
+    --book-text-secondary: #334155;
+    --book-text-muted: #64748b;
 }
 
 /* Container Principal do Book */
@@ -1247,4 +1250,372 @@
         box-sizing: border-box;
     }
 }
+
+/* ==========================================================================
+   Modo Claro Executivo (Light Theme) • Governança & Book CCO
+   Harmonização visual de alto padrão corporativo
+   ========================================================================== */
+
+[data-theme="light"] body {
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+
+/* Background Atmosférico Suave no Modo Claro */
+[data-theme="light"] .book-ambient-mesh {
+    background: 
+        radial-gradient(circle at 85% 15%, rgba(255, 42, 133, 0.06) 0%, transparent 45%),
+        radial-gradient(circle at 15% 85%, rgba(0, 180, 216, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(157, 78, 221, 0.03) 0%, transparent 60%);
+}
+
+/* Banner de Notícia Rádio Barretos FM - Destaque Executivo Equilibrado */
+[data-theme="light"] .book-radio-news-banner {
+    background: linear-gradient(135deg, #1c0a27 0%, #350b3a 45%, #590f3c 100%);
+    border: 1px solid rgba(255, 42, 133, 0.35);
+    box-shadow: 0 16px 40px -8px rgba(53, 11, 58, 0.28), 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .radio-news-title {
+    color: #ffffff;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"] .radio-news-text {
+    color: #f3e8ff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .btn-ouvir-estacao {
+    background: #ffffff;
+    color: #0f172a;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .btn-ouvir-estacao:hover {
+    background: #ffffff;
+    color: #ff2a85;
+    box-shadow: 0 8px 24px rgba(255, 42, 133, 0.3);
+}
+
+[data-theme="light"] .btn-visitar-sala {
+    background: rgba(255, 255, 255, 0.14);
+    border-color: rgba(255, 255, 255, 0.28);
+    color: #ffffff;
+}
+
+[data-theme="light"] .btn-visitar-sala:hover {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.4);
+    color: #ffffff;
+}
+
+/* Barra de Controles e Filtros */
+[data-theme="light"] .book-controls-bar {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .book-search-box i {
+    color: #64748b;
+}
+
+[data-theme="light"] .book-search-input {
+    background: #f8fafc;
+    border: 1.5px solid #cbd5e1;
+    color: #0f172a;
+}
+
+[data-theme="light"] .book-search-input::placeholder {
+    color: #94a3b8;
+}
+
+[data-theme="light"] .book-search-input:focus {
+    background: #ffffff;
+    border-color: #ff2a85;
+    box-shadow: 0 0 0 3px rgba(255, 42, 133, 0.15);
+}
+
+/* Filtros (Pills) */
+[data-theme="light"] .filter-pill {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+[data-theme="light"] .filter-pill:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+[data-theme="light"] .filter-pill.active {
+    background: #ff2a85;
+    border-color: #ff2a85;
+    color: #ffffff;
+    box-shadow: 0 3px 12px rgba(255, 42, 133, 0.35);
+}
+
+/* Botões de Ação na Barra de Controles */
+[data-theme="light"] .btn-book-audio {
+    background: #f0f9ff;
+    border: 1px solid #bae6fd;
+    color: #0284c7;
+}
+
+[data-theme="light"] .btn-book-audio:hover {
+    background: #e0f2fe;
+    color: #0369a1;
+}
+
+[data-theme="light"] .btn-book-primary {
+    background: linear-gradient(135deg, #ff2a85 0%, #e11d48 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 14px rgba(255, 42, 133, 0.35);
+}
+
+[data-theme="light"] .btn-book-primary:hover {
+    box-shadow: 0 6px 20px rgba(255, 42, 133, 0.5);
+}
+
+/* Título da Seção (Linha do Tempo) */
+[data-theme="light"] .book-section-title {
+    color: #0f172a;
+}
+
+[data-theme="light"] .book-section-badge {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    color: #b45309;
+}
+
+/* Cards das Missões (Mission Cards) */
+[data-theme="light"] .book-mission-card {
+    background: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .book-mission-card:hover {
+    border-color: #ff2a85;
+    box-shadow: 0 14px 34px -6px rgba(255, 42, 133, 0.18), 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .mission-number-tag {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+[data-theme="light"] .mission-category-tag {
+    background: #fdf2f8;
+    color: #be185d;
+    border: 1px solid #fbcfe8;
+}
+
+[data-theme="light"] .mission-category-tag.cyan {
+    background: #f0fdfa;
+    color: #0d9488;
+    border-color: #ccfbf1;
+}
+
+[data-theme="light"] .mission-category-tag.purple {
+    background: #faf5ff;
+    color: #7e22ce;
+    border-color: #e9d5ff;
+}
+
+[data-theme="light"] .mission-category-tag.amber {
+    background: #fffbeb;
+    color: #b45309;
+    border-color: #fde68a;
+}
+
+[data-theme="light"] .mission-category-tag.green {
+    background: #ecfdf5;
+    color: #047857;
+    border-color: #a7f3d0;
+}
+
+[data-theme="light"] .mission-stars {
+    color: #f59e0b;
+}
+
+[data-theme="light"] .mission-date-badge {
+    color: #64748b;
+}
+
+[data-theme="light"] .book-mission-title {
+    color: #0f172a;
+}
+
+[data-theme="light"] .book-mission-card:hover .book-mission-title {
+    color: #db2777;
+}
+
+[data-theme="light"] .book-mission-desc {
+    color: #334155;
+    font-weight: 450;
+}
+
+[data-theme="light"] .card-hud-bottom {
+    border-top: 1px solid #f1f5f9;
+}
+
+[data-theme="light"] .card-author-meta {
+    color: #64748b;
+}
+
+[data-theme="light"] .author-chip {
+    color: #1e293b;
+}
+
+[data-theme="light"] .author-chip i {
+    color: #0284c7;
+}
+
+[data-theme="light"] .version-chip {
+    background: #fdf2f8;
+    border: 1px solid #fbcfe8;
+    color: #be185d;
+}
+
+[data-theme="light"] .btn-card-action {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+[data-theme="light"] .btn-card-action:hover {
+    background: #fdf2f8;
+    border-color: #fbcfe8;
+    color: #db2777;
+}
+
+/* Modal de Criação de Marco */
+[data-theme="light"] .book-modal-overlay {
+    background: rgba(15, 23, 42, 0.45);
+}
+
+[data-theme="light"] .book-modal-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+}
+
+[data-theme="light"] .modal-header-book h3 {
+    color: #0f172a;
+}
+
+[data-theme="light"] .btn-close-modal {
+    color: #64748b;
+}
+
+[data-theme="light"] .btn-close-modal:hover {
+    color: #ff2a85;
+}
+
+[data-theme="light"] .modal-form-group label {
+    color: #475569;
+}
+
+[data-theme="light"] .modal-form-input,
+[data-theme="light"] .modal-form-textarea,
+[data-theme="light"] .modal-form-select {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+}
+
+[data-theme="light"] .modal-form-input:focus,
+[data-theme="light"] .modal-form-textarea:focus,
+[data-theme="light"] .modal-form-select:focus {
+    background: #ffffff;
+    border-color: #ff2a85;
+    box-shadow: 0 0 0 3px rgba(255, 42, 133, 0.15);
+}
+
+[data-theme="light"] .btn-modal-cancel {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    color: #475569;
+}
+
+[data-theme="light"] .btn-modal-cancel:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+/* Cards HUD de Indicadores */
+[data-theme="light"] .book-hud-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+}
+
+[data-theme="light"] .hud-card-label {
+    color: #64748b;
+}
+
+[data-theme="light"] .book-hud-card.pink .hud-card-value { color: #e11d48; text-shadow: none; }
+[data-theme="light"] .book-hud-card.cyan .hud-card-value { color: #0284c7; text-shadow: none; }
+[data-theme="light"] .book-hud-card.purple .hud-card-value { color: #7c3aed; text-shadow: none; }
+[data-theme="light"] .book-hud-card.gold .hud-card-value { color: #d97706; text-shadow: none; }
+
+[data-theme="light"] .hud-card-subtext {
+    color: #94a3b8;
+}
+
+/* Hero Banner Alternativo */
+[data-theme="light"] .book-hero-banner {
+    background: linear-gradient(135deg, #ffffff 0%, #fdf2f8 50%, #f0f9ff 100%);
+    border: 1px solid rgba(255, 42, 133, 0.25);
+    box-shadow: 0 10px 30px -5px rgba(255, 42, 133, 0.08), 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .book-hero-text h1 {
+    background: linear-gradient(90deg, #0f172a 0%, #be123c 60%, #0284c7 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+[data-theme="light"] .book-hero-text p {
+    color: #475569;
+}
+
+/* Estado Vazio */
+.book-empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    background: rgba(22, 17, 43, 0.4);
+    border: 1px dashed rgba(255, 42, 133, 0.3);
+    border-radius: 20px;
+}
+
+.empty-state-title {
+    color: #ffffff;
+    font-size: 18px;
+    margin: 0 0 6px;
+}
+
+.empty-state-desc {
+    color: #9f97b5;
+    font-size: 13.5px;
+    margin: 0;
+}
+
+[data-theme="light"] .book-empty-state {
+    background: #ffffff;
+    border: 1.5px dashed #cbd5e1;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+[data-theme="light"] .empty-state-title {
+    color: #0f172a;
+}
+
+[data-theme="light"] .empty-state-desc {
+    color: #64748b;
+}
+
 

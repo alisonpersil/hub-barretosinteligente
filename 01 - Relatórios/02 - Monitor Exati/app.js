@@ -3632,10 +3632,28 @@ const ExatiColumnResolver = {
     let s = String(text);
     // Remove diacríticos (acentos)
     s = s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
-    // Remove artefatos de encoding corrompido (\ufffd), interrogações e pontuação
-    s = s.replace(/[\ufffd\?\_\-\.\:\/\\\,]/g, ' ');
+    // Sanitize artefatos de encoding corrompidos comuns em exportações do Exati (ex: solicita?o, solicitao)
+    s = s.replace(/solicita[\ufffd\?\_\s]*o/gi, 'solicitacao');
+    s = s.replace(/ocorren[\ufffd\?\_\s]*a/gi, 'ocorrencia');
+    s = s.replace(/munic[\ufffd\?\_\s]*pio/gi, 'municipio');
+    s = s.replace(/conclus[\ufffd\?\_\s]*o/gi, 'conclusao');
+    s = s.replace(/situa[\ufffd\?\_\s]*o/gi, 'situacao');
+    s = s.replace(/servi[\ufffd\?\_\s]*o/gi, 'servico');
+    s = s.replace(/reclamac[\ufffd\?\_\s]*o/gi, 'reclamacao');
+    // Remove pontuação e caracteres não alfanuméricos
+    s = s.replace(/[\ufffd\?\_\-\.\:\/\\\,\(\)\[\]]/g, ' ');
     // Caixa baixa e colapsa espaços múltiplos
     return s.toLowerCase().replace(/\s+/g, ' ').trim();
+  },
+
+  stripStopWords(str) {
+    if (!str) return '';
+    const stopWords = new Set(['de', 'da', 'do', 'dos', 'das', 'e', 'em', 'no', 'na', 'd', 'a', 'o']);
+    return str
+      .split(/\s+/)
+      .filter(w => !stopWords.has(w))
+      .join(' ')
+      .trim();
   },
 
   schemas: {
@@ -3643,119 +3661,158 @@ const ExatiColumnResolver = {
       atendimento: {
         label: 'Número do Atendimento / ID',
         is_required: true,
-        synonyms: ['atendimento', 'id atendimento', 'ordem servico', 'os', 'numero atendimento', 'cod atendimento', 'chamado', 'solicitacao', 'protocolo']
+        synonyms: ['atendimento', 'id atendimento', 'ordem servico', 'ordem de servico', 'os', 'numero atendimento', 'num atendimento', 'cod atendimento', 'chamado', 'solicitacao', 'protocolo', 'id']
       },
       data_atendimento: {
         label: 'Data de Abertura / Solicitação',
         is_required: true,
-        synonyms: ['data atendimento', 'data solicitacao', 'data da solicitacao', 'abertura', 'data abertura', 'dt atendimento', 'dt solicitacao']
+        synonyms: [
+          'data de solicitacao', 'data da solicitacao', 'data solicitacao',
+          'data da ocorrencia', 'data de ocorrencia', 'data ocorrencia',
+          'data atendimento', 'data de atendimento', 'data da abertura', 'data de abertura', 'data abertura',
+          'dt atendimento', 'dt solicitacao', 'dt abertura', 'dt ocorrencia', 'dt inicio', 'data inicio',
+          'data cadastro', 'data e hora', 'data hora', 'data/hora', 'data', 'dt', 'abertura'
+        ]
       },
       conclusao: {
         label: 'Data de Conclusão / Atendimento',
         is_required: true,
-        synonyms: ['data conclusao atendimento', 'data conclusao', 'conclusao atendimento', 'conclusao', 'dt conclusao', 'finalizacao', 'data finalizacao', 'data encerramento']
+        synonyms: [
+          'data conclusao atendimento', 'data conclusao', 'conclusao atendimento', 'conclusao',
+          'dt conclusao', 'finalizacao', 'data finalizacao', 'data encerramento', 'data fim',
+          'dt fim', 'termino atendimento', 'data termino'
+        ]
       },
       tipo_ocorrencia: {
         label: 'Tipo de Ocorrência / Defeito',
         is_required: true,
-        synonyms: ['tipo ocorrencia', 'tipo da ocorrencia', 'ocorrencia', 'defeito', 'tipo defeito', 'servico', 'tipo servico', 'problema', 'reclamacao']
+        synonyms: [
+          'tipo ocorrencia', 'tipo da ocorrencia', 'tipo de ocorrencia', 'ocorrencia',
+          'defeito', 'tipo defeito', 'tipo de defeito', 'servico', 'tipo servico',
+          'tipo de servico', 'problema', 'reclamacao', 'tipo reclamacao'
+        ]
       },
       bairro: {
         label: 'Bairro',
         is_required: true,
-        synonyms: ['bairro', 'bairros', 'nome bairro', 'localizacao', 'regiao']
+        synonyms: ['bairro', 'bairros', 'nome bairro', 'localizacao', 'regiao', 'localidade', 'endereco', 'logradouro', 'logradouro/bairro']
       },
       equipe: {
         label: 'Equipe Responsável',
         is_required: false,
-        synonyms: ['equipe', 'equipes', 'equipe atendimento', 'nome equipe', 'turma', 'tecnico', 'executor']
+        synonyms: ['equipe', 'equipes', 'equipe atendimento', 'nome equipe', 'turma', 'tecnico', 'executor', 'executor atendimento', 'responsavel']
       },
       status: {
         label: 'Status do Chamado',
         is_required: false,
-        synonyms: ['status', 'situacao', 'status atendimento', 'fase']
+        synonyms: ['status', 'situacao', 'status atendimento', 'fase', 'estado']
       },
       origem: {
         label: 'Origem da Ocorrência',
         is_required: false,
-        synonyms: ['origem da ocorrencia', 'origem ocorrencia', 'origem', 'canal', 'origem solicitacao']
+        synonyms: ['origem da ocorrencia', 'origem de ocorrencia', 'origem ocorrencia', 'origem', 'canal', 'canal de entrada', 'origem solicitacao', 'canal reclamacao']
       },
       prazo_sla: {
         label: 'Prazo Limite / SLA',
         is_required: false,
-        synonyms: ['prazo atendimento', 'prazo sla', 'sla', 'tempo limite', 'prazo limite']
+        synonyms: ['prazo atendimento', 'prazo sla', 'sla', 'tempo limite', 'prazo limite', 'status sla']
       }
     },
     pendentes: {
       id_solicitacao: {
         label: 'ID da Solicitação',
         is_required: true,
-        synonyms: ['id solicitacao', 'id', 'solicitacao', 'cod solicitacao', 'numero solicitacao', 'chamado']
+        synonyms: ['id solicitacao', 'id da solicitacao', 'id', 'solicitacao', 'cod solicitacao', 'numero solicitacao', 'num solicitacao', 'chamado', 'solicitacao id']
       },
       protocolo: {
         label: 'Protocolo Exati',
         is_required: true,
-        synonyms: ['protocolo', 'numero protocolo', 'num protocolo', 'cod protocolo']
+        synonyms: ['protocolo', 'numero protocolo', 'num protocolo', 'cod protocolo', 'protocolo exati', 'protocolo atendimento']
       },
       data_solicitacao: {
         label: 'Data de Solicitação / Abertura',
         is_required: true,
-        synonyms: ['data de solicitacao', 'data solicitacao', 'abertura', 'data abertura', 'criacao', 'data criacao']
+        synonyms: [
+          'data de solicitacao', 'data da solicitacao', 'data solicitacao',
+          'data da ocorrencia', 'data de ocorrencia', 'data ocorrencia',
+          'data de abertura', 'data da abertura', 'data abertura',
+          'data do chamado', 'data chamado', 'data cadastro', 'data de cadastro',
+          'data criacao', 'data da criacao', 'abertura', 'criacao',
+          'dt solicitacao', 'dt da solicitacao', 'dt abertura', 'dt ocorrencia', 'dt cadastro',
+          'data e hora', 'data hora', 'data/hora', 'data', 'dt'
+        ]
       },
       origem: {
         label: 'Origem da Solicitação',
         is_required: true,
-        synonyms: ['origem solicitacao', 'origem da solicitacao', 'origem', 'canal']
-      },
-      bairro: {
-        label: 'Bairro',
-        is_required: true,
-        synonyms: ['bairros', 'bairro', 'nome bairro', 'localidade', 'regiao']
+        synonyms: [
+          'origem da ocorrencia', 'origem de ocorrencia', 'origem ocorrencia',
+          'origem solicitacao', 'origem da solicitacao', 'origem de solicitacao',
+          'origem', 'canal', 'canal de entrada', 'meio de abertura', 'meio abertura'
+        ]
       },
       pontos: {
         label: 'Pontos de Solicitação',
         is_required: true,
-        synonyms: ['pontos de solicitacao', 'pontos solicitacao', 'pontos', 'quantidade pontos', 'qtd pontos', 'pontos fisicos']
+        synonyms: [
+          'pontos de solicitacao', 'pontos da solicitacao', 'pontos solicitacao',
+          'pontos', 'quantidade pontos', 'quantidade de pontos', 'qtd pontos',
+          'pontos fisicos', 'num pontos', 'numero pontos'
+        ]
       },
       status: {
         label: 'Status do Atendimento',
         is_required: true,
-        synonyms: ['status', 'situacao', 'fase', 'estado']
+        synonyms: ['status', 'situacao', 'fase', 'estado', 'status atendimento', 'status da solicitacao', 'status solicitacao']
       },
       tempo_restante: {
         label: 'Tempo Restante / SLA Restante',
         is_required: true,
-        synonyms: ['tempo restante', 'prazo restante', 'tempo sla', 'sla restante', 'tempo']
+        synonyms: [
+          'tempo restante', 'prazo restante', 'prazo restante sla', 'tempo restante sla',
+          'tempo sla', 'sla restante', 'tempo', 'prazo', 'sla', 'status sla'
+        ]
+      },
+      bairro: {
+        label: 'Bairro',
+        is_required: false,
+        synonyms: ['bairros', 'bairro', 'nome bairro', 'bairro solicitacao', 'localidade', 'regiao', 'endereco', 'logradouro', 'logradouro/bairro', 'local', 'municipio', 'nome municipio']
       },
       parque: {
         label: 'Parque / Município',
         is_required: false,
-        synonyms: ['nome parque', 'parque', 'municipio', 'cidade']
+        synonyms: ['nome parque', 'parque', 'municipio', 'nome municipio', 'cidade', 'parque de servico', 'unidade']
       },
       solicitante: {
         label: 'Nome do Solicitante',
         is_required: false,
-        synonyms: ['nome solicitante', 'solicitante', 'municipe', 'usuario']
+        synonyms: [
+          'nome solicitante', 'nome do solicitante', 'solicitante', 'telefone solicitante',
+          'contato', 'contato solicitante', 'municipe', 'usuario', 'reclamante', 'nome reclamante', 'cidadao'
+        ]
       },
       atendente: {
         label: 'Atendente / Operador',
         is_required: false,
-        synonyms: ['nome atendente', 'atendente', 'operador', 'responsavel']
+        synonyms: ['nome atendente', 'nome do atendente', 'atendente', 'operador', 'responsavel', 'criado por', 'usuario criador']
       }
     }
   },
 
   detectDatasetType(rawHeaders) {
     const normHeaders = rawHeaders.map(h => this.normalizeHeader(h));
+    const strippedHeaders = normHeaders.map(h => this.stripStopWords(h));
 
     const checkScore = (schema) => {
       let score = 0;
       for (const [canonKey, def] of Object.entries(schema)) {
-        const found = normHeaders.some(nh => {
+        const found = normHeaders.some((nh, idx) => {
           if (!nh) return false;
+          const sh = strippedHeaders[idx];
           return def.synonyms.some(syn => {
             const nSyn = this.normalizeHeader(syn);
-            return nh === nSyn || nh.startsWith(nSyn) || nSyn.startsWith(nh) || nh.includes(nSyn);
+            const sSyn = this.stripStopWords(nSyn);
+            return nh === nSyn || (sh && sSyn && sh === sSyn) || nh.startsWith(nSyn) || nSyn.startsWith(nh) || nh.includes(nSyn);
           });
         });
         if (found) {
@@ -3769,7 +3826,7 @@ const ExatiColumnResolver = {
     const scorePendentes = checkScore(this.schemas.pendentes);
 
     const hasConclusao = normHeaders.some(nh => nh.includes('conclusao'));
-    const hasTempoRestante = normHeaders.some(nh => nh.includes('tempo restante'));
+    const hasTempoRestante = normHeaders.some(nh => nh.includes('tempo restante') || nh.includes('prazo restante'));
 
     if (hasTempoRestante && scorePendentes >= scoreAtendidos) return 'pendentes';
     if (hasConclusao && scoreAtendidos >= scorePendentes) return 'atendidos';
@@ -3780,6 +3837,7 @@ const ExatiColumnResolver = {
   resolveColumns(rawHeaders, datasetType) {
     const schema = this.schemas[datasetType] || this.schemas.atendidos;
     const normHeaders = rawHeaders.map(h => this.normalizeHeader(h));
+    const strippedHeaders = normHeaders.map(h => this.stripStopWords(h));
 
     const resolvedMap = {};
     const resolvedIndices = {};
@@ -3807,29 +3865,104 @@ const ExatiColumnResolver = {
       for (let i = 0; i < rawHeaders.length; i++) {
         if (usedIndices.has(i)) continue;
         const nh = normHeaders[i];
+        const sh = strippedHeaders[i];
         if (!nh) continue;
 
-        for (const syn of def.synonyms) {
+        for (let synIdx = 0; synIdx < def.synonyms.length; synIdx++) {
+          const syn = def.synonyms[synIdx];
           const nSyn = this.normalizeHeader(syn);
+          const sSyn = this.stripStopWords(nSyn);
+
+          // 1. Correspondência exata normalizada
           if (nh === nSyn) {
-            bestMatchIdx = i;
-            bestMatchScore = 100;
+            const score = 100 - (synIdx * 0.1);
+            if (score > bestMatchScore) {
+              bestMatchIdx = i;
+              bestMatchScore = score;
+            }
             break;
           }
-          if (nh.startsWith(nSyn) || nSyn.startsWith(nh)) {
-            if (bestMatchScore < 85) {
+          // 2. Correspondência sem stopwords
+          if (sh && sSyn && sh === sSyn) {
+            const score = 98 - (synIdx * 0.1);
+            if (score > bestMatchScore) {
               bestMatchIdx = i;
-              bestMatchScore = 85;
+              bestMatchScore = score;
             }
           }
-          if (nh.includes(nSyn)) {
-            if (bestMatchScore < 70) {
+          // 3. Começa com ou termina com
+          if (nh.startsWith(nSyn) || nSyn.startsWith(nh)) {
+            const score = 90 - (synIdx * 0.1);
+            if (score > bestMatchScore) {
               bestMatchIdx = i;
-              bestMatchScore = 70;
+              bestMatchScore = score;
+            }
+          }
+          // 4. Substring sem stopwords
+          if (sh && sSyn && (sh.includes(sSyn) || sSyn.includes(sh))) {
+            const score = 85 - (synIdx * 0.1);
+            if (score > bestMatchScore) {
+              bestMatchIdx = i;
+              bestMatchScore = score;
+            }
+          }
+          // 5. Inclusão geral de substring
+          if (nh.includes(nSyn)) {
+            const score = 75 - (synIdx * 0.1);
+            if (score > bestMatchScore) {
+              bestMatchIdx = i;
+              bestMatchScore = score;
             }
           }
         }
-        if (bestMatchScore === 100) break;
+        if (bestMatchScore >= 99) break;
+      }
+
+      // Heurística de resgate para colunas essenciais ainda não mapeadas
+      if (bestMatchIdx === -1) {
+        for (let i = 0; i < rawHeaders.length; i++) {
+          if (usedIndices.has(i)) continue;
+          const nh = normHeaders[i];
+          if (!nh) continue;
+
+          if (canonKey === 'data_solicitacao' || canonKey === 'data_atendimento') {
+            if (nh.includes('data') || nh.includes('dt') || nh.startsWith('abertura')) {
+              bestMatchIdx = i;
+              bestMatchScore = 70;
+              break;
+            }
+          } else if (canonKey === 'tempo_restante') {
+            if (nh.includes('prazo') || nh.includes('sla') || nh.includes('restante')) {
+              bestMatchIdx = i;
+              bestMatchScore = 70;
+              break;
+            }
+          } else if (canonKey === 'origem') {
+            if (nh.includes('origem') || nh.includes('canal')) {
+              bestMatchIdx = i;
+              bestMatchScore = 70;
+              break;
+            }
+          } else if (canonKey === 'pontos') {
+            if (nh.includes('ponto')) {
+              bestMatchIdx = i;
+              bestMatchScore = 70;
+              break;
+            }
+          } else if (canonKey === 'status') {
+            if (nh.includes('status') || nh.includes('situac')) {
+              bestMatchIdx = i;
+              bestMatchScore = 70;
+              break;
+            }
+          } else if (canonKey === 'solicitante') {
+            if (nh.includes('solicitante') || nh.includes('reclamante') || nh.includes('municipe') || nh.includes('cidadao') || nh.includes('usuario')) {
+              bestMatchIdx = i;
+              bestMatchScore = 70;
+              break;
+            }
+          }
+        }
       }
 
       if (bestMatchIdx !== -1) {
@@ -4217,35 +4350,113 @@ function setupUploadModal() {
           const catName = detectedType === 'pendentes' ? 'Chamados Pendentes (Backlog)' : 'Chamados Atendidos (Histórico)';
           auditSummaryText.innerHTML = `Tipo identificado: <strong>${catName}</strong> &bull; <strong>${resolution.matched_required} de ${resolution.total_required}</strong> colunas essenciais localizadas dinamicamente, independente da posição no Excel original.`;
 
-          // Tabela de colunas
+          // Tabela de colunas com mapeamento dinâmico e suporte a ajuste manual
           auditTbody.innerHTML = '';
+          const getColLetter = (idx) => {
+            let letter = '';
+            let temp = idx;
+            while (temp >= 0) {
+              letter = String.fromCharCode((temp % 26) + 65) + letter;
+              temp = Math.floor(temp / 26) - 1;
+            }
+            return letter;
+          };
+
+          const updateConfidenceBadge = () => {
+            let reqTotal = 0;
+            let reqMatched = 0;
+            resolution.audit_details.forEach(it => {
+              if (it.is_required) {
+                reqTotal++;
+                if (it.col_index >= 0) reqMatched++;
+              }
+            });
+            const conf = reqTotal > 0 ? Math.round((reqMatched / reqTotal) * 1000) / 10 : 100;
+            resolution.confidence = conf;
+            resolution.matched_required = reqMatched;
+            resolution.total_required = reqTotal;
+            if (conf >= 90) {
+              auditConfidenceBadge.className = 'audit-badge ok';
+              auditConfidenceBadge.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${conf}% de Confiança - Mapeamento Automático Perfeito`;
+            } else if (conf >= 70) {
+              auditConfidenceBadge.className = 'audit-badge warn';
+              auditConfidenceBadge.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${conf}% de Confiança - Algumas colunas não foram localizadas`;
+            } else {
+              auditConfidenceBadge.className = 'audit-badge danger';
+              auditConfidenceBadge.innerHTML = `<i class="fa-solid fa-circle-xmark"></i> ${conf}% de Confiança - Estrutura divergente`;
+            }
+            auditSummaryText.innerHTML = `Tipo identificado: <strong>${catName}</strong> &bull; <strong>${reqMatched} de ${reqTotal}</strong> colunas essenciais localizadas dinamicamente, independente da posição no Excel original.`;
+          };
+
           resolution.audit_details.forEach(item => {
             const tr = document.createElement('tr');
-
             const reqStar = item.is_required ? '<span style="color:#ef4444; font-weight:700;">*</span>' : '';
-            const colPos = item.raw_header
-              ? `<span style="font-family:monospace; font-weight:600; color:var(--primary);">Coluna ${item.col_letter}</span> <span style="font-size:0.75rem; color:var(--text-dim);">(Índice ${item.col_index + 1})</span>`
-              : `<span style="color:var(--text-dim);">-</span>`;
 
-            let statusBadge = '';
-            if (item.status === 'matched') {
-              statusBadge = `<span class="audit-badge ok"><i class="fa-solid fa-check"></i> Identificado</span>`;
-            } else if (item.is_required) {
-              statusBadge = `<span class="audit-badge danger"><i class="fa-solid fa-triangle-exclamation"></i> Obrigatória Ausente</span>`;
-            } else {
-              statusBadge = `<span class="audit-badge warn">Opcional</span>`;
-            }
+            // Dropdown de seleção manual caso o usuário queira verificar ou alternar qualquer coluna
+            const select = document.createElement('select');
+            select.className = 'form-select audit-col-dropdown';
+            select.style.cssText = 'font-size:0.8rem; padding:4px 8px; border-radius:6px; max-width:240px; width:100%; background:var(--bg-card); color:var(--text-main); border:1px solid var(--border-color);';
 
-            const rawColName = item.raw_header
-              ? `<strong style="color:var(--text-main); font-size:0.8rem;">${item.raw_header}</strong>`
-              : `<span style="color:var(--text-dim); font-size:0.78rem; font-style:italic;">Não encontrada</span>`;
+            const optNone = document.createElement('option');
+            optNone.value = -1;
+            optNone.textContent = '-- Não mapeada / Ausente --';
+            select.appendChild(optNone);
 
-            tr.innerHTML = `
-              <td><strong>${item.label}</strong> ${reqStar}</td>
-              <td>${rawColName}</td>
-              <td>${colPos}</td>
-              <td>${statusBadge}</td>
-            `;
+            headers.forEach((h, hIdx) => {
+              const opt = document.createElement('option');
+              opt.value = hIdx;
+              opt.textContent = `Coluna ${getColLetter(hIdx)}: ${h}`;
+              if (hIdx === item.col_index) opt.selected = true;
+              select.appendChild(opt);
+            });
+
+            const tdPos = document.createElement('td');
+            const tdBadge = document.createElement('td');
+
+            const renderStatus = () => {
+              if (item.col_index >= 0) {
+                tdPos.innerHTML = `<span style="font-family:monospace; font-weight:600; color:var(--primary);">Coluna ${getColLetter(item.col_index)}</span> <span style="font-size:0.75rem; color:var(--text-dim);">(Índice ${item.col_index + 1})</span>`;
+                tdBadge.innerHTML = `<span class="audit-badge ok"><i class="fa-solid fa-check"></i> Identificado</span>`;
+              } else if (item.is_required) {
+                tdPos.innerHTML = `<span style="color:var(--text-dim);">-</span>`;
+                tdBadge.innerHTML = `<span class="audit-badge danger"><i class="fa-solid fa-triangle-exclamation"></i> Obrigatória Ausente</span>`;
+              } else {
+                tdPos.innerHTML = `<span style="color:var(--text-dim);">-</span>`;
+                tdBadge.innerHTML = `<span class="audit-badge warn">Opcional</span>`;
+              }
+            };
+            renderStatus();
+
+            select.addEventListener('change', () => {
+              const newIdx = parseInt(select.value, 10);
+              item.col_index = newIdx;
+              if (newIdx >= 0) {
+                item.raw_header = headers[newIdx];
+                item.col_letter = getColLetter(newIdx);
+                item.status = 'matched';
+                resolution.resolved_map[item.canonical_key] = headers[newIdx];
+                resolution.resolved_indices[item.canonical_key] = newIdx;
+              } else {
+                item.raw_header = null;
+                item.col_letter = '-';
+                item.status = item.is_required ? 'missing_required' : 'missing_optional';
+                delete resolution.resolved_map[item.canonical_key];
+                delete resolution.resolved_indices[item.canonical_key];
+              }
+              renderStatus();
+              updateConfidenceBadge();
+            });
+
+            const tdLabel = document.createElement('td');
+            tdLabel.innerHTML = `<strong>${item.label}</strong> ${reqStar}`;
+
+            const tdSelect = document.createElement('td');
+            tdSelect.appendChild(select);
+
+            tr.appendChild(tdLabel);
+            tr.appendChild(tdSelect);
+            tr.appendChild(tdPos);
+            tr.appendChild(tdBadge);
             auditTbody.appendChild(tr);
           });
         }
@@ -4389,7 +4600,7 @@ function processarArquivoUploadLocal(file, analysis) {
 
       const { headerRowIdx, headers } = findHeaderRow(sheet);
       const targetCat = (analysis && analysis.category) ? analysis.category : ExatiColumnResolver.detectDatasetType(headers);
-      const resolution = ExatiColumnResolver.resolveColumns(headers, targetCat);
+      const resolution = (analysis && analysis.resolution) ? analysis.resolution : ExatiColumnResolver.resolveColumns(headers, targetCat);
 
       // Ler linhas respeitando a linha onde o cabeçalho foi detectado
       const rawRows = XLSX.utils.sheet_to_json(sheet, { range: headerRowIdx });

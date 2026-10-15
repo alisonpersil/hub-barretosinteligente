@@ -216,10 +216,10 @@
 
         if (!filtered.length) {
             timelineContainer.innerHTML = `
-                <div style="text-align: center; padding: 48px 20px; background: rgba(22, 17, 43, 0.4); border: 1px dashed rgba(255, 42, 133, 0.3); border-radius: 20px;">
+                <div class="book-empty-state">
                     <i class="fa-solid fa-satellite-dish" style="font-size: 38px; color: #ff2a85; margin-bottom: 14px; display: block;"></i>
-                    <h3 style="color: #fff; font-size: 18px; margin: 0 0 6px;">Nenhum marco encontrado</h3>
-                    <p style="color: #9f97b5; font-size: 13.5px; margin: 0;">Tente outro termo na busca ou selecione "Todas as Missões".</p>
+                    <h3 class="empty-state-title">Nenhum marco encontrado</h3>
+                    <p class="empty-state-desc">Tente outro termo na busca ou selecione "Todas as Missões".</p>
                 </div>
             `;
             return;

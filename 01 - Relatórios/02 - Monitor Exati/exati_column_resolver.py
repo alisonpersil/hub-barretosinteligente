@@ -23,47 +23,64 @@ def normalize_header(h: Any) -> str:
     # Decompor caracteres acentuados
     h = unicodedata.normalize('NFKD', h)
     h = ''.join(c for c in h if not unicodedata.combining(c))
-    # Tratar caracteres corrompidos comuns em planilhas Exati antigas (\ufffd, ?, etc.)
-    h = re.sub(r'[\ufffd\?\_\-\.\:\/\\\,]', ' ', h)
+    # Tratar artefatos de encoding corrompidos comuns em exportações do Exati
+    h = re.sub(r'solicita[\ufffd\?\_\s]*o', 'solicitacao', h, flags=re.I)
+    h = re.sub(r'ocorren[\ufffd\?\_\s]*a', 'ocorrencia', h, flags=re.I)
+    h = re.sub(r'munic[\ufffd\?\_\s]*pio', 'municipio', h, flags=re.I)
+    h = re.sub(r'conclus[\ufffd\?\_\s]*o', 'conclusao', h, flags=re.I)
+    h = re.sub(r'situa[\ufffd\?\_\s]*o', 'situacao', h, flags=re.I)
+    h = re.sub(r'servi[\ufffd\?\_\s]*o', 'servico', h, flags=re.I)
+    h = re.sub(r'reclamac[\ufffd\?\_\s]*o', 'reclamacao', h, flags=re.I)
+    # Tratar caracteres corrompidos e pontuação (\ufffd, ?, etc.)
+    h = re.sub(r'[\ufffd\?\_\-\.\:\/\\\,\(\)\[\]]', ' ', h)
     # Remover múltiplos espaços
     h = re.sub(r'\s+', ' ', h).strip()
     return h
+
+
+def strip_stopwords(text: str) -> str:
+    """Remove stopwords comuns em português para comparação semântica invariante."""
+    if not text:
+        return ""
+    stopwords = {'de', 'da', 'do', 'dos', 'das', 'e', 'em', 'no', 'na', 'd', 'a', 'o'}
+    tokens = [w for w in text.split() if w not in stopwords]
+    return ' '.join(tokens).strip()
 
 
 # Dicionário Canônico de Aliases para ATENDIDOS (SGI / Concluídos)
 ATENDIDOS_SCHEMA = {
     'os': [
         'atendimento', 'os', 'ordem de servico', 'ordem servico', 'num atendimento',
-        'numero atendimento', 'id atendimento', 'chamado', 'numero os', 'num os'
+        'numero atendimento', 'id atendimento', 'chamado', 'numero os', 'num os', 'id'
     ],
     'protocolo': [
         'protocolo', 'num protocolo', 'numero protocolo', 'cod protocolo', 'protocolo atendimento'
     ],
     'data_inicio': [
         'data inicial atendimento', 'data inicial', 'dt inicio', 'data inicio',
-        'inicio atendimento', 'dt inicial', 'hora inicio'
+        'inicio atendimento', 'dt inicial', 'hora inicio', 'data abertura', 'dt abertura'
     ],
     'data_fim': [
         'data conclusao atendimento', 'data conclusao', 'dt conclusao', 'data fim',
-        'dt fim', 'conclusao atendimento', 'termino atendimento', 'data termino'
+        'dt fim', 'conclusao atendimento', 'termino atendimento', 'data termino', 'data finalizacao'
     ],
     'data_reclamacao': [
         'data da reclamacao', 'data de reclamacao', 'data reclamacao', 'dt reclamacao',
-        'dt rec', 'reclamacao data', 'hora reclamacao'
+        'dt rec', 'reclamacao data', 'hora reclamacao', 'data da ocorrencia', 'data ocorrencia'
     ],
     'origem': [
-        'origem da ocorrencia', 'origem ocorrencia', 'origem da solicitacao',
+        'origem da ocorrencia', 'origem de ocorrencia', 'origem ocorrencia', 'origem da solicitacao',
         'origem solicitacao', 'origem', 'canal de entrada', 'canal', 'canal reclamacao'
     ],
     'bairro': [
-        'bairro', 'bairros', 'nome bairro', 'bairro atendimento'
+        'bairro', 'bairros', 'nome bairro', 'bairro atendimento', 'localidade', 'regiao'
     ],
     'equipe': [
-        'equipe', 'nome equipe', 'equipe responsavel', 'equipe executora'
+        'equipe', 'nome equipe', 'equipe responsavel', 'equipe executora', 'turma', 'tecnico'
     ],
     'tipo_ocorrencia': [
-        'tipo ocorrencia', 'tipo de ocorrencia', 'ocorrencia', 'defeito',
-        'defeito reclamado', 'motivo', 'tipo defeito', 'tipo servico'
+        'tipo ocorrencia', 'tipo da ocorrencia', 'tipo de ocorrencia', 'ocorrencia', 'defeito',
+        'defeito reclamado', 'motivo', 'tipo defeito', 'tipo servico', 'servico'
     ],
     'solucao': [
         'solucao', 'solucao aplicada', 'servico realizado', 'acao realizada', 'descricao solucao'
@@ -86,42 +103,51 @@ ATENDIDOS_SCHEMA = {
 # Dicionário Canônico de Aliases para PENDENTES (Backlog / Ordens em Aberto)
 PENDENTES_SCHEMA = {
     'id_solicitacao': [
-        'id solicitacao', 'solicitacao id', 'num solicitacao', 'chamado',
-        'id', 'numero solicitacao'
+        'id solicitacao', 'id da solicitacao', 'solicitacao id', 'num solicitacao', 'chamado',
+        'id', 'numero solicitacao', 'cod solicitacao'
     ],
     'protocolo': [
-        'protocolo', 'num protocolo', 'numero protocolo', 'cod protocolo'
+        'protocolo', 'num protocolo', 'numero protocolo', 'cod protocolo', 'protocolo exati'
     ],
     'data_solicitacao': [
         'data de solicitacao', 'data da solicitacao', 'data solicitacao',
-        'dt solicitacao', 'dt abertura', 'data abertura', 'data da reclamacao'
+        'data da ocorrencia', 'data de ocorrencia', 'data ocorrencia',
+        'data de abertura', 'data da abertura', 'data abertura',
+        'data do chamado', 'data chamado', 'data cadastro', 'data de cadastro',
+        'data criacao', 'abertura', 'criacao',
+        'dt solicitacao', 'dt da solicitacao', 'dt abertura', 'dt ocorrencia', 'dt cadastro',
+        'data e hora', 'data hora', 'data/hora', 'data', 'dt'
     ],
     'origem': [
-        'origem solicitacao', 'origem da solicitacao', 'origem da ocorrencia',
-        'origem ocorrencia', 'origem', 'canal entrada'
+        'origem da ocorrencia', 'origem de ocorrencia', 'origem ocorrencia',
+        'origem solicitacao', 'origem da solicitacao', 'origem de solicitacao',
+        'origem', 'canal', 'canal de entrada', 'canal entrada', 'meio abertura'
     ],
     'pontos': [
-        'pontos de solicitacao', 'pontos solicitacao', 'qtd pontos',
-        'pontos fisicos', 'pontos', 'quantidade pontos', 'num pontos'
+        'pontos de solicitacao', 'pontos da solicitacao', 'pontos solicitacao',
+        'pontos', 'quantidade pontos', 'quantidade de pontos', 'qtd pontos',
+        'pontos fisicos', 'num pontos', 'numero pontos'
     ],
     'bairro': [
-        'bairros', 'bairro', 'nome bairro', 'bairro solicitacao'
+        'bairros', 'bairro', 'nome bairro', 'bairro solicitacao', 'localidade', 'regiao',
+        'endereco', 'logradouro', 'municipio', 'nome municipio'
     ],
     'solicitante': [
-        'nome solicitante', 'solicitante', 'reclamante', 'nome reclamante', 'municipe'
+        'nome solicitante', 'nome do solicitante', 'solicitante', 'telefone solicitante',
+        'contato', 'contato solicitante', 'reclamante', 'nome reclamante', 'municipe', 'cidadao'
     ],
     'atendente': [
-        'nome atendente', 'atendente', 'operador', 'criado por'
+        'nome atendente', 'nome do atendente', 'atendente', 'operador', 'criado por', 'responsavel'
     ],
     'tempo_restante': [
-        'tempo restante', 'prazo restante', 'status sla', 'tempo sla',
-        'sla restante', 'tempo restante sla'
+        'tempo restante', 'prazo restante', 'prazo restante sla', 'tempo restante sla',
+        'status sla', 'tempo sla', 'sla restante', 'tempo', 'prazo', 'sla'
     ],
     'parque': [
-        'nome parque', 'parque', 'parque de servico', 'municipio'
+        'nome parque', 'parque', 'parque de servico', 'municipio', 'nome municipio', 'cidade', 'unidade'
     ],
     'status': [
-        'status', 'status solicitacao', 'situacao', 'estado'
+        'status', 'status solicitacao', 'status atendimento', 'situacao', 'estado', 'fase'
     ]
 }
 
@@ -192,17 +218,49 @@ def resolve_columns(columns: List[Any], dataset_type: Optional[str] = None) -> T
                 matched_alias = alias
                 break
 
-        # 2. Se não encontrou, correspondência parcial (contém substring do alias principal)
+        # 2. Correspondência sem stopwords (ex: 'data da solicitacao' == 'data de solicitacao')
+        if not found_orig:
+            for alias in aliases:
+                s_alias = strip_stopwords(normalize_header(alias))
+                for norm_col in normalized_list:
+                    s_col = strip_stopwords(norm_col)
+                    if s_alias and s_col and (s_alias == s_col or s_alias in s_col or s_col in s_alias):
+                        found_orig = col_dict[norm_col]
+                        matched_alias = f"stopwords({alias})"
+                        break
+                if found_orig:
+                    break
+
+        # 3. Se não encontrou, correspondência parcial (contém substring do alias principal)
         if not found_orig:
             for alias in aliases:
                 norm_alias = normalize_header(alias)
                 for norm_col in normalized_list:
-                    # Se o alias estiver contido na coluna ou vice-versa
-                    if norm_alias in norm_col or (len(norm_alias) > 5 and norm_col in norm_alias):
+                    if norm_alias in norm_col or (len(norm_alias) > 4 and norm_col in norm_alias):
                         found_orig = col_dict[norm_col]
                         matched_alias = f"substring({alias})"
                         break
                 if found_orig:
+                    break
+
+        # 4. Heurística de resgate para colunas críticas
+        if not found_orig:
+            for norm_col in normalized_list:
+                if canonical_key in ('data_solicitacao', 'data_inicio') and ('data' in norm_col or 'dt' in norm_col):
+                    found_orig = col_dict[norm_col]
+                    matched_alias = "heuristica(data)"
+                    break
+                elif canonical_key == 'tempo_restante' and ('prazo' in norm_col or 'sla' in norm_col or 'restante' in norm_col):
+                    found_orig = col_dict[norm_col]
+                    matched_alias = "heuristica(tempo_restante)"
+                    break
+                elif canonical_key == 'pontos' and 'ponto' in norm_col:
+                    found_orig = col_dict[norm_col]
+                    matched_alias = "heuristica(pontos)"
+                    break
+                elif canonical_key == 'origem' and ('origem' in norm_col or 'canal' in norm_col):
+                    found_orig = col_dict[norm_col]
+                    matched_alias = "heuristica(origem)"
                     break
 
         if found_orig:
