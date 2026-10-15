@@ -1277,20 +1277,39 @@ NOME_AGENTE_MAP = {
     "p1-qa": "QA & Rotas"
 }
 
-def obter_dify_api_key(agente_chave=None):
+def obter_dify_config():
     if os.path.exists(DIFY_CONFIG_FILE):
         try:
             with open(DIFY_CONFIG_FILE, "r", encoding="utf-8") as f:
-                d = json.load(f)
-                keys_map = d.get("api_keys", {})
-                if agente_chave and agente_chave in keys_map:
-                    return keys_map[agente_chave].strip()
-                return d.get("default_api_key") or d.get("api_key", "").strip()
+                return json.load(f)
         except Exception:
             pass
+    return {}
+
+def ia_externa_habilitada():
+    """Retorna True apenas se o usuário expressamente ativou o consumo de IA externa."""
+    if os.environ.get("HABILITAR_IA_EXTERNA", "").lower() in ["true", "1", "sim"]:
+        return True
+    cfg = obter_dify_config()
+    return bool(cfg.get("habilitar_ia_externa", False) or cfg.get("dify_ativo", False))
+
+def fallback_gemini_permitido():
+    cfg = obter_dify_config()
+    return bool(cfg.get("permitir_fallback_gemini", False))
+
+def obter_dify_api_key(agente_chave=None):
+    cfg = obter_dify_config()
+    if cfg:
+        keys_map = cfg.get("api_keys", {})
+        if agente_chave and agente_chave in keys_map:
+            return keys_map[agente_chave].strip()
+        return (cfg.get("default_api_key") or cfg.get("api_key", "")).strip()
     return os.environ.get("DIFY_API_KEY", "").strip()
 
 def consultar_dify(agente_chave, titulo, descricao=""):
+    if not ia_externa_habilitada():
+        print(f"[Dify API] Chamada suprimida para {agente_chave} ('{titulo[:30]}...'): Modo Economia Ativo (Zero Tokens).")
+        return None, None
     key = obter_dify_api_key(agente_chave)
     if not key:
         return None, None
@@ -1861,27 +1880,42 @@ def salvar_estado_agentes():
         print(f"[Estado Agentes] Falha ao salvar: {err}")
 
 def resolver_tarefa_ia(chave, t):
-    """Executa a ação real + Dify/Gemini e grava o parecer na tarefa."""
+    """Executa a ação real + Dify/Gemini e grava o parecer na tarefa de forma segura e idempotente.
+    NUNCA consome tokens a menos que expressamente autorizado pelo usuário."""
+    if t.get("ia_executada"):
+        return
+    t["ia_executada"] = True
     try:
         acoes = executar_acao_tarefa(t["titulo"], t.get("descricao", ""), chave)
-        resp, mod_nome = consultar_dify(chave, t["titulo"], t.get("descricao", ""))
+        resp = None
+        mod_nome = None
+
+        # Apenas consulta Dify/Gemini se o usuário pediu explicitamente e a IA externa estiver habilitada
+        if t.get("acionar_ia") and ia_externa_habilitada():
+            resp, mod_nome = consultar_dify(chave, t["titulo"], t.get("descricao", ""))
+            if not resp and fallback_gemini_permitido() and t.get("permitir_fallback_gemini"):
+                resp, mod_nome = chamar_gemini(chave, t["titulo"], t.get("descricao", ""), acoes_executadas=acoes)
+
         if not resp:
-            resp, mod_nome = chamar_gemini(chave, t["titulo"], t.get("descricao", ""), acoes_executadas=acoes)
+            resp = parecer_contingencia(chave, t["titulo"], t.get("descricao", ""))
+            mod_nome = "CCO Automação Local (Zero Tokens)"
+
         if acoes:
             resp += "\n\n**Ações Reais Executadas no Sistema & Arquivos:**\n" + "\n".join(f"• {a}" for a in acoes)
         t["resultado_ia"] = resp
         t["modelo_ia"] = mod_nome
         t["acoes_executadas"] = acoes
-        t["etapa"] = f"{mod_nome} concluiu a execução real com sucesso. Homologado!"
+        t["etapa"] = f"{mod_nome} concluiu a execução com sucesso. Homologado!"
     except Exception as err:
         print(f"[Worker IA Error]: {err}")
-        t["resultado_ia"] = "Execução homologada com conformidade pelo CCO."
+        t["resultado_ia"] = parecer_contingencia(chave, t.get("titulo", "Operação CCO"), t.get("descricao", ""))
         t["modelo_ia"] = "CCO Auditoria"
     finally:
         t["chamando_ia"] = False
 
 def avancar_agentes():
-    """Avança o progresso pelo tempo decorrido, conclui tarefas e promove a fila. Retorna True se mudou algo."""
+    """Avança o progresso pelo tempo decorrido, conclui tarefas e promove a fila.
+    NUNCA dispara chamadas a APIs externas de IA durante navegação/polling."""
     now = datetime.now()
     mudou = False
     for chave, ag in list(AGENTS_TASKS.items()):
@@ -1895,34 +1929,7 @@ def avancar_agentes():
             t["iniciado_em"] = now.isoformat()
         elapsed = max(0, (now - iniciado).total_seconds())
 
-        cap = 100
-        if t.get("origem_usuario") and not t.get("resultado_ia"):
-            cap = 92
-            stale = True
-            if t.get("chamando_ia") and t.get("chamando_em"):
-                try:
-                    stale = (now - datetime.fromisoformat(t["chamando_em"])).total_seconds() > 25
-                except Exception:
-                    stale = True
-            if not t.get("chamando_ia") or stale:
-                if elapsed > 120:
-                    t["resultado_ia"] = "Execução homologada com conformidade pelo CCO."
-                    t["modelo_ia"] = "CCO Auditoria"
-                    cap = 100
-                else:
-                    t["chamando_ia"] = True
-                    t["chamando_em"] = now.isoformat()
-                    th = threading.Thread(target=resolver_tarefa_ia, args=(chave, t), daemon=True)
-                    th.start()
-                    th.join(timeout=8)
-                    if t.get("resultado_ia"):
-                        cap = 100
-                mudou = True
-            if not t.get("resultado_ia"):
-                nome_ag = NOME_AGENTE_MAP.get(chave, "Agente")
-                t["etapa"] = f"{nome_ag} executando via Dify AI e validando no sistema..."
-
-        novo_prog = min(cap, 10 + int(elapsed / 2.5 * 6))
+        novo_prog = min(100, 10 + int(elapsed / 2.5 * 6))
         novo_prog = max(novo_prog, int(t.get("progresso", 0)))
         if novo_prog != t.get("progresso"):
             t["progresso"] = novo_prog
@@ -1932,14 +1939,19 @@ def avancar_agentes():
 
         if novo_prog >= 100:
             mudou = True
+            resultado_final = t.get("resultado_ia")
+            if not resultado_final:
+                resultado_final = parecer_contingencia(chave, t["titulo"], t.get("descricao", ""))
+            modelo_final = t.get("modelo_ia") or "CCO Automação Local"
+
             ag["historico"].insert(0, {
                 "id": t["id"],
                 "titulo": t["titulo"],
                 "concluido_em": now.strftime("%H:%M"),
                 "duracao": f"{max(1, t.get('duracao_min', 1))} min",
                 "status": "concluido",
-                "resultado": t.get("resultado_ia") or "Execução 100% concluída e homologada pelo CCO.",
-                "modelo": t.get("modelo_ia") or "Gemini Flash Lite"
+                "resultado": resultado_final,
+                "modelo": modelo_final
             })
             if ag.get("fila"):
                 prox = ag["fila"].pop(0)
@@ -1955,7 +1967,8 @@ def avancar_agentes():
                     "etapa": "Iniciando processamento da fila...",
                     "resultado_ia": None,
                     "chamando_ia": False,
-                    "origem_usuario": prox.get("origem_usuario", False)
+                    "origem_usuario": False,
+                    "acionar_ia": False
                 }
                 ag["estado"] = "trabalhando"
             else:
@@ -2093,6 +2106,7 @@ def api_criar_tarefa():
     descricao = data.get("descricao", "").strip()
     modo = data.get("modo", "agora")  # 'agora' ou 'fila'
     prioridade = data.get("prioridade", "Alta")
+    acionar_ia = bool(data.get("acionar_ia", False))
 
     if not agente_chave or not titulo:
         return jsonify({"success": False, "error": "Agente e título são obrigatórios."}), 400
@@ -2122,7 +2136,8 @@ def api_criar_tarefa():
         "previsao_min": 1,
         "prioridade": prioridade,
         "etapa": "Iniciando processamento autônomo...",
-        "origem_usuario": True
+        "origem_usuario": True,
+        "acionar_ia": acionar_ia
     }
 
     if modo == "agora":
@@ -2134,19 +2149,24 @@ def api_criar_tarefa():
                 "descricao": ag["tarefa_atual"]["descricao"],
                 "adicionado_em": now.strftime("%H:%M"),
                 "prioridade": ag["tarefa_atual"]["prioridade"],
-                "origem_usuario": ag["tarefa_atual"].get("origem_usuario", False)
+                "origem_usuario": False,
+                "acionar_ia": False
             })
         nova_tarefa["resultado_ia"] = None
         nova_tarefa["modelo_ia"] = None
-        nova_tarefa["chamando_ia"] = True
+        nova_tarefa["chamando_ia"] = acionar_ia
         nova_tarefa["chamando_em"] = now.isoformat()
         ag["tarefa_atual"] = nova_tarefa
         ag["estado"] = "trabalhando"
 
-        # Executa dentro da própria requisição (threads não sobrevivem em serverless/Vercel)
-        t_thread = threading.Thread(target=resolver_tarefa_ia, args=(agente_chave, nova_tarefa), daemon=True)
-        t_thread.start()
-        t_thread.join(timeout=8)
+        # Apenas dispara thread se expressamente solicitado e com chave ativa
+        if acionar_ia and ia_externa_habilitada():
+            t_thread = threading.Thread(target=resolver_tarefa_ia, args=(agente_chave, nova_tarefa), daemon=True)
+            t_thread.start()
+            t_thread.join(timeout=8)
+        else:
+            # Resolução local padrão (CCO Local - 0 tokens)
+            resolver_tarefa_ia(agente_chave, nova_tarefa)
     else:
         # Enfileira
         ag["fila"].append({
@@ -2155,7 +2175,8 @@ def api_criar_tarefa():
             "descricao": descricao,
             "adicionado_em": now.strftime("%H:%M"),
             "prioridade": prioridade,
-            "origem_usuario": True
+            "origem_usuario": True,
+            "acionar_ia": acionar_ia
         })
 
     return jsonify({"success": True, "agente": ag, "mensagem": f"Tarefa {'iniciada imediatamente' if modo == 'agora' else 'adicionada à fila'} com sucesso!"})
@@ -2171,6 +2192,18 @@ def api_pausar_tarefa():
 
     ag["estado"] = "aguardando"
     return jsonify({"success": True, "agente": ag, "mensagem": "Agente pausado com sucesso."})
+
+@app.route("/api/agentes/tarefas/retomar", methods=["POST"])
+def api_retomar_tarefa():
+    """Retoma um agente em pausa sem reiniciar nem duplicar chamadas de API."""
+    data = request.get_json(force=True, silent=True) or {}
+    agente_chave = data.get("agente_chave")
+    ag = AGENTS_TASKS.get(agente_chave)
+    if not ag:
+        return jsonify({"success": False, "error": "Agente não encontrado."}), 404
+
+    ag["estado"] = "trabalhando"
+    return jsonify({"success": True, "agente": ag, "mensagem": "Agente retomou a execução."})
 
 @app.route("/api/agentes/tarefas/concluir", methods=["POST"])
 def api_concluir_tarefa():
@@ -2274,19 +2307,33 @@ def api_promover_fila():
 def api_dify_config():
     if request.method == "POST":
         data = request.get_json(force=True, silent=True) or {}
+        cfg = obter_dify_config()
+        if "habilitar_ia_externa" in data:
+            cfg["habilitar_ia_externa"] = bool(data["habilitar_ia_externa"])
+        if "dify_ativo" in data:
+            cfg["dify_ativo"] = bool(data["dify_ativo"])
+        if "permitir_fallback_gemini" in data:
+            cfg["permitir_fallback_gemini"] = bool(data["permitir_fallback_gemini"])
         new_key = data.get("api_key", "").strip()
         if new_key:
+            cfg["default_api_key"] = new_key
+        try:
             with open(DIFY_CONFIG_FILE, "w", encoding="utf-8") as f:
-                json.dump({"api_key": new_key, "app_code": "1C2EOSw9M2vaqcXM", "updated_at": datetime.now().isoformat()}, f, indent=2)
-            return jsonify({"success": True, "mensagem": "Chave da API do Dify configurada com sucesso!"})
-        return jsonify({"success": False, "error": "Chave não informada."}), 400
+                json.dump(cfg, f, indent=2, ensure_ascii=False)
+            return jsonify({"success": True, "mensagem": "Configurações de IA salvas com sucesso!", "config": cfg})
+        except Exception as e:
+            return jsonify({"success": False, "error": str(e)}), 500
     
+    cfg = obter_dify_config()
     current_key = obter_dify_api_key()
     is_set = bool(current_key)
     masked = f"{current_key[:6]}...{current_key[-6:]}" if len(current_key) > 12 else ("Configurada" if is_set else "Não configurada")
     return jsonify({
         "configurada": is_set,
         "chave_mascarada": masked,
+        "dify_ativo": bool(cfg.get("dify_ativo", False)),
+        "habilitar_ia_externa": bool(cfg.get("habilitar_ia_externa", False)),
+        "permitir_fallback_gemini": bool(cfg.get("permitir_fallback_gemini", False)),
         "web_url": "https://udify.app/agent/1C2EOSw9M2vaqcXM",
         "app_code": "1C2EOSw9M2vaqcXM"
     })
@@ -2295,10 +2342,19 @@ def api_dify_config():
 def api_dify_chat():
     data = request.get_json(force=True, silent=True) or {}
     query = data.get("query", "").strip()
+    agente_chave = data.get("agente_chave", "p3-main")
     if not query:
         return jsonify({"error": "Mensagem não informada."}), 400
     
-    answer, modelo = consultar_dify(query)
+    if not ia_externa_habilitada():
+        return jsonify({
+            "success": False,
+            "error": "A IA externa do Dify está atualmente no Modo Economia (Zero Tokens). Para conversar diretamente com o robô, ative o interruptor do Dify no painel de configurações.",
+            "modo_economia": True,
+            "web_url": "https://udify.app/agent/1C2EOSw9M2vaqcXM"
+        }), 400
+    
+    answer, modelo = consultar_dify(agente_chave, query)
     if answer:
         return jsonify({"success": True, "answer": answer, "modelo": modelo})
     return jsonify({

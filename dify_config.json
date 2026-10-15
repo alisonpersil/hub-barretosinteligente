@@ -8,5 +8,8 @@
     "p1-qa": "app-43pZFk3t9bbAHJ5RBaaCZiHA"
   },
   "default_api_key": "app-SGldvJFNrPlyRctixLHR3Uqw",
-  "github_repo": "alisonpersil/hub-barretosinteligente"
+  "github_repo": "alisonpersil/hub-barretosinteligente",
+  "dify_ativo": false,
+  "habilitar_ia_externa": false,
+  "permitir_fallback_gemini": false
 }

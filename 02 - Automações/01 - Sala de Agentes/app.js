@@ -462,13 +462,9 @@ function renderLiveTaskPane(agent) {
   $('#btnDrawerTogglePause')?.addEventListener('click', async () => {
     try {
       if (isPaused) {
-        // Retoma: envia para criar ou mudar estado
-        await request('POST', '/agentes/tarefas/criar', {
-          agente_chave: agent.chave,
-          titulo: t.titulo,
-          descricao: t.descricao,
-          modo: 'agora',
-          prioridade: t.prioridade
+        // Retoma a execução sem duplicar tarefas nem acionar chamadas involuntárias
+        await request('POST', '/agentes/tarefas/retomar', {
+          agente_chave: agent.chave
         });
       } else {
         await request('POST', '/agentes/tarefas/pausar', { agente_chave: agent.chave });
@@ -676,6 +672,7 @@ function setupDrawerEvents() {
     const titulo = $('#drawerTaskTitle').value.trim();
     const descricao = $('#drawerTaskDesc').value.trim();
     const modo = $('input[name="drawerDispatchMode"]:checked')?.value || 'agora';
+    const acionar_ia = !!$('#drawerTaskUseAi')?.checked;
 
     try {
       const res = await request('POST', '/agentes/tarefas/criar', {
@@ -683,7 +680,8 @@ function setupDrawerEvents() {
         titulo,
         descricao,
         modo,
-        prioridade: 'Alta'
+        prioridade: 'Alta',
+        acionar_ia
       });
 
       // Limpa formulário
@@ -757,6 +755,7 @@ function setupGlobalModalEvents() {
     const titulo = $('#globalTaskTitle').value.trim();
     const descricao = $('#globalTaskDesc').value.trim();
     const modo = $('input[name="globalDispatchMode"]:checked')?.value || 'agora';
+    const acionar_ia = !!$('#globalTaskUseAi')?.checked;
 
     try {
       const res = await request('POST', '/agentes/tarefas/criar', {
@@ -764,7 +763,8 @@ function setupGlobalModalEvents() {
         titulo,
         descricao,
         modo,
-        prioridade: 'Alta'
+        prioridade: 'Alta',
+        acionar_ia
       });
 
       closeModal();
