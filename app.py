@@ -576,16 +576,74 @@ def api_upload_exati():
         cmd = [sys.executable, os.path.join(EXATI_DIR, "build_dashboard_data.py")]
         proc = subprocess.run(cmd, cwd=EXATI_DIR, capture_output=True, text=True)
 
+        # Captura automática do evento de upload e enfileiramento para 'O chefe' (p3-main)
+        task_info = {}
+        try:
+            carregar_estado_agentes()
+            chefe = AGENTS_TASKS.get("p3-main")
+            if not chefe:
+                for k, a in AGENTS_TASKS.items():
+                    if a.get("tipo") == "O chefe" or k in ("p3-main", "p0-chefe"):
+                        chefe = a
+                        break
+
+            if chefe:
+                now_dt = datetime.now()
+                task_id = f"tsk-upload-{int(now_dt.timestamp())}"
+                sucesso = (proc.returncode == 0)
+                status_txt = "Consolidação e sincronização concluídas com sucesso" if sucesso else "Alerta: Falha na execução do construtor de dados"
+                prioridade = "Alta" if sucesso else "Crítica"
+                
+                titulo_tarefa = f"Auditoria da planilha '{filename}' ({subfolder})"
+                desc_tarefa = (
+                    f"Planilha '{filename}' enviada pelo usuário para 'Base de dados/{subfolder}'. "
+                    f"Resultado da sincronização: {status_txt}. "
+                    f"Auditoria multi-arquivos e reconciliação de chamados ativos registrada em backlog para validação do Chefe. "
+                    f"Status IA: mantida em fila segura (Zero Tokens) aguardando ativação no painel."
+                )
+                if not sucesso and proc.stderr:
+                    desc_tarefa += f" Detalhes do erro capturado: {proc.stderr[-200:].strip()}"
+
+                nova_tarefa = {
+                    "id": task_id,
+                    "titulo": titulo_tarefa,
+                    "descricao": desc_tarefa,
+                    "adicionado_em": now_dt.strftime("%H:%M"),
+                    "prioridade": prioridade,
+                    "origem_usuario": True,
+                    "acionar_ia": False  # Zero tokens: mantido em backlog até o usuário resolver ativar o agente
+                }
+                chefe.setdefault("fila", []).append(nova_tarefa)
+                salvar_estado_agentes()
+                task_info = {
+                    "queued": True,
+                    "task_id": task_id,
+                    "agent": "p3-main",
+                    "title": titulo_tarefa
+                }
+        except Exception as e_task:
+            print(f"[Upload Task Enqueue Error]: {e_task}")
+
+        resp_success = (proc.returncode == 0)
+        msg = (
+            f"Planilha '{filename}' identificada ({target_category.upper()}) com sucesso e sincronizada! "
+            f"Tarefa de auditoria enviada para o backlog do agente Chefe."
+            if resp_success else
+            f"A planilha '{filename}' foi recebida, mas ocorreu erro no processamento. "
+            f"O incidente foi capturado e enviado para o backlog do agente Chefe para tratamento."
+        )
+
         return jsonify({
-            "success": proc.returncode == 0,
+            "success": resp_success,
             "filename": filename,
             "category": target_category,
             "folder": subfolder,
             "audit": audit,
-            "message": f"Planilha '{filename}' identificada ({target_category.upper()}) com sucesso e sincronizada!",
+            "task": task_info,
+            "message": msg,
             "stdout": proc.stdout[-300:] if proc.stdout else "",
             "stderr": proc.stderr[-300:] if proc.stderr else ""
-        }), (200 if proc.returncode == 0 else 500)
+        }), (200 if resp_success else 500)
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
@@ -1977,7 +2035,7 @@ def avancar_agentes():
     return mudou
 
 def _rota_estado_agentes():
-    return request.path.startswith(("/api/agentes", "/api/painel", "/api/sessoes"))
+    return request.path.startswith(("/api/agentes", "/api/painel", "/api/sessoes", "/api/upload", "/exati/api/upload"))
 
 @app.before_request
 def _agentes_antes_da_requisicao():

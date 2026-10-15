@@ -642,6 +642,7 @@ function applyDateFilter(inicioStr, fimStr, nomePreset, notify = true) {
   setVal('kpi-backlog-pontos', totPendPts + ' pts');
   setVal('kpi-backlog-vencidos', pendVenc);
   setVal('kpi-backlog-prazo', pendPrazo);
+  setVal('badge-backlog-count', totPendCham);
 
   const elBacklogMom = document.getElementById('kpi-backlog-mom');
   if (elBacklogMom) {
@@ -1806,8 +1807,8 @@ function renderChartEvolucaoPendentes() {
   };
 
   const kpis = dashboardData.kpis || {};
-  const totPontos = kpis.total_pendentes_pontos || 32;
-  const totChamados = kpis.total_pendentes_chamados || 11;
+  const totPontos = kpis.total_pendentes_pontos !== undefined ? kpis.total_pendentes_pontos : 39;
+  const totChamados = kpis.total_pendentes_chamados !== undefined ? kpis.total_pendentes_chamados : 30;
   const lista = dashboardData.pendentes_lista || [];
   const rondaPts = lista.filter(p => p.origem && p.origem.includes('Ronda')).reduce((a, c) => a + (c.pontos || 1), 0);
   const callPts = Math.max(0, totPontos - rondaPts);
@@ -2418,6 +2419,9 @@ function updateFilterButtonsForPendentes() {
   if (btnPrazo) btnPrazo.textContent = `No Prazo (${prazo})`;
   if (btnRonda) btnRonda.textContent = `Ronda (${rondaPts} pts)`;
   if (btnCall) btnCall.textContent = `Call Center (${callPts} pts)`;
+
+  const badgeBacklog = document.getElementById('badge-backlog-count');
+  if (badgeBacklog) badgeBacklog.textContent = tot;
 }
 
 function renderPendentesTable() {
@@ -2629,8 +2633,12 @@ function renderPendentesTable() {
       ? `<span class="badge badge-warning">Ronda Própria</span>`
       : `<span class="badge badge-info">Call Center</span>`;
 
+    let badgeAuditoria = item.alerta_auditoria
+      ? `<span class="badge" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); margin-left: 6px; font-size: 0.7rem; font-weight: 700; padding: 2px 6px; border-radius: 4px;" title="Ordem auditada: recuperada e preservada no backlog CCO"><i class="fa-solid fa-shield-halved"></i> Preservado CCO</span>`
+      : '';
+
     tr.innerHTML = `
-      <td style="font-weight: 700;">${item.protocolo}</td>
+      <td style="font-weight: 700;">${item.protocolo}${badgeAuditoria}</td>
       <td>${item.data_solicitacao}</td>
       <td>${badgeOrigem}</td>
       <td><span class="badge badge-info" style="font-weight: 700;">${item.pontos} pt${item.pontos > 1 ? 's' : ''}</span></td>
@@ -4609,14 +4617,28 @@ function setupUploadModal() {
           }
 
           modal.classList.remove('active');
-          const successToast = overwriteInfo.updatedToday
+          let successToast = overwriteInfo.updatedToday
             ? `Planilha '${selectedFile.name}' salva! A atualização anterior de hoje foi substituída com sucesso.`
             : `Planilha '${selectedFile.name}' salva com sucesso em 'Base de dados/${result.folder}' e painel 100% atualizado!`;
+          if (result.task && result.task.queued) {
+            successToast += ` Auditoria enviada ao backlog do Chefe.`;
+          }
           showToast(successToast, 'fa-circle-check');
+          return;
+        } else {
+          // Servidor respondeu com código de erro (ex: 500)
+          let errorMsg = 'Falha no processamento da planilha pelo servidor.';
+          try {
+            const errJson = await response.json();
+            if (errJson.message) errorMsg = errJson.message;
+            if (errJson.error) errorMsg += ' (' + errJson.error + ')';
+          } catch (_) {}
+          modal.classList.remove('active');
+          showToast(`Aviso: ${errorMsg}`, 'fa-triangle-exclamation');
           return;
         }
       } catch (err) {
-        console.log('Backend servidor.py indisponível (modo online/standalone ativo). Executando motor autônomo no navegador:', err);
+        console.log('Backend servidor.py/app.py indisponível (modo online/standalone ativo). Executando motor autônomo no navegador:', err);
       }
 
       // 2. Fallback Autônomo Client-Side (quando online no GitHub Pages ou sem servidor Python)

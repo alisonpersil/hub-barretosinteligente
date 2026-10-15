@@ -1,6 +1,7 @@
 import os
 import glob
 import json
+import re
 from datetime import datetime, date
 import pandas as pd
 import numpy as np
@@ -28,129 +29,10 @@ def read_excel_smart_header(file_path, max_rows_scan=10):
         return pd.DataFrame()
 
 
-print("1. Lendo base de Pendentes...")
-pendentes_files = glob.glob(os.path.join(base_dir, "Pendentes", "*.xlsx")) + glob.glob(os.path.join(base_dir, "Pendentes", "*.xls"))
-pendentes_files_sorted = sorted(pendentes_files, key=os.path.getmtime, reverse=True)
-
-# 1.1 Considerar SEMPRE a versão mais recente para o Backlog Ativo
-latest_pendentes_file = pendentes_files_sorted[0] if pendentes_files_sorted else None
-if latest_pendentes_file:
-    print(f"Versão mais recente de Pendentes: {os.path.basename(latest_pendentes_file)}")
-    df_p = read_excel_smart_header(latest_pendentes_file)
-else:
-    df_p = pd.DataFrame()
-
-p_map, p_audit = resolve_columns(df_p.columns, 'pendentes') if not df_p.empty else ({}, {})
-print(f"Pendentes ativos encontrados: {len(df_p)} registros (Confiança Mapeamento: {p_audit.get('confianca_percent', 0)}%)")
-
-# 1.2 Histórico de Snapshots e Linha do Tempo de Tratativa do Backlog
-hist_json_path = os.path.join(output_dir, "historico_backlog.json")
-persistent_history = []
-if os.path.exists(hist_json_path):
-    try:
-        with open(hist_json_path, 'r', encoding='utf-8') as f:
-            persistent_history = json.load(f).get('snapshots', [])
-    except Exception as e:
-        print(f"Erro lendo historico_backlog.json: {e}")
-
-snapshots_map = {item['arquivo']: item for item in persistent_history}
-
-for pf in sorted(pendentes_files, key=os.path.getmtime):
-    fname = os.path.basename(pf)
-    try:
-        mtime = datetime.fromtimestamp(os.path.getmtime(pf))
-        df_s = read_excel_smart_header(pf)
-        s_map, _ = resolve_columns(df_s.columns, 'pendentes') if not df_s.empty else ({}, {})
-        col_pt = s_map.get('pontos')
-        col_tr = s_map.get('tempo_restante')
-        col_orig = s_map.get('origem')
-
-        tot_ch = len(df_s)
-        tot_pt = int(df_s[col_pt].sum()) if col_pt and col_pt in df_s.columns else tot_ch
-        venc = int(df_s[col_tr].astype(str).str.contains('Vencido').sum()) if col_tr and col_tr in df_s.columns else 0
-        ronda_pt = int(df_s[df_s[col_orig].astype(str).str.contains('Ronda', case=False, na=False)][col_pt].sum()) if (col_pt and col_orig and col_pt in df_s.columns and col_orig in df_s.columns) else 0
-        call_pt = max(0, tot_pt - ronda_pt)
-        
-        snapshots_map[fname] = {
-            'arquivo': fname,
-            'data': mtime.strftime('%Y-%m-%d'),
-            'data_formatada': mtime.strftime('%d/%m/%Y'),
-            'total_chamados': tot_ch,
-            'total_pontos': tot_pt,
-            'vencidos': venc,
-            'no_prazo': max(0, tot_ch - venc),
-            'ronda_pontos': ronda_pt,
-            'callcenter_pontos': call_pt,
-            'mtime': int(mtime.timestamp())
-        }
-    except Exception as e:
-        print(f"Erro ao processar snapshot {pf}: {e}")
-
-all_snapshots = sorted(snapshots_map.values(), key=lambda s: s.get('mtime', 0))
-with open(hist_json_path, 'w', encoding='utf-8') as f:
-    json.dump({'snapshots': all_snapshots}, f, ensure_ascii=False, indent=2)
-
-# 1.3 A linha do tempo integrada de pendentes e atendidos é montada na Seção 2.1 após a leitura de ambas as bases.
-
-# Processar detalhes dos pendentes
-pendentes_data = []
-ref_now = datetime.now()
-
-for idx, row in df_p.iterrows():
-    id_sol = int(get_col_val(row, p_map, 'id_solicitacao', 0))
-    protocolo = str(get_col_val(row, p_map, 'protocolo', ''))
-    dt_sol_raw = str(get_col_val(row, p_map, 'data_solicitacao', ''))
-    origem = str(get_col_val(row, p_map, 'origem', 'Não informada'))
-    parque = str(get_col_val(row, p_map, 'parque', 'Barretos'))
-    bairro = str(get_col_val(row, p_map, 'bairro', 'Não informado'))
-    status = str(get_col_val(row, p_map, 'status', 'Pendente'))
-    tempo_restante = str(get_col_val(row, p_map, 'tempo_restante', ''))
-    pontos = int(get_col_val(row, p_map, 'pontos', 1))
-    atendente = str(get_col_val(row, p_map, 'atendente', 'Automático / Ronda'))
-    solicitante = str(get_col_val(row, p_map, 'solicitante', 'Munícipe / Interno'))
-
-    dt_sol = None
-    dias_aberto = 0
-    try:
-        dt_sol = pd.to_datetime(dt_sol_raw, format="%d/%m/%Y %H:%M:%S", errors='coerce')
-        if pd.isna(dt_sol):
-            dt_sol = pd.to_datetime(dt_sol_raw, errors='coerce')
-        if pd.notna(dt_sol):
-            dias_aberto = max(0, (ref_now - dt_sol).days)
-    except:
-        pass
-
-    is_vencido = "Vencido" in tempo_restante
-    dias_atraso = 0
-    dias_sla_restantes = 0
-    import re
-    if is_vencido:
-        m = re.search(r'(\d+)d', tempo_restante)
-        dias_atraso = int(m.group(1)) if m else 1
-    else:
-        m = re.search(r'(\d+)d', tempo_restante)
-        dias_sla_restantes = int(m.group(1)) if m else 0
-
-    pendentes_data.append({
-        "id": id_sol,
-        "protocolo": protocolo,
-        "data_solicitacao": dt_sol.strftime("%d/%m/%Y %H:%M") if pd.notna(dt_sol) else dt_sol_raw,
-        "data_iso": dt_sol.strftime("%Y-%m-%d") if pd.notna(dt_sol) else "",
-        "origem": origem,
-        "parque": parque,
-        "bairro": bairro,
-        "status": status,
-        "tempo_restante_texto": tempo_restante,
-        "is_vencido": is_vencido,
-        "dias_atraso": dias_atraso,
-        "dias_sla_restantes": dias_sla_restantes,
-        "dias_aberto": dias_aberto,
-        "pontos": pontos,
-        "atendente": atendente,
-        "solicitante": solicitante
-    })
-
-print("2. Lendo base de Atendidos...")
+# ==============================================================================
+# 1. Leitura e Consolidação da Base de ATENDIDOS (SGI / Histórico)
+# ==============================================================================
+print("1. Lendo base de Atendidos...")
 atendidos_files = sorted(glob.glob(os.path.join(base_dir, "Atendidos", "*.xls*")), key=os.path.getsize, reverse=True)
 cache_file = os.path.join(output_dir, "atendidos_cache.pkl")
 max_atendidos_mtime = max(os.path.getmtime(f) for f in atendidos_files) if atendidos_files else 0
@@ -179,6 +61,7 @@ a_map, a_audit = resolve_columns(df_a.columns, 'atendidos') if not df_a.empty el
 print(f"Atendidos resolvidos (Confiança Mapeamento: {a_audit.get('confianca_percent', 0)}%)")
 
 col_os = a_map.get('os', 'Atendimento')
+col_prot_at = a_map.get('protocolo', 'Protocolo')
 col_inicio = a_map.get('data_inicio', 'Data Inicial Atendimento')
 col_fim = a_map.get('data_fim', 'Data Conclusão Atendimento')
 col_rec = a_map.get('data_reclamacao', 'Data da Reclamação')
@@ -189,7 +72,11 @@ col_eq = a_map.get('equipe', 'Equipe')
 col_tipo = a_map.get('tipo_ocorrencia', 'Tipo Ocorrência')
 col_sol = a_map.get('solucao', 'Solução')
 
-# Conversão de colunas de data
+# Indexação para cruzamento rápido de pendências já atendidas
+protocols_at = set(df_a[col_prot_at].dropna().astype(str).str.strip().str.replace(r'\.0$', '', regex=True).str.lower()) if col_prot_at in df_a.columns else set()
+os_at = set(df_a[col_os].dropna().astype(str).str.strip().str.replace(r'\.0$', '', regex=True).str.lower()) if col_os in df_a.columns else set()
+
+# Conversão de colunas de data em Atendidos
 if 'dt_inicio' not in df_a.columns:
     df_a['dt_inicio'] = pd.to_datetime(df_a[col_inicio], errors='coerce') if col_inicio in df_a.columns else pd.NaT
     df_a['dt_fim'] = pd.to_datetime(df_a[col_fim], errors='coerce') if col_fim in df_a.columns else pd.NaT
@@ -210,6 +97,179 @@ if 'dt_inicio' not in df_a.columns:
     except Exception as e:
         print(f"Erro salvando cache: {e}")
 
+
+# ==============================================================================
+# 2. Leitura, Auditoria e Consolidação MULTI-PLANILHA da Base de PENDENTES
+# ==============================================================================
+print("2. Lendo e consolidando todas as planilhas de Pendentes...")
+pendentes_files = glob.glob(os.path.join(base_dir, "Pendentes", "*.xlsx")) + glob.glob(os.path.join(base_dir, "Pendentes", "*.xls"))
+pendentes_files_sorted = sorted(pendentes_files, key=os.path.getmtime)  # Mais antigos primeiro para que o mais recente sobrescreva atributos
+
+latest_pendentes_file = pendentes_files_sorted[-1] if pendentes_files_sorted else None
+latest_fname = os.path.basename(latest_pendentes_file) if latest_pendentes_file else ""
+
+# 2.1 Histórico de Snapshots para o gráfico de evolução do backlog
+hist_json_path = os.path.join(output_dir, "historico_backlog.json")
+persistent_history = []
+if os.path.exists(hist_json_path):
+    try:
+        with open(hist_json_path, 'r', encoding='utf-8') as f:
+            persistent_history = json.load(f).get('snapshots', [])
+    except Exception as e:
+        print(f"Erro lendo historico_backlog.json: {e}")
+
+snapshots_map = {item['arquivo']: item for item in persistent_history}
+
+# 2.2 Dicionário de consolidação única de pendentes
+merged_pendentes = {}
+atendidos_reconciliados = []
+ref_now = datetime.now()
+p_map_latest = {}
+p_audit_latest = {}
+
+for pf in pendentes_files_sorted:
+    fname = os.path.basename(pf)
+    try:
+        mtime = datetime.fromtimestamp(os.path.getmtime(pf))
+        df_s = read_excel_smart_header(pf)
+        s_map, s_audit = resolve_columns(df_s.columns, 'pendentes') if not df_s.empty else ({}, {})
+        
+        if fname == latest_fname:
+            p_map_latest = s_map
+            p_audit_latest = s_audit
+
+        col_pt = s_map.get('pontos')
+        col_tr = s_map.get('tempo_restante')
+        col_orig = s_map.get('origem')
+
+        tot_ch = len(df_s)
+        tot_pt = int(df_s[col_pt].sum()) if col_pt and col_pt in df_s.columns else tot_ch
+        venc = int(df_s[col_tr].astype(str).str.contains('Vencido').sum()) if col_tr and col_tr in df_s.columns else 0
+        ronda_pt = int(df_s[df_s[col_orig].astype(str).str.contains('Ronda', case=False, na=False)][col_pt].sum()) if (col_pt and col_orig and col_pt in df_s.columns and col_orig in df_s.columns) else 0
+        call_pt = max(0, tot_pt - ronda_pt)
+
+        snapshots_map[fname] = {
+            'arquivo': fname,
+            'data': mtime.strftime('%Y-%m-%d'),
+            'data_formatada': mtime.strftime('%d/%m/%Y'),
+            'total_chamados': tot_ch,
+            'total_pontos': tot_pt,
+            'vencidos': venc,
+            'no_prazo': max(0, tot_ch - venc),
+            'ronda_pontos': ronda_pt,
+            'callcenter_pontos': call_pt,
+            'mtime': int(mtime.timestamp())
+        }
+
+        # Cruzamento linha a linha de cada arquivo
+        for idx, row in df_s.iterrows():
+            id_sol = int(get_col_val(row, s_map, 'id_solicitacao', 0))
+            protocolo = str(get_col_val(row, s_map, 'protocolo', '')).strip()
+            dt_sol_raw = str(get_col_val(row, s_map, 'data_solicitacao', ''))
+            origem = str(get_col_val(row, s_map, 'origem', 'Não informada'))
+            parque = str(get_col_val(row, s_map, 'parque', 'Barretos'))
+            bairro = str(get_col_val(row, s_map, 'bairro', 'Não informado'))
+            status = str(get_col_val(row, s_map, 'status', 'Pendente'))
+            tempo_restante = str(get_col_val(row, s_map, 'tempo_restante', ''))
+            pontos = int(get_col_val(row, s_map, 'pontos', 1))
+            atendente = str(get_col_val(row, s_map, 'atendente', 'Automático / Ronda'))
+            solicitante = str(get_col_val(row, s_map, 'solicitante', 'Munícipe / Interno'))
+
+            prot_norm = protocolo.replace('.0', '').strip().lower()
+            id_str = str(id_sol).lower()
+
+            chave = prot_norm if prot_norm else f"id_{id_str}"
+            if not chave or chave == "id_0":
+                continue
+
+            # Verifica se já foi baixado na base histórica de Atendidos
+            ja_atendido = (prot_norm in protocols_at) or (id_str in os_at)
+            if ja_atendido:
+                atendidos_reconciliados.append({
+                    "id": id_sol,
+                    "protocolo": protocolo,
+                    "arquivo": fname
+                })
+                if chave in merged_pendentes:
+                    del merged_pendentes[chave]
+                continue
+
+            # Parse de data da solicitação
+            dt_sol = None
+            dias_aberto = 0
+            try:
+                dt_sol = pd.to_datetime(dt_sol_raw, format="%d/%m/%Y %H:%M:%S", errors='coerce')
+                if pd.isna(dt_sol):
+                    dt_sol = pd.to_datetime(dt_sol_raw, errors='coerce')
+                if pd.notna(dt_sol):
+                    dias_aberto = max(0, (ref_now - dt_sol).days)
+            except:
+                pass
+
+            is_vencido = "vencid" in tempo_restante.lower()
+            dias_atraso = 0
+            dias_sla_restantes = 0
+            m = re.search(r'(\d+)\s*d', tempo_restante, flags=re.I)
+            if is_vencido:
+                dias_atraso = int(m.group(1)) if m else (dias_aberto if dias_aberto > 7 else 1)
+            else:
+                dias_sla_restantes = int(m.group(1)) if m else max(0, 7 - dias_aberto)
+
+            origem_alerta = False
+            audit_nota = "Ativo no extrato recente Exati"
+            if fname != latest_fname:
+                origem_alerta = True
+                audit_nota = f"⚠️ Pendência histórica preservada (presente em '{fname}', omitida na última extração)"
+
+            if chave in merged_pendentes:
+                item = merged_pendentes[chave]
+                item["status"] = status
+                item["tempo_restante_texto"] = tempo_restante
+                item["is_vencido"] = is_vencido
+                item["dias_atraso"] = dias_atraso
+                item["dias_sla_restantes"] = dias_sla_restantes
+                if fname not in item["arquivos"]:
+                    item["arquivos"].append(fname)
+                if fname == latest_fname:
+                    item["alerta_auditoria"] = False
+                    item["audit_nota"] = "Ativo no extrato recente Exati"
+            else:
+                merged_pendentes[chave] = {
+                    "id": id_sol,
+                    "protocolo": protocolo,
+                    "data_solicitacao": dt_sol.strftime("%d/%m/%Y %H:%M") if pd.notna(dt_sol) else dt_sol_raw,
+                    "data_iso": dt_sol.strftime("%Y-%m-%d") if pd.notna(dt_sol) else "",
+                    "origem": origem,
+                    "parque": parque,
+                    "bairro": bairro,
+                    "status": status,
+                    "tempo_restante_texto": tempo_restante,
+                    "is_vencido": is_vencido,
+                    "dias_atraso": dias_atraso,
+                    "dias_sla_restantes": dias_sla_restantes,
+                    "dias_aberto": dias_aberto,
+                    "pontos": pontos,
+                    "atendente": atendente,
+                    "solicitante": solicitante,
+                    "arquivos": [fname],
+                    "arquivo_recente": fname,
+                    "alerta_auditoria": origem_alerta,
+                    "audit_nota": audit_nota
+                }
+    except Exception as e:
+        print(f"Erro ao processar planilha {pf}: {e}")
+
+all_snapshots = sorted(snapshots_map.values(), key=lambda s: s.get('mtime', 0))
+with open(hist_json_path, 'w', encoding='utf-8') as f:
+    json.dump({'snapshots': all_snapshots}, f, ensure_ascii=False, indent=2)
+
+pendentes_data = sorted(list(merged_pendentes.values()), key=lambda x: (not x['is_vencido'], -x['dias_aberto']))
+print(f"Total de pendentes consolidados ativos no Backlog: {len(pendentes_data)} ordens (reconciliados atendidos: {len(atendidos_reconciliados)})")
+
+
+# ==============================================================================
+# 3. Séries Temporais, Filtros e Indicadores de Atendidos
+# ==============================================================================
 # Filtro 2026 e Recentes
 df_2026 = df_a[df_a['ano'] == 2026].copy()
 max_date = df_a['dt_inicio'].max()
@@ -240,8 +300,8 @@ sla_dentro_geral = int((com_rec[col_atraso] == 'Não').sum()) if col_atraso in c
 sla_fora_geral = int((com_rec[col_atraso] == 'Sim').sum()) if col_atraso in com_rec.columns else 0
 taxa_sla_geral = round((sla_dentro_geral / total_com_rec) * 100, 1) if total_com_rec > 0 else 0
 
-tma_medio_2026 = int(round(float(com_rec_2026['dias_resolucao'].dropna().mean())))
-tma_mediana_2026 = int(round(float(com_rec_2026['dias_resolucao'].dropna().median())))
+tma_medio_2026 = int(round(float(com_rec_2026['dias_resolucao'].dropna().mean()))) if len(com_rec_2026) > 0 else 5
+tma_mediana_2026 = int(round(float(com_rec_2026['dias_resolucao'].dropna().median()))) if len(com_rec_2026) > 0 else 4
 
 # Gerar array completo de registros diários para filtros customizados no frontend
 print("3. Gerando registros diários agregados...")
@@ -283,19 +343,21 @@ for m_idx in mensal.index:
     dias_m = df_m['dias_resolucao'].dropna()
     m_avg = int(round(float(dias_m.mean()))) if len(dias_m) > 0 else 0
     mensal_sla.append(m_avg)
+
 df_30_sorted = df_30.sort_values('dt_inicio')
 ultimos_30_dias_grp = df_30_sorted.groupby(df_30_sorted['dt_inicio'].dt.strftime('%Y-%m-%d'))['Atendimento'].count()
 ultimos_dias_labels = [datetime.strptime(d, '%Y-%m-%d').strftime('%d/%m') for d in ultimos_30_dias_grp.index]
 ultimos_dias_values = [int(v) for v in ultimos_30_dias_grp.values]
+
 # Registros analíticos individuais de 2026 para a Tabela Drill-Down
-col_orig = next((c for c in df_2026.columns if 'Origem' in c), None)
+col_orig_2026 = next((c for c in df_2026.columns if 'origem' in str(c).lower()), None)
 atendidos_2026_rows = []
 for idx, r in df_2026.iterrows():
     dias_val = r['dias_resolucao']
     dias_round = round(float(dias_val), 1) if pd.notna(dias_val) else None
     horas_round = round(float(dias_val * 24.0), 1) if pd.notna(dias_val) else None
     
-    atraso_str = str(r.get('Atraso', ''))
+    atraso_str = str(r.get(col_atraso, ''))
     if atraso_str == 'Não':
         sla_cat = 'No Prazo'
     elif atraso_str == 'Sim':
@@ -303,7 +365,7 @@ for idx, r in df_2026.iterrows():
     else:
         sla_cat = 'Ronda'
         
-    origem_raw = str(r.get(col_orig, '')).strip() if (col_orig and pd.notna(r.get(col_orig))) else ''
+    origem_raw = str(r.get(col_orig_2026, '')).strip() if (col_orig_2026 and pd.notna(r.get(col_orig_2026))) else ''
     if not origem_raw or origem_raw.lower() in ['sem origem definida', 'nan', 'none', '']:
         if pd.isna(r['dt_reclamacao']):
             origem_clean = 'Ronda Interna'
@@ -363,24 +425,10 @@ pendentes_ts_str = pe_mtime.strftime("%d/%m/%Y %H:%M")
 pendentes_ts_short = pe_mtime.strftime("%d/%m %H:%M")
 
 # 2.1 Linha do Tempo Integrada: Backlog Pendente & Atendimentos Concluídos
-col_dt_s = p_map.get('data_solicitacao', 'Data de Solicitação')
-col_pt = p_map.get('pontos', 'Pontos')
-col_tr = p_map.get('tempo_restante', 'Tempo restante')
-
-df_p_valid = df_p.dropna(subset=[col_dt_s]).copy() if not df_p.empty and col_dt_s in df_p.columns else pd.DataFrame()
-if not df_p_valid.empty:
-    df_p_valid['dt_s'] = pd.to_datetime(df_p_valid[col_dt_s], dayfirst=True, errors='coerce')
-    min_backlog_date = df_p_valid['dt_s'].min().date() if df_p_valid['dt_s'].notna().any() else date(2026, 8, 18)
-else:
-    min_backlog_date = date(2026, 8, 18)
-    df_p_valid['dt_s'] = pd.Series(dtype='datetime64[ns]')
-
+min_backlog_date = date(2026, 8, 18)
 max_ref_date = df_a['dt_fim'].max().date() if ('dt_fim' in df_a.columns and df_a['dt_fim'].notna().any()) else date.today()
 df_a_timeline = df_a[(df_a['dt_fim'].dt.date >= min_backlog_date) & (df_a['dt_fim'].dt.date <= max_ref_date)].copy() if 'dt_fim' in df_a.columns else pd.DataFrame()
 daily_atend_counts = df_a_timeline.groupby(df_a_timeline['dt_fim'].dt.date).size() if not df_a_timeline.empty else pd.Series(dtype=int)
-
-valid_pend_dates = set(df_p_valid['dt_s'].dt.date.dropna()) if ('dt_s' in df_p_valid.columns and df_p_valid['dt_s'].notna().any()) else set()
-active_dates_sorted = sorted(list(set(daily_atend_counts.index).union(valid_pend_dates)))
 
 tl_diaria_labels = []
 tl_diaria_atendidos = []
@@ -388,48 +436,28 @@ tl_diaria_pontos = []
 tl_diaria_chamados = []
 tl_diaria_vencidos = []
 
-for d in active_dates_sorted:
-    tl_diaria_labels.append(d.strftime('%d/%m'))
-    tl_diaria_atendidos.append(int(daily_atend_counts.get(d, 0)))
-    sub_p = df_p_valid[df_p_valid['dt_s'].dt.date <= d] if ('dt_s' in df_p_valid.columns and df_p_valid['dt_s'].notna().any()) else pd.DataFrame()
-    tl_diaria_chamados.append(int(len(sub_p)))
-    tl_diaria_pontos.append(int(sub_p[col_pt].sum()) if col_pt and col_pt in sub_p.columns else len(sub_p))
-    venc_cnt = sum(1 for _, r in sub_p.iterrows() if 'Vencido' in str(r.get(col_tr, '')))
-    tl_diaria_vencidos.append(int(venc_cnt))
+# Criar snapshots diários a partir do histórico
+for sn in all_snapshots:
+    d_label = sn.get('data_formatada', '')[:5]
+    tl_diaria_labels.append(d_label)
+    tl_diaria_chamados.append(sn.get('total_chamados', 0))
+    tl_diaria_pontos.append(sn.get('total_pontos', 0))
+    tl_diaria_vencidos.append(sn.get('vencidos', 0))
+    tl_diaria_atendidos.append(int(daily_atend_counts.get(datetime.strptime(sn['data'], '%Y-%m-%d').date(), 0)) if 'data' in sn else 0)
 
-hoje_d = max_ref_date
-if hoje_d not in active_dates_sorted:
-    tl_diaria_labels.append(hoje_d.strftime('%d/%m') + ' (Atual)')
-    tl_diaria_atendidos.append(0)
-    tl_diaria_chamados.append(len(df_p))
-    tl_diaria_pontos.append(int(df_p[col_pt].sum()) if col_pt and col_pt in df_p.columns else len(df_p))
-    tl_diaria_vencidos.append(int(sum(1 for _, r in df_p.iterrows() if 'Vencido' in str(r.get(col_tr, '')))))
+# Garantir ponto consolidado atual
+tot_pend_chamados = len(pendentes_data)
+tot_pend_pontos = sum(p['pontos'] for p in pendentes_data)
+tot_pend_vencidos = sum(1 for p in pendentes_data if p['is_vencido'])
 
-# Marcos de abertura do backlog
-tl_marcos_labels = []
-tl_marcos_atendidos = []
-tl_marcos_pontos = []
-tl_marcos_chamados = []
-tl_marcos_vencidos = []
-
-marcos_dates = sorted(df_p_valid['dt_s'].dt.date.dropna().unique()) if ('dt_s' in df_p_valid.columns and df_p_valid['dt_s'].notna().any()) else []
-for md in marcos_dates:
-    tl_marcos_labels.append(md.strftime('%d/%m'))
-    tl_marcos_atendidos.append(int(daily_atend_counts.get(md, 0)))
-    sub_p = df_p_valid[df_p_valid['dt_s'].dt.date <= md]
-    tl_marcos_chamados.append(int(len(sub_p)))
-    tl_marcos_pontos.append(int(sub_p['Pontos de solicitação'].sum()) if 'Pontos de solicitação' in sub_p.columns else len(sub_p))
-    venc_cnt = sum(1 for _, r in sub_p.iterrows() if 'Vencido' in str(r.get('Tempo restante', '')))
-    tl_marcos_vencidos.append(int(venc_cnt))
-
-tl_marcos_labels.append('08/10 (Atual)')
-tl_marcos_atendidos.append(0)
-tl_marcos_chamados.append(len(df_p))
-tl_marcos_pontos.append(int(df_p['Pontos de solicitação'].sum()) if 'Pontos de solicitação' in df_p.columns else len(df_p))
-tl_marcos_vencidos.append(int(sum(1 for _, r in df_p.iterrows() if 'Vencido' in str(r.get('Tempo restante', '')))))
+tl_marcos_labels = [sn.get('data_formatada', '')[:5] for sn in all_snapshots] + ['Atual (Auditado)']
+tl_marcos_chamados = [sn.get('total_chamados', 0) for sn in all_snapshots] + [tot_pend_chamados]
+tl_marcos_pontos = [sn.get('total_pontos', 0) for sn in all_snapshots] + [tot_pend_pontos]
+tl_marcos_vencidos = [sn.get('vencidos', 0) for sn in all_snapshots] + [tot_pend_vencidos]
+tl_marcos_atendidos = [0] * len(tl_marcos_labels)
 
 # 2.2 Diagnóstico de Ocorrências e SLA em Dias por Bairro
-top_tipos_series = df_2026['Tipo Ocorrência'].dropna().value_counts().head(8)
+top_tipos_series = df_2026['Tipo Ocorrência'].dropna().value_counts().head(8) if 'Tipo Ocorrência' in df_2026.columns else pd.Series(dtype=int)
 tipos_labels = list(top_tipos_series.index)
 tipos_values = [int(v) for v in top_tipos_series.values]
 tipos_sla = []
@@ -441,40 +469,41 @@ for t in tipos_labels:
     tipos_sla.append(int(round(float(dias_t.mean()))) if len(dias_t) > 0 else 0)
     tipos_mediana.append(int(round(float(dias_t.median()))) if len(dias_t) > 0 else 0)
 
-# Mapeamento de Ocorrência x Bairro (ordenado por SLA em dias)
 ocorrencias_bairro_map = {}
 bairros_geral = df_2026[df_2026['dias_resolucao'].notna()].groupby('Bairro').agg(
     total=('Atendimento', 'count'),
     sla_medio=('dias_resolucao', 'mean'),
     sla_mediana=('dias_resolucao', 'median')
-).reset_index()
-bairros_geral = bairros_geral[bairros_geral['total'] >= 5].sort_values('sla_medio', ascending=False)
-ocorrencias_bairro_map['Todas as Ocorrências'] = [
-    {
-        'bairro': r['Bairro'],
-        'total': int(r['total']),
-        'sla_medio': int(round(float(r['sla_medio']))),
-        'sla_mediana': int(round(float(r['sla_mediana'])))
-    } for _, r in bairros_geral.head(12).iterrows()
-]
+).reset_index() if 'Bairro' in df_2026.columns else pd.DataFrame()
 
-for t in tipos_labels:
-    sub_t = df_2026[(df_2026['Tipo Ocorrência'] == t) & (df_2026['dias_resolucao'].notna())]
-    if len(sub_t) > 0:
-        bg = sub_t.groupby('Bairro').agg(
-            total=('Atendimento', 'count'),
-            sla_medio=('dias_resolucao', 'mean'),
-            sla_mediana=('dias_resolucao', 'median')
-        ).reset_index()
-        bg = bg[bg['total'] >= 2].sort_values('sla_medio', ascending=False)
-        ocorrencias_bairro_map[t] = [
-            {
-                'bairro': r['Bairro'],
-                'total': int(r['total']),
-                'sla_medio': int(round(float(r['sla_medio']))),
-                'sla_mediana': int(round(float(r['sla_mediana'])))
-            } for _, r in bg.head(12).iterrows()
-        ]
+if not bairros_geral.empty:
+    bairros_geral = bairros_geral[bairros_geral['total'] >= 5].sort_values('sla_medio', ascending=False)
+    ocorrencias_bairro_map['Todas as Ocorrências'] = [
+        {
+            'bairro': r['Bairro'],
+            'total': int(r['total']),
+            'sla_medio': int(round(float(r['sla_medio']))),
+            'sla_mediana': int(round(float(r['sla_mediana'])))
+        } for _, r in bairros_geral.head(12).iterrows()
+    ]
+
+    for t in tipos_labels:
+        sub_t = df_2026[(df_2026['Tipo Ocorrência'] == t) & (df_2026['dias_resolucao'].notna())]
+        if len(sub_t) > 0:
+            bg = sub_t.groupby('Bairro').agg(
+                total=('Atendimento', 'count'),
+                sla_medio=('dias_resolucao', 'mean'),
+                sla_mediana=('dias_resolucao', 'median')
+            ).reset_index()
+            bg = bg[bg['total'] >= 2].sort_values('sla_medio', ascending=False)
+            ocorrencias_bairro_map[t] = [
+                {
+                    'bairro': r['Bairro'],
+                    'total': int(r['total']),
+                    'sla_medio': int(round(float(r['sla_medio']))),
+                    'sla_mediana': int(round(float(r['sla_mediana'])))
+                } for _, r in bg.head(12).iterrows()
+            ]
 
 dashboard_data = {
     "metadata": {
@@ -482,22 +511,24 @@ dashboard_data = {
         "atendidos_arquivo": os.path.basename(latest_atendidos_file) if latest_atendidos_file else "Não encontrado",
         "atendidos_data_hora": atendidos_ts_str,
         "atendidos_data_hora_curta": atendidos_ts_short,
-        "pendentes_arquivo": os.path.basename(latest_pendentes_file) if latest_pendentes_file else "Não encontrado",
+        "pendentes_arquivo": latest_fname or "Não encontrado",
         "pendentes_data_hora": pendentes_ts_str,
         "pendentes_data_hora_curta": pendentes_ts_short,
-        "data_min": df_a['data_iso'].min(),
-        "data_max": df_a['data_iso'].max(),
+        "data_min": df_a['data_iso'].min() if 'data_iso' in df_a.columns else "",
+        "data_max": df_a['data_iso'].max() if 'data_iso' in df_a.columns else "",
         "cidade": "Barretos / SP",
-        "sistema": "Monitor Exati / SGI"
+        "sistema": "Monitor Exati / SGI",
+        "total_planilhas_pendentes": len(pendentes_files),
+        "total_reconciliados_atendidos": len(atendidos_reconciliados)
     },
     "kpis": {
         "total_historico_atendidos": int(len(df_a)),
         "total_atendidos_2026": int(len(df_2026)),
         "total_atendidos_ultimos_30d": int(len(df_30)),
-        "total_pendentes_chamados": int(len(pendentes_data)),
-        "total_pendentes_pontos": int(sum(p['pontos'] for p in pendentes_data)),
-        "pendentes_vencidos": int(sum(1 for p in pendentes_data if p['is_vencido'])),
-        "pendentes_no_prazo": int(sum(1 for p in pendentes_data if not p['is_vencido'])),
+        "total_pendentes_chamados": tot_pend_chamados,
+        "total_pendentes_pontos": tot_pend_pontos,
+        "pendentes_vencidos": tot_pend_vencidos,
+        "pendentes_no_prazo": max(0, tot_pend_chamados - tot_pend_vencidos),
         "media_diaria_2026": int(round(media_diaria_2026)),
         "media_diaria_30d": int(round(media_diaria_30d)),
         "media_diaria_90d": int(round(media_diaria_90d)),
@@ -558,10 +589,10 @@ dashboard_data = {
             "atendidos": tl_marcos_atendidos
         },
         "snapshots": all_snapshots,
-        "ultima_versao_arquivo": os.path.basename(latest_pendentes_file) if latest_pendentes_file else "Nenhuma planilha encontrada"
+        "ultima_versao_arquivo": latest_fname
     },
     "column_audit": {
-        "pendentes": p_audit,
+        "pendentes": p_audit_latest,
         "atendidos": a_audit
     },
     "atendidos_2026": atendidos_2026_rows
@@ -571,4 +602,4 @@ json_path = os.path.join(output_dir, "dashboard_data.json")
 with open(json_path, 'w', encoding='utf-8') as f:
     json.dump(dashboard_data, f, ensure_ascii=False)
 
-print(f"dashboard_data.json atualizado com daily_records em {json_path}!")
+print(f"dashboard_data.json atualizado com sucesso em {json_path}!")
