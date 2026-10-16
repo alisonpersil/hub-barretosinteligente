@@ -14,27 +14,19 @@
     <title>Painel Alison • Barretos Inteligente</title>
     <meta name="description" content="Painel Alison - Observabilidade de Tokens, Custos OpenAI e Integridade Matemática da Concessionária Barretos Inteligente.">
     
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="/img/favicon.png">
     <link rel="apple-touch-icon" href="/img/favicon.png">
 
-    <!-- Google Fonts: Inter & JetBrains Mono -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
-
-    <!-- Font Awesome Icons 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-    <!-- Padrão Unificado de Layout Barretos Inteligente -->
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="/css/sidebar.css">
     <link rel="stylesheet" href="/qa/qa.css">
 
     <style>
-        /* ==========================================================================
-           TELA DE BLOQUEIO / PIN DE SEGURANÇA (1264)
-           ========================================================================== */
         .lock-screen-modal {
             position: fixed;
             inset: 0;
@@ -213,9 +205,6 @@
             40%, 60% { transform: translate3d(6px, 0, 0); }
         }
 
-        /* ==========================================================================
-           BOTÕES E COMPONENTES ESPECÍFICOS DO PAINEL ALISON
-           ========================================================================== */
         .btn-lock-nav {
             display: inline-flex;
             align-items: center;
@@ -245,7 +234,6 @@
             color: #f87171;
         }
 
-        /* Botões de Ação na Hero (Completos e Sem Quebrar Texto) */
         .alison-actions-wrap {
             display: flex;
             align-items: center;
@@ -311,7 +299,6 @@
             filter: brightness(1.06);
         }
 
-        /* Notificação Toast */
         .toast-box {
             position: fixed;
             bottom: 24px;
@@ -349,7 +336,6 @@
 </head>
 <body>
 
-    <!-- ==================== TELA DE BLOQUEIO POR SENHA (1264) ==================== -->
     <div class="lock-screen-modal" id="lockScreenModal">
         <div class="lock-card" id="lockCard">
             <div class="lock-icon-wrap">
@@ -365,7 +351,7 @@
 
             <form id="pinForm" onsubmit="event.preventDefault(); verificarPIN();">
                 <div class="pin-input-group">
-                    <input type="password" id="pinInput" class="pin-input" maxlength="8" placeholder="••••" autocomplete="off" autofocus>
+                    <input type="password" id="pinInput" class="pin-input" maxlength="16" placeholder="••••" autocomplete="off" autofocus>
                     <button type="button" class="btn-toggle-eye" id="btnToggleEye" title="Mostrar/Ocultar Senha">
                         <i class="fa-solid fa-eye" id="eyeIcon"></i>
                     </button>
@@ -382,10 +368,7 @@
         </div>
     </div>
 
-    <!-- ==================== LAYOUT UNIFICADO DO HUB (DESBLOQUEADO) ==================== -->
     <div class="hub-layout" id="hubLayoutRoot" style="display: none;">
-        
-        <!-- Top Navigation Bar Oficial Padronizada -->
         <header class="navbar">
             <div class="nav-left">
                 <button id="btnToggleSidebar" class="sidebar-toggle-btn" title="Recolher / Expandir menu lateral" aria-label="Alternar barra lateral">
@@ -412,16 +395,12 @@
             </div>
         </header>
 
-        <!-- Hub Body: Sidebar Lateral + Área Principal -->
         <div class="hub-body-wrapper">
-            
-            <!-- Barra Lateral Executiva Oficial -->
             <aside class="hub-sidebar" id="hubSidebar">
                 <div class="sidebar-inner">
                     <div class="sidebar-section-label">Módulos</div>
 
                     <nav class="sidebar-nav" aria-label="Navegação Lateral">
-                        <!-- Início / Home -->
                         <div class="sidebar-group">
                             <a href="/" class="sidebar-item" id="tabBtnHome" title="Página Inicial do HUB">
                                 <div class="item-left">
@@ -431,7 +410,6 @@
                             </a>
                         </div>
 
-                        <!-- Módulo 1: Relatórios -->
                         <div class="sidebar-group">
                             <a href="/?tab=relatorios" class="sidebar-item active" id="tabBtnRelatorios" title="Módulo de Relatórios">
                                 <div class="item-left">
@@ -441,7 +419,6 @@
                                 <span class="sidebar-badge" title="5 páginas disponíveis">5</span>
                             </a>
 
-                            <!-- Submenu com as páginas vinculadas a Relatórios -->
                             <div class="sidebar-submenu" id="subRelatorios" style="display: flex;">
                                 <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Consulta de Ofícios">
                                     <i class="fa-solid fa-folder-open sub-icon green"></i>
@@ -466,7 +443,6 @@
                             </div>
                         </div>
 
-                        <!-- Módulo 2: Automações -->
                         <div class="sidebar-group">
                             <a href="/?tab=automacoes" class="sidebar-item" id="tabBtnAutomacoes" title="Módulo de Automações">
                                 <div class="item-left">
@@ -483,7 +459,6 @@
                             </div>
                         </div>
 
-                        <!-- Módulo 3: Book -->
                         <div class="sidebar-group">
                             <a href="/book/" class="sidebar-item" id="tabBtnBook" title="Módulo Book">
                                 <div class="item-left">
@@ -496,12 +471,10 @@
                 </div>
             </aside>
 
-            <!-- Área Central de Conteúdo -->
             <div class="hub-main-area">
                 <main class="qa-main-container">
                     <div class="qa-ambient-glow"></div>
 
-                    <!-- Hero Banner Executivo do Painel Alison -->
                     <div class="qa-hero-banner">
                         <div class="qa-hero-top">
                             <span class="qa-edition-pill" style="color: #10b981; background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3);">
@@ -533,7 +506,6 @@
                         </div>
                     </div>
 
-                    <!-- HUD Grid de Indicadores Analíticos (Padrão 100% Unificado) -->
                     <div class="qa-hud-grid">
                         <div class="qa-hud-card green">
                             <div class="hud-card-top">
@@ -572,7 +544,6 @@
                         </div>
                     </div>
 
-                    <!-- Seção 1: Limite Mensal de Segurança e Orçamento -->
                     <section class="qa-section">
                         <div class="section-title-bar">
                             <h2><i class="fa-solid fa-gauge" style="color: #10b981;"></i> Limite Mensal de Segurança Orçamentária</h2>
@@ -591,7 +562,6 @@
                         </div>
                     </section>
 
-                    <!-- Seção 2: Comparativo Dify vs OpenAI Direto -->
                     <section class="qa-section" style="border-left: 4px solid #10b981;">
                         <div style="display: flex; gap: 16px; align-items: flex-start;">
                             <div style="width: 42px; height: 42px; min-width: 42px; border-radius: 12px; background: rgba(16, 185, 129, 0.14); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 20px;">
@@ -609,7 +579,6 @@
                         </div>
                     </section>
 
-                    <!-- Seção 3: Parecer Executivo do Auditor CCO -->
                     <section class="qa-section">
                         <div class="section-title-bar">
                             <h2><i class="fa-solid fa-clipboard-check" style="color: #0284c7;"></i> Último Parecer Executivo do Auditor CCO</h2>
@@ -635,7 +604,6 @@
                         </div>
                     </section>
 
-                    <!-- Seção 4: Histórico de Auditorias e Consumo de Tokens -->
                     <section class="qa-section">
                         <div class="section-title-bar">
                             <h2><i class="fa-solid fa-list-check" style="color: #10b981;"></i> Registro Contínuo de Consumo e Auditorias</h2>
@@ -673,10 +641,8 @@
                             </table>
                         </div>
                     </section>
-
                 </main>
 
-                <!-- Footer Oficial no Rodapé da Página (Padrão 100% Unificado PMO / CCO) -->
                 <footer class="hub-footer">
                     <div class="footer-left">
                         <span>&copy; 2026 Barretos Inteligente</span>
@@ -694,24 +660,25 @@
         </div>
     </div>
 
-    <!-- Toast Notification -->
     <div class="toast-box" id="toastBox">
         <i class="fa-solid fa-circle-check" id="toastIcon"></i>
         <span id="toastMsg">Mensagem</span>
     </div>
 
-    <!-- Scripts Compartilhados do HUB -->
     <script src="/js/sidebar.js"></script>
     <script src="/js/radio.js" defer></script>
 
     <script>
-        const SENHA_CORRETA = "1264";
         const AUTH_KEY = "pmo_ai_token_auth";
 
         let globalTokenStats = null;
         let globalDashboardData = null;
 
-        // Gerenciamento do Tema Claro / Escuro Unificado
+        try {
+            sessionStorage.removeItem(AUTH_KEY);
+            localStorage.removeItem(AUTH_KEY);
+        } catch (_) {}
+
         function initTheme() {
             const savedTheme = localStorage.getItem('pmo_theme') || localStorage.getItem('theme') || 'light';
             applyTheme(savedTheme);
@@ -743,12 +710,6 @@
             btnThemeToggle.addEventListener('click', toggleTheme);
         }
 
-        // Limpeza forçada ao carregar a página: Sempre inicia bloqueado
-        try {
-            sessionStorage.removeItem(AUTH_KEY);
-            localStorage.removeItem(AUTH_KEY);
-        } catch (_) {}
-
         function showToast(msg, icon = 'fa-circle-check') {
             const box = document.getElementById('toastBox');
             const msgEl = document.getElementById('toastMsg');
@@ -760,7 +721,6 @@
             setTimeout(() => box.classList.remove('show'), 3500);
         }
 
-        // Toggle Mostrar/Ocultar Senha
         const btnToggleEye = document.getElementById('btnToggleEye');
         const pinInput = document.getElementById('pinInput');
         const eyeIcon = document.getElementById('eyeIcon');
@@ -772,39 +732,57 @@
             });
         }
 
-        // Validação da Senha 1264
-        function verificarPIN() {
+        async function verificarPIN() {
             const input = document.getElementById('pinInput');
             const lockError = document.getElementById('lockError');
             const lockCard = document.getElementById('lockCard');
             const btnUnlock = document.getElementById('btnUnlock');
             const val = (input.value || "").trim();
 
-            if (val === SENHA_CORRETA) {
-                lockError.style.display = 'none';
-                btnUnlock.disabled = true;
-                btnUnlock.innerHTML = '<i class="fa-solid fa-check"></i> <span>Acesso Liberado!</span>';
-                btnUnlock.style.background = 'linear-gradient(135deg, #059669, #047857)';
-                
-                setTimeout(() => {
-                    liberarDashboard();
-                    btnUnlock.disabled = false;
-                    btnUnlock.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Entrar no Painel Alison</span>';
-                    btnUnlock.style.background = '';
-                }, 200);
-            } else {
+            if (!val) return;
+
+            btnUnlock.disabled = true;
+            btnUnlock.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Verificando...</span>';
+
+            try {
+                const res = await fetch('/api/painel-alison/auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: val })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    lockError.style.display = 'none';
+                    btnUnlock.innerHTML = '<i class="fa-solid fa-check"></i> <span>Acesso Liberado!</span>';
+                    btnUnlock.style.background = 'linear-gradient(135deg, #059669, #047857)';
+                    
+                    setTimeout(() => {
+                        liberarDashboard();
+                        btnUnlock.disabled = false;
+                        btnUnlock.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Entrar no Painel Alison</span>';
+                        btnUnlock.style.background = '';
+                    }, 200);
+                } else {
+                    throw new Error(data.error || 'Acesso negado');
+                }
+            } catch (err) {
                 lockError.style.display = 'block';
                 lockCard.classList.remove('shake');
                 void lockCard.offsetWidth;
                 lockCard.classList.add('shake');
                 input.value = '';
                 input.focus();
+                btnUnlock.disabled = false;
+                btnUnlock.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> <span>Entrar no Painel Alison</span>';
+                btnUnlock.style.background = '';
             }
         }
 
         if (pinInput) {
-            pinInput.addEventListener('input', (e) => {
-                if (e.target.value.length === 4) {
+            pinInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
                     verificarPIN();
                 }
             });
@@ -831,6 +809,7 @@
         }
 
         function checkAuthOnLoad() {
+            initTheme();
             try {
                 sessionStorage.removeItem(AUTH_KEY);
                 localStorage.removeItem(AUTH_KEY);
@@ -904,7 +883,6 @@
             const mediaBrl = totReq > 0 ? (gastoBrl / totReq) : 0.00115;
             const remainBrl = Math.max(0, limite - gastoBrl);
 
-            // KPIs HUD
             document.getElementById('kpiGastoBrl').textContent = formatBRL(gastoBrl);
             document.getElementById('kpiGastoUsd').textContent = `${formatUSD(gastoUsd)} USD • Câmbio R$ ${(stats.taxa_dolar || 5.50).toFixed(2)}`;
 
@@ -913,14 +891,12 @@
 
             document.getElementById('kpiCustoMedio').textContent = formatBRL(mediaBrl);
 
-            // Orçamento
             document.getElementById('budgetLimitBadge').textContent = `Teto: ${formatBRL(limite)} / mês`;
             document.getElementById('budgetSpentDesc').textContent = `${formatBRL(gastoBrl)} gastos (${pctGasto.toFixed(3)}% do teto)`;
             document.getElementById('budgetRemainDesc').textContent = `${formatBRL(remainBrl)} disponíveis no mês`;
             document.getElementById('budgetPctText').textContent = `${pctGasto.toFixed(3)}%`;
             document.getElementById('budgetProgressBar').style.width = `${Math.min(100, Math.max(0.002, pctGasto))}%`;
 
-            // Pareceres Executivos
             if (ai.resumo_executivo) {
                 document.getElementById('resumoExecutivoText').textContent = ai.resumo_executivo;
             }
@@ -930,7 +906,6 @@
             const dataAuditoria = ai.auditado_em || stats.updated_at || '16/10/2026 17:13:07';
             document.getElementById('kpiTimestampBadge').textContent = dataAuditoria;
 
-            // Tabela de Histórico
             const list = stats.historico || [];
             renderTabela(list);
         }
@@ -996,7 +971,6 @@
             }).join('');
         }
 
-        // Filtro da tabela
         document.getElementById('tableFilter').addEventListener('input', (e) => {
             const q = e.target.value.toLowerCase().trim();
             const list = (globalTokenStats && globalTokenStats.historico) || [];
@@ -1011,13 +985,11 @@
             renderTabela(filtered);
         });
 
-        // Botão Atualizar
         document.getElementById('btnRefreshStats').addEventListener('click', async () => {
             await carregarDadosDashboard();
             showToast('Dados do Painel Alison atualizados com sucesso!', 'fa-rotate');
         });
 
-        // Botão Exportar CSV
         document.getElementById('btnExportCSV').addEventListener('click', () => {
             const list = (globalTokenStats && globalTokenStats.historico) || [];
             if (list.length === 0) {
@@ -1050,7 +1022,6 @@
             showToast('Planilha CSV exportada com sucesso!', 'fa-file-excel');
         });
 
-        // Botão Executar Auditoria
         document.getElementById('btnTriggerAudit').addEventListener('click', async () => {
             const btn = document.getElementById('btnTriggerAudit');
             btn.disabled = true;

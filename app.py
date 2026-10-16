@@ -976,7 +976,7 @@ def serve_sala_file(filename):
 @app.route("/tokens/")
 @app.route("/admin/tokens")
 def painel_alison_index():
-    """Serve o Painel Alison protegido por senha (1264)."""
+    """Serve o Painel Alison com autenticação restrita."""
     index_path = os.path.join(PAINEL_ALISON_DIR, "index.html")
     if os.path.exists(index_path):
         resp = make_response(send_file(index_path))
@@ -985,6 +985,26 @@ def painel_alison_index():
         resp.headers["Expires"] = "0"
         return resp
     return "Painel Alison em configuração.", 404
+
+@app.route("/api/painel-alison/auth", methods=["POST"])
+def api_painel_alison_auth():
+    """Valida a credencial no backend utilizando a variável de ambiente PASSWORD_IA_PAINEL configurada na Vercel."""
+    data = request.get_json(silent=True) or {}
+    password_input = str(data.get("password") or "").strip()
+    
+    expected_password = (os.getenv("PASSWORD_IA_PAINEL") or "").strip()
+    
+    if expected_password and password_input == expected_password:
+        import hashlib, time
+        auth_token = hashlib.sha256(f"{expected_password}_{int(time.time() // 86400)}".encode()).hexdigest()
+        return jsonify({
+            "success": True,
+            "token": auth_token
+        })
+    return jsonify({
+        "success": False,
+        "error": "Senha incorreta"
+    }), 401
 
 @app.route("/painel-alison/<path:filename>")
 def serve_painel_alison_file(filename):
