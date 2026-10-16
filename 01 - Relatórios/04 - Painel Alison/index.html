@@ -1141,16 +1141,32 @@
       });
     }
 
+    // Limpeza forçada de qualquer sessão prévia para garantir que a senha 1264 seja sempre solicitada
+    try {
+      sessionStorage.removeItem(AUTH_KEY);
+      localStorage.removeItem(AUTH_KEY);
+    } catch (_) {}
+
     // Autenticação com PIN 1264
     function verificarPIN() {
       const input = document.getElementById('pinInput');
       const lockError = document.getElementById('lockError');
       const lockCard = document.getElementById('lockCard');
+      const btnUnlock = document.getElementById('btnUnlock');
       const val = (input.value || "").trim();
 
       if (val === SENHA_CORRETA) {
-        sessionStorage.setItem(AUTH_KEY, SENHA_CORRETA);
-        liberarDashboard();
+        lockError.style.display = 'none';
+        btnUnlock.disabled = true;
+        btnUnlock.innerHTML = '<i class="fa-solid fa-check"></i> Acesso Liberado!';
+        btnUnlock.style.background = 'linear-gradient(135deg, #059669, #047857)';
+        
+        setTimeout(() => {
+          liberarDashboard();
+          btnUnlock.disabled = false;
+          btnUnlock.innerHTML = '<i class="fa-solid fa-unlock-keyhole"></i> Entrar no Painel Alison';
+          btnUnlock.style.background = '';
+        }, 250);
       } else {
         lockError.style.display = 'block';
         lockCard.classList.remove('shake');
@@ -1168,7 +1184,10 @@
     });
 
     function bloquearAcesso() {
-      sessionStorage.removeItem(AUTH_KEY);
+      try {
+        sessionStorage.removeItem(AUTH_KEY);
+        localStorage.removeItem(AUTH_KEY);
+      } catch (_) {}
       document.getElementById('lockScreen').style.display = 'flex';
       document.getElementById('dashboardWrapper').style.display = 'none';
       const input = document.getElementById('pinInput');
@@ -1184,15 +1203,27 @@
 
     function checkAuthOnLoad() {
       initTheme();
-      const savedAuth = sessionStorage.getItem(AUTH_KEY);
-      if (savedAuth === SENHA_CORRETA) {
-        liberarDashboard();
-      } else {
-        document.getElementById('lockScreen').style.display = 'flex';
-        document.getElementById('dashboardWrapper').style.display = 'none';
-        setTimeout(() => document.getElementById('pinInput').focus(), 150);
+      // Sempre inicia bloqueado e aguarda digitação da senha 1264
+      try {
+        sessionStorage.removeItem(AUTH_KEY);
+        localStorage.removeItem(AUTH_KEY);
+      } catch (_) {}
+
+      document.getElementById('lockScreen').style.display = 'flex';
+      document.getElementById('dashboardWrapper').style.display = 'none';
+      const input = document.getElementById('pinInput');
+      if (input) {
+        input.value = '';
+        setTimeout(() => input.focus(), 100);
       }
     }
+
+    window.addEventListener('beforeunload', () => {
+      try {
+        sessionStorage.removeItem(AUTH_KEY);
+        localStorage.removeItem(AUTH_KEY);
+      } catch (_) {}
+    });
 
     document.getElementById('btnLockExit').addEventListener('click', bloquearAcesso);
 
