@@ -1614,12 +1614,27 @@ function updateFilteredCharts(series) {
       .sort((a, b) => b.sla - a.sla)
       .slice(0, 8);
 
-    if (tiposList.length === 0 && series.tipos_ocorrencia && series.tipos_ocorrencia.labels) {
-      tiposList = series.tipos_ocorrencia.labels.map((lbl, idx) => ({
-        tipo: lbl,
-        total: series.tipos_ocorrencia.values[idx] || 0,
-        sla: Math.round((series.tipos_ocorrencia.sla_dias && series.tipos_ocorrencia.sla_dias[idx]) || 2)
-      })).sort((a, b) => b.sla - a.sla);
+    const fallbackTipos = dashboardData.series && dashboardData.series.tipos_ocorrencia;
+    if (tiposList.length === 0) {
+      if (series.tipos && series.tipos.labels && series.tipos.labels.length > 0) {
+        const slaMapRef = {};
+        if (fallbackTipos && fallbackTipos.labels) {
+          fallbackTipos.labels.forEach((lbl, idx) => {
+            slaMapRef[lbl] = (fallbackTipos.sla_dias && fallbackTipos.sla_dias[idx]) || 2;
+          });
+        }
+        tiposList = series.tipos.labels.map((lbl, idx) => ({
+          tipo: lbl,
+          total: series.tipos.values[idx] || 0,
+          sla: slaMapRef[lbl] !== undefined ? slaMapRef[lbl] : 2
+        })).sort((a, b) => b.sla - a.sla);
+      } else if (fallbackTipos && fallbackTipos.labels) {
+        tiposList = fallbackTipos.labels.map((lbl, idx) => ({
+          tipo: lbl,
+          total: fallbackTipos.values[idx] || 0,
+          sla: Math.round((fallbackTipos.sla_dias && fallbackTipos.sla_dias[idx]) || 2)
+        })).sort((a, b) => b.sla - a.sla);
+      }
     }
 
     const labelsTipos = tiposList.map(item => item.tipo);
@@ -3129,6 +3144,10 @@ function updateAnaliticoKPIs(filtered) {
 
   const chipTotal = document.getElementById('analitico-chip-total');
   if (chipTotal) chipTotal.textContent = total.toLocaleString('pt-BR');
+
+  const exclusaoTotal = filtered.filter(r => r.is_pendente && r.alerta_auditoria).length;
+  setEl('analitico-chip-backlog', pendentesTotal.toLocaleString('pt-BR'));
+  setEl('analitico-chip-exclusao', exclusaoTotal.toLocaleString('pt-BR'));
 }
 
 function sortAndRenderAnalitico() {
@@ -3166,18 +3185,6 @@ function sortAndRenderAnalitico() {
 function renderAnaliticoTable() {
   const tbody = document.getElementById('analitico-tbody');
   if (!tbody) return;
-
-  // Auto-recuperação de integridade: se filteredData estiver vazio mas houver dados brutos, reaplica filtros
-  const fullList = getAnaliticoFullList();
-  if ((!analiticoState.filteredData || analiticoState.filteredData.length === 0) &&
-      fullList.length > 0) {
-    if (analiticoState.search === '' && analiticoState.slaFilter === 'todos' &&
-        analiticoState.tmaFilter === 'todas' && analiticoState.equipeFilter === 'todas' &&
-        analiticoState.origemFilter === 'todas') {
-      applyAnaliticoFilters();
-      return;
-    }
-  }
 
   const total = analiticoState.filteredData ? analiticoState.filteredData.length : 0;
   const pageSize = analiticoState.pageSize || 25;
@@ -3219,15 +3226,33 @@ function renderAnaliticoTable() {
   if (btnLast) btnLast.disabled = analiticoState.currentPage >= totalPages;
 
   if (pageRows.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="10" style="text-align: center; padding: 40px 20px; color: var(--text-dim);">
-          <div style="font-size: 1.8rem; margin-bottom: 8px;"><i class="fa-solid fa-magnifying-glass"></i></div>
-          <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">Nenhum chamado encontrado para os filtros selecionados.</div>
-          <div style="font-size: 0.8rem; margin-top: 4px;">Tente alterar os termos da busca ou clique em <strong>Limpar Filtros</strong>.</div>
-        </td>
-      </tr>
-    `;
+    const isHistoric = dateFilterState.inicio && (dateFilterState.inicio.startsWith('2025') || dateFilterState.inicio.startsWith('2024') || dateFilterState.inicio.startsWith('2023'));
+    if (isHistoric) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="10" style="text-align: center; padding: 48px 24px; color: var(--text-dim);">
+            <div style="font-size: 2.2rem; margin-bottom: 12px; color: var(--accent-blue);"><i class="fa-solid fa-calendar-check"></i></div>
+            <div style="font-weight: 700; font-size: 1.05rem; color: var(--text-main); margin-bottom: 6px;">
+              Período Histórico (${escapeHtml(dateFilterState.label || 'Ano Anterior')})
+            </div>
+            <div style="font-size: 0.85rem; color: var(--text-muted); max-width: 600px; margin: 0 auto; line-height: 1.6;">
+              Nenhum chamado de backlog pendente neste período (Backlog = 0). O detalhamento linha a linha individual cobre o exercício operacional de 2026 e o Backlog Ativo.<br>
+              Os <strong>21.798 atendimentos de 2025</strong> estão consolidados nos gráficos executivos do <strong>Cockpit</strong>.
+            </div>
+          </td>
+        </tr>
+      `;
+    } else {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="10" style="text-align: center; padding: 40px 20px; color: var(--text-dim);">
+            <div style="font-size: 1.8rem; margin-bottom: 8px;"><i class="fa-solid fa-magnifying-glass"></i></div>
+            <div style="font-weight: 600; font-size: 0.95rem; color: var(--text-main);">Nenhum chamado encontrado para os filtros selecionados.</div>
+            <div style="font-size: 0.8rem; margin-top: 4px;">Tente alterar os termos da busca ou clique em <strong>Limpar Filtros</strong>.</div>
+          </td>
+        </tr>
+      `;
+    }
     return;
   }
 
@@ -3653,7 +3678,7 @@ function renderBairroOcorrenciaSlaChart() {
   });
 
   const minOrders = isAll ? 4 : 2;
-  const bairrosList = Object.keys(bairroMap)
+  let bairrosList = Object.keys(bairroMap)
     .filter(b => bairroMap[b].count >= minOrders && b !== 'NÃO ENCONTRADO')
     .map(b => {
       const item = bairroMap[b];
@@ -3668,6 +3693,20 @@ function renderBairroOcorrenciaSlaChart() {
     .slice(0, 10);
 
   const diagBox = document.getElementById('bairro-diagnostico-box');
+
+  let isFallback = false;
+  if (bairrosList.length === 0) {
+    const fallbackMap = (dashboardData.series && dashboardData.series.ocorrencias_bairro_map) || {};
+    const fallbackArr = fallbackMap[selectedOcorrenciaBairro] || fallbackMap['Todas as Ocorrências'] || [];
+    if (fallbackArr.length > 0) {
+      isFallback = true;
+      bairrosList = fallbackArr.map(item => ({
+        bairro: item.bairro,
+        sla: Math.round(item.sla_medio || item.sla_mediana || 2),
+        total: item.total || 0
+      })).slice(0, 10);
+    }
+  }
 
   if (bairrosList.length === 0) {
     if (diagBox) {
@@ -3746,13 +3785,17 @@ function renderBairroOcorrenciaSlaChart() {
     const highest = bairrosList[0];
     const lowest = bairrosList[bairrosList.length - 1];
     const ratio = lowest.sla > 0 ? (highest.sla / lowest.sla).toFixed(1) : (highest.sla).toFixed(0);
+    const subNotice = isFallback
+      ? `<div style="display:inline-block; margin-bottom:4px; font-size:0.75rem; color:var(--accent-blue);"><i class="fa-solid fa-circle-info"></i> Referência histórica consolidada para este defeito</div><br>`
+      : '';
 
     diagBox.innerHTML = `
       <div style="display: flex; gap: 8px; align-items: flex-start;">
         <i class="fa-solid fa-lightbulb" style="color: var(--warning, #f59e0b); font-size: 1.15rem; margin-top: 2px;"></i>
         <div>
+          ${subNotice}
           <div style="font-weight: 700; color: var(--text-main); margin-bottom: 3px;">
-            Diagnóstico de Variação de Prazo • <em>${selectedOcorrenciaBairro}</em>
+            Diagnóstico de Variação de Prazo • <em>${escapeHtml(selectedOcorrenciaBairro)}</em>
           </div>
           <div style="color: var(--text-muted); font-size: 0.78rem;">
             O SLA varia de <strong style="color: #10b981;">${Math.round(lowest.sla)}d em ${lowest.bairro}</strong> até <strong style="color: #ef4444;">${Math.round(highest.sla)}d em ${highest.bairro}</strong> (discrepância de <strong>${ratio}x</strong>).

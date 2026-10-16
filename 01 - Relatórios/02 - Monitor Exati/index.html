@@ -1308,8 +1308,8 @@
         <!-- Chips de 1 Clique para Filtro Imediato -->
         <div class="analitico-quick-chips">
           <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-dim); margin-right: 2px;">Atalhos rápidos:</span>
-          <button class="quick-chip" data-sla="pendentes"><i class="fa-solid fa-clock-rotate-left"></i> Backlog (30)</button>
-          <button class="quick-chip" data-sla="exclusao" style="border-color: rgba(239, 68, 68, 0.4); color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Detectado Exclusão</button>
+          <button class="quick-chip" data-sla="pendentes" id="btn-quick-backlog"><i class="fa-solid fa-clock-rotate-left"></i> Backlog (<span id="analitico-chip-backlog">30</span>)</button>
+          <button class="quick-chip" data-sla="exclusao" style="border-color: rgba(239, 68, 68, 0.4); color: #ef4444;" id="btn-quick-exclusao"><i class="fa-solid fa-triangle-exclamation"></i> Detectado Exclusão (<span id="analitico-chip-exclusao">1</span>)</button>
           <button class="quick-chip" data-origem="callcenter"><i class="fa-solid fa-headset"></i> Call Center</button>
           <button class="quick-chip" data-origem="ronda"><i class="fa-solid fa-shield-halved"></i> Rondas</button>
           <button class="quick-chip" data-sla="atrasado"><i class="fa-solid fa-triangle-exclamation"></i> Atrasados (> 7d)</button>
@@ -1584,7 +1584,7 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
   </div>
 
   <!-- JavaScript da Aplicação -->
-  <script src="/exati/app.js?v=20261016_v11"></script>
+  <script src="/exati/app.js?v=20261016_v12"></script>
   <!-- Shared Sidebar Controller & Rádio Global -->
   <script src="/js/sidebar.js"></script>
   <script src="/js/radio.js" defer></script>
