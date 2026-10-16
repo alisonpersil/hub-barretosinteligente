@@ -786,6 +786,13 @@
                     verificarPIN();
                 }
             });
+            pinInput.addEventListener('input', (e) => {
+                const err = document.getElementById('lockError');
+                if (err) err.style.display = 'none';
+                if (e.target.value.length === 4) {
+                    verificarPIN();
+                }
+            });
         }
 
         function bloquearAcesso() {
