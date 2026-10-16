@@ -108,12 +108,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     ? dashboardData.pendentes_lista.reduce((max, p) => (p.data_iso && p.data_iso > max ? p.data_iso : max), '')
     : '';
   const defaultDataMax = (dashboardData && dashboardData.metadata && dashboardData.metadata.data_max) || pendingMax || '2026-10-15';
-  dateFilterState.fim = defaultDataMax;
+  const maxFinal = (pendingMax && pendingMax > defaultDataMax) ? pendingMax : defaultDataMax;
+  dateFilterState.inicio = '2026-01-01';
+  dateFilterState.fim = maxFinal;
+  dateFilterState.preset = '2026';
+  dateFilterState.label = 'Ano 2026';
 
   updateSyncNotice();
   initTabs();
   initDateFilters();
-  applyDateFilter('2026-01-01', defaultDataMax, 'Ano 2026', false);
+  applyDateFilter('2026-01-01', maxFinal, 'Ano 2026', false);
   initSimulator();
   renderPendentesTable();
   initAnaliticoTable();
@@ -201,6 +205,26 @@ function rebuildChartsForTheme() {
   destroyAllCharts();
   renderCharts();
   updateSimulation();
+
+  // Failsafe de integridade: na visão anual/consolidada, o card de Backlog deve exibir rigorosamente os 30 chamados (38 pts)
+  if (isCurrentOrTotalPreset(dateFilterState.preset, dateFilterState.label)) {
+    const listaPend = (dashboardData && dashboardData.pendentes_lista) || [];
+    if (listaPend.length > 0) {
+      const totCham = listaPend.length;
+      const totPts = listaPend.reduce((a, c) => a + (c.pontos || 1), 0);
+      const venc = listaPend.filter(c => c.is_vencido).length;
+      const prazo = listaPend.filter(c => !c.is_vencido).length;
+      const setV = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = val;
+      };
+      setV('kpi-backlog-chamados', totCham);
+      setV('kpi-backlog-pontos', totPts + ' pts');
+      setV('kpi-backlog-vencidos', venc);
+      setV('kpi-backlog-prazo', prazo);
+      setV('badge-backlog-count', totCham);
+    }
+  }
 }
 
 function destroyAllCharts() {
@@ -433,11 +457,19 @@ const PRESET_MAP = {
   'Personalizado': { key: 'custom', label: 'Personalizado' }
 };
 
+// Helper: verifica se um preset/label refere-se ao ano corrente 2026, consolidado ou total
+function isCurrentOrTotalPreset(presetKey, presetLabel) {
+  const k = String(presetKey || '').trim().toLowerCase();
+  const l = String(presetLabel || '').trim().toLowerCase();
+  return !k || k === 'tudo' || k === '2026' || k === '30d' || k === '90d' ||
+         k.includes('2026') || l.includes('2026') || l.includes('total') || l.includes('consolidado');
+}
+
 // Função Central de Filtragem e Recálculo
 function applyDateFilter(inicioStr, fimStr, nomePreset, notify = true) {
   const presetInfo = PRESET_MAP[nomePreset] || {
-    key: dateFilterState.preset || 'custom',
-    label: (nomePreset && typeof nomePreset === 'string' && nomePreset.trim()) ? nomePreset : (dateFilterState.label || 'Personalizado')
+    key: dateFilterState.preset || '2026',
+    label: (nomePreset && typeof nomePreset === 'string' && nomePreset.trim()) ? nomePreset : (dateFilterState.label || 'Ano 2026')
   };
 
   dateFilterState.inicio = inicioStr;
@@ -655,7 +687,8 @@ function applyDateFilter(inicioStr, fimStr, nomePreset, notify = true) {
   // Card 2: Backlog Pendente Ativo
   const listaPend = dashboardData.pendentes_lista || [];
   let pendFiltrados = listaPend;
-  if (presetInfo.key !== 'tudo' && presetInfo.key !== '2026') {
+  const isCurrentOrTotal = isCurrentOrTotalPreset(presetInfo.key, presetInfo.label);
+  if (!isCurrentOrTotal) {
     pendFiltrados = listaPend.filter(p => {
       if (p.data_iso) {
         return p.data_iso >= inicioStr && p.data_iso <= fimStr;
@@ -1198,7 +1231,9 @@ function updateDrillUI() {
 }
 
 function renderCharts() {
-  applyDateFilter(dateFilterState.inicio, dateFilterState.fim, dateFilterState.label || dateFilterState.preset, false);
+  const pKey = dateFilterState.preset || '2026';
+  const pLabel = dateFilterState.label || (pKey === '2026' ? 'Ano 2026' : pKey);
+  applyDateFilter(dateFilterState.inicio, dateFilterState.fim, pLabel, false);
   renderChartEvolucaoPendentes();
 }
 
@@ -2611,7 +2646,7 @@ function renderPendentesTable() {
     }
 
     // 2. Filtro temporal para ordens solicitadas no período
-    if (dateFilterState.preset !== 'tudo' && dateFilterState.preset !== '2026') {
+    if (!isCurrentOrTotalPreset(dateFilterState.preset, dateFilterState.label)) {
       if (item.data_iso) {
         if (dateFilterState.inicio && item.data_iso < dateFilterState.inicio) return false;
         if (dateFilterState.fim && item.data_iso > dateFilterState.fim) return false;
@@ -2640,7 +2675,7 @@ function renderPendentesTable() {
     if (filtroGraficoData) {
       const modeTxt = filtroGraficoData.mode === 'acumulado' ? 'acumuladas até' : 'abertas em';
       totalElCount.textContent = `${filtrados.length} ordens ${modeTxt} ${filtroGraficoData.label} (Filtro do Gráfico Ativo)`;
-    } else if (dateFilterState.preset !== 'tudo' && dateFilterState.preset !== '2026') {
+    } else if (!isCurrentOrTotalPreset(dateFilterState.preset, dateFilterState.label)) {
       totalElCount.textContent = `${filtrados.length} ordens no período (de ${lista.length} ativas)`;
     } else {
       totalElCount.textContent = `${filtrados.length} ordens exibidas`;

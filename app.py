@@ -22,7 +22,7 @@ if sys.platform == "win32":
     except Exception:
         pass
 
-from flask import Flask, render_template, jsonify, send_file, send_from_directory, request, abort, redirect, g
+from flask import Flask, render_template, jsonify, send_file, send_from_directory, request, abort, redirect, g, make_response
 
 # Base Directories with Dynamic Resolution
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -100,6 +100,11 @@ def add_cors_headers(response):
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+    # Anti-cache para Monitor Exati e arquivos HTML/JS/CSS/JSON
+    if request.path.startswith("/exati") or request.path.endswith((".html", ".js", ".css", ".json")):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
     return response
 
 # ==============================================================================
@@ -522,17 +527,24 @@ def exati_index():
     """Serve o Painel Executivo do Monitor Exati."""
     index_path = os.path.join(EXATI_DIR, "index.html")
     if os.path.exists(index_path):
-        return send_file(index_path)
+        resp = make_response(send_file(index_path))
+        resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+        resp.headers["Pragma"] = "no-cache"
+        resp.headers["Expires"] = "0"
+        return resp
     return "Painel Exati em configuração.", 404
 
 @app.route("/exati/<path:filename>")
 def serve_exati_file(filename):
     """Serve arquivos estáticos e assets do Monitor Exati."""
-    return send_from_directory(EXATI_DIR, filename)
+    resp = make_response(send_from_directory(EXATI_DIR, filename))
+    resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    resp.headers["Pragma"] = "no-cache"
+    resp.headers["Expires"] = "0"
+    return resp
 
 @app.route("/api/upload", methods=["POST"])
 @app.route("/exati/api/upload", methods=["POST"])
-@app.route("/api/upload", methods=["POST"])
 def api_upload_exati():
     """Recebe planilhas de Pendentes ou Atendidos do Monitor Exati e sincroniza no GitHub ou em disco local."""
     try:
