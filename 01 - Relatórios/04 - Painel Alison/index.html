@@ -3,17 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Observabilidade de Tokens & Auditoria IA | Barretos Inteligente</title>
-  <meta name="description" content="Painel restrito de controle financeiro de tokens OpenAI e auditoria matemática contínua das planilhas.">
+  <title>Painel Alison | Barretos Inteligente</title>
+  <meta name="description" content="Painel Alison - Observabilidade de Tokens, Custos e Auditoria Contínua da Concessionária Barretos Inteligente.">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
 
-  <!-- Google Fonts: Inter -->
+  <!-- Google Fonts: Inter & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Font Awesome Pro / Free CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Estilos Globais do HUB -->
+  <link rel="stylesheet" href="/css/sidebar.css">
 
   <style>
     :root {
@@ -78,6 +81,12 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    .app-layout {
+      display: flex;
+      flex: 1;
+      width: 100%;
+    }
+
     /* ==========================================================================
        TELA DE BLOQUEIO / PIN DE SEGURANÇA (1264)
        ========================================================================== */
@@ -134,9 +143,9 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(2, 132, 199, 0.12);
-      border: 1px solid rgba(2, 132, 199, 0.3);
-      color: var(--primary);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--accent-green);
       font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
@@ -147,7 +156,7 @@
     }
 
     .lock-title {
-      font-size: 1.35rem;
+      font-size: 1.45rem;
       font-weight: 800;
       color: var(--text-main);
       margin-bottom: 6px;
@@ -242,15 +251,15 @@
     }
 
     /* ==========================================================================
-       DASHBOARD PRINCIPAL (DESBLOQUEADO)
+       DASHBOARD DESBLOQUEADO
        ========================================================================== */
     .dashboard-wrapper {
       display: none;
       flex-direction: column;
-      min-height: 100vh;
+      flex: 1;
+      min-width: 0;
     }
 
-    /* Topbar */
     .app-topbar {
       height: 64px;
       background: var(--bg-card);
@@ -283,13 +292,13 @@
       background: var(--border-color);
     }
 
-    .topbar-badge-confidencial {
+    .topbar-badge-alison {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: #ef4444;
+      background: var(--accent-green-bg);
+      border: 1px solid var(--accent-green-border);
+      color: var(--accent-green);
       font-size: 0.72rem;
       font-weight: 700;
       padding: 3px 10px;
@@ -335,7 +344,7 @@
       background: rgba(239, 68, 68, 0.15);
     }
 
-    /* Container */
+    /* Conteúdo Principal */
     .main-content {
       flex: 1;
       max-width: 1280px;
@@ -344,7 +353,6 @@
       padding: 24px 20px 40px 20px;
     }
 
-    /* Breadcrumbs */
     .breadcrumbs {
       display: flex;
       align-items: center;
@@ -359,7 +367,6 @@
       text-decoration: none;
     }
 
-    /* Header Banner */
     .page-header {
       background: var(--bg-card);
       border: 1px solid var(--border-color);
@@ -375,7 +382,7 @@
     }
 
     .page-title {
-      font-size: 1.55rem;
+      font-size: 1.6rem;
       font-weight: 800;
       color: var(--text-main);
       letter-spacing: -0.5px;
@@ -399,7 +406,7 @@
     }
 
     .btn-action-primary {
-      background: linear-gradient(135deg, #0284c7, #0369a1);
+      background: linear-gradient(135deg, #10b981, #059669);
       color: #ffffff;
       border: none;
       padding: 8px 16px;
@@ -410,14 +417,14 @@
       align-items: center;
       gap: 6px;
       cursor: pointer;
-      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.25);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
       transition: var(--transition);
       text-decoration: none;
     }
 
     .btn-action-primary:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 16px rgba(2, 132, 199, 0.35);
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.35);
     }
 
     /* KPI Grid */
@@ -737,7 +744,6 @@
       opacity: 1;
     }
 
-    /* Responsividade */
     @media (max-width: 980px) {
       .kpi-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -763,14 +769,14 @@
   <div class="lock-screen-wrapper" id="lockScreen">
     <div class="lock-card" id="lockCard">
       <div class="lock-icon-wrap">
-        <i class="fa-solid fa-shield-halved"></i>
+        <i class="fa-solid fa-user-shield"></i>
       </div>
       <div class="lock-pill">
-        <i class="fa-solid fa-lock"></i> Acesso Restrito • Operações CCO
+        <i class="fa-solid fa-lock"></i> Acesso Restrito • Gestão CCO
       </div>
-      <h2 class="lock-title">Observabilidade &amp; Tokens IA</h2>
+      <h2 class="lock-title">Painel Alison</h2>
       <p class="lock-subtitle">
-        Digite o PIN de segurança para liberar o monitoramento financeiro e auditorias da OpenAI.
+        Digite a senha de segurança para acessar o controle de tokens e auditorias da OpenAI.
       </p>
 
       <form id="pinForm" onsubmit="event.preventDefault(); verificarPIN();">
@@ -782,7 +788,7 @@
         </div>
 
         <button type="submit" class="btn-unlock" id="btnUnlock">
-          <i class="fa-solid fa-unlock-keyhole"></i> Desbloquear Acesso
+          <i class="fa-solid fa-unlock-keyhole"></i> Entrar no Painel Alison
         </button>
 
         <div class="lock-error" id="lockError">
@@ -802,8 +808,8 @@
           <img src="/logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="logo-img">
         </a>
         <div class="topbar-divider"></div>
-        <span class="topbar-badge-confidencial">
-          <i class="fa-solid fa-shield"></i> Confidencial • PMO
+        <span class="topbar-badge-alison">
+          <i class="fa-solid fa-user-shield"></i> Painel Alison • Confidencial
         </span>
       </div>
 
@@ -817,176 +823,260 @@
       </div>
     </header>
 
-    <main class="main-content">
-      <!-- Breadcrumb -->
-      <nav class="breadcrumbs">
-        <a href="/"><i class="fa-solid fa-house"></i> Início</a>
-        <span>&rsaquo;</span>
-        <span>Automações</span>
-        <span>&rsaquo;</span>
-        <span style="color: var(--text-main); font-weight: 600;">Observabilidade de Tokens &amp; Custos IA</span>
-      </nav>
+    <div class="app-layout">
+      <!-- Sidebar Oficial Unificada -->
+      <aside class="hub-sidebar" id="hubSidebar">
+        <div class="sidebar-inner">
+          <div class="sidebar-section-label">Módulos</div>
 
-      <!-- Page Header -->
-      <div class="page-header">
-        <div>
-          <h1 class="page-title">
-            <i class="fa-solid fa-chart-line" style="color: var(--accent-green);"></i>
-            Observabilidade de Tokens &amp; Auditoria IA
-          </h1>
-          <p class="page-subtitle">
-            Gestão financeira de tokens do modelo <strong>OpenAI GPT-4o-mini</strong>, controle orçamentário mensal e auditoria matemática contínua dos dados operacionais da concessão.
-          </p>
+          <nav class="sidebar-nav" aria-label="Navegação Lateral">
+            <!-- Início / Home -->
+            <div class="sidebar-group">
+              <a href="/" class="sidebar-item" id="tabBtnHome" title="Página Inicial do HUB">
+                <div class="item-left">
+                  <i class="fa-solid fa-house item-icon"></i>
+                  <span class="item-text">Início</span>
+                </div>
+              </a>
+            </div>
+
+            <!-- Módulo 1: Relatórios (Ativo) -->
+            <div class="sidebar-group">
+              <a href="/?tab=relatorios" class="sidebar-item active" id="tabBtnRelatorios" title="Módulo de Relatórios">
+                <div class="item-left">
+                  <i class="fa-solid fa-chart-pie item-icon"></i>
+                  <span class="item-text">Relatórios</span>
+                </div>
+                <span class="sidebar-badge" title="5 páginas disponíveis">5</span>
+              </a>
+
+              <!-- Submenu com as páginas de Relatórios -->
+              <div class="sidebar-submenu" id="subRelatorios" style="display: flex;">
+                <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Consulta de Ofícios">
+                  <i class="fa-solid fa-folder-open sub-icon green"></i>
+                  <span class="sub-text">Consulta de Ofícios</span>
+                </a>
+                <a href="/exati" class="sidebar-subitem" id="sideLinkExati" title="Monitor Exati">
+                  <i class="fa-solid fa-chart-line sub-icon blue"></i>
+                  <span class="sub-text">Monitor Exati</span>
+                </a>
+                <a href="https://app.powerbi.com/links/31OdxYhV_S?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare" target="_blank" rel="noopener noreferrer" class="sidebar-subitem" id="sideLinkBIEstoque" title="Acessar BI Estoque (Power BI)">
+                  <i class="fa-solid fa-chart-column sub-icon amber"></i>
+                  <span class="sub-text">BI Estoque</span>
+                </a>
+                <a href="/qa" class="sidebar-subitem" id="sideLinkQA" title="QA do Site">
+                  <i class="fa-solid fa-shield-halved sub-icon purple"></i>
+                  <span class="sub-text">QA do Site</span>
+                </a>
+                <a href="/painel-alison" class="sidebar-subitem active" id="sideLinkPainelAlison" title="Painel Alison (Acesso Restrito)">
+                  <i class="fa-solid fa-user-shield sub-icon green"></i>
+                  <span class="sub-text">Painel Alison</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Módulo 2: Automações -->
+            <div class="sidebar-group">
+              <a href="/?tab=automacoes" class="sidebar-item" id="tabBtnAutomacoes" title="Módulo de Automações">
+                <div class="item-left">
+                  <i class="fa-solid fa-bolt item-icon"></i>
+                  <span class="item-text">Automações</span>
+                </div>
+                <span class="sidebar-badge" title="1 ferramenta disponível">1</span>
+              </a>
+              <div class="sidebar-submenu" id="subAutomacoes" style="display: none;">
+                <a href="/sala-agentes" class="sidebar-subitem" id="sideLinkSala" title="Sala de Agentes Autônomos">
+                  <i class="fa-solid fa-robot sub-icon purple"></i>
+                  <span class="sub-text">Sala de Agentes</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Módulo 3: Book -->
+            <div class="sidebar-group">
+              <a href="/?tab=book" class="sidebar-item" id="tabBtnBook" title="Módulo Book">
+                <div class="item-left">
+                  <i class="fa-solid fa-book-bookmark item-icon"></i>
+                  <span class="item-text">Book</span>
+                </div>
+              </a>
+            </div>
+          </nav>
         </div>
+      </aside>
 
-        <div class="header-actions">
-          <button class="nav-btn" id="btnRefreshStats" title="Recarregar dados mais recentes">
-            <i class="fa-solid fa-rotate"></i> Atualizar
-          </button>
-          <button class="nav-btn" id="btnExportCSV" title="Exportar histórico em planilha CSV">
-            <i class="fa-solid fa-file-csv"></i> Exportar CSV
-          </button>
-          <a href="https://github.com/alisonpersil/hub-barretosinteligente/blob/main/CONSUMO_TOKENS.md" target="_blank" rel="noopener noreferrer" class="nav-btn" title="Ver relatório em Markdown no repositório GitHub">
-            <i class="fa-brands fa-github"></i> Ver no GitHub
-          </a>
-          <button class="btn-action-primary" id="btnTriggerAudit" title="Disparar reconciliação e auditoria matemática agora">
-            <i class="fa-solid fa-bolt"></i> Executar Auditoria
-          </button>
-        </div>
-      </div>
+      <!-- Área de Conteúdo -->
+      <main class="main-content">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumbs">
+          <a href="/"><i class="fa-solid fa-house"></i> Início</a>
+          <span>&rsaquo;</span>
+          <a href="/?tab=relatorios">Relatórios</a>
+          <span>&rsaquo;</span>
+          <span style="color: var(--text-main); font-weight: 600;">Painel Alison</span>
+        </nav>
 
-      <!-- Grid de 4 KPIs Principais -->
-      <div class="kpi-grid">
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <span class="kpi-label">Gasto Total Acumulado</span>
-            <span class="kpi-badge success" id="kpiPctTeto">0.002% do teto</span>
+        <!-- Page Header -->
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">
+              <i class="fa-solid fa-user-shield" style="color: var(--accent-green);"></i>
+              Painel Alison
+            </h1>
+            <p class="page-subtitle">
+              Observabilidade contínua de custos de tokens OpenAI (<strong>GPT-4o-mini</strong>), orçamento mensal e integridade matemática das planilhas operacionais.
+            </p>
           </div>
-          <div class="kpi-value" id="kpiGastoBrl">R$ 0,0011</div>
-          <div class="kpi-sub" id="kpiGastoUsd">$ 0.000208 USD &bull; Câmbio R$ 5,50</div>
-        </div>
 
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <span class="kpi-label">Tokens Processados</span>
-            <span class="kpi-badge info" id="kpiReqCount">1 auditoria</span>
-          </div>
-          <div class="kpi-value" id="kpiTotalTokens">861</div>
-          <div class="kpi-sub" id="kpiBreakdownTokens">Entrada: 685 &bull; Saída: 176</div>
-        </div>
-
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <span class="kpi-label">Custo Médio / Upload</span>
-            <span class="kpi-badge warning">Ultra Econômico</span>
-          </div>
-          <div class="kpi-value" id="kpiMedioBrl">R$ 0,0011</div>
-          <div class="kpi-sub" id="kpiMilUploads">1.000 uploads &approx; R$ 1,15</div>
-        </div>
-
-        <div class="kpi-card">
-          <div class="kpi-top">
-            <span class="kpi-label">Status da Integridade</span>
-            <span class="kpi-badge success">Zero Alucinação</span>
-          </div>
-          <div class="kpi-value" style="color: var(--accent-green);" id="kpiIntegridade">100% APROVADO</div>
-          <div class="kpi-sub">Reconciliação e CCO Validados</div>
-        </div>
-      </div>
-
-      <!-- Barra de Progresso do Orçamento Mensal -->
-      <div class="budget-card">
-        <div class="budget-header">
-          <span>
-            <i class="fa-solid fa-shield-halved" style="color: var(--accent-green); margin-right: 6px;"></i>
-            Limite Mensal de Segurança (Teto: R$ 50,00)
-          </span>
-          <span id="budgetText">R$ 0,0011 gastos &bull; R$ 49,9989 disponíveis</span>
-        </div>
-        <div class="budget-track">
-          <div class="budget-fill" id="budgetBar" style="width: 0.1%;"></div>
-        </div>
-      </div>
-
-      <!-- Comparativo de Eficiência (Dify vs Nosso Auditor) -->
-      <div class="efficiency-card">
-        <div class="efficiency-icon">
-          <i class="fa-solid fa-lightbulb"></i>
-        </div>
-        <div class="efficiency-text">
-          <strong>Por que a cota não esgota como acontecia com os bots do Dify?</strong>
-          <p>
-            Plataformas de chat conversacional (como o Dify) mantêm históricos extensos em memória e realizam chamadas redundantes em loop, consumindo centenas de milhares de tokens por conversa. Nosso sistema utiliza o <strong>Auditor Cirúrgico GPT-4o-mini</strong> ($0.15 por milhão de tokens): cada verificação envia estritamente os KPIs matemáticos da planilha consolidada. Cada upload consome apenas ~860 tokens (menos de um décimo de centavo de real).
-          </p>
-        </div>
-      </div>
-
-      <!-- Parecer Executivo do Auditor CCO -->
-      <div class="audit-summary-card">
-        <div class="audit-summary-title">
-          <i class="fa-solid fa-clipboard-check" style="color: var(--accent-blue);"></i>
-          Último Parecer Executivo do Auditor CCO (<span id="auditTimestamp">Recente</span>)
-        </div>
-        <div class="audit-summary-content" id="auditSummaryContent">
-          Carregando parecer da auditoria...
-        </div>
-
-        <div class="validations-grid">
-          <div class="val-item" id="valBacklog">
-            <i class="fa-solid fa-circle-check" style="color: var(--accent-green);"></i>
-            <span>Backlog Matemático (Pendentes = Prazo + Vencidos)</span>
-          </div>
-          <div class="val-item" id="valCard">
-            <i class="fa-solid fa-circle-check" style="color: var(--accent-green);"></i>
-            <span>Card Crítico Exato (Ordens e pontos conferidos)</span>
-          </div>
-          <div class="val-item" id="valExclusao">
-            <i class="fa-solid fa-circle-check" style="color: var(--accent-green);"></i>
-            <span>Exclusões Preservadas (Chamado 1827690 protegido)</span>
-          </div>
-          <div class="val-item" id="valFull">
-            <i class="fa-solid fa-circle-check" style="color: var(--accent-green);"></i>
-            <span>Tabela Full Unificada (Atendidos + Pendentes)</span>
+          <div class="header-actions">
+            <button class="nav-btn" id="btnRefreshStats" title="Recarregar dados mais recentes">
+              <i class="fa-solid fa-rotate"></i> Atualizar
+            </button>
+            <button class="nav-btn" id="btnExportCSV" title="Exportar histórico em planilha CSV">
+              <i class="fa-solid fa-file-csv"></i> Exportar CSV
+            </button>
+            <a href="https://github.com/alisonpersil/hub-barretosinteligente/blob/main/CONSUMO_TOKENS.md" target="_blank" rel="noopener noreferrer" class="nav-btn" title="Ver relatório no repositório GitHub">
+              <i class="fa-brands fa-github"></i> Ver no GitHub
+            </a>
+            <button class="btn-action-primary" id="btnTriggerAudit" title="Disparar reconciliação e auditoria matemática agora">
+              <i class="fa-solid fa-bolt"></i> Executar Auditoria
+            </button>
           </div>
         </div>
-      </div>
 
-      <!-- Tabela Histórica de Auditorias e Tokens -->
-      <div class="table-section">
-        <div class="table-header-row">
-          <div class="table-title">
-            <i class="fa-solid fa-clock-rotate-left" style="color: var(--accent-blue);"></i>
-            Histórico Linha a Linha de Auditorias &amp; Consumo de Tokens
+        <!-- Grid de 4 KPIs Principais -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Gasto Total Acumulado</span>
+              <span class="kpi-badge success" id="kpiPctTeto">0.002% do teto</span>
+            </div>
+            <div class="kpi-value" id="kpiGastoBrl">R$ 0,0011</div>
+            <div class="kpi-sub" id="kpiGastoUsd">$ 0.000208 USD &bull; Câmbio R$ 5,50</div>
           </div>
-          <input type="text" id="tableFilter" class="table-search-input" placeholder="Filtrar por arquivo ou data...">
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Tokens Processados</span>
+              <span class="kpi-badge info" id="kpiReqCount">1 auditoria</span>
+            </div>
+            <div class="kpi-value" id="kpiTotalTokens">861</div>
+            <div class="kpi-sub" id="kpiBreakdownTokens">Entrada: 685 &bull; Saída: 176</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Custo Médio / Upload</span>
+              <span class="kpi-badge warning">Ultra Econômico</span>
+            </div>
+            <div class="kpi-value" id="kpiMedioBrl">R$ 0,0011</div>
+            <div class="kpi-sub" id="kpiMilUploads">1.000 uploads &approx; R$ 1,15</div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-top">
+              <span class="kpi-label">Status da Integridade</span>
+              <span class="kpi-badge success">Zero Alucinação</span>
+            </div>
+            <div class="kpi-value" style="color: var(--accent-green);" id="kpiIntegridade">100% APROVADO</div>
+            <div class="kpi-sub">Reconciliação e CCO Validados</div>
+          </div>
         </div>
 
-        <div class="table-responsive">
-          <table class="tokens-table">
-            <thead>
-              <tr>
-                <th>Data / Hora</th>
-                <th>Planilha / Origem</th>
-                <th>Modelo</th>
-                <th>Tokens Entrada</th>
-                <th>Tokens Saída</th>
-                <th>Total Tokens</th>
-                <th>Custo (R$)</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="tokensTbody">
-              <tr>
-                <td colspan="8" style="text-align: center; color: var(--text-dim); padding: 24px;">
-                  Carregando registros de auditoria...
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Barra de Progresso do Orçamento Mensal -->
+        <div class="budget-card">
+          <div class="budget-header">
+            <span>
+              <i class="fa-solid fa-shield-halved" style="color: var(--accent-green); margin-right: 6px;"></i>
+              Limite Mensal de Segurança (Teto: R$ 50,00)
+            </span>
+            <span id="budgetText">R$ 0,0011 gastos &bull; R$ 49,9989 disponíveis</span>
+          </div>
+          <div class="budget-track">
+            <div class="budget-fill" id="budgetBar" style="width: 0.1%;"></div>
+          </div>
         </div>
-      </div>
 
-    </main>
+        <!-- Comparativo de Eficiência (Dify vs Nosso Auditor) -->
+        <div class="efficiency-card">
+          <div class="efficiency-icon">
+            <i class="fa-solid fa-lightbulb"></i>
+          </div>
+          <div class="efficiency-text">
+            <strong>Por que a cota não esgota como acontecia com os bots do Dify?</strong>
+            <p>
+              Plataformas de chat conversacional (como o Dify) mantêm históricos extensos em memória e realizam chamadas redundantes em loop, consumindo centenas de milhares de tokens por conversa. Nosso sistema utiliza o <strong>Auditor Cirúrgico GPT-4o-mini</strong> ($0.15 por milhão de tokens): cada verificação envia estritamente os KPIs matemáticos da planilha consolidada. Cada upload consome apenas ~860 tokens (menos de um décimo de centavo de real).
+            </p>
+          </div>
+        </div>
+
+        <!-- Parecer Executivo do Auditor CCO -->
+        <div class="audit-summary-card">
+          <div class="audit-summary-title">
+            <i class="fa-solid fa-clipboard-check" style="color: var(--accent-blue);"></i>
+            Último Parecer Executivo do Auditor CCO (<span id="auditTimestamp">Recente</span>)
+          </div>
+          <div class="audit-summary-content" id="auditSummaryContent">
+            Carregando parecer da auditoria...
+          </div>
+
+          <div class="validations-grid">
+            <div class="val-item" id="valBacklog">
+              <i class="fa-solid fa-circle-check" style="color: var(--accent-green);"></i>
+              <span>Backlog Matemático (Pendentes = Prazo + Vencidos)</span>
+            </div>
+            <div class="val-item" id="valCard">
+              <i class="fa-solid fa-circle-check" style="color: var(--accent-green);"></i>
+              <span>Card Crítico Exato (Ordens e pontos conferidos)</span>
+            </div>
+            <div class="val-item" id="valExclusao">
+              <i class="fa-solid fa-circle-check" style="color: var(--accent-green);"></i>
+              <span>Exclusões Preservadas (Chamado 1827690 protegido)</span>
+            </div>
+            <div class="val-item" id="valFull">
+              <i class="fa-solid fa-circle-check" style="color: var(--accent-green);"></i>
+              <span>Tabela Full Unificada (Atendidos + Pendentes)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela Histórica de Auditorias e Tokens -->
+        <div class="table-section">
+          <div class="table-header-row">
+            <div class="table-title">
+              <i class="fa-solid fa-clock-rotate-left" style="color: var(--accent-blue);"></i>
+              Histórico Linha a Linha de Auditorias &amp; Consumo de Tokens
+            </div>
+            <input type="text" id="tableFilter" class="table-search-input" placeholder="Filtrar por arquivo ou data...">
+          </div>
+
+          <div class="table-responsive">
+            <table class="tokens-table">
+              <thead>
+                <tr>
+                  <th>Data / Hora</th>
+                  <th>Planilha / Origem</th>
+                  <th>Modelo</th>
+                  <th>Tokens Entrada</th>
+                  <th>Tokens Saída</th>
+                  <th>Total Tokens</th>
+                  <th>Custo (R$)</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="tokensTbody">
+                <tr>
+                  <td colspan="8" style="text-align: center; color: var(--text-dim); padding: 24px;">
+                    Carregando registros de auditoria...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
   </div>
 
   <!-- Toast Notification -->
@@ -995,6 +1085,7 @@
     <span id="toastMsg">Mensagem</span>
   </div>
 
+  <script src="/js/sidebar.js"></script>
   <script>
     const SENHA_CORRETA = "1264";
     const AUTH_KEY = "pmo_ai_token_auth";
@@ -1063,14 +1154,13 @@
       } else {
         lockError.style.display = 'block';
         lockCard.classList.remove('shake');
-        void lockCard.offsetWidth; // trigger reflow
+        void lockCard.offsetWidth;
         lockCard.classList.add('shake');
         input.value = '';
         input.focus();
       }
     }
 
-    // Auto-submissão ao digitar 4 dígitos
     pinInput.addEventListener('input', (e) => {
       if (e.target.value.length === 4) {
         verificarPIN();
@@ -1092,7 +1182,6 @@
       carregarDadosDashboard();
     }
 
-    // Verificar se já autenticado na sessão
     function checkAuthOnLoad() {
       initTheme();
       const savedAuth = sessionStorage.getItem(AUTH_KEY);
@@ -1105,10 +1194,8 @@
       }
     }
 
-    // Botão de Logout / Sair
     document.getElementById('btnLockExit').addEventListener('click', bloquearAcesso);
 
-    // Formatações
     function formatBRL(val) {
       const num = Number(val) || 0;
       if (num < 0.01 && num > 0) {
@@ -1122,7 +1209,6 @@
       return '$ ' + num.toFixed(6);
     }
 
-    // Buscar dados da API
     async function carregarDadosDashboard() {
       try {
         const [resTokens, resDash] = await Promise.all([
@@ -1160,7 +1246,6 @@
       const cTokens = stats.total_completion_tokens || 176;
       const mediaBrl = totReq > 0 ? (gastoBrl / totReq) : 0.00115;
 
-      // KPIs
       document.getElementById('kpiGastoBrl').textContent = formatBRL(gastoBrl);
       document.getElementById('kpiGastoUsd').textContent = `${formatUSD(gastoUsd)} USD • Câmbio R$ ${(stats.taxa_dolar || 5.50).toFixed(2)}`;
       document.getElementById('kpiPctTeto').textContent = `${pctGasto.toFixed(3)}% do teto`;
@@ -1174,14 +1259,12 @@
 
       document.getElementById('kpiIntegridade').textContent = `${ai.confianca_percent || 100}% ${ai.status || 'APROVADO'}`;
 
-      // Budget Bar
       const budgetBar = document.getElementById('budgetBar');
       const budgetText = document.getElementById('budgetText');
       const disp = Math.max(0, limite - gastoBrl);
       budgetBar.style.width = `${Math.max(0.5, Math.min(100, pctGasto))}%`;
       budgetText.textContent = `${formatBRL(gastoBrl)} gastos • ${formatBRL(disp)} disponíveis no mês`;
 
-      // Parecer Executivo
       document.getElementById('auditTimestamp').textContent = ai.auditado_em || stats.updated_at || 'Recente';
       document.getElementById('auditSummaryContent').innerHTML = `
         <strong>Resumo Executivo para a Diretoria:</strong> ${ai.resumo_executivo || 'Base consolidada auditada com 100% de integridade matemática e conformidade contratual CCO.'}
@@ -1189,7 +1272,6 @@
         <strong>Parecer CCO:</strong> ${ai.parecer_cco || 'Aprovado sem pendências.'}
       `;
 
-      // Validações
       const setVal = (id, ok) => {
         const el = document.getElementById(id);
         if (!el) return;
@@ -1202,7 +1284,6 @@
       setVal('valExclusao', validacoes.exclusao_preservada !== false);
       setVal('valFull', validacoes.solicitacoes_full_unificadas !== false);
 
-      // Tabela
       renderTabela(stats.historico || []);
     }
 
@@ -1246,7 +1327,6 @@
       }).join('');
     }
 
-    // Filtro na Tabela
     document.getElementById('tableFilter').addEventListener('input', (e) => {
       const q = e.target.value.toLowerCase().trim();
       const list = (globalTokenStats && globalTokenStats.historico) || [];
@@ -1261,13 +1341,11 @@
       renderTabela(filtered);
     });
 
-    // Ações
     document.getElementById('btnRefreshStats').addEventListener('click', async () => {
       await carregarDadosDashboard();
-      showToast('Dados de observabilidade atualizados!', 'fa-rotate');
+      showToast('Dados do Painel Alison atualizados!', 'fa-rotate');
     });
 
-    // Exportar CSV
     document.getElementById('btnExportCSV').addEventListener('click', () => {
       const list = (globalTokenStats && globalTokenStats.historico) || [];
       if (list.length === 0) {
@@ -1293,7 +1371,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `observabilidade_tokens_ia_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.download = `painel_alison_tokens_${new Date().toISOString().slice(0, 10)}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1301,7 +1379,6 @@
       showToast('Planilha CSV exportada com sucesso!', 'fa-file-excel');
     });
 
-    // Disparar Auditoria Manual
     document.getElementById('btnTriggerAudit').addEventListener('click', async () => {
       const btn = document.getElementById('btnTriggerAudit');
       btn.disabled = true;
@@ -1323,7 +1400,6 @@
       }
     });
 
-    // Inicialização
     window.addEventListener('DOMContentLoaded', checkAuthOnLoad);
   </script>
 </body>
