@@ -4447,71 +4447,9 @@ function setupUploadModal() {
 
   if (!modal || !btnOpen) return;
 
-  // Gerenciamento de Conexão com Banco de Dados no GitHub
-  const btnToggleGh = document.getElementById('btnToggleGithubSettingsExati');
-  const ghBody = document.getElementById('githubSettingsBodyExati');
-  const ghChevron = document.getElementById('githubSettingsChevronExati');
-  const ghInput = document.getElementById('githubTokenInputExati');
-  const btnSaveGh = document.getElementById('btnSaveGithubTokenExati');
-  const ghTitle = document.getElementById('cloudStatusTitleExati');
-  const ghSub = document.getElementById('cloudStatusSubtitleExati');
-
-  const updateGhStatus = async () => {
-    const token = localStorage.getItem('pmo_github_token') || '';
-    if (ghInput) ghInput.value = token;
-    try {
-      const res = await fetch('/api/system/status', {
-        headers: token ? { 'X-GitHub-Token': token } : {}
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data.has_github_token || token) {
-          if (ghTitle) ghTitle.textContent = 'Banco de Dados no GitHub (Conectado)';
-          if (ghSub) ghSub.innerHTML = `<span style="color:var(--success); font-weight:600;"><i class="fa-solid fa-circle-check"></i> Pronto para salvar em ${data.repo || 'alisonpersil/hub-barretosinteligente'}</span>`;
-        } else if (data.is_vercel) {
-          if (ghTitle) ghTitle.textContent = 'Banco de Dados no GitHub (Token Necessário)';
-          if (ghSub) ghSub.innerHTML = `<span style="color:var(--warning);"><i class="fa-solid fa-triangle-exclamation"></i> Clique para informar o GitHub Token</span>`;
-        } else {
-          if (ghTitle) ghTitle.textContent = 'Servidor Local (Disco Físico Ativo)';
-          if (ghSub) ghSub.innerHTML = `<span style="color:var(--accent-blue);"><i class="fa-solid fa-hard-drive"></i> Gravação física na pasta Base de dados</span>`;
-        }
-      }
-    } catch (_) {
-      if (token) {
-        if (ghTitle) ghTitle.textContent = 'Banco de Dados no GitHub (Conectado)';
-        if (ghSub) ghSub.innerHTML = `<span style="color:var(--success); font-weight:600;"><i class="fa-solid fa-circle-check"></i> Token configurado no navegador</span>`;
-      }
-    }
-  };
-
-  if (btnToggleGh && ghBody) {
-    btnToggleGh.addEventListener('click', () => {
-      const isOpen = ghBody.style.display !== 'none';
-      ghBody.style.display = isOpen ? 'none' : 'block';
-      if (ghChevron) ghChevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
-    });
-  }
-
-  if (btnSaveGh && ghInput) {
-    btnSaveGh.addEventListener('click', () => {
-      const tVal = ghInput.value.trim();
-      if (tVal) {
-        localStorage.setItem('pmo_github_token', tVal);
-        showToast('Token do GitHub salvo com sucesso!', 'fa-circle-check');
-      } else {
-        localStorage.removeItem('pmo_github_token');
-        showToast('Token do GitHub removido.', 'fa-circle-info');
-      }
-      if (ghBody) ghBody.style.display = 'none';
-      if (ghChevron) ghChevron.style.transform = 'rotate(0deg)';
-      updateGhStatus();
-    });
-  }
-
   btnOpen.addEventListener('click', () => {
     modal.classList.add('active');
     resetUploadState();
-    updateGhStatus();
   });
 
   if (btnClose) btnClose.addEventListener('click', () => modal.classList.remove('active'));
