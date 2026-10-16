@@ -406,6 +406,51 @@ for idx, r in df_2026.iterrows():
         'solucao': str(get_col_val(r, a_map, 'solucao', ''))
     })
 
+# Unificação integral para o Explorador Analítico (Atendidos + Backlog Ativo / Exclusão Detectada)
+solicitacoes_full_rows = []
+for item_at in atendidos_2026_rows:
+    row_copy = dict(item_at)
+    row_copy['is_pendente'] = False
+    row_copy['alerta_auditoria'] = False
+    row_copy['audit_nota'] = 'Concluído no Histórico Operacional'
+    solicitacoes_full_rows.append(row_copy)
+
+for p in pendentes_data:
+    sol_id = p.get('id', 0)
+    proto_str = str(p.get('protocolo', sol_id))
+    origem_clean = p.get('origem', 'Ronda própria')
+    dt_sol = p.get('data_solicitacao', '')
+    dt_iso = p.get('data_iso', '')
+    is_venc = p.get('is_vencido', False)
+    dias_atraso = p.get('dias_atraso', 0)
+    dias_rest = p.get('dias_sla_restantes', 0)
+    dias_aberto = p.get('dias_aberto', 0)
+    alerta_exclusao = bool(p.get('alerta_auditoria', False))
+    audit_nota = p.get('audit_nota', '')
+    
+    sla_status = 'Detectado Exclusão' if alerta_exclusao else ('Atrasado' if is_venc else 'No Prazo')
+    
+    solicitacoes_full_rows.append({
+        'os': int(sol_id) if str(sol_id).isdigit() else sol_id,
+        'proto': proto_str,
+        'origem': origem_clean,
+        'dt_rec': dt_sol,
+        'dt_fim': '',
+        'data_iso': dt_iso,
+        'dias': dias_atraso if is_venc else dias_rest,
+        'horas': round(dias_aberto * 24.0, 1),
+        'sla': sla_status,
+        'eq': str(p.get('atendente', 'Backlog / CCO')),
+        'bairro': str(p.get('bairro', 'Barretos')),
+        'tipo': str(p.get('tipo', 'Manutenção / Iluminação Pública')),
+        'solucao': str(p.get('status', 'Em Atendimento')),
+        'is_pendente': True,
+        'alerta_auditoria': alerta_exclusao,
+        'audit_nota': audit_nota,
+        'pontos': p.get('pontos', 1),
+        'tempo_restante_texto': p.get('tempo_restante_texto', '')
+    })
+
 top_bairros_idx = list(df_2026[col_bairro].dropna().value_counts().head(8).index) if col_bairro in df_2026.columns else []
 top_bairros_vals = [int(v) for v in df_2026[col_bairro].dropna().value_counts().head(8).values] if col_bairro in df_2026.columns else []
 top_bairros_sla = []
@@ -595,7 +640,8 @@ dashboard_data = {
         "pendentes": p_audit_latest,
         "atendidos": a_audit
     },
-    "atendidos_2026": atendidos_2026_rows
+    "atendidos_2026": atendidos_2026_rows,
+    "solicitacoes_full": solicitacoes_full_rows
 }
 
 json_path = os.path.join(output_dir, "dashboard_data.json")

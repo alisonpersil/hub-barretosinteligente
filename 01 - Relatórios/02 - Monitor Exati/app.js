@@ -2675,8 +2675,42 @@ let analiticoState = {
   filteredData: []
 };
 
+function getAnaliticoFullList() {
+  if (dashboardData.solicitacoes_full && dashboardData.solicitacoes_full.length > 0) {
+    return dashboardData.solicitacoes_full;
+  }
+  // Fallback: unificar atendidos_2026 com pendentes_lista
+  const atendidos = (dashboardData.atendidos_2026 || []).map(r => ({ ...r, is_pendente: false }));
+  const pendentes = (dashboardData.pendentes_lista || []).map(p => {
+    const isVenc = !!p.is_vencido;
+    const solId = p.solicitacao || (p.protocolo ? p.protocolo.split('/')[0] : '');
+    const alertaExclusao = !!p.alerta_auditoria;
+    return {
+      os: parseInt(solId) || solId,
+      proto: p.protocolo || '',
+      origem: p.origem || 'Ronda própria',
+      dt_rec: p.data_solicitacao || '',
+      dt_fim: '',
+      data_iso: (p.data_solicitacao || '').slice(0, 10).split('/').reverse().join('-'),
+      dias: isVenc ? (p.dias_atraso || 0) : (p.dias_sla_restantes || 0),
+      horas: null,
+      sla: alertaExclusao ? 'Detectado Exclusão' : (isVenc ? 'Atrasado' : 'No Prazo'),
+      eq: p.atendente || 'Backlog / CCO',
+      bairro: p.bairro || 'Barretos',
+      tipo: p.tipo || 'Manutenção / Iluminação Pública',
+      solucao: p.status || 'Em Atendimento',
+      is_pendente: true,
+      alerta_auditoria: alertaExclusao,
+      audit_nota: p.audit_nota || '',
+      pontos: p.pontos || 1,
+      tempo_restante_texto: p.tempo_restante_texto || ''
+    };
+  });
+  return [...atendidos, ...pendentes];
+}
+
 function initAnaliticoTable() {
-  const lista = dashboardData.atendidos_2026 || [];
+  const lista = getAnaliticoFullList();
 
   // Preencher dropdown de equipes dinamicamente
   const selectEquipe = document.getElementById('filtro-analitico-equipe');
@@ -2900,8 +2934,8 @@ function resetAnaliticoFilters() {
 }
 
 function applyAnaliticoFilters() {
-  const rawList = dashboardData.atendidos_2026 || [];
-  const q = analiticoState.search;
+  const rawList = getAnaliticoFullList();
+  const q = (analiticoState.search || '').trim().toLowerCase();
   const slaF = analiticoState.slaFilter;
   const tmaF = analiticoState.tmaFilter;
   const eqF = analiticoState.equipeFilter;
@@ -2910,16 +2944,21 @@ function applyAnaliticoFilters() {
   // Filtragem
   const filtered = rawList.filter(r => {
     // 0. Filtro Temporal Global (dateFilterState)
-    if (r.data_iso) {
+    // Se o usuário digitou uma busca específica (ex: '1827690', número de OS ou texto),
+    // ignoramos a restrição de data para garantir localização instantânea de qualquer chamado.
+    if (!q && r.data_iso) {
       if (dateFilterState.inicio && r.data_iso < dateFilterState.inicio) return false;
       if (dateFilterState.fim && r.data_iso > dateFilterState.fim) return false;
     }
 
     // 1. SLA Filter
-    if (slaF === 'com_rec' && (r.dias === null || r.dias === undefined)) return false;
+    if (slaF === 'pendentes' && !r.is_pendente) return false;
+    if (slaF === 'concluidos' && r.is_pendente) return false;
+    if (slaF === 'exclusao' && (!r.is_pendente || !r.alerta_auditoria)) return false;
+    if (slaF === 'com_rec' && (r.dias === null || r.dias === undefined || (r.origem && r.origem.toLowerCase().includes('ronda')))) return false;
     if (slaF === 'no_prazo' && r.sla !== 'No Prazo') return false;
     if (slaF === 'atrasado' && r.sla !== 'Atrasado') return false;
-    if (slaF === 'ronda' && r.sla !== 'Ronda') return false;
+    if (slaF === 'ronda' && r.sla !== 'Ronda' && !(r.origem && r.origem.toLowerCase().includes('ronda'))) return false;
 
     // 2. TMA Filter
     if (tmaF === 'rapido') {
@@ -2956,16 +2995,19 @@ function applyAnaliticoFilters() {
       if (!o.includes('chatbot')) return false;
     }
 
-    // 5. Busca Textual
+    // 5. Busca Textual Ampla
     if (q) {
-      const match = String(r.os).includes(q) ||
+      const match = String(r.os).toLowerCase().includes(q) ||
                     (r.proto && r.proto.toLowerCase().includes(q)) ||
                     (r.origem && r.origem.toLowerCase().includes(q)) ||
                     (r.bairro && r.bairro.toLowerCase().includes(q)) ||
                     (r.eq && r.eq.toLowerCase().includes(q)) ||
                     (r.tipo && r.tipo.toLowerCase().includes(q)) ||
                     (r.solucao && r.solucao.toLowerCase().includes(q)) ||
-                    (r.dt_rec && r.dt_rec.toLowerCase().includes(q));
+                    (r.dt_rec && r.dt_rec.toLowerCase().includes(q)) ||
+                    (r.dt_fim && r.dt_fim.toLowerCase().includes(q)) ||
+                    (r.sla && r.sla.toLowerCase().includes(q)) ||
+                    (r.audit_nota && r.audit_nota.toLowerCase().includes(q));
       if (!match) return false;
     }
 
@@ -2983,27 +3025,29 @@ function applyAnaliticoFilters() {
 
 function updateAnaliticoKPIs(filtered) {
   const total = filtered.length;
-  const comDias = filtered.filter(r => r.dias !== null && r.dias !== undefined);
-  const noPrazo = filtered.filter(r => r.sla === 'No Prazo').length;
-  const atrasadas = filtered.filter(r => r.sla === 'Atrasado').length;
-  const rondas = filtered.filter(r => r.sla === 'Ronda').length;
+  const concluidosComDias = filtered.filter(r => !r.is_pendente && r.dias !== null && r.dias !== undefined);
+  const noPrazo = filtered.filter(r => !r.is_pendente && r.sla === 'No Prazo').length;
+  const atrasadas = filtered.filter(r => !r.is_pendente && r.sla === 'Atrasado').length;
+  const rondas = filtered.filter(r => !r.is_pendente && (r.sla === 'Ronda' || ((r.origem || '').toLowerCase().includes('ronda') && (r.dias === null || r.dias === undefined)))).length;
+  const pendentesTotal = filtered.filter(r => r.is_pendente).length;
+  const pendentesAtrasadas = filtered.filter(r => r.is_pendente && (r.sla === 'Atrasado' || r.alerta_auditoria)).length;
 
   let tmaMedio = '-';
   let tmaHoras = '-';
   let tmaMediana = '-';
   let taxaSla = '-';
 
-  if (comDias.length > 0) {
-    const sumDias = comDias.reduce((acc, c) => acc + c.dias, 0);
-    const sumHoras = comDias.reduce((acc, c) => acc + (c.horas || c.dias * 24), 0);
-    const avgDias = sumDias / comDias.length;
-    const avgHoras = sumHoras / comDias.length;
+  if (concluidosComDias.length > 0) {
+    const sumDias = concluidosComDias.reduce((acc, c) => acc + c.dias, 0);
+    const sumHoras = concluidosComDias.reduce((acc, c) => acc + (c.horas || c.dias * 24), 0);
+    const avgDias = sumDias / concluidosComDias.length;
+    const avgHoras = sumHoras / concluidosComDias.length;
 
     tmaMedio = Math.round(avgDias) + ' dias';
     tmaHoras = `~${Math.round(avgHoras)} horas`;
 
     // Mediana
-    const sortedDias = comDias.map(c => c.dias).sort((a, b) => a - b);
+    const sortedDias = concluidosComDias.map(c => c.dias).sort((a, b) => a - b);
     const mid = Math.floor(sortedDias.length / 2);
     const medVal = sortedDias.length % 2 !== 0 ? sortedDias[mid] : ((sortedDias[mid - 1] + sortedDias[mid]) / 2);
     const medValInt = Math.round(medVal);
@@ -3027,7 +3071,7 @@ function updateAnaliticoKPIs(filtered) {
   setEl('analitico-kpi-sla', taxaSla);
   setEl('analitico-kpi-noprazo', `${noPrazo.toLocaleString('pt-BR')} no prazo (≤ 7d)`);
   setEl('analitico-kpi-noprazo-count', noPrazo.toLocaleString('pt-BR'));
-  setEl('analitico-kpi-atrasadas', atrasadas.toLocaleString('pt-BR'));
+  setEl('analitico-kpi-atrasadas', (atrasadas + pendentesAtrasadas).toLocaleString('pt-BR'));
   setEl('analitico-kpi-ronda', rondas.toLocaleString('pt-BR'));
 
   const countEl = document.getElementById('analitico-table-count');
@@ -3038,7 +3082,11 @@ function updateAnaliticoKPIs(filtered) {
 
   const badgeMetodologia = document.getElementById('badge-metodologia-sla');
   if (badgeMetodologia) {
-    badgeMetodologia.textContent = `${comDias.length.toLocaleString('pt-BR')} com chamado (Base do SLA) • ${rondas.toLocaleString('pt-BR')} rondas`;
+    let metText = `${concluidosComDias.length.toLocaleString('pt-BR')} com chamado (Base do SLA) &bull; ${rondas.toLocaleString('pt-BR')} rondas`;
+    if (pendentesTotal > 0) {
+      metText += ` &bull; ${pendentesTotal.toLocaleString('pt-BR')} backlog em aberto`;
+    }
+    badgeMetodologia.innerHTML = metText;
   }
 
   const chipTotal = document.getElementById('analitico-chip-total');
@@ -3082,8 +3130,9 @@ function renderAnaliticoTable() {
   if (!tbody) return;
 
   // Auto-recuperação de integridade: se filteredData estiver vazio mas houver dados brutos, reaplica filtros
+  const fullList = getAnaliticoFullList();
   if ((!analiticoState.filteredData || analiticoState.filteredData.length === 0) &&
-      dashboardData.atendidos_2026 && dashboardData.atendidos_2026.length > 0) {
+      fullList.length > 0) {
     if (analiticoState.search === '' && analiticoState.slaFilter === 'todos' &&
         analiticoState.tmaFilter === 'todas' && analiticoState.equipeFilter === 'todas' &&
         analiticoState.origemFilter === 'todas') {
@@ -3168,7 +3217,16 @@ function renderAnaliticoTable() {
 
     // Badge SLA em Dias (arredondado para número inteiro)
     let tmaBadge = '';
-    if (r.dias === null || r.dias === undefined) {
+    if (r.is_pendente) {
+      const dInt = Math.round(r.dias || 0);
+      if (r.alerta_auditoria) {
+        tmaBadge = `<span class="tma-badge tma-badge-danger" title="${escapeHtml(r.tempo_restante_texto || 'Aguardando regularização CCO')}"><i class="fa-solid fa-triangle-exclamation"></i> ${dInt}d <small>(Aberto)</small></span>`;
+      } else if (r.sla === 'Atrasado') {
+        tmaBadge = `<span class="tma-badge tma-badge-danger" title="${escapeHtml(r.tempo_restante_texto || 'Atraso no backlog')}"><i class="fa-solid fa-triangle-exclamation"></i> ${dInt}d <small>(Atraso)</small></span>`;
+      } else {
+        tmaBadge = `<span class="tma-badge tma-badge-ontime" title="${escapeHtml(r.tempo_restante_texto || 'Dentro do prazo')}"><i class="fa-solid fa-clock"></i> ${dInt}d <small>(Restam)</small></span>`;
+      }
+    } else if (r.dias === null || r.dias === undefined) {
       tmaBadge = `<span class="badge badge-secondary" title="Atendimento originado em ronda interna"><i class="fa-solid fa-shield-halved"></i> Ronda</span>`;
     } else {
       const dInt = Math.round(r.dias);
@@ -3186,7 +3244,15 @@ function renderAnaliticoTable() {
 
     // Badge SLA
     let slaBadge = '';
-    if (r.sla === 'No Prazo') {
+    if (r.alerta_auditoria) {
+      slaBadge = `<span class="badge badge-danger" style="background: rgba(239, 68, 68, 0.16); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4);"><i class="fa-solid fa-triangle-exclamation"></i> Detectado Exclusão</span>`;
+    } else if (r.is_pendente) {
+      if (r.sla === 'Atrasado') {
+        slaBadge = `<span class="badge badge-danger"><i class="fa-solid fa-clock"></i> Backlog Vencido</span>`;
+      } else {
+        slaBadge = `<span class="badge badge-success"><i class="fa-solid fa-clock"></i> Backlog no Prazo</span>`;
+      }
+    } else if (r.sla === 'No Prazo') {
       slaBadge = `<span class="badge badge-success"><i class="fa-solid fa-check"></i> No Prazo</span>`;
     } else if (r.sla === 'Atrasado') {
       slaBadge = `<span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> Atrasado</span>`;
@@ -3194,18 +3260,43 @@ function renderAnaliticoTable() {
       slaBadge = `<span class="badge badge-secondary"><i class="fa-solid fa-shield-halved"></i> Ronda</span>`;
     }
 
+    // Badge Auditoria Exclusão no número da OS
+    let badgeExclusaoOs = '';
+    if (r.alerta_auditoria) {
+      badgeExclusaoOs = `
+        <span class="badge-exclusao" title="Detectado Exclusão: Essa solicitação não se enconta na base de itens pendentes e ela não foi migrada para para itens concluídos, o sistema mantém essa solicitação até ela entrar no status de concluído.">
+          <span>Detectado Exclusão</span>
+          <span class="badge-info-icon"><i class="fa-solid fa-circle-info"></i></span>
+          <div class="badge-tooltip-popup">
+            <strong><i class="fa-solid fa-circle-info"></i> Detectado Exclusão</strong>
+            Essa solicitação não se enconta na base de itens pendentes e ela não foi migrada para para itens concluídos, o sistema mantém essa solicitação até ela entrar no status de concluído.
+          </div>
+        </span>`;
+    } else if (r.is_pendente) {
+      badgeExclusaoOs = `<span class="badge badge-warning" style="font-size:0.7rem; margin-left: 4px; padding: 1px 5px;"><i class="fa-solid fa-clock-rotate-left"></i> Pendente</span>`;
+    }
+
     const protoText = r.proto ? `<span style="font-size:0.75rem; color:var(--text-dim); display:block;">Prot: ${escapeHtml(r.proto)}</span>` : '<span style="font-size:0.75rem; color:var(--text-dim); display:block;">Sem protocolo</span>';
     const dtRecHtml = r.dt_rec === 'Ronda Interna' ? '<span class="badge badge-secondary" style="font-size:0.72rem;">Ronda Interna</span>' : escapeHtml(r.dt_rec);
+    const dtFimHtml = r.is_pendente
+      ? `<span class="badge badge-warning" style="font-size: 0.72rem; font-weight: 700; background: rgba(234, 179, 8, 0.15); color: #eab308; border: 1px solid rgba(234, 179, 8, 0.3);"><i class="fa-solid fa-hourglass-half" style="margin-right: 3px;"></i>Em Aberto</span>`
+      : escapeHtml(r.dt_fim || '-');
+    const solucaoHtml = r.is_pendente
+      ? `<span style="color: var(--warning); font-weight: 600;"><i class="fa-solid fa-wrench" style="margin-right: 4px;"></i>${escapeHtml(r.solucao || 'Em Atendimento')}</span>`
+      : escapeHtml(r.solucao || '-');
 
     return `
       <tr>
         <td style="white-space: nowrap;">
-          <strong style="color: var(--primary);">#${r.os}</strong>
+          <div style="display: inline-flex; align-items: center; flex-wrap: wrap;">
+            <strong style="color: var(--primary);">#${r.os}</strong>
+            ${badgeExclusaoOs}
+          </div>
           ${protoText}
         </td>
         <td style="white-space: nowrap;">${origemBadge}</td>
         <td style="white-space: nowrap;">${dtRecHtml}</td>
-        <td style="white-space: nowrap;">${escapeHtml(r.dt_fim || '-')}</td>
+        <td style="white-space: nowrap;">${dtFimHtml}</td>
         <td style="white-space: nowrap;">${tmaBadge}</td>
         <td style="white-space: nowrap;">${slaBadge}</td>
         <td style="white-space: nowrap;"><strong>${escapeHtml(r.eq)}</strong></td>
@@ -3214,7 +3305,7 @@ function renderAnaliticoTable() {
           ${escapeHtml(r.tipo)}
         </td>
         <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${escapeHtml(r.solucao || '-')}">
-          ${escapeHtml(r.solucao || '-')}
+          ${solucaoHtml}
         </td>
       </tr>
     `;
@@ -3232,20 +3323,22 @@ function exportarAnaliticoExcel() {
     'Protocolo': r.proto || '-',
     'Origem': r.origem || 'Não Informada',
     'Data Reclamação': r.dt_rec,
-    'Data Conclusão': r.dt_fim,
+    'Data Conclusão': r.dt_fim || (r.is_pendente ? 'Em Aberto (Backlog)' : '-'),
     'Tempo Resolução (Dias)': r.dias !== null ? r.dias : 'Ronda Interna',
     'Tempo Resolução (Horas)': r.horas !== null ? r.horas : '-',
     'Status SLA': r.sla,
+    'Situação Operacional': r.is_pendente ? (r.alerta_auditoria ? 'Backlog (Detectado Exclusão)' : 'Pendente em Aberto') : 'Concluído',
     'Equipe': r.eq,
     'Bairro': r.bairro,
     'Defeito / Ocorrência': r.tipo,
-    'Solução Aplicada': r.solucao || '-'
+    'Solução Aplicada': r.solucao || (r.is_pendente ? 'Em Atendimento' : '-'),
+    'Nota de Auditoria CCO': r.audit_nota || (r.is_pendente ? 'Item ativo em fila operacional' : 'Atendimento concluído e registrado no SGI')
   }));
 
   const ws = XLSX.utils.json_to_sheet(exportRows);
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Atendimentos_SLA_2026');
-  XLSX.writeFile(wb, `Auditoria_SLA_Exati_${new Date().toISOString().slice(0, 10)}.xlsx`);
+  XLSX.utils.book_append_sheet(wb, ws, 'Solicitacoes_Full_2026');
+  XLSX.writeFile(wb, `Auditoria_Solicitacoes_Exati_${new Date().toISOString().slice(0, 10)}.xlsx`);
   showToast(`Planilha exportada com sucesso! (${exportRows.length.toLocaleString('pt-BR')} linhas)`);
 }
 

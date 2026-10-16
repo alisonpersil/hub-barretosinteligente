@@ -261,10 +261,10 @@
               <span>Bairros</span>
             </button>
 
-            <button class="subnav-chip" data-target="tab-analitico" data-title="Tabela Analítica (SLA)" data-sub="Detalhamento linha a linha dos 2.796 atendimentos, tempos de resolução e SLA">
+            <button class="subnav-chip" data-target="tab-analitico" data-title="Tabela Analítica (Full)" data-sub="Detalhamento linha a linha de todas as 2.869 solicitações (Atendimentos + Backlog), tempos de resolução e auditoria CCO">
               <i class="fa-solid fa-table-list"></i>
               <span>Tabela Analítica</span>
-              <span class="chip-badge highlight" id="badge-analitico-count">2.804</span>
+              <span class="chip-badge highlight" id="badge-analitico-count">2.869</span>
             </button>
 
             <button class="subnav-chip highlight-star" data-target="tab-pitch" data-title="Resumo do Dia • Marcela" data-sub="Síntese diária da operação e decisões estratégicas para diretoria">
@@ -1181,7 +1181,7 @@
         <div class="card-header" style="flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 10px; border-bottom: 1px solid var(--border-color);">
           <div>
             <h2 class="card-title" style="font-size: 1.12rem; margin-bottom: 2px;"><i class="fa-solid fa-magnifying-glass-chart" style="margin-right: 6px; color: var(--accent-blue);"></i> Explorador Analítico & Auditoria de Indicadores</h2>
-            <p class="card-subtitle" style="font-size: 0.76rem;">Auditoria linha a linha das 2.796 ordens de serviço executadas em 2026 &bull; SLA Médio Consolidado: 3 dias</p>
+            <p class="card-subtitle" style="font-size: 0.76rem;">Auditoria linha a linha de todas as 2.869 solicitações operacionais (2.839 Atendimentos Concluídos + 30 Backlog em Aberto) &bull; SLA Médio Consolidado: 3 dias</p>
           </div>
           <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
             <button id="btn-exportar-analitico" class="btn-export-excel" title="Exportar todas as linhas filtradas em planilha Excel (.xlsx)">
@@ -1195,7 +1195,7 @@
         <div class="analitico-kpi-grid">
           <div class="analitico-kpi-card">
             <span class="analitico-kpi-label">Ordens Filtradas</span>
-            <span class="analitico-kpi-val" id="analitico-kpi-total">2.796</span>
+            <span class="analitico-kpi-val" id="analitico-kpi-total">2.869</span>
             <span class="analitico-kpi-sub">Total no filtro ativo</span>
           </div>
           <div class="analitico-kpi-card">
@@ -1227,7 +1227,7 @@
           <div class="insight-summary-left">
             <span style="font-size: 0.95rem; color: var(--warning);"><i class="fa-solid fa-lightbulb"></i></span>
             <span class="insight-summary-title">Metodologia &amp; Auditoria: Como o SLA em dias é calculado linha a linha?</span>
-            <span class="insight-summary-badge" id="badge-metodologia-sla">957 com chamado (Base do SLA) &bull; 1.839 rondas</span>
+            <span class="insight-summary-badge" id="badge-metodologia-sla">957 com chamado (Base do SLA) &bull; 1.839 rondas &bull; 30 backlog em aberto</span>
           </div>
           <div class="insight-summary-right">
             <span>Ver metodologia</span>
@@ -1236,11 +1236,12 @@
         </summary>
         <div class="insight-accordion-content">
           <strong>Como o SLA em dias é calculado linha a linha?</strong><br>
-          Das <strong>2.804 ordens de 2026</strong>, <strong>957 foram abertas com chamado de munícipe</strong> (possuem Data da Reclamação formal). O tempo de resolução de cada ordem é a diferença exata em dias corridos entre <code>Data Conclusão - Data Reclamação</code>.<br>
-          &bull; <strong>SLA Geral: 3 dias</strong> (arredondado para número inteiro).<br>
+          Da base operacional total de <strong>2.869 solicitações de 2026</strong> (2.839 atendimentos concluídos + 30 em backlog), <strong>957 atendimentos foram abertos formalmente por munícipes</strong> (possuem Data da Reclamação). O tempo de resolução de cada ordem concluída é a diferença em dias corridos entre <code>Data Conclusão - Data Reclamação</code>.<br>
+          &bull; <strong>SLA Geral Consolidado: 3 dias</strong> (arredondado para número inteiro).<br>
           &bull; <strong>Ordens no Prazo: 885 ordens (92,5%)</strong> atendidas dentro do limite contratual de até 7 dias.<br>
           &bull; <strong>Ordens Atrasadas: 72 ordens (7,5%)</strong> excederam o prazo contratual de 7 dias.<br>
-          &bull; <strong>Rondas Preventivas: 1.839 ordens</strong> realizadas proativamente pela concessionária (sem reclamação prévia).
+          &bull; <strong>Rondas Preventivas: 1.839 ordens</strong> executadas proativamente sem reclamação prévia.<br>
+          &bull; <strong>Backlog Pendente: 30 ordens em aberto</strong> (incluindo chamados mantidos sob auditoria CCO como <em>Detectado Exclusão</em>).
         </div>
       </details>
 
@@ -1256,7 +1257,10 @@
           <div class="analitico-select-group">
             <label for="filtro-analitico-sla" class="filter-label">SLA:</label>
             <select id="filtro-analitico-sla" class="custom-select">
-              <option value="todos">Todos os Status</option>
+              <option value="todos">Todos os Status (Full)</option>
+              <option value="pendentes">Backlog em Aberto (30)</option>
+              <option value="exclusao">Detectado Exclusão (Auditoria CCO)</option>
+              <option value="concluidos">Atendimentos Concluídos (2.839)</option>
               <option value="com_rec">Munícipes (com Reclamação)</option>
               <option value="no_prazo">No Prazo (≤ 7 dias)</option>
               <option value="atrasado">Atrasado (> 7 dias)</option>
@@ -1304,12 +1308,14 @@
         <!-- Chips de 1 Clique para Filtro Imediato -->
         <div class="analitico-quick-chips">
           <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-dim); margin-right: 2px;">Atalhos rápidos:</span>
+          <button class="quick-chip" data-sla="pendentes"><i class="fa-solid fa-clock-rotate-left"></i> Backlog (30)</button>
+          <button class="quick-chip" data-sla="exclusao" style="border-color: rgba(239, 68, 68, 0.4); color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Detectado Exclusão</button>
           <button class="quick-chip" data-origem="callcenter"><i class="fa-solid fa-headset"></i> Call Center</button>
           <button class="quick-chip" data-origem="ronda"><i class="fa-solid fa-shield-halved"></i> Rondas</button>
           <button class="quick-chip" data-sla="atrasado"><i class="fa-solid fa-triangle-exclamation"></i> Atrasados (> 7d)</button>
           <button class="quick-chip" data-sla="com_rec"><i class="fa-solid fa-phone"></i> Munícipes (Base 3d)</button>
           <button class="quick-chip" data-tma="rapido"><i class="fa-solid fa-bolt"></i> SLA ≤ 24h</button>
-          <button class="quick-chip active" data-reset="true"><i class="fa-solid fa-rotate-left"></i> Todos (<span id="analitico-chip-total">2.796</span>)</button>
+          <button class="quick-chip active" data-reset="true"><i class="fa-solid fa-rotate-left"></i> Todos (<span id="analitico-chip-total">2.869</span>)</button>
         </div>
       </div>
 
@@ -1317,7 +1323,7 @@
       <div class="card">
         <div class="card-header" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
           <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-            <h3 class="card-title" style="font-size: 1rem;">Registros de Atendimento (<span id="analitico-table-count">2.796</span>)</h3>
+            <h3 class="card-title" style="font-size: 1rem;">Registros de Atendimento (<span id="analitico-table-count">2.869</span>)</h3>
             <span class="badge badge-info" id="analitico-sort-info" style="font-size: 0.72rem;">Ordenado por: SLA em Dias (Maior p/ Menor)</span>
           </div>
 
@@ -1357,7 +1363,7 @@
         <!-- Barra de Paginação -->
         <div class="analitico-pagination">
           <div class="pagination-info" id="analitico-page-info">
-            Mostrando 1–25 de 2.796 ordens
+            Mostrando 1–25 de 2.869 ordens
           </div>
           <div class="pagination-buttons">
             <button id="analitico-first" class="btn-page" title="Primeira Página">&laquo;</button>
