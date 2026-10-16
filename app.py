@@ -234,7 +234,9 @@ def run_git_sync_background(commit_message="Atualização de dados", extra_paths
                     docs_rel_path,
                     f"{exati_rel_path}/Base de dados",
                     f"{exati_rel_path}/dashboard_data.json",
-                    f"{exati_rel_path}/historico_backlog.json"
+                    f"{exati_rel_path}/historico_backlog.json",
+                    f"{exati_rel_path}/consumo_tokens.json",
+                    "CONSUMO_TOKENS.md"
                 ])
             for p in paths_to_add:
                 subprocess.run(["git", "add", p], cwd=BASE_DIR, check=False)
@@ -847,6 +849,19 @@ def api_exati_ai_sync():
             "stdout": proc.stdout[-300:] if proc.stdout else "",
             "stderr": proc.stderr[-300:] if proc.stderr else ""
         }), (200 if sucesso else 500)
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/exati/tokens")
+@app.route("/exati/api/tokens")
+def api_exati_tokens():
+    """Retorna métricas em tempo real de consumo de tokens e custos do OpenAI GPT-4o-mini."""
+    try:
+        if EXATI_DIR not in sys.path:
+            sys.path.insert(0, EXATI_DIR)
+        from ai_data_auditor import get_token_usage_stats
+        data = get_token_usage_stats()
+        return jsonify({"success": True, "data": data})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 

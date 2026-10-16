@@ -1,0 +1,29 @@
+{
+  "updated_at": "16/10/2026 17:13:10",
+  "taxa_dolar": 5.5,
+  "limite_mensal_brl": 50.0,
+  "total_requisicoes": 1,
+  "total_prompt_tokens": 685,
+  "total_completion_tokens": 176,
+  "total_tokens": 861,
+  "custo_total_usd": 0.000208,
+  "custo_total_brl": 0.00115,
+  "historico": [
+    {
+      "id": "aud-1792181590",
+      "timestamp": "16/10/2026 17:13:10",
+      "modelo": "gpt-4o-mini",
+      "origem": "Auditoria de Planilhas Exati",
+      "arquivo_pendentes": "ConsultarSolicitacao-5621.xlsx",
+      "arquivo_atendidos": "sgi_pontos_servicos_atendidos_909c6195-7295-42fa-b7d3-e392d4120f67.xls",
+      "prompt_tokens": 685,
+      "completion_tokens": 176,
+      "total_tokens": 861,
+      "custo_usd": 0.000208,
+      "custo_brl": 0.00115,
+      "status": "APROVADO",
+      "confianca_percent": 100,
+      "resumo_executivo": "A auditoria dos dados consolidados indica que todas as validações críticas foram atendidas, garantindo a integridade matemática e a conformidade operacional. Não foram identificado"
+    }
+  ]
+}

@@ -38,9 +38,9 @@ jobs:
         run: |
           git config --global user.name "Barretos Inteligente AI"
           git config --global user.email "ai@barretosinteligente.com.br"
-          git add "01 - Relatórios/02 - Monitor Exati/dashboard_data.json" "01 - Relatórios/02 - Monitor Exati/historico_backlog.json" || true
+          git add "01 - Relatórios/02 - Monitor Exati/dashboard_data.json" "01 - Relatórios/02 - Monitor Exati/historico_backlog.json" "01 - Relatórios/02 - Monitor Exati/consumo_tokens.json" "CONSUMO_TOKENS.md" || true
           if git diff --staged --quiet; then
-            echo "Nenhuma alteração em dashboard_data.json para comitar."
+            echo "Nenhuma alteração para comitar."
           else
             git commit -m "chore(exati): auto-sync dashboard_data.json auditado por OpenAI GPT-4o-mini [skip ci]"
             git push origin main
