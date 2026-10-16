@@ -80,6 +80,11 @@ BOOK_DIR = resolve_dir(
     os.path.join(BASE_DIR, "03 - Book"),
     os.path.join(BASE_DIR, "Book")
 )
+OBS_IA_DIR = resolve_dir(
+    os.path.join(BASE_DIR, "02 - Automações", "02 - Observabilidade IA"),
+    os.path.join(BASE_DIR, "02 - Automacoes", "02 - Observabilidade IA"),
+    os.path.join(BASE_DIR, "Automações", "02 - Observabilidade IA")
+)
 
 DOCS_DIR = os.path.join(OFICIOS_DIR, "Base de dados Ofícios")
 OFICIOS_STATIC_DIR = os.path.join(OFICIOS_DIR, "static")
@@ -236,7 +241,8 @@ def run_git_sync_background(commit_message="Atualização de dados", extra_paths
                     f"{exati_rel_path}/dashboard_data.json",
                     f"{exati_rel_path}/historico_backlog.json",
                     f"{exati_rel_path}/consumo_tokens.json",
-                    "CONSUMO_TOKENS.md"
+                    "CONSUMO_TOKENS.md",
+                    "02 - Automações/02 - Observabilidade IA"
                 ])
             for p in paths_to_add:
                 subprocess.run(["git", "add", p], cwd=BASE_DIR, check=False)
@@ -958,6 +964,30 @@ def automacoes_redirect():
 def serve_sala_file(filename):
     """Serve assets da Sala de Agentes."""
     return send_from_directory(SALA_DIR, filename)
+
+# ==============================================================================
+# Rotas: 02 - Automações / Observabilidade IA (/observabilidade-ia, /tokens)
+# ==============================================================================
+@app.route("/observabilidade-ia")
+@app.route("/observabilidade-ia/")
+@app.route("/tokens")
+@app.route("/tokens/")
+@app.route("/admin/tokens")
+def observabilidade_ia_index():
+    """Serve o painel restrito de Observabilidade de Tokens e Auditoria IA protegido por PIN 1264."""
+    index_path = os.path.join(OBS_IA_DIR, "index.html")
+    if os.path.exists(index_path):
+        resp = make_response(send_file(index_path))
+        resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+        resp.headers["Pragma"] = "no-cache"
+        resp.headers["Expires"] = "0"
+        return resp
+    return "Painel de Observabilidade IA em configuração.", 404
+
+@app.route("/observabilidade-ia/<path:filename>")
+def serve_observabilidade_ia_file(filename):
+    """Serve assets da página de Observabilidade IA."""
+    return send_from_directory(OBS_IA_DIR, filename)
 
 @app.route("/banner_radio_barretos.svg")
 @app.route("/banner_radio_barretos_inteligente_quadrado.svg")

@@ -75,12 +75,6 @@
           </div>
         </div>
 
-        <!-- SELO DE AUDITORIA CONTÍNUA IA (OPENAI GPT-4O-MINI) -->
-        <div class="topbar-ai-badge" id="topbar-ai-badge" title="Auditoria Contínua com OpenAI GPT-4o-mini (100% Validado)" style="display: inline-flex; align-items: center; gap: 6px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 20px; padding: 4px 10px; font-size: 0.73rem; color: #10b981; font-weight: 600; cursor: pointer;">
-          <i class="fa-solid fa-microchip" style="color: #34d399;"></i>
-          <span id="topbar-ai-status-text">IA (GPT-4o-mini): 100% Validado</span>
-        </div>
-
         <!-- DROPDOWN DE FILTRO DE PERÍODO -->
         <div class="filter-dropdown-wrapper" id="filter-dropdown-wrapper">
           <button class="nav-btn btn-filter-trigger" id="btn-filter-trigger" title="Filtrar período ou selecionar datas">
@@ -282,12 +276,6 @@
             <button class="subnav-chip" data-target="tab-powerbi" data-title="Guia Power BI (DAX)">
               <i class="fa-solid fa-chart-simple"></i>
               <span>Power BI (DAX)</span>
-            </button>
-
-            <button class="subnav-chip" id="chip-open-ai-modal" type="button" title="Abrir Painel de Observabilidade & Custos da IA (GPT-4o-mini)" style="border: 1px solid rgba(16, 185, 129, 0.4); background: rgba(16, 185, 129, 0.08); color: #10b981;">
-              <i class="fa-solid fa-microchip" style="color: #34d399;"></i>
-              <span>Painel IA</span>
-              <span class="chip-badge highlight" style="background: rgba(16, 185, 129, 0.2); color: #10b981;">Tokens</span>
             </button>
           </div>
         </nav>
@@ -1592,168 +1580,6 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
       <div style="font-size: 0.78rem; color: var(--text-dim); text-align: center; margin-top: 12px;">
         *Dica: Você também pode usar o arquivo <code>atualizar_dashboard.bat</code> na pasta para sincronizar lotes pesados.
       </div>
-    </div>
-  </div>
-
-  <!-- ==================== MODAL DE OBSERVABILIDADE & CUSTOS DA IA (GPT-4O-MINI) ==================== -->
-  <div class="modal-overlay" id="modal-consumo-ia" style="display: none;">
-    <div class="modal-card modal-ai-observability">
-      <button class="modal-close" id="btn-close-ai-modal" title="Fechar">&times;</button>
-      
-      <!-- Cabeçalho -->
-      <div class="ai-obs-header">
-        <div class="ai-obs-header-left">
-          <div class="ai-obs-icon-wrap">
-            <i class="fa-solid fa-microchip"></i>
-          </div>
-          <div>
-            <div class="ai-obs-pill-row">
-              <span class="ai-obs-model-pill"><i class="fa-solid fa-brain"></i> OpenAI GPT-4o-mini</span>
-              <span class="ai-obs-status-pill success"><i class="fa-solid fa-circle-check"></i> 100% Auditado</span>
-              <span class="ai-obs-status-pill info" id="ai-obs-sync-time">Atualizado: Recente</span>
-            </div>
-            <h3 class="ai-obs-title">Observabilidade de Tokens &amp; Auditoria da IA</h3>
-            <p class="ai-obs-subtitle">
-              Monitoramento financeiro em tempo real, controle orçamentário de tokens e auditoria matemática contínua das planilhas.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Grid de 4 KPIs Principais -->
-      <div class="ai-kpi-grid">
-        <div class="ai-kpi-card">
-          <div class="ai-kpi-top">
-            <span class="ai-kpi-label">Gasto Total Acumulado</span>
-            <span class="ai-kpi-badge success" id="ai-kpi-pct-badge">0.002% do teto</span>
-          </div>
-          <div class="ai-kpi-value" id="ai-kpi-gasto-brl">R$ 0,0011</div>
-          <div class="ai-kpi-sub" id="ai-kpi-gasto-usd">$ 0.000208 USD &bull; Câmbio R$ 5,50</div>
-        </div>
-
-        <div class="ai-kpi-card">
-          <div class="ai-kpi-top">
-            <span class="ai-kpi-label">Tokens Processados</span>
-            <span class="ai-kpi-badge info" id="ai-kpi-req-count">1 auditoria</span>
-          </div>
-          <div class="ai-kpi-value" id="ai-kpi-total-tokens">861</div>
-          <div class="ai-kpi-sub" id="ai-kpi-tokens-breakdown">Entrada: 685 &bull; Saída: 176</div>
-        </div>
-
-        <div class="ai-kpi-card">
-          <div class="ai-kpi-top">
-            <span class="ai-kpi-label">Custo Médio / Upload</span>
-            <span class="ai-kpi-badge warning">Ultra Econômico</span>
-          </div>
-          <div class="ai-kpi-value" id="ai-kpi-medio-brl">R$ 0,0011</div>
-          <div class="ai-kpi-sub" id="ai-kpi-mil-uploads">1.000 uploads &approx; R$ 1,15</div>
-        </div>
-
-        <div class="ai-kpi-card">
-          <div class="ai-kpi-top">
-            <span class="ai-kpi-label">Validação de Integridade</span>
-            <span class="ai-kpi-badge success">Zero Alucinação</span>
-          </div>
-          <div class="ai-kpi-value" style="color: #10b981;" id="ai-kpi-integridade">100% APROVADO</div>
-          <div class="ai-kpi-sub">Reconciliação e CCO Validados</div>
-        </div>
-      </div>
-
-      <!-- Barra de Progresso Orçamentário -->
-      <div class="ai-budget-box">
-        <div class="ai-budget-header">
-          <span><i class="fa-solid fa-shield-halved" style="color: #10b981; margin-right: 6px;"></i> Limite Mensal de Segurança (Teto: R$ 50,00)</span>
-          <span id="ai-budget-text">R$ 0,0011 gastos &bull; R$ 49,9989 disponíveis</span>
-        </div>
-        <div class="ai-budget-track">
-          <div class="ai-budget-bar" id="ai-budget-bar" style="width: 0.1%;"></div>
-        </div>
-      </div>
-
-      <!-- Diferencial Estratégico (Por que não estoura tokens como Dify) -->
-      <div class="ai-diferencial-card">
-        <div class="ai-diferencial-icon">
-          <i class="fa-solid fa-lightbulb"></i>
-        </div>
-        <div class="ai-diferencial-text">
-          <strong>Por que o consumo não esgota como acontecia com bots do Dify?</strong>
-          <p>
-            Plataformas de assistentes de chat (como o Dify) mantêm históricos gigantescos na memória e realizam chamadas conversacionais repetitivas, consumindo centenas de milhares de tokens por sessão. Nosso construtor utiliza o <strong>Auditor Cirúrgico GPT-4o-mini</strong> ($0.15 por milhão de tokens): o sistema processa apenas um payload enxuto com as somas e regras matemáticas essenciais. Cada validação consome menos de <strong>R$ 0,001</strong>.
-          </p>
-        </div>
-      </div>
-
-      <!-- Parecer Executivo da Última Auditoria Realizada -->
-      <div class="ai-last-audit-box">
-        <div class="ai-last-audit-title">
-          <i class="fa-solid fa-clipboard-check" style="color: #3b82f6; margin-right: 6px;"></i>
-          Parecer Executivo do Auditor CCO (<span id="ai-last-audit-date">Recente</span>)
-        </div>
-        <div class="ai-last-audit-summary" id="ai-last-audit-summary">
-          Carregando parecer da auditoria...
-        </div>
-        
-        <!-- Checklist das 4 Validações Críticas -->
-        <div class="ai-validations-grid">
-          <div class="ai-val-item" id="val-item-backlog">
-            <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
-            <span>Backlog Matemático (Pendentes = Prazo + Vencidos)</span>
-          </div>
-          <div class="ai-val-item" id="val-item-card">
-            <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
-            <span>Card Crítico Exato (Ordens e pontos conferidos)</span>
-          </div>
-          <div class="ai-val-item" id="val-item-exclusao">
-            <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
-            <span>Exclusões Preservadas (Chamado 1827690 protegido)</span>
-          </div>
-          <div class="ai-val-item" id="val-item-full">
-            <i class="fa-solid fa-circle-check" style="color: #10b981;"></i>
-            <span>Tabela Full Unificada (Atendidos + Pendentes)</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabela Histórica de Consumo de Tokens -->
-      <div class="ai-table-section">
-        <div class="ai-table-header">
-          <span style="font-weight: 700; font-size: 0.92rem; color: var(--text-main);">
-            <i class="fa-solid fa-clock-rotate-left" style="margin-right: 6px; color: var(--accent-blue);"></i> Histórico de Auditorias &amp; Consumo de Tokens
-          </span>
-          <div class="ai-table-actions">
-            <button class="ai-btn-action" id="btn-export-tokens-csv" title="Exportar histórico em planilha CSV">
-              <i class="fa-solid fa-file-csv"></i> Exportar CSV
-            </button>
-            <a href="https://github.com/alisonpersil/hub-barretosinteligente/blob/main/CONSUMO_TOKENS.md" target="_blank" rel="noopener noreferrer" class="ai-btn-action" title="Abrir tabela em Markdown no repositório GitHub">
-              <i class="fa-brands fa-github"></i> Ver no GitHub (CONSUMO_TOKENS.md)
-            </a>
-            <button class="ai-btn-action" id="btn-refresh-tokens" title="Atualizar dados em tempo real">
-              <i class="fa-solid fa-rotate"></i>
-            </button>
-          </div>
-        </div>
-
-        <div class="ai-table-wrap">
-          <table class="ai-tokens-table">
-            <thead>
-              <tr>
-                <th>Data / Hora</th>
-                <th>Planilha / Origem</th>
-                <th>Modelo</th>
-                <th>Tokens Entrada</th>
-                <th>Tokens Saída</th>
-                <th>Total Tokens</th>
-                <th>Custo (R$)</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="ai-tokens-tbody">
-              <!-- Preenchido via app.js -->
-            </tbody>
-          </table>
-        </div>
-      </div>
-
     </div>
   </div>
 
