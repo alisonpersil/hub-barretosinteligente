@@ -70,39 +70,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log("Modo standalone/offline ativo.");
   }
 
-  // Tenta carregar dados customizados salvos em LocalStorage pelo navegador
-  // APENAS se o servidor não estiver acessível ou se o cache local for comprovadamente mais recente
+  // Garantia absoluta de integridade: sempre limpa cache local de planilhas customizadas
+  // Todos os dados do painel devem ser processados no backend oficial
   try {
-    const savedCustom = localStorage.getItem('exati_custom_dashboard_data');
-    if (savedCustom) {
-      const customData = JSON.parse(savedCustom);
-      if (customData && customData.kpis) {
-        let useCustom = !serverDataLoaded;
-        if (serverDataLoaded && customData.metadata && customData.metadata.gerado_em && dashboardData.metadata && dashboardData.metadata.gerado_em) {
-          const parseGerado = (str) => {
-            const p = parseExatiDate(str);
-            return p ? p.getTime() : 0;
-          };
-          if (parseGerado(dashboardData.metadata.gerado_em) >= parseGerado(customData.metadata.gerado_em)) {
-            useCustom = false;
-            try { localStorage.removeItem('exati_custom_dashboard_data'); } catch (_) {}
-            console.log("Base do servidor é mais recente ou igual. Cache local antigo descartado.");
-          }
-        } else if (serverDataLoaded) {
-          useCustom = false;
-          try { localStorage.removeItem('exati_custom_dashboard_data'); } catch (_) {}
-        }
-
-        if (useCustom) {
-          dashboardData = customData;
-          Object.assign(originalDashboardData, JSON.parse(JSON.stringify(customData)));
-          console.log("Base customizada carregada do LocalStorage com sucesso.");
-        }
-      }
-    }
-  } catch (e) {
-    console.warn("Aviso ao ler localStorage:", e);
-  }
+    localStorage.removeItem('exati_custom_dashboard_data');
+    localStorage.removeItem('exati_upload_history');
+  } catch (_) {}
 
   const pendingMax = (dashboardData && dashboardData.pendentes_lista)
     ? dashboardData.pendentes_lista.reduce((max, p) => (p.data_iso && p.data_iso > max ? p.data_iso : max), '')
@@ -4745,41 +4718,66 @@ function setupUploadModal() {
       if (loadingBar) loadingBar.style.display = 'flex';
       if (loadingText) loadingText.textContent = `Processando '${selectedFile.name}' e recalculando todos os indicadores...`;
 
-      const token = localStorage.getItem('pmo_github_token') || '';
-      const MAX_VERCEL_BYTES = 4.3 * 1024 * 1024;
+      // 1. Obter credenciais seguras do GitHub configuradas no ambiente da Vercel
+      let token = localStorage.getItem('pmo_github_token') || '';
+      let repo = 'alisonpersil/hub-barretosinteligente';
+      let isVercel = false;
 
-      // 1. Arquivos grandes (> 4.3 MB, como planilhas completas de Atendidos)
-      // Se houver token, comita direto via GitHub REST API pelo navegador para contornar o limite de payload da Vercel
-      if (token && selectedFile.size > MAX_VERCEL_BYTES) {
+      try {
+        const credRes = await fetch('/api/upload/credentials');
+        if (credRes.ok) {
+          const credData = await credRes.json();
+          if (credData.token) token = credData.token;
+          if (credData.repo) repo = credData.repo;
+          isVercel = Boolean(credData.is_vercel);
+        }
+      } catch (_) {}
+
+      const subfolder = targetCat === 'atendidos' ? 'Atendidos' : 'Pendentes';
+      const MAX_VERCEL_BYTES = 4.2 * 1024 * 1024;
+
+      // 2. Arquivos grandes (> 4.2 MB) ou ambiente Vercel com token disponível:
+      // Envia diretamente para a API do GitHub para não ser bloqueado pelo limite de payload de 4.5 MB da Vercel
+      if ((selectedFile.size > MAX_VERCEL_BYTES || isVercel) && token) {
         try {
-          if (loadingText) loadingText.textContent = `Enviando planilha grande (${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB) diretamente para o GitHub...`;
+          if (loadingText) loadingText.textContent = `Enviando '${selectedFile.name}' (${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB) diretamente para o banco de dados do GitHub...`;
 
-          const subfolder = targetCat === 'atendidos' ? 'Atendidos' : 'Pendentes';
           const repoPath = `01 - Relatórios/02 - Monitor Exati/Base de dados/${subfolder}/${selectedFile.name}`;
-          const ghUrl = `https://api.github.com/repos/alisonpersil/hub-barretosinteligente/contents/${encodeURIComponent(repoPath)}`;
+          const parentDir = `01 - Relatórios/02 - Monitor Exati/Base de dados/${subfolder}`;
+          const ghUrl = `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(repoPath)}`;
+          const ghParentUrl = `https://api.github.com/repos/${repo}/contents/${encodeURIComponent(parentDir)}`;
 
+          // Localiza SHA do arquivo através da listagem do diretório pai (evita erro de blob > 1 MB do GitHub)
           let sha = null;
           try {
-            const checkRes = await fetch(ghUrl, {
+            const listRes = await fetch(ghParentUrl, {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'Accept': 'application/vnd.github.v3+json'
               }
             });
-            if (checkRes.ok) {
-              const checkData = await checkRes.json();
-              sha = checkData.sha;
+            if (listRes.ok) {
+              const listData = await listRes.json();
+              if (Array.isArray(listData)) {
+                const existing = listData.find(item => item.name === selectedFile.name);
+                if (existing && existing.sha) {
+                  sha = existing.sha;
+                }
+              }
             }
           } catch (_) {}
 
-          const arrayBuffer = await selectedFile.arrayBuffer();
-          let binary = '';
-          const bytes = new Uint8Array(arrayBuffer);
-          const len = bytes.byteLength;
-          for (let b = 0; b < len; b++) {
-            binary += String.fromCharCode(bytes[b]);
-          }
-          const base64Content = btoa(binary);
+          // Conversão nativa e ultra-rápida de arquivo para Base64 usando FileReader
+          const base64Content = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const res = String(reader.result || '');
+              const b64 = res.includes(',') ? res.split(',')[1] : res;
+              resolve(b64);
+            };
+            reader.onerror = () => reject(new Error('Erro ao ler bytes da planilha'));
+            reader.readAsDataURL(selectedFile);
+          });
 
           const ghBody = {
             message: `feat(exati): importar planilha ${selectedFile.name} para Base de dados/${subfolder}`,
@@ -4802,19 +4800,19 @@ function setupUploadModal() {
             throw new Error(ghErr.message || `Erro GitHub (${ghRes.status})`);
           }
 
-          showToast(`Planilha '${selectedFile.name}' salva com sucesso no GitHub em 'Base de dados/${subfolder}'!`, 'fa-circle-check');
-          recordUploadHistory(targetCat, selectedFile.name);
-          processarArquivoUploadLocal(selectedFile, currentAnalysis);
+          if (loadingBar) loadingBar.style.display = 'none';
+          modal.classList.remove('active');
+          showToast(`Planilha '${selectedFile.name}' salva com sucesso no banco de dados do GitHub!`, 'fa-circle-check');
           return;
         } catch (errGh) {
-          console.error('Erro no upload direto para GitHub API:', errGh);
-          showToast(`Erro ao enviar para o GitHub: ${errGh.message}`, 'fa-triangle-exclamation');
+          console.error('Erro no upload para o GitHub:', errGh);
           if (loadingBar) loadingBar.style.display = 'none';
+          showToast(`Erro ao enviar para o GitHub: ${errGh.message}`, 'fa-triangle-exclamation');
           return;
         }
       }
 
-      // 2. Arquivos normais (<= 4.3 MB, como planilhas de Pendentes de poucos KB)
+      // 3. Arquivos normais (<= 4.2 MB) enviados via backend da aplicação
       try {
         const headers = {
           'X-Filename': encodeURIComponent(selectedFile.name),
@@ -4829,62 +4827,18 @@ function setupUploadModal() {
         });
 
         if (response.ok) {
-          const result = await response.json();
-          recordUploadHistory(targetCat, selectedFile.name);
-
-          // Se estiver rodando offline/local e o servidor tiver gerado um novo dashboard_data.json
-          if (!result.github_synced) {
-            try {
-              localStorage.removeItem('exati_custom_dashboard_data');
-            } catch (e) {}
-
-            const resData = await fetch('./dashboard_data.json?t=' + Date.now());
-            if (resData.ok) {
-              const freshData = await resData.json();
-              dashboardData = freshData;
-              Object.assign(originalDashboardData, JSON.parse(JSON.stringify(freshData)));
-
-              applyDateFilter(dateFilterState.inicio, dateFilterState.fim, dateFilterState.label || dateFilterState.preset, false);
-              renderChartEvolucaoPendentes();
-              renderPendentesTable();
-              updateSimulation();
-              updateSyncNotice();
-              if (typeof renderBairroOcorrenciaSlaChart === 'function') renderBairroOcorrenciaSlaChart();
-            }
-          } else {
-            // Sincronizado com sucesso no repositório GitHub!
-            // Atualiza os indicadores imediatamente no navegador do usuário
-            processarArquivoUploadLocal(selectedFile, currentAnalysis);
-          }
-
           if (loadingBar) loadingBar.style.display = 'none';
           modal.classList.remove('active');
-          let successToast = `Planilha '${selectedFile.name}' salva com sucesso em 'Base de dados/${result.folder}' no GitHub!`;
-          showToast(successToast, 'fa-circle-check');
-          return;
-        } else if (response.status === 403) {
-          const errJson = await response.json().catch(() => ({}));
-          if (loadingBar) loadingBar.style.display = 'none';
-          if (errJson.error === 'github_token_required') {
-            if (ghBody) ghBody.style.display = 'block';
-            if (ghChevron) ghChevron.style.transform = 'rotate(180deg)';
-            if (ghInput) ghInput.focus();
-            showToast('Informe o GitHub Personal Access Token para salvar no banco de dados da nuvem.', 'fa-key');
-            return;
-          }
-          showToast(`Aviso: ${errJson.message || 'Acesso negado'}`, 'fa-triangle-exclamation');
+          showToast(`Planilha '${selectedFile.name}' enviada e salva com sucesso!`, 'fa-circle-check');
           return;
         } else {
-          // Servidor respondeu com outro código - aciona processamento local resiliente
-          console.warn('Servidor falhou ao processar backend. Acionando motor autônomo no navegador:', response.status);
-          recordUploadHistory(targetCat, selectedFile.name);
-          processarArquivoUploadLocal(selectedFile, currentAnalysis);
-          return;
+          const errData = await response.json().catch(() => ({}));
+          throw new Error(errData.error || errData.message || `Erro HTTP ${response.status}`);
         }
       } catch (err) {
-        console.warn('Backend servidor.py/app.py indisponível. Executando motor autônomo no navegador:', err);
-        recordUploadHistory(targetCat, selectedFile.name);
-        processarArquivoUploadLocal(selectedFile, currentAnalysis);
+        console.error('Falha no upload para o servidor:', err);
+        if (loadingBar) loadingBar.style.display = 'none';
+        showToast(`Erro ao enviar arquivo para o servidor: ${err.message}`, 'fa-triangle-exclamation');
         return;
       }
     });
@@ -4910,6 +4864,8 @@ function setupUploadModal() {
 // =====================================================================
 
 function processarArquivoUploadLocal(file, analysis) {
+  // Motor desativado: todo o processamento de planilhas é executado no backend oficial
+  return;
   const loadingBar = document.getElementById('upload-loading-bar');
   const modal = document.getElementById('modal-upload');
 

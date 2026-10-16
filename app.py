@@ -242,23 +242,31 @@ def github_api_commit_file(token, repo_path, file_bytes, commit_message):
     import urllib.parse
     import json
 
+    parent_dir = os.path.dirname(repo_path).replace("\\", "/")
+    file_name = os.path.basename(repo_path)
+    encoded_parent = "/".join(urllib.parse.quote(part) for part in parent_dir.strip("/").split("/"))
     encoded_path = "/".join(urllib.parse.quote(part) for part in repo_path.strip("/").split("/"))
+    
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}"
+    url_parent = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_parent}"
     
     sha = None
-    req_get = urllib.request.Request(url, headers={
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "Hub-BarretosInteligente-App"
-    })
     try:
-        with urllib.request.urlopen(req_get) as response:
+        req_parent = urllib.request.Request(url_parent, headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github.v3+json",
+            "User-Agent": "Hub-BarretosInteligente-App"
+        })
+        with urllib.request.urlopen(req_parent) as response:
             if response.status == 200:
-                data = json.loads(response.read().decode("utf-8"))
-                sha = data.get("sha")
-    except urllib.error.HTTPError as e:
-        if e.code != 404:
-            raise
+                items = json.loads(response.read().decode("utf-8"))
+                if isinstance(items, list):
+                    for item in items:
+                        if item.get("name") == file_name:
+                            sha = item.get("sha")
+                            break
+    except Exception:
+        pass
 
     payload = {
         "message": commit_message,
@@ -542,6 +550,23 @@ def serve_exati_file(filename):
     resp.headers["Pragma"] = "no-cache"
     resp.headers["Expires"] = "0"
     return resp
+
+@app.route("/api/upload/credentials")
+@app.route("/exati/api/upload/credentials")
+def api_upload_credentials():
+    """Retorna credenciais seguras do GitHub configuradas no ambiente para upload direto."""
+    token = (
+        os.environ.get("GITHUB_TOKEN")
+        or os.environ.get("GH_TOKEN")
+        or os.environ.get("PMO_GITHUB_TOKEN")
+        or ""
+    ).strip()
+    return jsonify({
+        "success": bool(token),
+        "token": token,
+        "repo": GITHUB_REPO,
+        "is_vercel": bool(os.environ.get("VERCEL"))
+    })
 
 @app.route("/api/upload", methods=["POST"])
 @app.route("/exati/api/upload", methods=["POST"])
