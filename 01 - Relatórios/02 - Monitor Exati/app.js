@@ -2475,6 +2475,36 @@ function updateFilterButtonsForPendentes() {
 
   const badgeBacklog = document.getElementById('badge-backlog-count');
   if (badgeBacklog) badgeBacklog.textContent = tot;
+
+  updateDiagnosticoRonda();
+}
+
+function updateDiagnosticoRonda() {
+  const lista = dashboardData.pendentes_lista || [];
+  const tot = lista.length;
+  const ronda = lista.filter(p => (p.origem || '').toLowerCase().includes('ronda'));
+  const rondaPts = ronda.reduce((a, c) => a + (c.pontos || 1), 0);
+  const rondaVenc = ronda.filter(p => p.is_vencido);
+  const rondaVencPts = rondaVenc.reduce((a, c) => a + (c.pontos || 1), 0);
+
+  const call = lista.filter(p => !(p.origem || '').toLowerCase().includes('ronda'));
+  const callPts = call.reduce((a, c) => a + (c.pontos || 1), 0);
+  const callVenc = call.filter(p => p.is_vencido);
+  const callVencPts = callVenc.reduce((a, c) => a + (c.pontos || 1), 0);
+
+  const badgeEl = document.getElementById('diag-ronda-badge') || document.querySelector('.insight-summary-badge');
+  if (badgeEl) {
+    badgeEl.textContent = `${rondaVenc.length} ordens vencidas (${rondaVencPts} pts) na Ronda`;
+  }
+
+  const contentEl = document.getElementById('diag-ronda-content') || document.querySelector('.insight-accordion-content');
+  if (contentEl) {
+    contentEl.innerHTML = `
+      Dos <strong>${tot} chamados pendentes</strong>, existe uma divisão nítida na operação:<br>
+      &bull; <strong>Call Center (Munícipes):</strong> ${call.length} chamados (${callPts} pontos) &rarr; <strong>${callVenc.length === 0 ? '100% estão dentro do SLA' : `${callVenc.length} vencidos`}</strong>. A equipe atende a população rigorosamente no prazo!<br>
+      &bull; <strong>Ronda Própria (Inspeção Técnica Interna):</strong> ${ronda.length} chamados (${rondaPts} pontos) &rarr; <strong>${rondaVenc.length} ordens estão com SLA vencido (${rondaVencPts} pontos)</strong>. Os chamados da ronda técnica concentram todo o passivo em atraso nos bairros.
+    `;
+  }
 }
 
 function renderPendentesTable() {

@@ -753,17 +753,17 @@
           <div class="insight-summary-left">
             <span style="font-size: 0.95rem; color: var(--danger);"><i class="fa-solid fa-triangle-exclamation"></i></span>
             <span class="insight-summary-title">Diagnóstico Crítico: Fator "Ronda Própria" vs Call Center</span>
-            <span class="insight-summary-badge">6 ordens vencidas (27 pts) na Ronda</span>
+            <span class="insight-summary-badge" id="diag-ronda-badge">4 ordens vencidas (12 pts) na Ronda</span>
           </div>
           <div class="insight-summary-right">
             <span>Ver detalhes textuais</span>
             <span class="insight-arrow">▼</span>
           </div>
         </summary>
-        <div class="insight-accordion-content">
-          Dos <strong>11 chamados pendentes</strong>, existe uma divisão nítida na operação:<br>
-          &bull; <strong>Call Center (Munícipes):</strong> 5 chamados (5 pontos) &rarr; Abertos entre 02/10 e 07/10. <strong>100% estão dentro do SLA</strong> (restam de 1 a 6 dias). A equipe atende a população rigorosamente no prazo!<br>
-          &bull; <strong>Ronda Própria (Inspeção Técnica Interna):</strong> 6 chamados (27 pontos!) &rarr; Abertos entre 18/08 e 22/09. <strong>100% estão com SLA vencido</strong> (atraso de até 44 dias). Os chamados da ronda foram preteridos em favor do Call Center, acumulando passivo nos bairros.
+        <div class="insight-accordion-content" id="diag-ronda-content">
+          Dos <strong>30 chamados pendentes</strong>, existe uma divisão nítida na operação:<br>
+          &bull; <strong>Call Center (Munícipes):</strong> 25 chamados (25 pontos) &rarr; <strong>100% estão dentro do SLA</strong>. A equipe atende a população rigorosamente no prazo!<br>
+          &bull; <strong>Ronda Própria (Inspeção Técnica Interna):</strong> 5 chamados (13 pontos) &rarr; <strong>4 ordens estão com SLA vencido (12 pontos)</strong>. Os chamados da ronda técnica concentram todo o passivo em atraso nos bairros.
         </div>
       </details>
 
@@ -796,12 +796,12 @@
           </div>
           <div class="timeline-kpi-item">
             <span class="tkpi-label">Origem Ronda Interna</span>
-            <span class="tkpi-val amber" id="tkpi-ronda-pts">27 pts (84%)</span>
+            <span class="tkpi-val amber" id="tkpi-ronda-pts">13 pts (34%)</span>
             <span class="tkpi-sub">Passivo represado</span>
           </div>
           <div class="timeline-kpi-item">
             <span class="tkpi-label">Origem Call Center</span>
-            <span class="tkpi-val blue" id="tkpi-callcenter-pts">5 pts (16%)</span>
+            <span class="tkpi-val blue" id="tkpi-callcenter-pts">25 pts (66%)</span>
             <span class="tkpi-sub">100% no prazo</span>
           </div>
           <div class="timeline-kpi-item">
@@ -820,7 +820,7 @@
         <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
           <div>
             <h2 class="card-title" id="titulo-tabela-backlog">Lista Completa de Solicitações Pendentes</h2>
-            <p class="card-subtitle" id="table-total-count">11 ordens exibidas</p>
+            <p class="card-subtitle" id="table-total-count">30 ordens exibidas</p>
           </div>
           
           <div class="card-actions" style="flex-wrap: wrap;">
@@ -828,11 +828,11 @@
             <input type="text" id="input-busca-pendentes" class="search-input" placeholder="Buscar por protocolo, bairro...">
 
             <!-- Filtros Rápidos -->
-            <button class="btn-header filter-btn active" data-filter="todos">Todos (11)</button>
-            <button class="btn-header filter-btn" data-filter="vencidos" style="color: #f87171;">Vencidos (6)</button>
-            <button class="btn-header filter-btn" data-filter="no_prazo" style="color: #34d399;">No Prazo (5)</button>
-            <button class="btn-header filter-btn" data-filter="ronda" style="color: #fbbf24;">Ronda (27 pts)</button>
-            <button class="btn-header filter-btn" data-filter="callcenter" style="color: #60a5fa;">Call Center (5 pts)</button>
+            <button class="btn-header filter-btn active" data-filter="todos">Todos (30)</button>
+            <button class="btn-header filter-btn" data-filter="vencidos" style="color: #f87171;">Vencidos (4)</button>
+            <button class="btn-header filter-btn" data-filter="no_prazo" style="color: #34d399;">No Prazo (26)</button>
+            <button class="btn-header filter-btn" data-filter="ronda" style="color: #fbbf24;">Ronda (13 pts)</button>
+            <button class="btn-header filter-btn" data-filter="callcenter" style="color: #60a5fa;">Call Center (25 pts)</button>
           </div>
         </div>
 
@@ -1584,7 +1584,7 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
   </div>
 
   <!-- JavaScript da Aplicação -->
-  <script src="/exati/app.js?v=20261016_v12"></script>
+  <script src="/exati/app.js?v=20261016_v13"></script>
   <!-- Shared Sidebar Controller & Rádio Global -->
   <script src="/js/sidebar.js"></script>
   <script src="/js/radio.js" defer></script>
