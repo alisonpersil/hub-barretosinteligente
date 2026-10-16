@@ -559,8 +559,14 @@ dashboard_data = {
         "pendentes_arquivo": latest_fname or "Não encontrado",
         "pendentes_data_hora": pendentes_ts_str,
         "pendentes_data_hora_curta": pendentes_ts_short,
-        "data_min": df_a['data_iso'].min() if 'data_iso' in df_a.columns else "",
-        "data_max": df_a['data_iso'].max() if 'data_iso' in df_a.columns else "",
+        "data_min": min(filter(None, [
+            df_a['data_iso'].min() if ('data_iso' in df_a.columns and not df_a.empty) else "",
+            min([p['data_iso'] for p in pendentes_data if p.get('data_iso')], default="")
+        ])) if (not df_a.empty or pendentes_data) else "",
+        "data_max": max(filter(None, [
+            df_a['data_iso'].max() if ('data_iso' in df_a.columns and not df_a.empty) else "",
+            max([p['data_iso'] for p in pendentes_data if p.get('data_iso')], default="")
+        ])) if (not df_a.empty or pendentes_data) else "",
         "cidade": "Barretos / SP",
         "sistema": "Monitor Exati / SGI",
         "total_planilhas_pendentes": len(pendentes_files),

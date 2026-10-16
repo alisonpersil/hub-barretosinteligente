@@ -30,8 +30,9 @@ let simConfig = {
 // Estado do Filtro de Data
 let dateFilterState = {
   inicio: '2026-01-01',
-  fim: '2026-10-09',
-  preset: '2026'
+  fim: '2026-10-15',
+  preset: '2026',
+  label: 'Ano 2026'
 };
 
 // Dicionários de Nomes dos Meses em Português
@@ -103,7 +104,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.warn("Aviso ao ler localStorage:", e);
   }
 
-  const defaultDataMax = (dashboardData && dashboardData.metadata && dashboardData.metadata.data_max) || '2026-10-09';
+  const pendingMax = (dashboardData && dashboardData.pendentes_lista)
+    ? dashboardData.pendentes_lista.reduce((max, p) => (p.data_iso && p.data_iso > max ? p.data_iso : max), '')
+    : '';
+  const defaultDataMax = (dashboardData && dashboardData.metadata && dashboardData.metadata.data_max) || pendingMax || '2026-10-15';
   dateFilterState.fim = defaultDataMax;
 
   updateSyncNotice();
@@ -373,6 +377,7 @@ function initDateFilters() {
       if (inputInicio) inputInicio.value = dtInicio;
       if (inputFim) inputFim.value = dtFim;
 
+      dateFilterState.label = labelPreset;
       applyDateFilter(dtInicio, dtFim, labelPreset, true);
       if (filterWrapper) filterWrapper.classList.remove('open');
     });
@@ -395,6 +400,7 @@ function initDateFilters() {
 
       presetBtns.forEach(b => b.classList.remove('active'));
       dateFilterState.preset = 'custom';
+      dateFilterState.label = 'Personalizado';
       evolucaoDrillMonth = null;
       evolucaoGranularidade = 'mes';
       applyDateFilter(dIni, dFim, 'Personalizado', true);
@@ -411,10 +417,34 @@ function initDateFilters() {
   }
 }
 
+// Mapa canônico de presets: mapeia chaves ('2026') e rótulos ('Ano 2026') para par consistente
+const PRESET_MAP = {
+  '2026': { key: '2026', label: 'Ano 2026' },
+  'Ano 2026': { key: '2026', label: 'Ano 2026' },
+  '30d': { key: '30d', label: 'Últimos 30 Dias' },
+  'Últimos 30 Dias': { key: '30d', label: 'Últimos 30 Dias' },
+  '90d': { key: '90d', label: 'Últimos 90 Dias' },
+  'Últimos 90 Dias': { key: '90d', label: 'Últimos 90 Dias' },
+  '2025': { key: '2025', label: 'Ano 2025' },
+  'Ano 2025': { key: '2025', label: 'Ano 2025' },
+  'tudo': { key: 'tudo', label: 'Histórico Total' },
+  'Histórico Total': { key: 'tudo', label: 'Histórico Total' },
+  'custom': { key: 'custom', label: 'Personalizado' },
+  'Personalizado': { key: 'custom', label: 'Personalizado' }
+};
+
 // Função Central de Filtragem e Recálculo
 function applyDateFilter(inicioStr, fimStr, nomePreset, notify = true) {
+  const presetInfo = PRESET_MAP[nomePreset] || {
+    key: dateFilterState.preset || 'custom',
+    label: (nomePreset && typeof nomePreset === 'string' && nomePreset.trim()) ? nomePreset : (dateFilterState.label || 'Personalizado')
+  };
+
   dateFilterState.inicio = inicioStr;
   dateFilterState.fim = fimStr;
+  dateFilterState.preset = presetInfo.key;
+  dateFilterState.label = presetInfo.label;
+  nomePreset = presetInfo.label;
 
   const records = dashboardData.daily_records || [];
   const filtrados = records.filter(r => r.d >= inicioStr && r.d <= fimStr);
@@ -625,7 +655,7 @@ function applyDateFilter(inicioStr, fimStr, nomePreset, notify = true) {
   // Card 2: Backlog Pendente Ativo
   const listaPend = dashboardData.pendentes_lista || [];
   let pendFiltrados = listaPend;
-  if (nomePreset !== 'Histórico Total' && nomePreset !== 'Ano 2026') {
+  if (presetInfo.key !== 'tudo' && presetInfo.key !== '2026') {
     pendFiltrados = listaPend.filter(p => {
       if (p.data_iso) {
         return p.data_iso >= inicioStr && p.data_iso <= fimStr;
@@ -1168,7 +1198,7 @@ function updateDrillUI() {
 }
 
 function renderCharts() {
-  applyDateFilter(dateFilterState.inicio, dateFilterState.fim, dateFilterState.preset, false);
+  applyDateFilter(dateFilterState.inicio, dateFilterState.fim, dateFilterState.label || dateFilterState.preset, false);
   renderChartEvolucaoPendentes();
 }
 
@@ -4382,9 +4412,71 @@ function setupUploadModal() {
 
   if (!modal || !btnOpen) return;
 
+  // Gerenciamento de Conexão com Banco de Dados no GitHub
+  const btnToggleGh = document.getElementById('btnToggleGithubSettingsExati');
+  const ghBody = document.getElementById('githubSettingsBodyExati');
+  const ghChevron = document.getElementById('githubSettingsChevronExati');
+  const ghInput = document.getElementById('githubTokenInputExati');
+  const btnSaveGh = document.getElementById('btnSaveGithubTokenExati');
+  const ghTitle = document.getElementById('cloudStatusTitleExati');
+  const ghSub = document.getElementById('cloudStatusSubtitleExati');
+
+  const updateGhStatus = async () => {
+    const token = localStorage.getItem('pmo_github_token') || '';
+    if (ghInput) ghInput.value = token;
+    try {
+      const res = await fetch('/api/system/status', {
+        headers: token ? { 'X-GitHub-Token': token } : {}
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.has_github_token || token) {
+          if (ghTitle) ghTitle.textContent = 'Banco de Dados no GitHub (Conectado)';
+          if (ghSub) ghSub.innerHTML = `<span style="color:var(--success); font-weight:600;"><i class="fa-solid fa-circle-check"></i> Pronto para salvar em ${data.repo || 'alisonpersil/hub-barretosinteligente'}</span>`;
+        } else if (data.is_vercel) {
+          if (ghTitle) ghTitle.textContent = 'Banco de Dados no GitHub (Token Necessário)';
+          if (ghSub) ghSub.innerHTML = `<span style="color:var(--warning);"><i class="fa-solid fa-triangle-exclamation"></i> Clique para informar o GitHub Token</span>`;
+        } else {
+          if (ghTitle) ghTitle.textContent = 'Servidor Local (Disco Físico Ativo)';
+          if (ghSub) ghSub.innerHTML = `<span style="color:var(--accent-blue);"><i class="fa-solid fa-hard-drive"></i> Gravação física na pasta Base de dados</span>`;
+        }
+      }
+    } catch (_) {
+      if (token) {
+        if (ghTitle) ghTitle.textContent = 'Banco de Dados no GitHub (Conectado)';
+        if (ghSub) ghSub.innerHTML = `<span style="color:var(--success); font-weight:600;"><i class="fa-solid fa-circle-check"></i> Token configurado no navegador</span>`;
+      }
+    }
+  };
+
+  if (btnToggleGh && ghBody) {
+    btnToggleGh.addEventListener('click', () => {
+      const isOpen = ghBody.style.display !== 'none';
+      ghBody.style.display = isOpen ? 'none' : 'block';
+      if (ghChevron) ghChevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    });
+  }
+
+  if (btnSaveGh && ghInput) {
+    btnSaveGh.addEventListener('click', () => {
+      const tVal = ghInput.value.trim();
+      if (tVal) {
+        localStorage.setItem('pmo_github_token', tVal);
+        showToast('Token do GitHub salvo com sucesso!', 'fa-circle-check');
+      } else {
+        localStorage.removeItem('pmo_github_token');
+        showToast('Token do GitHub removido.', 'fa-circle-info');
+      }
+      if (ghBody) ghBody.style.display = 'none';
+      if (ghChevron) ghChevron.style.transform = 'rotate(0deg)';
+      updateGhStatus();
+    });
+  }
+
   btnOpen.addEventListener('click', () => {
     modal.classList.add('active');
     resetUploadState();
+    updateGhStatus();
   });
 
   if (btnClose) btnClose.addEventListener('click', () => modal.classList.remove('active'));
@@ -4680,14 +4772,86 @@ function setupUploadModal() {
       if (loadingBar) loadingBar.style.display = 'flex';
       if (loadingText) loadingText.textContent = `Processando '${selectedFile.name}' e recalculando todos os indicadores...`;
 
-      // 1. Tenta enviar para o backend local servidor.py
+      const token = localStorage.getItem('pmo_github_token') || '';
+      const MAX_VERCEL_BYTES = 4.3 * 1024 * 1024;
+
+      // 1. Arquivos grandes (> 4.3 MB, como planilhas completas de Atendidos)
+      // Se houver token, comita direto via GitHub REST API pelo navegador para contornar o limite de payload da Vercel
+      if (token && selectedFile.size > MAX_VERCEL_BYTES) {
+        try {
+          if (loadingText) loadingText.textContent = `Enviando planilha grande (${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB) diretamente para o GitHub...`;
+
+          const subfolder = targetCat === 'atendidos' ? 'Atendidos' : 'Pendentes';
+          const repoPath = `01 - Relatórios/02 - Monitor Exati/Base de dados/${subfolder}/${selectedFile.name}`;
+          const ghUrl = `https://api.github.com/repos/alisonpersil/hub-barretosinteligente/contents/${encodeURIComponent(repoPath)}`;
+
+          let sha = null;
+          try {
+            const checkRes = await fetch(ghUrl, {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Accept': 'application/vnd.github.v3+json'
+              }
+            });
+            if (checkRes.ok) {
+              const checkData = await checkRes.json();
+              sha = checkData.sha;
+            }
+          } catch (_) {}
+
+          const arrayBuffer = await selectedFile.arrayBuffer();
+          let binary = '';
+          const bytes = new Uint8Array(arrayBuffer);
+          const len = bytes.byteLength;
+          for (let b = 0; b < len; b++) {
+            binary += String.fromCharCode(bytes[b]);
+          }
+          const base64Content = btoa(binary);
+
+          const ghBody = {
+            message: `feat(exati): importar planilha ${selectedFile.name} para Base de dados/${subfolder}`,
+            content: base64Content
+          };
+          if (sha) ghBody.sha = sha;
+
+          const ghRes = await fetch(ghUrl, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Accept': 'application/vnd.github.v3+json',
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(ghBody)
+          });
+
+          if (!ghRes.ok) {
+            const ghErr = await ghRes.json().catch(() => ({}));
+            throw new Error(ghErr.message || `Erro GitHub (${ghRes.status})`);
+          }
+
+          showToast(`Planilha '${selectedFile.name}' salva com sucesso no GitHub em 'Base de dados/${subfolder}'!`, 'fa-circle-check');
+          recordUploadHistory(targetCat, selectedFile.name);
+          processarArquivoUploadLocal(selectedFile, currentAnalysis);
+          return;
+        } catch (errGh) {
+          console.error('Erro no upload direto para GitHub API:', errGh);
+          showToast(`Erro ao enviar para o GitHub: ${errGh.message}`, 'fa-triangle-exclamation');
+          if (loadingBar) loadingBar.style.display = 'none';
+          return;
+        }
+      }
+
+      // 2. Arquivos normais (<= 4.3 MB, como planilhas de Pendentes de poucos KB)
       try {
+        const headers = {
+          'X-Filename': encodeURIComponent(selectedFile.name),
+          'X-Category': targetCat
+        };
+        if (token) headers['X-GitHub-Token'] = token;
+
         const response = await fetch('/api/upload', {
           method: 'POST',
-          headers: {
-            'X-Filename': encodeURIComponent(selectedFile.name),
-            'X-Category': targetCat
-          },
+          headers: headers,
           body: selectedFile
         });
 
@@ -4695,55 +4859,61 @@ function setupUploadModal() {
           const result = await response.json();
           recordUploadHistory(targetCat, selectedFile.name);
 
-          // Limpar qualquer cache desatualizado no localStorage para priorizar os dados recalculados pelo servidor
-          try {
-            localStorage.removeItem('exati_custom_dashboard_data');
-          } catch (e) {}
+          // Se estiver rodando offline/local e o servidor tiver gerado um novo dashboard_data.json
+          if (!result.github_synced) {
+            try {
+              localStorage.removeItem('exati_custom_dashboard_data');
+            } catch (e) {}
 
-          // Recarregar dashboard_data.json atualizado gerado pelo servidor
-          const resData = await fetch('./dashboard_data.json?t=' + Date.now());
-          if (resData.ok) {
-            const freshData = await resData.json();
-            dashboardData = freshData;
-            Object.assign(originalDashboardData, JSON.parse(JSON.stringify(freshData)));
+            const resData = await fetch('./dashboard_data.json?t=' + Date.now());
+            if (resData.ok) {
+              const freshData = await resData.json();
+              dashboardData = freshData;
+              Object.assign(originalDashboardData, JSON.parse(JSON.stringify(freshData)));
 
-            // Reaplicar filtros e renderizar tudo
-            applyDateFilter(dateFilterState.inicio, dateFilterState.fim, dateFilterState.preset, false);
-            renderChartEvolucaoPendentes();
-            renderPendentesTable();
-            updateSimulation();
-            updateSyncNotice();
-            if (typeof renderBairroOcorrenciaSlaChart === 'function') renderBairroOcorrenciaSlaChart();
+              applyDateFilter(dateFilterState.inicio, dateFilterState.fim, dateFilterState.label || dateFilterState.preset, false);
+              renderChartEvolucaoPendentes();
+              renderPendentesTable();
+              updateSimulation();
+              updateSyncNotice();
+              if (typeof renderBairroOcorrenciaSlaChart === 'function') renderBairroOcorrenciaSlaChart();
+            }
+          } else {
+            // Sincronizado com sucesso no repositório GitHub!
+            // Atualiza os indicadores imediatamente no navegador do usuário
+            processarArquivoUploadLocal(selectedFile, currentAnalysis);
           }
 
+          if (loadingBar) loadingBar.style.display = 'none';
           modal.classList.remove('active');
-          let successToast = overwriteInfo.updatedToday
-            ? `Planilha '${selectedFile.name}' salva! A atualização anterior de hoje foi substituída com sucesso.`
-            : `Planilha '${selectedFile.name}' salva com sucesso em 'Base de dados/${result.folder}' e painel 100% atualizado!`;
-          if (result.task && result.task.queued) {
-            successToast += ` Auditoria enviada ao backlog do Chefe.`;
-          }
+          let successToast = `Planilha '${selectedFile.name}' salva com sucesso em 'Base de dados/${result.folder}' no GitHub!`;
           showToast(successToast, 'fa-circle-check');
           return;
+        } else if (response.status === 403) {
+          const errJson = await response.json().catch(() => ({}));
+          if (loadingBar) loadingBar.style.display = 'none';
+          if (errJson.error === 'github_token_required') {
+            if (ghBody) ghBody.style.display = 'block';
+            if (ghChevron) ghChevron.style.transform = 'rotate(180deg)';
+            if (ghInput) ghInput.focus();
+            showToast('Informe o GitHub Personal Access Token para salvar no banco de dados da nuvem.', 'fa-key');
+            return;
+          }
+          showToast(`Aviso: ${errJson.message || 'Acesso negado'}`, 'fa-triangle-exclamation');
+          return;
         } else {
-          // Servidor respondeu com código de erro (ex: 500)
-          let errorMsg = 'Falha no processamento da planilha pelo servidor.';
-          try {
-            const errJson = await response.json();
-            if (errJson.message) errorMsg = errJson.message;
-            if (errJson.error) errorMsg += ' (' + errJson.error + ')';
-          } catch (_) {}
-          modal.classList.remove('active');
-          showToast(`Aviso: ${errorMsg}`, 'fa-triangle-exclamation');
+          // Servidor respondeu com outro código - aciona processamento local resiliente
+          console.warn('Servidor falhou ao processar backend. Acionando motor autônomo no navegador:', response.status);
+          recordUploadHistory(targetCat, selectedFile.name);
+          processarArquivoUploadLocal(selectedFile, currentAnalysis);
           return;
         }
       } catch (err) {
-        console.log('Backend servidor.py/app.py indisponível (modo online/standalone ativo). Executando motor autônomo no navegador:', err);
+        console.warn('Backend servidor.py/app.py indisponível. Executando motor autônomo no navegador:', err);
+        recordUploadHistory(targetCat, selectedFile.name);
+        processarArquivoUploadLocal(selectedFile, currentAnalysis);
+        return;
       }
-
-      // 2. Fallback Autônomo Client-Side (quando online no GitHub Pages ou sem servidor Python)
-      recordUploadHistory(targetCat, selectedFile.name);
-      processarArquivoUploadLocal(selectedFile, currentAnalysis);
     });
   }
 
@@ -4767,7 +4937,12 @@ function setupUploadModal() {
 // =====================================================================
 
 function processarArquivoUploadLocal(file, analysis) {
+  const loadingBar = document.getElementById('upload-loading-bar');
+  const modal = document.getElementById('modal-upload');
+
   if (typeof XLSX === 'undefined') {
+    if (loadingBar) loadingBar.style.display = 'none';
+    if (modal) modal.classList.remove('active');
     showToast('Biblioteca SheetJS não carregada.');
     return;
   }
@@ -4788,14 +4963,18 @@ function processarArquivoUploadLocal(file, analysis) {
       const rawRows = XLSX.utils.sheet_to_json(sheet, { range: headerRowIdx });
 
       if (rawRows.length === 0) {
+        if (loadingBar) loadingBar.style.display = 'none';
+        if (modal) modal.classList.remove('active');
         showToast('A planilha enviada não contém linhas de dados.');
-        document.getElementById('modal-upload').classList.remove('active');
         return;
       }
 
       const now = new Date();
       const nowFormatted = formatExatiDateTime(now);
       const nowFormattedShort = formatExatiDateTimeShort(now);
+
+      if (!dashboardData.metadata) dashboardData.metadata = {};
+      dashboardData.metadata.gerado_em = nowFormatted;
 
       if (targetCat === 'pendentes') {
         // --- PROCESSAMENTO AUTÔNOMO DE PENDENTES (BACKLOG) ---
@@ -4867,6 +5046,14 @@ function processarArquivoUploadLocal(file, analysis) {
         dashboardData.metadata.pendentes_data_hora_curta = nowFormattedShort;
         if (dashboardData.evolucao_pendentes) {
           dashboardData.evolucao_pendentes.ultima_versao_arquivo = file.name;
+        }
+
+        let maxPendingIso = '';
+        newPendentes.forEach(p => {
+          if (p.data_iso && p.data_iso > maxPendingIso) maxPendingIso = p.data_iso;
+        });
+        if (maxPendingIso && (!dashboardData.metadata.data_max || maxPendingIso > dashboardData.metadata.data_max)) {
+          dashboardData.metadata.data_max = maxPendingIso;
         }
 
         if (!dashboardData.column_audit) dashboardData.column_audit = {};
@@ -5008,6 +5195,14 @@ function processarArquivoUploadLocal(file, analysis) {
           dashboardData.daily_records = [...prevDaily, ...newDaily2026];
         }
 
+        let maxAtendidoIso = '';
+        rows2026.forEach(r => {
+          if (r.data_iso && r.data_iso > maxAtendidoIso) maxAtendidoIso = r.data_iso;
+        });
+        if (maxAtendidoIso && (!dashboardData.metadata.data_max || maxAtendidoIso > dashboardData.metadata.data_max)) {
+          dashboardData.metadata.data_max = maxAtendidoIso;
+        }
+
         dashboardData.metadata.atendidos_arquivo = file.name;
         dashboardData.metadata.atendidos_data_hora = nowFormatted;
         dashboardData.metadata.atendidos_data_hora_curta = nowFormattedShort;
@@ -5027,22 +5222,24 @@ function processarArquivoUploadLocal(file, analysis) {
       Object.assign(originalDashboardData, JSON.parse(JSON.stringify(dashboardData)));
 
       // Reaplicar filtros e renderizar todas as telas
-      applyDateFilter(dateFilterState.inicio, dateFilterState.fim, dateFilterState.preset, false);
+      applyDateFilter(dateFilterState.inicio, dateFilterState.fim, dateFilterState.label || dateFilterState.preset, false);
       renderChartEvolucaoPendentes();
       renderPendentesTable();
       updateSimulation();
       updateSyncNotice();
       if (typeof renderBairroOcorrenciaSlaChart === 'function') renderBairroOcorrenciaSlaChart();
 
-      document.getElementById('modal-upload').classList.remove('active');
+      if (loadingBar) loadingBar.style.display = 'none';
+      if (modal) modal.classList.remove('active');
       const rowCount = rawRows.length;
       recordUploadHistory(targetCat, file.name);
       showToast(`Planilha '${file.name}' analisada dinamicamente com sucesso! ${rowCount} registros processados e painel recalculado.`, 'fa-circle-check');
 
     } catch (err) {
       console.error('Erro ao processar arquivo no navegador:', err);
+      if (loadingBar) loadingBar.style.display = 'none';
+      if (modal) modal.classList.remove('active');
       showToast('Erro ao processar arquivo Excel no navegador.');
-      document.getElementById('modal-upload').classList.remove('active');
     }
   };
   reader.readAsArrayBuffer(file);

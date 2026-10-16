@@ -368,7 +368,12 @@ def serve_oficios_static(filename):
 def system_status():
     """Retorna informações do ambiente Cloud / Local."""
     is_vercel = bool(os.environ.get("VERCEL"))
-    token = request.headers.get("X-GitHub-Token") or os.environ.get("GITHUB_TOKEN")
+    token = (
+        request.headers.get("X-GitHub-Token")
+        or os.environ.get("GITHUB_TOKEN")
+        or os.environ.get("GH_TOKEN")
+        or os.environ.get("PMO_GITHUB_TOKEN")
+    )
     return jsonify({
         "success": True,
         "is_vercel": is_vercel,
@@ -427,7 +432,12 @@ def upload_oficios():
         return jsonify({"success": False, "error": "Nenhum arquivo enviado."}), 400
 
     is_vercel = bool(os.environ.get("VERCEL"))
-    token = request.headers.get("X-GitHub-Token") or os.environ.get("GITHUB_TOKEN")
+    token = (
+        request.headers.get("X-GitHub-Token")
+        or os.environ.get("GITHUB_TOKEN")
+        or os.environ.get("GH_TOKEN")
+        or os.environ.get("PMO_GITHUB_TOKEN")
+    )
     
     if is_vercel and not token:
         return jsonify({
@@ -522,8 +532,9 @@ def serve_exati_file(filename):
 
 @app.route("/api/upload", methods=["POST"])
 @app.route("/exati/api/upload", methods=["POST"])
+@app.route("/api/upload", methods=["POST"])
 def api_upload_exati():
-    """Recebe planilhas de Pendentes ou Atendidos do Monitor Exati e sincroniza os dados."""
+    """Recebe planilhas de Pendentes ou Atendidos do Monitor Exati e sincroniza no GitHub ou em disco local."""
     try:
         raw_filename = request.headers.get("X-Filename", "")
         category = request.headers.get("X-Category", "auto").lower()
@@ -535,20 +546,26 @@ def api_upload_exati():
         if not file_bytes:
             return jsonify({"success": False, "error": "Nenhum dado recebido"}), 400
 
-        temp_dir = os.path.join(EXATI_DIR, "Base de dados", "_temp")
-        os.makedirs(temp_dir, exist_ok=True)
-        temp_path = os.path.join(temp_dir, filename)
-        with open(temp_path, "wb") as f:
-            f.write(file_bytes)
+        is_vercel = bool(os.environ.get("VERCEL"))
+        token = (
+            request.headers.get("X-GitHub-Token")
+            or os.environ.get("GITHUB_TOKEN")
+            or os.environ.get("GH_TOKEN")
+            or os.environ.get("PMO_GITHUB_TOKEN")
+        )
 
+        import io
         if EXATI_DIR not in sys.path:
             sys.path.insert(0, EXATI_DIR)
         from exati_column_resolver import detect_dataset_type, resolve_columns
+
+        # Inspecionar amostra em memória para identificar colunas e categoria sem salvar em disco
         try:
             import pandas as pd
-            df_sample = pd.read_excel(temp_path, nrows=2)
+            df_sample = pd.read_excel(io.BytesIO(file_bytes), nrows=2)
             cols = list(df_sample.columns)
-        except Exception:
+        except Exception as e_sample:
+            print(f"[Upload Exati Sample Error]: {e_sample}")
             cols = []
 
         if category == "auto":
@@ -559,25 +576,99 @@ def api_upload_exati():
             target_category = detect_dataset_type(cols, filename)
 
         mapping, audit = resolve_columns(cols, target_category) if cols else ({}, {})
-
         subfolder = "Atendidos" if target_category == "atendidos" else "Pendentes"
+
+        task_info = {}
+
+        # -------------------------------------------------------------
+        # CENÁRIO 1: AMBIENTE VERCEL (SERVERLESS) -> SALVA NO GITHUB API
+        # -------------------------------------------------------------
+        if is_vercel:
+            if not token:
+                return jsonify({
+                    "success": False,
+                    "error": "github_token_required",
+                    "message": "Para que as planilhas sejam salvas permanentemente no banco de dados do GitHub, configure a variável GITHUB_TOKEN na Vercel ou informe seu token no painel."
+                }), 403
+
+            exati_rel_path = os.path.relpath(EXATI_DIR, BASE_DIR).replace("\\", "/")
+            repo_path = f"{exati_rel_path}/Base de dados/{subfolder}/{filename}"
+            commit_msg = f"feat(exati): importar planilha {filename} para Base de dados/{subfolder}"
+
+            gh_result = github_api_commit_file(
+                token=token,
+                repo_path=repo_path,
+                file_bytes=file_bytes,
+                commit_message=commit_msg
+            )
+
+            # Enfileirar tarefa de auditoria para o agente Chefe (mantida em fila segura)
+            try:
+                carregar_estado_agentes()
+                chefe = AGENTS_TASKS.get("p3-main")
+                if not chefe:
+                    for k, a in AGENTS_TASKS.items():
+                        if a.get("tipo") == "O chefe" or k in ("p3-main", "p0-chefe"):
+                            chefe = a
+                            break
+
+                if chefe:
+                    now_dt = datetime.now()
+                    task_id = f"tsk-upload-{int(now_dt.timestamp())}"
+                    titulo_tarefa = f"Auditoria da planilha '{filename}' ({subfolder})"
+                    desc_tarefa = (
+                        f"Planilha '{filename}' enviada pelo usuário e comitada com sucesso no repositório GitHub em 'Base de dados/{subfolder}'. "
+                        f"Auditoria multi-arquivos e reconciliação registradas em fila segura (Zero Tokens) aguardando validação no painel."
+                    )
+                    nova_tarefa = {
+                        "id": task_id,
+                        "titulo": titulo_tarefa,
+                        "descricao": desc_tarefa,
+                        "adicionado_em": now_dt.strftime("%H:%M"),
+                        "prioridade": "Alta",
+                        "origem_usuario": True,
+                        "acionar_ia": False
+                    }
+                    chefe.setdefault("fila", []).append(nova_tarefa)
+                    salvar_estado_agentes()
+                    task_info = {
+                        "queued": True,
+                        "task_id": task_id,
+                        "agent": "p3-main",
+                        "title": titulo_tarefa
+                    }
+            except Exception as e_task:
+                print(f"[Upload Task Enqueue Error]: {e_task}")
+
+            commit_sha = ""
+            if isinstance(gh_result, dict):
+                commit_sha = gh_result.get("commit", {}).get("sha", "") or gh_result.get("content", {}).get("sha", "")
+
+            return jsonify({
+                "success": True,
+                "filename": filename,
+                "category": target_category,
+                "folder": subfolder,
+                "audit": audit,
+                "task": task_info,
+                "github_synced": True,
+                "commit_sha": commit_sha,
+                "message": f"Planilha '{filename}' salva e comitada com sucesso no GitHub em 'Base de dados/{subfolder}'!"
+            }), 200
+
+        # -------------------------------------------------------------
+        # CENÁRIO 2: AMBIENTE LOCAL / SERVIDOR FÍSICO COM DISCO GRAVÁVEL
+        # -------------------------------------------------------------
         dest_dir = os.path.join(EXATI_DIR, "Base de dados", subfolder)
         os.makedirs(dest_dir, exist_ok=True)
         dest_path = os.path.join(dest_dir, filename)
 
-        if os.path.exists(dest_path):
-            try:
-                os.remove(dest_path)
-            except Exception:
-                pass
-        import shutil
-        shutil.move(temp_path, dest_path)
+        with open(dest_path, "wb") as f:
+            f.write(file_bytes)
 
         cmd = [sys.executable, os.path.join(EXATI_DIR, "build_dashboard_data.py")]
         proc = subprocess.run(cmd, cwd=EXATI_DIR, capture_output=True, text=True)
 
-        # Captura automática do evento de upload e enfileiramento para 'O chefe' (p3-main)
-        task_info = {}
         try:
             carregar_estado_agentes()
             chefe = AGENTS_TASKS.get("p3-main")
@@ -611,7 +702,7 @@ def api_upload_exati():
                     "adicionado_em": now_dt.strftime("%H:%M"),
                     "prioridade": prioridade,
                     "origem_usuario": True,
-                    "acionar_ia": False  # Zero tokens: mantido em backlog até o usuário resolver ativar o agente
+                    "acionar_ia": False
                 }
                 chefe.setdefault("fila", []).append(nova_tarefa)
                 salvar_estado_agentes()
@@ -625,12 +716,13 @@ def api_upload_exati():
             print(f"[Upload Task Enqueue Error]: {e_task}")
 
         resp_success = (proc.returncode == 0)
+        if resp_success:
+            run_git_sync_background(f"feat(exati): importar planilha {filename} para Base de dados/{subfolder}")
+
         msg = (
-            f"Planilha '{filename}' identificada ({target_category.upper()}) com sucesso e sincronizada! "
-            f"Tarefa de auditoria enviada para o backlog do agente Chefe."
+            f"Planilha '{filename}' salva em 'Base de dados/{subfolder}' e sincronizada com sucesso!"
             if resp_success else
-            f"A planilha '{filename}' foi recebida, mas ocorreu erro no processamento. "
-            f"O incidente foi capturado e enviado para o backlog do agente Chefe para tratamento."
+            f"A planilha '{filename}' foi recebida, mas ocorreu erro no recálculo local."
         )
 
         return jsonify({

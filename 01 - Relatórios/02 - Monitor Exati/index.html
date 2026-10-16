@@ -358,7 +358,7 @@
               <span class="kpi-unit">ordens</span>
             </div>
             <span class="kpi-badge-secondary" title="Total físico de lâmpadas e pontos a atender">
-              Físico: <strong id="kpi-backlog-pontos">39 pts</strong>
+              Físico: <strong id="kpi-backlog-pontos">38 pts</strong>
             </span>
             <span class="kpi-mom-badge up-danger" id="kpi-backlog-mom" title="Variação em relação ao mês anterior">
               &uarr; vs Set/26: +650% (+26 ordens)
@@ -791,7 +791,7 @@
         <div class="backlog-timeline-kpis">
           <div class="timeline-kpi-item">
             <span class="tkpi-label">Passivo Atual em Aberto</span>
-            <span class="tkpi-val red" id="tkpi-pontos-atual">39 pts</span>
+            <span class="tkpi-val red" id="tkpi-pontos-atual">38 pts</span>
             <span class="tkpi-sub" id="tkpi-chamados-atual">30 ordens ativas</span>
           </div>
           <div class="timeline-kpi-item">
@@ -1485,6 +1485,32 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
           <input type="radio" name="upload-cat" value="atendidos">
           <span><i class="fa-solid fa-circle-check" style="margin-right: 4px;"></i> Ordens Atendidas (Base de dados/Atendidos)</span>
         </label>
+      </div>
+
+      <!-- Alerta e Status de Sincronização com o Banco de Dados do GitHub -->
+      <div id="exatiGithubSyncCard" class="cloud-settings-card" style="margin: 10px 0 14px 0; padding: 10px 14px; background: var(--bg-card-sub); border: 1px solid var(--border-color); border-radius: 8px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; cursor: pointer;" id="btnToggleGithubSettingsExati">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i class="fa-brands fa-github" style="font-size: 1.25rem; color: var(--accent-blue);"></i>
+            <div>
+              <span id="cloudStatusTitleExati" style="font-weight: 600; font-size: 0.85rem; color: var(--text-main); display: block;">Banco de Dados no GitHub</span>
+              <span id="cloudStatusSubtitleExati" style="font-size: 0.74rem; color: var(--text-dim);">Verificando conexão com o repositório...</span>
+            </div>
+          </div>
+          <i class="fa-solid fa-chevron-down" id="githubSettingsChevronExati" style="font-size: 0.8rem; color: var(--text-dim); transition: transform 0.2s;"></i>
+        </div>
+        <div id="githubSettingsBodyExati" style="display: none; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 10px;">
+          <p style="font-size: 0.76rem; color: var(--text-muted); margin-bottom: 8px; line-height: 1.4;">
+            As planilhas são salvas diretamente no repositório GitHub (pasta <code>Base de dados</code>), que funciona como banco de dados permanente na nuvem.
+          </p>
+          <div style="display: flex; gap: 8px;">
+            <input type="password" id="githubTokenInputExati" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx..." style="flex: 1; padding: 6px 10px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--text-main);" autocomplete="off">
+            <button type="button" id="btnSaveGithubTokenExati" type="button" style="padding: 6px 14px; font-size: 0.78rem; font-weight: 600; background: var(--primary); color: #fff; border: none; border-radius: 6px; cursor: pointer;">Salvar</button>
+          </div>
+          <small style="font-size: 0.72rem; color: var(--text-dim); margin-top: 5px; display: block;">
+            O token é compartilhado entre Ofícios e Exati e fica salvo com segurança no seu navegador.
+          </small>
+        </div>
       </div>
 
       <div class="drop-zone" id="drop-zone">
