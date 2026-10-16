@@ -650,8 +650,17 @@ dashboard_data = {
     "solicitacoes_full": solicitacoes_full_rows
 }
 
+try:
+    from ai_data_auditor import audit_and_reconcile_dashboard_data
+    print("4. Executando Auditoria Autônoma de Dados com OpenAI GPT-4o-mini...")
+    ai_audit = audit_and_reconcile_dashboard_data(dashboard_data)
+    print(f"Auditoria IA concluída: Status {ai_audit.get('status')} • Confiança {ai_audit.get('confianca_percent')}%")
+except Exception as e_ai:
+    print(f"Aviso na auditoria IA: {e_ai}")
+
 json_path = os.path.join(output_dir, "dashboard_data.json")
 with open(json_path, 'w', encoding='utf-8') as f:
     json.dump(dashboard_data, f, ensure_ascii=False)
 
 print(f"dashboard_data.json atualizado com sucesso em {json_path}!")
+

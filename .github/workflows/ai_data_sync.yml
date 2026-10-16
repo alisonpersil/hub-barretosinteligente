@@ -1,0 +1,47 @@
+name: "Sincronização e Auditoria IA (OpenAI GPT-4o-mini)"
+
+on:
+  push:
+    paths:
+      - "01 - Relatórios/02 - Monitor Exati/Base de dados/**"
+  workflow_dispatch:
+
+jobs:
+  audit_and_sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pandas openpyxl numpy xlrd Flask Werkzeug
+
+      - name: Run Build and OpenAI GPT-4o-mini Audit
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          python "01 - Relatórios/02 - Monitor Exati/build_dashboard_data.py"
+
+      - name: Commit and Push Updated Dashboard Data
+        run: |
+          git config --global user.name "Barretos Inteligente AI"
+          git config --global user.email "ai@barretosinteligente.com.br"
+          git add "01 - Relatórios/02 - Monitor Exati/dashboard_data.json" "01 - Relatórios/02 - Monitor Exati/historico_backlog.json" || true
+          if git diff --staged --quiet; then
+            echo "Nenhuma alteração em dashboard_data.json para comitar."
+          else
+            git commit -m "chore(exati): auto-sync dashboard_data.json auditado por OpenAI GPT-4o-mini [skip ci]"
+            git push origin main
+          fi

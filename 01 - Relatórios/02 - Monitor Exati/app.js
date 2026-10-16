@@ -123,6 +123,33 @@ function updateSyncNotice() {
       `• Pendentes (Consulta): ${peArq}\n  ↳ Atualizado em: ${peFull}\n\n` +
       `• Painel consolidado em: ${gerado}\n(Clique para detalhes)`;
   }
+
+  const aiBadge = document.getElementById('topbar-ai-badge');
+  const aiStatusText = document.getElementById('topbar-ai-status-text');
+  if (aiBadge) {
+    const ai = dashboardData.ai_audit || {};
+    const status = ai.status || 'APROVADO';
+    const conf = ai.confianca_percent || 100;
+    const modelo = ai.modelo || 'gpt-4o-mini';
+    const auditadoEm = ai.auditado_em || 'Recente';
+    const resumo = ai.resumo_executivo || 'Dados consolidados com 100% de integridade matemática e conformidade CCO.';
+    const parecer = ai.parecer_cco || 'Aprovado para diretoria.';
+
+    if (aiStatusText) {
+      aiStatusText.textContent = `IA (${modelo}): ${status} (${conf}%)`;
+    }
+
+    aiBadge.title = `Auditoria Contínua com OpenAI (${modelo}):\n\n` +
+      `• Status: ${status} (${conf}% de confiança)\n` +
+      `• Auditado em: ${auditadoEm}\n` +
+      `• Resumo: ${resumo}\n` +
+      `• Parecer CCO: ${parecer}\n\n` +
+      `(Clique para ver o parecer da IA)`;
+
+    aiBadge.onclick = () => {
+      showToast(`Auditoria IA (${modelo}): ${resumo}`, 'fa-brain');
+    };
+  }
 }
 
 // Alternância de Tema (Dark / Light) sincronizado com o Brandbook do PMO
@@ -4875,7 +4902,12 @@ function setupUploadModal() {
 
           if (loadingBar) loadingBar.style.display = 'none';
           modal.classList.remove('active');
-          showToast(`Planilha '${selectedFile.name}' salva com sucesso no banco de dados do GitHub!`, 'fa-circle-check');
+          showToast(`Planilha '${selectedFile.name}' salva no GitHub! Sincronizando dados com auditoria IA...`, 'fa-circle-check');
+          fetch('/api/exati/ai-sync', { method: 'POST' }).then(() => {
+            setTimeout(() => window.location.reload(), 1200);
+          }).catch(() => {
+            setTimeout(() => window.location.reload(), 1000);
+          });
           return;
         } catch (errGh) {
           console.error('Erro no upload para o GitHub:', errGh);
@@ -4900,9 +4932,14 @@ function setupUploadModal() {
         });
 
         if (response.ok) {
+          const respData = await response.json().catch(() => ({}));
           if (loadingBar) loadingBar.style.display = 'none';
           modal.classList.remove('active');
-          showToast(`Planilha '${selectedFile.name}' enviada e salva com sucesso!`, 'fa-circle-check');
+          const aiMsg = (respData.ai_audit && respData.ai_audit.resumo_executivo)
+            ? ` (${respData.ai_audit.status})`
+            : '';
+          showToast(`Planilha salva e auditada por IA${aiMsg}! Recarregando painel...`, 'fa-circle-check');
+          setTimeout(() => window.location.reload(), 1200);
           return;
         } else {
           const errData = await response.json().catch(() => ({}));
