@@ -1863,11 +1863,16 @@ def chamar_gemini(agente_chave, titulo, descricao, acoes_executadas=None):
     # Fallback estruturado de alta fidelidade
     return parecer_contingencia(agente_chave, titulo, descricao), "Diagnóstico HUB"
 
-def chamar_openai_agente(agente_chave, titulo, descricao, acoes_executadas=None):
+def chamar_openai_agente(agente_chave, titulo, descricao, acoes_executadas=None, autorizado_pin=False):
     """
     Executa a inteligência do agente utilizando o motor OpenAI GPT-4o-mini,
-    com contexto em tempo real do repositório Git e histórico de alterações em disco.
+    EXCLUSIVAMENTE se houver autorização explícita por PIN (1264) fornecido pelo operador.
+    Zero consumo sem permissão explícita.
     """
+    if not autorizado_pin:
+        print(f"[Segurança de Tokens] BLOQUEADO: Chamada OpenAI para '{agente_chave}' rejeitada. Não há autorização por PIN.")
+        return parecer_contingencia(agente_chave, titulo, descricao), "Automação Local HUB (Protegido)"
+
     api_key = os.environ.get("OPENAI_API_KEY", "").strip()
     if not api_key:
         env_file = os.path.join(BASE_DIR, ".env")
@@ -2407,17 +2412,31 @@ def salvar_estado_agentes():
         print(f"[Estado Agentes] Falha ao salvar: {err}")
 
 def resolver_tarefa_ia(chave, t):
-    """Executa a ação física no repositório + motor OpenAI GPT-4o-mini, gravando o parecer executivo HUB."""
+    """Executa a ação física no repositório + motor OpenAI GPT-4o-mini com trava estrita de PIN."""
     if t.get("ia_executada"):
         return
     t["ia_executada"] = True
+
+    autorizado_pin = bool(t.get("autorizado_pin", False))
+    if not autorizado_pin:
+        print(f"[Segurança de Tokens] Tarefa '{t.get('titulo')}' NÃO possui autorização por PIN pelo operador. OpenAI BLOQUEADA.")
+        acoes = executar_acao_tarefa(t["titulo"], t.get("descricao", ""), chave)
+        t["resultado_ia"] = parecer_contingencia(chave, t.get("titulo", "Operação HUB"), t.get("descricao", ""))
+        if acoes:
+            t["resultado_ia"] += "\n\n**Ações Reais Executadas no Sistema:**\n" + "\n".join(f"• {a}" for a in acoes)
+        t["modelo_ia"] = "Automação Local HUB (Zero Consumo)"
+        t["acoes_executadas"] = acoes
+        t["etapa"] = "Tarefa concluída localmente (Zero consumo de tokens)."
+        t["chamando_ia"] = False
+        return
+
     try:
         acoes = executar_acao_tarefa(t["titulo"], t.get("descricao", ""), chave)
         resp = None
         mod_nome = "Automação HUB"
 
-        # Execução prioritária com OpenAI GPT-4o-mini
-        resp, mod_nome = chamar_openai_agente(chave, t["titulo"], t.get("descricao", ""), acoes_executadas=acoes)
+        # Execução prioritária com OpenAI GPT-4o-mini (autorizada com PIN)
+        resp, mod_nome = chamar_openai_agente(chave, t["titulo"], t.get("descricao", ""), acoes_executadas=acoes, autorizado_pin=True)
 
         if not resp:
             # Fallback de contingência
@@ -2665,6 +2684,7 @@ def api_criar_tarefa():
     }
 
     if modo == "agora":
+        nova_tarefa["autorizado_pin"] = True
         if ag["tarefa_atual"]:
             ag["fila"].insert(0, {
                 "id": ag["tarefa_atual"]["id"],
@@ -2863,7 +2883,8 @@ def api_promover_fila():
             "prioridade": target.get("prioridade", "Alta"),
             "etapa": "Iniciando processamento autônomo com autorização...",
             "origem_usuario": True,
-            "acionar_ia": True
+            "acionar_ia": True,
+            "autorizado_pin": True
         }
         ag["tarefa_atual"] = target_task
         ag["estado"] = "trabalhando"
