@@ -2206,15 +2206,20 @@ def carregar_estado_agentes():
                 raw = f.read()
     except Exception as err:
         print(f"[Estado Agentes] Falha ao carregar: {err}")
-    if not raw:
-        return
-    try:
-        data = json.loads(raw)
-        if isinstance(data, dict) and data:
-            AGENTS_TASKS.clear()
-            AGENTS_TASKS.update(data)
-    except Exception:
-        pass
+    if raw:
+        try:
+            data = json.loads(raw)
+            if isinstance(data, dict) and data:
+                AGENTS_TASKS.clear()
+                AGENTS_TASKS.update(data)
+        except Exception:
+            pass
+    # Trava Absoluta: Todas as tarefas canceladas por ordem do operador.
+    # Nenhuma tarefa pode iniciar ou se repetir a cada deploy sem o operador presente com PIN.
+    for ag in AGENTS_TASKS.values():
+        ag["tarefa_atual"] = None
+        ag["fila"] = []
+        ag["estado"] = "aguardando"
 
 def salvar_estado_agentes():
     try:
@@ -2273,50 +2278,9 @@ def resolver_tarefa_ia(chave, t):
         t["chamando_ia"] = False
 
 def avancar_agentes():
-    """Avança o progresso pelo tempo decorrido, conclui tarefas e promove a fila.
-    NUNCA dispara chamadas a APIs externas de IA durante navegação/polling."""
-    now = datetime.now()
-    mudou = False
-    for chave, ag in list(AGENTS_TASKS.items()):
-        t = ag.get("tarefa_atual")
-        if ag.get("estado") != "trabalhando" or not t:
-            continue
-        try:
-            iniciado = datetime.fromisoformat(t["iniciado_em"])
-        except Exception:
-            iniciado = now
-            t["iniciado_em"] = now.isoformat()
-        elapsed = max(0, (now - iniciado).total_seconds())
-
-        novo_prog = min(100, 10 + int(elapsed / 2.5 * 6))
-        novo_prog = max(novo_prog, int(t.get("progresso", 0)))
-        if novo_prog != t.get("progresso"):
-            t["progresso"] = novo_prog
-            mudou = True
-        t["duracao_min"] = max(1, int(elapsed) // 60)
-        t["previsao_min"] = max(0, int((100 - novo_prog) / 25))
-
-        if novo_prog >= 100:
-            mudou = True
-            resultado_final = t.get("resultado_ia")
-            if not resultado_final:
-                resultado_final = parecer_contingencia(chave, t["titulo"], t.get("descricao", ""))
-            modelo_final = t.get("modelo_ia") or "HUB Automação Local"
-
-            ag["historico"].insert(0, {
-                "id": t["id"],
-                "titulo": t["titulo"],
-                "concluido_em": now.strftime("%H:%M"),
-                "duracao": f"{max(1, t.get('duracao_min', 1))} min",
-                "status": "concluido",
-                "resultado": resultado_final,
-                "modelo": modelo_final
-            })
-            # Trava de Seguranca: Conclui a tarefa e coloca o agente em standby sem auto-promover a fila.
-            # O backlog/fila permanece aguardando acionamento manual do operador com PIN para proteger os tokens OpenAI.
-            ag["tarefa_atual"] = None
-            ag["estado"] = "aguardando"
-    return mudou
+    """Trava de seguranca absoluta: NENHUMA tarefa avanca ou executa automaticamente em segundo plano.
+    Zero consumo de tokens. Execucao exclusivamente sob autorizacao manual do operador com PIN."""
+    return False
 
 def _rota_estado_agentes():
     return request.path.startswith(("/api/agentes", "/api/painel", "/api/sessoes", "/api/upload", "/exati/api/upload"))
@@ -2377,46 +2341,21 @@ def api_painel():
             "atualizado_em": now_iso
         })
 
-    historico = [
-        {"session_id": "sess-nova", "tipo": "QA", "projeto_nome": "Nova Insights", "estado": "aguardando", "atualizado_em": now_iso},
-        {"session_id": "sess-nova", "tipo": "Pesquisador de contexto", "projeto_nome": "Nova Insights", "estado": "aguardando", "atualizado_em": now_iso},
-        {"session_id": "sess-orion", "tipo": "Pesquisador de contexto", "projeto_nome": "Orion Flow", "estado": "aguardando", "atualizado_em": now_iso},
-        {"session_id": "sess-orion", "tipo": "Handoff", "projeto_nome": "Orion Flow", "estado": "aguardando", "atualizado_em": now_iso},
-        {"session_id": "sess-cco", "tipo": "Monitor Exati", "projeto_nome": "Barretos Inteligente • HUB", "estado": "aguardando", "atualizado_em": now_iso},
-        {"session_id": "sess-cco", "tipo": "Consulta de Ofícios", "projeto_nome": "Barretos Inteligente • HUB", "estado": "aguardando", "atualizado_em": now_iso}
-    ]
-
-    historico_tipos = {
-        "Pesquisador de contexto": [
-            {"projeto_nome": "Nova Insights", "ocorrido_em": "13:31", "em_andamento": False},
-            {"projeto_nome": "Orion Flow", "ocorrido_em": "13:43", "em_andamento": False}
-        ],
-        "QA": [
-            {"projeto_nome": "Nova Insights", "ocorrido_em": "13:30", "em_andamento": False}
-        ],
-        "Monitor Exati": [
-            {"projeto_nome": "Barretos Inteligente • HUB", "ocorrido_em": "13:35", "em_andamento": False}
-        ],
-        "Consulta de Ofícios": [
-            {"projeto_nome": "Barretos Inteligente • HUB", "ocorrido_em": "13:36", "em_andamento": False}
-        ]
-    }
-
     return jsonify({
         "horas": 2,
         "resumo": {
-            "trabalhando": trabalhando_cnt,
-            "delegando": delegando_cnt,
-            "aguardando": aguardando_cnt,
-            "sessoes_ativas": 6,
-            "execucoes_na_janela": 17,
-            "concluidas": 5,
+            "trabalhando": 0,
+            "delegando": 0,
+            "aguardando": len(AGENTS_TASKS),
+            "sessoes_ativas": 3,
+            "execucoes_na_janela": 0,
+            "concluidas": 0,
             "orfas": 0,
-            "ultimo_evento": "07/10/2026 13:43"
+            "ultimo_evento": "Standby permanente"
         },
         "execucoes": execucoes,
-        "historico": historico,
-        "historico_tipos": historico_tipos
+        "historico": [],
+        "historico_tipos": {}
     })
 
 # ==============================================================================

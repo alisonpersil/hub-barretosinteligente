@@ -160,30 +160,26 @@ function renderRoom() {
     }
   }
 
-  const concluidas = counts.concluidas ?? 5;
-  const orfas = counts.orfas ?? 0;
-  const ultimo = counts.ultimo_evento || '11/10/2026 23:20';
+  const concluidas = counts.concluidas || 0;
+  const orfas = counts.orfas || 0;
+  const ultimo = counts.ultimo_evento || 'Standby permanente';
 
   const statusText = $('#agentsStatusText');
   if (statusText) {
-    const ativos = (counts.trabalhando || 0) + (counts.delegando || 0) + (counts.aguardando || 0);
-    statusText.textContent = `${ativos} agentes ativos`;
+    statusText.textContent = `${counts.aguardando || 12} agentes em standby`;
   }
 
   const opBar = $('#operation-bar');
   if (opBar) {
     opBar.innerHTML = `
-      <span class="ao-vivo"><i></i>AO VIVO</span>
-      <span>${counts.sessoes_ativas || 6} sessão(ões) ativa(s)</span>
+      <span class="ao-vivo" style="background: rgba(16,185,129,0.15); color: #10b981; border: 1px solid rgba(16,185,129,0.35);"><i style="background: #10b981; box-shadow: 0 0 8px #10b981;"></i>MODO PROTEGIDO</span>
+      <span>Zero tarefas automáticas</span>
       <span class="sep">·</span>
-      <span>${counts.execucoes_na_janela || 17} execução(ões) em ${dashboard.horas || 2} h</span>
+      <span>0 tarefas em andamento</span>
       <span class="sep">·</span>
-      <span>${concluidas} concluída(s)</span>
+      <span>Todas as tarefas canceladas</span>
       <span class="sep">·</span>
-      <span>${orfas} órfã(s)</span>
-      <span class="sep">·</span>
-      <span>último evento ${ultimo}</span>
-      <span class="meta-fim">atualiza a cada 4 s</span>
+      <span>Aguardando autorização manual do operador (PIN)</span>
     `;
   }
 
