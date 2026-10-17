@@ -30,39 +30,8 @@ let currentDrawerAgentKey = null;
 let currentDrawerAgentData = null;
 let currentDrawerActiveTab = 'live-task';
 
-// Presets de Sugestões Rápidas por Agente
-const AGENT_TEMPLATES = {
-  'p0-chefe': [
-    { title: 'Auditar commits recentes e integridade do repositório', desc: 'Verificação do histórico de commits e branches do repositório.' },
-    { title: 'Criar branch de homologação e validar status do código', desc: 'Comando executivo de versionamento para testar automação do agente.' },
-    { title: 'Inspecionar pendências operacionais e coordenar os agentes', desc: 'Diretriz geral do Chefe para a malha operacional do HUB.' }
-  ],
-  'p3-exati': [
-    { title: 'Auditar chamados pendentes com SLA > 7 dias', desc: 'Cruzamento de dados entre abertura e encerramento para identificação de gargalos.' },
-    { title: 'Cruzar reincidência de lâmpadas no Cristiano de Carvalho', desc: 'Identificação de logradouros com múltiplas ordens de serviço no mesmo poste nos últimos 30 dias.' },
-    { title: 'Verificar divergências de logradouros na importação', desc: 'Conferência de nomes de ruas e bairros em desacordo com a base cartográfica oficial.' }
-  ],
-  'p3-oficios': [
-    { title: 'Auditar prazos de resposta de documentos e ofícios de 2026', desc: 'Varredura na base de dados indexada de 454 ofícios para detectar respostas vencendo nos próximos 15 dias.' },
-    { title: 'Indexação OCR de novos anexos adicionados ao repositório', desc: 'Extração automática de metadados de páginas escaneadas e conferência de numeração sequencial.' },
-    { title: 'Varredura de termos de garantia técnica e aditivos', desc: 'Busca semântica por prazos de garantia de equipamentos LED e telegestão instalados.' }
-  ],
-  'p1-qa': [
-    { title: 'Executar checklist de responsividade mobile (360px a 412px)', desc: 'Auditoria de renderização de componentes, menus gaveta e ausência de corte de texto.' },
-    { title: 'Auditar rotas e integridade da barra lateral do sistema', desc: 'Validação de links para Início, Relatórios, Automações e Book em todas as resoluções.' },
-    { title: 'Simulação de carga de planilhas e teste de latência', desc: 'Medição do tempo de resposta da API na importação de 2.800+ registros.' }
-  ],
-  'p3-book': [
-    { title: 'Catalogar marco da Sala de Agentes Autônomos no Book', desc: 'Registro da entrega da Sala de Operações com fotos, arquitetura e impacto operacional.' },
-    { title: 'Atualizar capítulo de Eficiência Operacional da Concessão', desc: 'Consolidação das métricas de atendimento com base no fechamento da planilha Exati.' },
-    { title: 'Auditar alinhamento visual com o Brandbook Barretos', desc: 'Conferência de paletas HSL, tipografia Inter e proporções de cards corporativos.' }
-  ],
-  'p3-main': [
-    { title: 'Auditar commits recentes e integridade do repositório', desc: 'Verificação do histórico de commits e branches do repositório.' },
-    { title: 'Criar branch de homologação e validar status do código', desc: 'Comando executivo de versionamento para testar automação do agente.' },
-    { title: 'Inspecionar pendências operacionais e coordenar os agentes', desc: 'Diretriz geral do Chefe para a malha operacional do HUB.' }
-  ]
-};
+// Presets de Sugestões Rápidas por Agente (desativado para evitar tarefas automáticas/recorrentes)
+const AGENT_TEMPLATES = {};
 
 const AGENT_ICONS = {
   'p0-chefe': 'fa-solid fa-user-tie',

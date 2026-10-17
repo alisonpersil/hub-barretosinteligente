@@ -1198,33 +1198,8 @@ AGENTS_TASKS = {
         "agent_id": None,
         "dify_url": "https://udify.app/agent/1C2EOSw9M2vaqcXM",
         "tarefa_atual": None,
-        "fila": [
-            {
-                "id": "tsk-chefe-01",
-                "titulo": "Supervisão da sala e integridade do repositório GitHub",
-                "descricao": "Inspeção de integridade e auditoria de branches e commits no repositório GitHub alisonpersil/hub-barretosinteligente.",
-                "adicionado_em": "10:22",
-                "prioridade": "Crítica"
-            },
-            {
-                "id": "tsk-chefe-f1",
-                "titulo": "Sincronização de branches e auditoria de commits no repositório",
-                "descricao": "Verificação de histórico de commits e integridade do repositório remoto via API do GitHub.",
-                "adicionado_em": "10:23",
-                "prioridade": "Alta"
-            }
-        ],
-        "historico": [
-            {
-                "id": "tsk-chefe-h1",
-                "titulo": "Integração do Agente 'O chefe' ao Hub Barretos Inteligente",
-                "concluido_em": "10:24",
-                "duracao": "2 min",
-                "status": "concluido",
-                "modelo": "Automação HUB",
-                "resultado": "Agente 'O chefe' liderando a Sala de Operações do HUB com integração e telemetria Git homologada."
-            }
-        ]
+        "fila": [],
+        "historico": []
     },
     "p3-exati": {
         "chave": "p3-exati",
@@ -1238,49 +1213,8 @@ AGENTS_TASKS = {
         "pai_chave": "p3-main",
         "agent_id": "sub-exati",
         "tarefa_atual": None,
-        "fila": [
-            {
-                "id": "tsk-exati-01",
-                "titulo": "Auditoria de chamados pendentes com SLA excedido (>7 dias)",
-                "descricao": "Identificação de 6 ordens pendentes críticas da Ronda Própria abertas desde Agosto/Setembro e geração de matriz de criticidade.",
-                "adicionado_em": "22:57",
-                "prioridade": "Crítica"
-            },
-            {
-                "id": "tsk-exati-f1",
-                "titulo": "Cruzamento de reincidência de lâmpadas no bairro Cristiano de Carvalho",
-                "descricao": "Verificação de histórico de trocas de luminárias nos últimos 90 dias.",
-                "adicionado_em": "23:10",
-                "prioridade": "Alta"
-            },
-            {
-                "id": "tsk-exati-f2",
-                "titulo": "Simulação de capacidade preditiva para queima de backlog em 48h",
-                "descricao": "Execução do modelo de regressão linear para dimensionamento de equipes.",
-                "adicionado_em": "23:18",
-                "prioridade": "Normal"
-            }
-        ],
-        "historico": [
-            {
-                "id": "tsk-exati-h1",
-                "titulo": "Importação e consolidação da planilha ExportacaoConsulta (1).xlsx",
-                "concluido_em": "22:55",
-                "duracao": "4 min",
-                "status": "concluido",
-                "modelo": "Automação HUB",
-                "resultado": "2.804 atendimentos processados e indicadores atualizados."
-            },
-            {
-                "id": "tsk-exati-h2",
-                "titulo": "Cálculo de produtividade diária por equipe (Equipe 6 vs Equipe 01)",
-                "concluido_em": "22:40",
-                "duracao": "2 min",
-                "status": "concluido",
-                "modelo": "Automação HUB",
-                "resultado": "Média de 15 ordens/dia validada sem desvios operacionais."
-            }
-        ]
+        "fila": [],
+        "historico": []
     },
     "p3-oficios": {
         "chave": "p3-oficios",
@@ -1294,38 +1228,13 @@ AGENTS_TASKS = {
         "pai_chave": "p3-main",
         "agent_id": "sub-oficios",
         "tarefa_atual": None,
-        "fila": [
-            {
-                "id": "tsk-oficios-01",
-                "titulo": "Auditoria de prazos de resposta de documentos e ofícios de 2026",
-                "descricao": "Varredura na base de dados indexada de 454 ofícios para detectar termos de garantia e respostas vencendo nos próximos 15 dias.",
-                "adicionado_em": "22:55",
-                "prioridade": "Alta"
-            },
-            {
-                "id": "tsk-oficios-f1",
-                "titulo": "Indexação e extração OCR de novos anexos adicionados ao repositório",
-                "descricao": "Extração de metadados de páginas escaneadas e conferência de numeração.",
-                "adicionado_em": "23:12",
-                "prioridade": "Normal"
-            }
-        ],
-        "historico": [
-            {
-                "id": "tsk-oficios-h1",
-                "titulo": "Checagem de integridade de links e busca textual sem acentos",
-                "concluido_em": "22:50",
-                "duracao": "5 min",
-                "status": "concluido",
-                "modelo": "Automação HUB",
-                "resultado": "Zero PDFs corrompidos encontrados; 454 arquivos validados."
-            }
-        ]
+        "fila": [],
+        "historico": []
     },
     "p1-qa": {
         "chave": "p1-qa",
         "tipo": "QA",
-        "nome": "Sentinela de QA & Rotas",
+        "nome": "Sentinela de QA e Rotas",
         "session_id": "sess-nova",
         "projeto_id": 1,
         "projeto_nome": "Nova Insights",
@@ -1334,33 +1243,8 @@ AGENTS_TASKS = {
         "pai_chave": "p1-main",
         "agent_id": "sub-qa",
         "tarefa_atual": None,
-        "fila": [
-            {
-                "id": "tsk-qa-01",
-                "titulo": "Varredura de responsividade mobile, gaveta lateral e rotas",
-                "descricao": "Testes simulando viewport de smartphones (360x640 até 412x915) e verificação de integridade de rotas.",
-                "adicionado_em": "22:58",
-                "prioridade": "Normal"
-            },
-            {
-                "id": "tsk-qa-f1",
-                "titulo": "Checkup de renderização da tabela analítica do Monitor Exati",
-                "descricao": "Conferência de scroll horizontal e renderização de badges em celulares.",
-                "adicionado_em": "23:14",
-                "prioridade": "Normal"
-            }
-        ],
-        "historico": [
-            {
-                "id": "tsk-qa-h1",
-                "titulo": "Inspeção do corte de texto na barra lateral sob a navbar",
-                "concluido_em": "22:45",
-                "duracao": "3 min",
-                "status": "concluido",
-                "modelo": "Automação HUB",
-                "resultado": "Aprovado: padding-top adicionado, texto 100% legível."
-            }
-        ]
+        "fila": [],
+        "historico": []
     },
     "p3-book": {
         "chave": "p3-book",
@@ -1374,26 +1258,8 @@ AGENTS_TASKS = {
         "pai_chave": "p3-main",
         "agent_id": "sub-book",
         "tarefa_atual": None,
-        "fila": [
-            {
-                "id": "tsk-book-f1",
-                "titulo": "Catalogação do marco da Sala de Agentes Autônomos no Book de Governança",
-                "descricao": "Registro da entrega com fotos, arquitetura e impacto operacional no Livro de Inovações.",
-                "adicionado_em": "23:15",
-                "prioridade": "Alta"
-            }
-        ],
-        "historico": [
-            {
-                "id": "tsk-book-h1",
-                "titulo": "Registro executivo dos 2.804 atendimentos de iluminação pública",
-                "concluido_em": "22:30",
-                "duracao": "4 min",
-                "status": "concluido",
-                "modelo": "Automação HUB",
-                "resultado": "Capítulo de Eficiência Operacional atualizado no Book."
-            }
-        ]
+        "fila": [],
+        "historico": []
     },
     "p1-main": {
         "chave": "p1-main",
@@ -1407,15 +1273,7 @@ AGENTS_TASKS = {
         "pai_chave": None,
         "agent_id": None,
         "tarefa_atual": None,
-        "fila": [
-            {
-                "id": "tsk-nov-01",
-                "titulo": "Coordenação de testes e mapeamento de contexto da concessão",
-                "descricao": "Distribuição de sub-rotinas de checagem para QA e pesquisa semântica.",
-                "adicionado_em": "22:39",
-                "prioridade": "Alta"
-            }
-        ],
+        "fila": [],
         "historico": []
     },
     "p1-context": {
@@ -1430,26 +1288,8 @@ AGENTS_TASKS = {
         "pai_chave": "p1-main",
         "agent_id": "sub-context",
         "tarefa_atual": None,
-        "fila": [
-            {
-                "id": "tsk-ctx-01",
-                "titulo": "Mapeamento semântico de contratos de concessão e aditivos",
-                "descricao": "Cruzamento de cláusulas contratuais de modernização luminotécnica com relatórios de entrega.",
-                "adicionado_em": "22:56",
-                "prioridade": "Normal"
-            }
-        ],
-        "historico": [
-            {
-                "id": "tsk-ctx-h1",
-                "titulo": "Análise de aditivo do parque luminotécnico de Barretos",
-                "concluido_em": "22:10",
-                "duracao": "6 min",
-                "status": "concluido",
-                "modelo": "Automação HUB",
-                "resultado": "Cláusulas de garantia e metas de telegestão mapeadas."
-            }
-        ]
+        "fila": [],
+        "historico": []
     },
     "p1-obsidian": {
         "chave": "p1-obsidian",
@@ -1478,15 +1318,7 @@ AGENTS_TASKS = {
         "pai_chave": None,
         "agent_id": None,
         "tarefa_atual": None,
-        "fila": [
-            {
-                "id": "tsk-orn-01",
-                "titulo": "Gestão de filas assíncronas e handoff de tarefas",
-                "descricao": "Orquestração contínua dos processos em segundo plano da infraestrutura.",
-                "adicionado_em": "22:34",
-                "prioridade": "Alta"
-            }
-        ],
+        "fila": [],
         "historico": []
     },
     "p2-context": {
@@ -1501,15 +1333,7 @@ AGENTS_TASKS = {
         "pai_chave": "p2-main",
         "agent_id": "sub-context2",
         "tarefa_atual": None,
-        "fila": [
-            {
-                "id": "tsk-ctx2-01",
-                "titulo": "Varredura de dependências e atualização de bibliotecas",
-                "descricao": "Auditoria de integridade de pacotes e tempos de resposta de rede.",
-                "adicionado_em": "22:58",
-                "prioridade": "Normal"
-            }
-        ],
+        "fila": [],
         "historico": []
     },
     "p2-bug": {
@@ -1539,15 +1363,7 @@ AGENTS_TASKS = {
         "pai_chave": "p2-main",
         "agent_id": "sub-handoff",
         "tarefa_atual": None,
-        "fila": [
-            {
-                "id": "tsk-hnd-01",
-                "titulo": "Sincronização de relatórios de campo com o painel do HUB",
-                "descricao": "Transmissão segura de dados de ronda e fechamento de ordens de serviço.",
-                "adicionado_em": "22:55",
-                "prioridade": "Alta"
-            }
-        ],
+        "fila": [],
         "historico": []
     }
 }
