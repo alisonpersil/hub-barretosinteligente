@@ -698,6 +698,71 @@ function setupDrawerEvents() {
     });
   });
 
+  // Submissão do Formulário de Nova Tarefa do Drawer
+  $('#formDrawerNewTask')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!currentDrawerAgentKey) return;
+
+    const titulo = $('#drawerTaskTitle').value.trim();
+    const descricao = $('#drawerTaskDesc').value.trim();
+    const modo = $('input[name="drawerDispatchMode"]:checked')?.value || 'agora';
+    const acionar_ia = !!$('#drawerTaskUseAi')?.checked;
+
+    if (modo === 'agora') {
+      requestPinAuthorization({
+        title: titulo,
+        agentKey: currentDrawerAgentKey,
+        agentName: currentDrawerAgentData?.tipo || 'Agente HUB',
+        onAuthorized: async (pin) => {
+          try {
+            const res = await request('POST', '/agentes/tarefas/criar', {
+              agente_chave: currentDrawerAgentKey,
+              titulo,
+              descricao,
+              modo: 'agora',
+              prioridade: 'Alta',
+              acionar_ia,
+              pin
+            });
+
+            $('#drawerTaskTitle').value = '';
+            $('#drawerTaskDesc').value = '';
+
+            notice(res.mensagem || 'Tarefa autorizada com sucesso!');
+            await refresh();
+            await openAgentTaskDrawer(currentDrawerAgentKey);
+            switchDrawerTab('live-task');
+          } catch (err) {
+            notice(err.message, true);
+          }
+        }
+      });
+    } else {
+      try {
+        const res = await request('POST', '/agentes/tarefas/criar', {
+          agente_chave: currentDrawerAgentKey,
+          titulo,
+          descricao,
+          modo: 'fila',
+          prioridade: 'Alta',
+          acionar_ia
+        });
+
+        $('#drawerTaskTitle').value = '';
+        $('#drawerTaskDesc').value = '';
+
+        notice(res.mensagem || 'Tarefa adicionada à fila com sucesso!');
+        await refresh();
+        await openAgentTaskDrawer(currentDrawerAgentKey);
+        switchDrawerTab('task-queue');
+      } catch (err) {
+        notice(err.message, true);
+      }
+    }
+  });
+}
+
+/* ------------------------------------------------------------- PIN Modal */
 let pendingPinCallback = null;
 
 function requestPinAuthorization({ title, agentKey, agentName, onAuthorized }) {
@@ -779,70 +844,6 @@ function setupPinModalEvents() {
       if (btn) {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-lock-open"></i> Autorizar &amp; Executar';
-      }
-    }
-  });
-}
-
-  // Submissão do Formulário de Nova Tarefa do Drawer
-  $('#formDrawerNewTask')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (!currentDrawerAgentKey) return;
-
-    const titulo = $('#drawerTaskTitle').value.trim();
-    const descricao = $('#drawerTaskDesc').value.trim();
-    const modo = $('input[name="drawerDispatchMode"]:checked')?.value || 'agora';
-    const acionar_ia = !!$('#drawerTaskUseAi')?.checked;
-
-    if (modo === 'agora') {
-      requestPinAuthorization({
-        title: titulo,
-        agentKey: currentDrawerAgentKey,
-        agentName: currentDrawerAgentData?.tipo || 'Agente HUB',
-        onAuthorized: async (pin) => {
-          try {
-            const res = await request('POST', '/agentes/tarefas/criar', {
-              agente_chave: currentDrawerAgentKey,
-              titulo,
-              descricao,
-              modo: 'agora',
-              prioridade: 'Alta',
-              acionar_ia,
-              pin
-            });
-
-            $('#drawerTaskTitle').value = '';
-            $('#drawerTaskDesc').value = '';
-
-            notice(res.mensagem || 'Tarefa autorizada com sucesso!');
-            await refresh();
-            await openAgentTaskDrawer(currentDrawerAgentKey);
-            switchDrawerTab('live-task');
-          } catch (err) {
-            notice(err.message, true);
-          }
-        }
-      });
-    } else {
-      try {
-        const res = await request('POST', '/agentes/tarefas/criar', {
-          agente_chave: currentDrawerAgentKey,
-          titulo,
-          descricao,
-          modo: 'fila',
-          prioridade: 'Alta',
-          acionar_ia
-        });
-
-        $('#drawerTaskTitle').value = '';
-        $('#drawerTaskDesc').value = '';
-
-        notice(res.mensagem || 'Tarefa adicionada à fila com sucesso!');
-        await refresh();
-        await openAgentTaskDrawer(currentDrawerAgentKey);
-        switchDrawerTab('task-queue');
-      } catch (err) {
-        notice(err.message, true);
       }
     }
   });
