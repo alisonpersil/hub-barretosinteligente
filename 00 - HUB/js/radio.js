@@ -7,6 +7,12 @@
 (function () {
   'use strict';
 
+  // Se estiver dentro de um iframe ou módulo embutido, não inicia player secundário.
+  // Apenas a janela principal (Shell do HUB) gerencia a rádio contínua sem duplicação de áudio.
+  if (window.self !== window.top) {
+    return;
+  }
+
   const STORAGE_KEY = 'barretos_radio_active';
   const RADIO_EPOCH = 1700000000;
   const RELEASE_BASE_URL = 'https://github.com/alisonpersil/hub-barretosinteligente/releases/download/radio-assets';

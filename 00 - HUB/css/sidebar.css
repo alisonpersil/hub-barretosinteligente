@@ -1020,3 +1020,46 @@
     }
 }
 
+/* ==========================================================================
+   Modo Integrado / Embutido (Shell Contínuo HUB - Rádio sem Interrupção)
+   ========================================================================== */
+html.is-embedded header.navbar,
+html.is-embedded aside.hub-sidebar,
+html.is-embedded #sidebarBackdrop,
+html.is-embedded #radioToast,
+body.is-embedded header.navbar,
+body.is-embedded aside.hub-sidebar,
+body.is-embedded #sidebarBackdrop,
+body.is-embedded #radioToast {
+    display: none !important;
+}
+
+html.is-embedded,
+body.is-embedded {
+    height: 100% !important;
+    min-height: 100% !important;
+    background-color: var(--bg-main) !important;
+    overflow-x: hidden !important;
+}
+
+html.is-embedded .app-layout,
+html.is-embedded .hub-layout {
+    height: 100% !important;
+    min-height: 100% !important;
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+html.is-embedded .app-main-area,
+html.is-embedded .hub-main-area,
+html.is-embedded .app-body-wrapper,
+html.is-embedded .hub-body-wrapper {
+    padding-top: 0 !important;
+    margin-left: 0 !important;
+    width: 100% !important;
+    min-height: 100% !important;
+    height: 100% !important;
+}
+
+

@@ -5,7 +5,38 @@
 
 (function () {
     'use strict';
-function setupSidebar() {
+
+    // Se estiver embutido no Shell Contínuo da Central HUB
+    if (window.self !== window.top) {
+        document.documentElement.classList.add('is-embedded');
+        if (document.body) document.body.classList.add('is-embedded');
+        window.addEventListener('DOMContentLoaded', () => {
+            document.documentElement.classList.add('is-embedded');
+            if (document.body) document.body.classList.add('is-embedded');
+        });
+
+        // Intercepta cliques internos para coordenar navegação na janela mãe (Shell)
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (!link) return;
+            const href = link.getAttribute('href');
+            if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+            if (link.target === '_blank' || link.hasAttribute('download') || e.ctrlKey || e.metaKey || e.shiftKey) return;
+
+            try {
+                const targetUrl = new URL(href, window.location.href);
+                if (targetUrl.origin === window.location.origin) {
+                    const targetPath = targetUrl.pathname;
+                    if (targetPath === '/' || targetPath === '/hub' || targetPath.startsWith('/oficios') || targetPath.startsWith('/exati') || targetPath.startsWith('/sala-agentes') || targetPath.startsWith('/qa') || targetPath.startsWith('/painel-alison') || targetPath.startsWith('/bi')) {
+                        e.preventDefault();
+                        window.top.postMessage({ type: 'NAVIGATE_HUB', url: targetPath + targetUrl.search }, '*');
+                    }
+                }
+            } catch (_) {}
+        });
+    }
+
+    function setupSidebar() {
         const btnToggleSidebar = document.getElementById('btnToggleSidebar');
         const hubSidebar = document.getElementById('hubSidebar');
         const SIDEBAR_STATE_KEY = 'hub_sidebar_collapsed';
