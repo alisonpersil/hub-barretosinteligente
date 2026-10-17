@@ -420,7 +420,7 @@ function renderLiveTaskPane(agent) {
         <div style="background: rgba(125,54,236,0.1); border: 1px solid rgba(164,105,255,0.3); border-radius: 10px; padding: 13px; margin-bottom: 18px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px;">
             <span style="color: #d8b4fe; font-size: 11.5px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-sparkles" style="color: #a469ff;"></i> Parecer do Agente (${esc(t.modelo_ia || 'Gemini Flash')})
+              <i class="fa-solid fa-sparkles" style="color: #a469ff;"></i> Parecer do Agente (Automação CCO)
             </span>
             <span style="font-size: 10.5px; background: rgba(34,197,94,0.15); color: #4ade80; padding: 1px 7px; border-radius: 4px; font-weight: 600;">
               Resolvido com IA
@@ -533,14 +533,29 @@ function renderTaskQueuePane(agent) {
 }
 
 async function promoteQueueTask(agentKey, taskId) {
-  try {
-    await request('POST', '/agentes/tarefas/promover-fila', { agente_chave: agentKey, task_id: taskId });
-    await refresh();
-    await openAgentTaskDrawer(agentKey);
-    notice('Tarefa promovida para execução imediata!');
-  } catch (e) {
-    notice(e.message, true);
-  }
+  const agent = (dashboard.execucoes || []).find((e) => e.chave === agentKey);
+  const targetTask = (currentDrawerAgentData?.fila || []).find((t) => t.id === taskId);
+  const taskTitle = targetTask ? targetTask.titulo : 'Executar tarefa da fila';
+
+  requestPinAuthorization({
+    title: taskTitle,
+    agentKey,
+    agentName: currentDrawerAgentData?.tipo || agent?.tipo || 'Agente CCO',
+    onAuthorized: async (pin) => {
+      try {
+        const res = await request('POST', '/agentes/tarefas/promover-fila', {
+          agente_chave: agentKey,
+          task_id: taskId,
+          pin
+        });
+        await refresh();
+        await openAgentTaskDrawer(agentKey);
+        notice(res.mensagem || 'Tarefa autorizada com PIN e iniciada!');
+      } catch (e) {
+        notice(e.message, true);
+      }
+    }
+  });
 }
 
 async function removeQueueTask(agentKey, taskId) {
@@ -576,7 +591,7 @@ function renderTaskHistoryPane(agent) {
           <i class="fa-solid fa-circle-check"></i> ${esc(item.status === 'concluido' ? 'CONCLUÍDO' : item.status.toUpperCase())}
         </span>
         <div style="display: flex; align-items: center; gap: 8px;">
-          ${item.modelo ? `<span style="font-size: 11px; background: rgba(164,105,255,0.14); color: #c499ff; padding: 2px 7px; border-radius: 4px; font-weight: 600;"><i class="fa-solid fa-sparkles"></i> ${esc(item.modelo)}</span>` : ''}
+          ${item.modelo ? `<span style="font-size: 11px; background: rgba(164,105,255,0.14); color: #c499ff; padding: 2px 7px; border-radius: 4px; font-weight: 600;"><i class="fa-solid fa-sparkles"></i> Automação CCO</span>` : ''}
           <span class="history-time"><i class="fa-regular fa-clock"></i> ${esc(item.concluido_em)} (${esc(item.duracao || '5 min')})</span>
         </div>
       </div>
@@ -664,6 +679,92 @@ function setupDrawerEvents() {
     });
   });
 
+let pendingPinCallback = null;
+
+function requestPinAuthorization({ title, agentKey, agentName, onAuthorized }) {
+  const modal = $('#pinAuthModal');
+  const backdrop = $('#pinModalBackdrop');
+  const inputPin = $('#inputOperatorPin');
+  const errorMsg = $('#pinErrorMessage');
+
+  const agentLabel = agentName || (dashboard.execucoes || []).find((e) => e.chave === agentKey)?.tipo || 'Agente CCO';
+  if ($('#pinAgentName')) $('#pinAgentName').textContent = agentLabel;
+  if ($('#pinTaskTitle')) $('#pinTaskTitle').textContent = title || 'Execução de Tarefa';
+
+  if (errorMsg) errorMsg.style.display = 'none';
+  if (inputPin) {
+    inputPin.value = '';
+    inputPin.classList.remove('error');
+  }
+
+  pendingPinCallback = onAuthorized;
+
+  if (modal) {
+    if (typeof modal.showModal === 'function') modal.showModal();
+    modal.classList.add('open');
+  }
+  backdrop?.classList.add('active');
+  setTimeout(() => inputPin?.focus(), 80);
+}
+
+function closePinModal() {
+  const modal = $('#pinAuthModal');
+  const backdrop = $('#pinModalBackdrop');
+  if (modal) {
+    if (typeof modal.close === 'function') modal.close();
+    modal.classList.remove('open');
+  }
+  backdrop?.classList.remove('active');
+  pendingPinCallback = null;
+}
+
+function setupPinModalEvents() {
+  $('#btnClosePinModal')?.addEventListener('click', closePinModal);
+  $('#btnCancelPinModal')?.addEventListener('click', closePinModal);
+  $('#pinModalBackdrop')?.addEventListener('click', closePinModal);
+
+  $('#formPinAuth')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pin = $('#inputOperatorPin')?.value.trim();
+    const errorMsg = $('#pinErrorMessage');
+    const btn = $('#btnConfirmPin');
+
+    if (!pin) return;
+
+    try {
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Validando...';
+      }
+      const check = await request('POST', '/agentes/validar-pin', { pin });
+      if (!check.valid) {
+        throw new Error(check.error || 'PIN incorreto. Tente novamente.');
+      }
+
+      const cb = pendingPinCallback;
+      closePinModal();
+      if (typeof cb === 'function') {
+        await cb(pin);
+      }
+    } catch (err) {
+      if (errorMsg) {
+        errorMsg.textContent = err.message || 'PIN incorreto. Tente novamente.';
+        errorMsg.style.display = 'block';
+      }
+      const inputPin = $('#inputOperatorPin');
+      if (inputPin) {
+        inputPin.value = '';
+        inputPin.focus();
+      }
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-lock-open"></i> Autorizar &amp; Executar';
+      }
+    }
+  });
+}
+
   // Submissão do Formulário de Nova Tarefa do Drawer
   $('#formDrawerNewTask')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -674,28 +775,56 @@ function setupDrawerEvents() {
     const modo = $('input[name="drawerDispatchMode"]:checked')?.value || 'agora';
     const acionar_ia = !!$('#drawerTaskUseAi')?.checked;
 
-    try {
-      const res = await request('POST', '/agentes/tarefas/criar', {
-        agente_chave: currentDrawerAgentKey,
-        titulo,
-        descricao,
-        modo,
-        prioridade: 'Alta',
-        acionar_ia
+    if (modo === 'agora') {
+      requestPinAuthorization({
+        title: titulo,
+        agentKey: currentDrawerAgentKey,
+        agentName: currentDrawerAgentData?.tipo || 'Agente CCO',
+        onAuthorized: async (pin) => {
+          try {
+            const res = await request('POST', '/agentes/tarefas/criar', {
+              agente_chave: currentDrawerAgentKey,
+              titulo,
+              descricao,
+              modo: 'agora',
+              prioridade: 'Alta',
+              acionar_ia,
+              pin
+            });
+
+            $('#drawerTaskTitle').value = '';
+            $('#drawerTaskDesc').value = '';
+
+            notice(res.mensagem || 'Tarefa autorizada com sucesso!');
+            await refresh();
+            await openAgentTaskDrawer(currentDrawerAgentKey);
+            switchDrawerTab('live-task');
+          } catch (err) {
+            notice(err.message, true);
+          }
+        }
       });
+    } else {
+      try {
+        const res = await request('POST', '/agentes/tarefas/criar', {
+          agente_chave: currentDrawerAgentKey,
+          titulo,
+          descricao,
+          modo: 'fila',
+          prioridade: 'Alta',
+          acionar_ia
+        });
 
-      // Limpa formulário
-      $('#drawerTaskTitle').value = '';
-      $('#drawerTaskDesc').value = '';
+        $('#drawerTaskTitle').value = '';
+        $('#drawerTaskDesc').value = '';
 
-      notice(res.mensagem || 'Tarefa criada com sucesso!');
-      await refresh();
-      await openAgentTaskDrawer(currentDrawerAgentKey);
-
-      // Alterna para a aba correspondente
-      switchDrawerTab(modo === 'agora' ? 'live-task' : 'task-queue');
-    } catch (err) {
-      notice(err.message, true);
+        notice(res.mensagem || 'Tarefa adicionada à fila com sucesso!');
+        await refresh();
+        await openAgentTaskDrawer(currentDrawerAgentKey);
+        switchDrawerTab('task-queue');
+      } catch (err) {
+        notice(err.message, true);
+      }
     }
   });
 }
@@ -756,27 +885,59 @@ function setupGlobalModalEvents() {
     const descricao = $('#globalTaskDesc').value.trim();
     const modo = $('input[name="globalDispatchMode"]:checked')?.value || 'agora';
     const acionar_ia = !!$('#globalTaskUseAi')?.checked;
+    const agentObj = (dashboard.execucoes || []).find((x) => x.chave === agente_chave);
 
-    try {
-      const res = await request('POST', '/agentes/tarefas/criar', {
-        agente_chave,
-        titulo,
-        descricao,
-        modo,
-        prioridade: 'Alta',
-        acionar_ia
-      });
-
+    if (modo === 'agora') {
       closeModal();
-      $('#globalTaskTitle').value = '';
-      $('#globalTaskDesc').value = '';
+      requestPinAuthorization({
+        title: titulo,
+        agentKey: agente_chave,
+        agentName: agentObj?.tipo || 'Agente CCO',
+        onAuthorized: async (pin) => {
+          try {
+            const res = await request('POST', '/agentes/tarefas/criar', {
+              agente_chave,
+              titulo,
+              descricao,
+              modo: 'agora',
+              prioridade: 'Alta',
+              acionar_ia,
+              pin
+            });
 
-      notice(res.mensagem || 'Tarefa criada com sucesso!');
-      await refresh();
-      // Abre a gaveta do agente para mostrar a tarefa em execução
-      openAgentTaskDrawer(agente_chave);
-    } catch (err) {
-      notice(err.message, true);
+            $('#globalTaskTitle').value = '';
+            $('#globalTaskDesc').value = '';
+
+            notice(res.mensagem || 'Tarefa autorizada e iniciada com sucesso!');
+            await refresh();
+            openAgentTaskDrawer(agente_chave);
+          } catch (err) {
+            notice(err.message, true);
+          }
+        }
+      });
+    } else {
+      try {
+        const res = await request('POST', '/agentes/tarefas/criar', {
+          agente_chave,
+          titulo,
+          descricao,
+          modo: 'fila',
+          prioridade: 'Alta',
+          acionar_ia
+        });
+
+        closeModal();
+        $('#globalTaskTitle').value = '';
+        $('#globalTaskDesc').value = '';
+
+        notice(res.mensagem || 'Tarefa adicionada à fila com sucesso!');
+        await refresh();
+        openAgentTaskDrawer(agente_chave);
+        switchDrawerTab('task-queue');
+      } catch (err) {
+        notice(err.message, true);
+      }
     }
   });
 }
@@ -923,6 +1084,7 @@ async function refresh() {
 document.addEventListener('DOMContentLoaded', () => {
   setupDrawerEvents();
   setupGlobalModalEvents();
+  setupPinModalEvents();
   setupThemeToggle();
 
   // Controles de Visualização (Painel vs Escritório)

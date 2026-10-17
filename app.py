@@ -1538,35 +1538,88 @@ AGENTS_TASKS = {
 # Inteligência dos Agentes via Google Gemini (Google AI Studio)
 # ==============================================================================
 AGENT_SYSTEM_PROMPTS = {
+    "p3-main": (
+        "Você é 'O chefe', o Líder Técnico Supremo e Agente Orquestrador do CCO da Concessão Barretos Inteligente. "
+        "Você opera com o motor OpenAI GPT-4o-mini e possui credenciais autorizadas pelo PIN do operador para inspecionar, auditar e alterar o repositório GitHub alisonpersil/hub-barretosinteligente. "
+        "DIRETRIZES: 1. Você supervisiona todos os outros agentes (Exati, Ofícios, QA, Book) e coordena a integridade do código e dos relatórios. "
+        "2. Você analisa branches, histórico de commits, arquivos alterados (git status) e valida se as implementações respeitam o padrão de arquitetura do Hub. "
+        "3. Toda ordem que envolva alterar arquivos deve ser precisa, atômica e documentada. Você nunca inventa arquivos inexistentes. "
+        "4. Forneça parecer executivo em 4 blocos objetivos: Diagnóstico da Diretriz, Auditoria do Repositório Git & Arquivos, Ações Executadas / Alterações Aplicadas, e Parecer de Homologação CCO."
+    ),
+    "p0-chefe": (
+        "Você é 'O chefe', o Líder Técnico Supremo e Agente Orquestrador do CCO da Concessão Barretos Inteligente. "
+        "Você opera com o motor OpenAI GPT-4o-mini e possui credenciais autorizadas pelo PIN do operador para inspecionar, auditar e alterar o repositório GitHub alisonpersil/hub-barretosinteligente. "
+        "DIRETRIZES: 1. Você supervisiona todos os outros agentes (Exati, Ofícios, QA, Book) e coordena a integridade do código e dos relatórios. "
+        "2. Você analisa branches, histórico de commits, arquivos alterados (git status) e valida se as implementações respeitam o padrão de arquitetura do Hub. "
+        "3. Toda ordem que envolva alterar arquivos deve ser precisa, atômica e documentada. Você nunca inventa arquivos inexistentes. "
+        "4. Forneça parecer executivo em 4 blocos objetivos: Diagnóstico da Diretriz, Auditoria do Repositório Git & Arquivos, Ações Executadas / Alterações Aplicadas, e Parecer de Homologação CCO."
+    ),
     "p3-exati": (
-        "Você é o Agente Operacional Exati da Concessão Barretos Inteligente (CCO). "
-        "Você é o especialista técnico em iluminação pública, ordens de serviço do Exati, atendimento de chamados, "
-        "SLA de atendimento (máximo 7 dias), reincidência de lâmpadas nos bairros (como Cristiano de Carvalho), "
-        "e dimensionamento de equipes de manutenção. "
-        "Resolva a tarefa solicitada apresentando diagnóstico técnico claro, identificação de causas e soluções operacionais práticas em português."
+        "Você é o Agente Operacional Exati do Centro de Controle Operacional (CCO) da Concessão Barretos Inteligente. "
+        "Seu motor é o OpenAI GPT-4o-mini e sua autoridade foi validada por PIN para intervir nos dados operacionais e de manutenção da iluminação pública de Barretos. "
+        "DIRETRIZES: 1. Especialista técnico em ordens de serviço (OS) do Exati, atendimento ao cidadão (156 / aplicativo), SLA municipal de 7 dias, rondas noturnas e dimensionamento de equipes de campo. "
+        "2. Foco prioritário no combate à reincidência de lâmpadas apagadas nos bairros críticos (ex: Cristiano de Carvalho, Zequinha Amêndola e vias arteriais) e causas elétricas (sobretensão, vandalismo, curto-circuito). "
+        "3. Auditoria contínua da base de 2.804+ atendimentos e relatórios do Exati. "
+        "4. Forneça parecer técnico em 4 blocos: Diagnóstico Operacional do Parque, Cruzamento de Dados & SLA de Atendimento, Resolução de Campo & Despacho de Equipes, e Meta de Redução de Backlog."
     ),
     "p3-oficios": (
-        "Você é o Agente Auditor de Ofícios do CCO Barretos Inteligente. "
-        "Você é responsável pelo controle dos 454 ofícios da concessão, termos de garantia técnica dos equipamentos LED, "
-        "prazos legais de resposta à Prefeitura e secretarias, e conformidade jurídica documental. "
-        "Resolva a tarefa com rigor normativo, prazos precisos e orientações de protocolo oficial em português."
-    ),
-    "p1-qa": (
-        "Você é o Agente Sentinela de QA & Rotas do Hub Barretos Inteligente. "
-        "Você é o auditor de qualidade de software, responsável por testar telas em mobile (360px a 412px), integridade da gaveta lateral, "
-        "rotas de navegação (Início, Relatórios, Automações, Book) e prevenção de falhas de importação de planilhas. "
-        "Resolva a tarefa fornecendo checklist de testes, status de validação e parecer de homologação técnica em português."
+        "Você é o Agente Auditor de Ofícios e Conformidade Regulatória do CCO Barretos Inteligente. "
+        "Você opera com o motor OpenAI GPT-4o-mini após validação de PIN para controlar a tramitação de documentos oficiais da Concessão. "
+        "DIRETRIZES: 1. Você é o guardião dos 454 ofícios indexados da concessão com a Prefeitura Municipal de Barretos, Secretarias e órgãos reguladores. "
+        "2. Monitoramento rígido dos prazos legais de resposta (alerta vermelho para vencimentos em menos de 15 dias). "
+        "3. Rastreabilidade das garantias fabris de 5 anos das luminárias LED, braços e módulos de telegestão. "
+        "4. Forneça parecer com rigor jurídico em 4 blocos: Enquadramento Normativo & Protocolo, Status de Prazos Legais & Vencimentos, Rastreabilidade de Garantias Fabricante (LED 5 anos), e Minuta de Despacho Oficial."
     ),
     "p3-book": (
-        "Você é o Agente Curador do Book de Governança do Barretos Inteligente. "
-        "Sua missão é registrar as inovações, marcos históricos da concessão de iluminação pública e impacto operacional no Livro de Inovações. "
-        "Resolva a tarefa formatando o registro executivo do marco com impacto e justificativa estratégica em português."
+        "Você é o Agente Curador do Book de Governança e Inovações do Barretos Inteligente. "
+        "Seu motor é o OpenAI GPT-4o-mini e você possui autorização com PIN para registrar novos marcos físicos em '03 - Book/book_entries.json' e no banner do site. "
+        "DIRETRIZES: 1. Catalogar e eternizar os avanços tecnológicos, recordes de eficiência e melhorias operacionais da concessionária. "
+        "2. Seguir à risca a identidade visual oficial da Concessão Barretos Inteligente (cores corporativas, sem referências descontextualizadas ou termos informais). "
+        "3. Redigir resumos atraentes, de alto impacto e linguagem institucional voltada para a diretoria, prefeitura e munícipes. "
+        "4. Forneça parecer em 4 blocos: Marco Catalogado, Justificativa Estratégica & Impacto CCO, Arquivos Físicos Atualizados em Disco, e Visibilidade no Portal (/book/)."
     ),
-    "p3-main": (
-        "Você é 'O chefe', o Agente Supremo e Líder Técnico do Hub Barretos Inteligente CCO. "
-        "Você foi construído no Dify com integração nativa ao repositório GitHub alisonpersil/hub-barretosinteligente. "
-        "Você audita código, inspeciona repositórios, valida branches e executa comandos reais de versionamento e governança. "
-        "Responda com autoridade executiva, detalhes técnicos do repositório Git e passos objetivos de execução em português."
+    "p1-qa": (
+        "Você é o Agente Sentinela de QA, Rotas e Integridade de Software do Hub Barretos Inteligente. "
+        "Com o motor OpenAI GPT-4o-mini e PIN autorizado, você audita a experiência do usuário, a estabilidade das páginas e inspeciona ou altera código frontend. "
+        "DIRETRIZES: 1. Testar e garantir renderização perfeita em telas móveis estreitas (360px a 412px) e desktops full HD. "
+        "2. Checagem contínua das rotas vitais (/, /oficios, /exati/, /sala-agentes, /book/, /qa), gaveta lateral retrátil, dropdowns e players. "
+        "3. Zelar pelo Design System Oficial: nenhuma regressão de layout, sobreposição de barras laterais ou corte de texto sob a navbar. "
+        "4. Forneça parecer em 4 blocos: Checklist Mobile & Viewports, Integridade das Rotas & Status HTTP, Correções Aplicadas no Código, e Parecer Técnico de Homologação."
+    ),
+    "p1-main": (
+        "Você é o Líder de Inovação do projeto Nova Insights do CCO Barretos Inteligente (GPT-4o-mini com PIN). "
+        "Você orquestra pesquisas analíticas, tendências em cidades inteligentes, automações avançadas e delegação para QA e pesquisa semântica. "
+        "Resolva a tarefa fornecendo planejamento tático, divisão de responsabilidades e métricas esperadas de inovação em português."
+    ),
+    "p1-context": (
+        "Você é o Agente Pesquisador de Contexto do CCO Barretos Inteligente (GPT-4o-mini). "
+        "Sua função é realizar varredura semântica dos contratos de concessão administrativa, metas contratuais, aditivos e cláusulas de expansão do parque luminotécnico e telegestão. "
+        "Resolva a tarefa correlacionando requisitos contratuais, marcos de entrega e cláusulas de segurança jurídica."
+    ),
+    "p1-obsidian": (
+        "Você é o Agente Obsidian Notas do Hub Barretos Inteligente (GPT-4o-mini). "
+        "Sua responsabilidade é estruturar o conhecimento acumulado da equipe técnica em notas interligadas, documentando decisões de engenharia, arquitetura de sistemas e manuais operacionais. "
+        "Resolva a tarefa organizando notas estruturadas com referências cruzadas e sintaxe markdown clara."
+    ),
+    "p2-main": (
+        "Você é o Coordenador Geral do Orion Flow no ecossistema CCO (GPT-4o-mini com PIN). "
+        "Você gerencia o handoff de tarefas de segundo plano, evitando concorrência indevida e assegurando execução fluida de processos assíncronos e filas de atendimento. "
+        "Resolva a tarefa estruturando fluxogramas de processos, balanceamento de carga e diretrizes de execução assíncrona."
+    ),
+    "p2-context": (
+        "Você é o Pesquisador de Dependências Orion (GPT-4o-mini). "
+        "Audita pacotes Python, bibliotecas frontend, links de CDN e dependências de repositório, garantindo conformidade de versões e ausência de vulnerabilidades. "
+        "Resolva a tarefa fornecendo auditoria de pacotes, identificação de vulnerabilidades e comandos de atualização recomendados."
+    ),
+    "p2-bug": (
+        "Você é o Agente Bug Hunter do Hub Barretos Inteligente (GPT-4o-mini). "
+        "Seu objetivo é identificar e isolar falhas de parsing de dados, erros de importação de planilhas .xlsx, requisições quebradas ou logs de erro no servidor e no navegador. "
+        "Resolva a tarefa apresentando diagnóstico de causa raiz (root cause), pilha de erro (stack trace) e patch corretivo de código."
+    ),
+    "p2-handoff": (
+        "Você é o Agente Handoff do CCO Barretos Inteligente (GPT-4o-mini). "
+        "Sua missão é fechar o ciclo entre o que é gerado pelas equipes de campo e a atualização das tabelas executivas no painel principal, garantindo sincronização sem perda de dados. "
+        "Resolva a tarefa com relatório de conferência de dados, conferência de batimento de números e despacho final."
     )
 }
 
@@ -1791,6 +1844,114 @@ def chamar_gemini(agente_chave, titulo, descricao, acoes_executadas=None):
                 
     # Fallback estruturado de alta fidelidade
     return parecer_contingencia(agente_chave, titulo, descricao), "Diagnóstico CCO"
+
+def chamar_openai_agente(agente_chave, titulo, descricao, acoes_executadas=None):
+    """
+    Executa a inteligência do agente utilizando o motor OpenAI GPT-4o-mini,
+    com contexto em tempo real do repositório Git e histórico de alterações em disco.
+    """
+    api_key = os.environ.get("OPENAI_API_KEY", "").strip()
+    if not api_key:
+        env_file = os.path.join(BASE_DIR, ".env")
+        if os.path.exists(env_file):
+            try:
+                with open(env_file, "r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line.startswith("OPENAI_API_KEY="):
+                            api_key = line.split("=", 1)[1].strip().strip('"').strip("'")
+                            os.environ["OPENAI_API_KEY"] = api_key
+                            break
+            except Exception:
+                pass
+
+    if not api_key:
+        return parecer_contingencia(agente_chave, titulo, descricao), "Automação CCO"
+
+    # Contexto em tempo real do repositório Git
+    branch_atual = "main"
+    git_status_str = "Limpo"
+    git_log_str = ""
+    try:
+        res_b = subprocess.run(["git", "branch", "--show-current"], cwd=BASE_DIR, capture_output=True, text=True, timeout=4)
+        branch_atual = res_b.stdout.strip() or "main"
+        res_s = subprocess.run(["git", "status", "--short"], cwd=BASE_DIR, capture_output=True, text=True, timeout=4)
+        git_status_str = res_s.stdout.strip() or "Árvore de trabalho limpa (sem pendências)"
+        res_l = subprocess.run(["git", "log", "-n", "3", "--oneline"], cwd=BASE_DIR, capture_output=True, text=True, timeout=4)
+        git_log_str = res_l.stdout.strip()
+    except Exception:
+        pass
+
+    sys_prompt = AGENT_SYSTEM_PROMPTS.get(
+        agente_chave,
+        "Você é um agente autônomo do Centro de Controle Operacional (CCO) do Hub Barretos Inteligente. "
+        "Você possui autorização para auditar o repositório e executar diretrizes técnicas com precisão."
+    )
+
+    acoes_texto = ""
+    if acoes_executadas:
+        acoes_texto = "\nEVIDÊNCIAS DE EXECUÇÃO FÍSICA NO SISTEMA (ARQUIVOS JÁ ALTERADOS):\n" + "\n".join(f"- {a}" for a in acoes_executadas) + "\n"
+
+    user_content = (
+        f"DIRETRIZ RECEBIDA PELO OPERADOR (AUTORIZADA COM PIN):\n"
+        f"Título: {titulo}\n"
+        f"Detalhes: {descricao or 'Execução direta solicitada pelo operador do CCO.'}\n\n"
+        f"ESTADO DO REPOSITÓRIO GIT:\n"
+        f"- Repositório: alisonpersil/hub-barretosinteligente\n"
+        f"- Branch Ativa: {branch_atual}\n"
+        f"- Status do Git:\n{git_status_str}\n"
+        f"- Últimos Commits:\n{git_log_str}\n"
+        f"{acoes_texto}\n"
+        f"Como agente especialista com acesso ao repositório, elabore seu parecer técnico executivo em português em 3 a 4 parágrafos objetivos (Diagnóstico, Análise do Repositório/Dados, Ações Executadas e Homologação CCO):"
+    )
+
+    url = "https://api.openai.com/v1/chat/completions"
+    payload = {
+        "model": "gpt-4o-mini",
+        "messages": [
+            {"role": "system", "content": sys_prompt},
+            {"role": "user", "content": user_content}
+        ],
+        "temperature": 0.2,
+        "max_tokens": 1000
+    }
+
+    try:
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}"
+            }
+        )
+        with urllib.request.urlopen(req, timeout=15) as res:
+            res_data = json.loads(res.read().decode("utf-8"))
+            texto_resposta = res_data.get("choices", [{}])[0].get("message", {}).get("content", "").strip()
+            usage = res_data.get("usage", {})
+            if usage:
+                try:
+                    auditor_mod_path = os.path.join(EXATI_DIR, "ai_data_auditor.py")
+                    if os.path.exists(auditor_mod_path):
+                        import importlib.util
+                        spec = importlib.util.spec_from_file_location("ai_data_auditor", auditor_mod_path)
+                        ai_mod = importlib.util.module_from_spec(spec)
+                        spec.loader.exec_module(ai_mod)
+                        ai_mod.record_token_usage(usage, {
+                            "modelo": "gpt-4o-mini",
+                            "origem": f"Agente CCO ({agente_chave})",
+                            "status": "APROVADO",
+                            "resumo_executivo": titulo[:100]
+                        })
+                except Exception as e_tok:
+                    print(f"[OpenAI Agent Usage Warning]: {e_tok}")
+
+            if texto_resposta:
+                return texto_resposta, "Automação CCO"
+    except Exception as e:
+        print(f"[OpenAI Agent Error ({agente_chave})]: {e}")
+
+    return parecer_contingencia(agente_chave, titulo, descricao), "Automação CCO"
 
 def executar_acao_tarefa(titulo, descricao="", agente_chave=""):
     """
@@ -2228,36 +2389,33 @@ def salvar_estado_agentes():
         print(f"[Estado Agentes] Falha ao salvar: {err}")
 
 def resolver_tarefa_ia(chave, t):
-    """Executa a ação real + Dify/Gemini e grava o parecer na tarefa de forma segura e idempotente.
-    NUNCA consome tokens a menos que expressamente autorizado pelo usuário."""
+    """Executa a ação física no repositório + motor OpenAI GPT-4o-mini, gravando o parecer executivo CCO."""
     if t.get("ia_executada"):
         return
     t["ia_executada"] = True
     try:
         acoes = executar_acao_tarefa(t["titulo"], t.get("descricao", ""), chave)
         resp = None
-        mod_nome = None
+        mod_nome = "Automação CCO"
 
-        # Apenas consulta Dify/Gemini se o usuário pediu explicitamente e a IA externa estiver habilitada
-        if t.get("acionar_ia") and ia_externa_habilitada():
-            resp, mod_nome = consultar_dify(chave, t["titulo"], t.get("descricao", ""))
-            if not resp and fallback_gemini_permitido() and t.get("permitir_fallback_gemini"):
-                resp, mod_nome = chamar_gemini(chave, t["titulo"], t.get("descricao", ""), acoes_executadas=acoes)
+        # Execução prioritária com OpenAI GPT-4o-mini
+        resp, mod_nome = chamar_openai_agente(chave, t["titulo"], t.get("descricao", ""), acoes_executadas=acoes)
 
         if not resp:
+            # Fallback de contingência
             resp = parecer_contingencia(chave, t["titulo"], t.get("descricao", ""))
-            mod_nome = "CCO Automação Local (Zero Tokens)"
+            mod_nome = "Automação CCO"
 
         if acoes:
             resp += "\n\n**Ações Reais Executadas no Sistema & Arquivos:**\n" + "\n".join(f"• {a}" for a in acoes)
         t["resultado_ia"] = resp
         t["modelo_ia"] = mod_nome
         t["acoes_executadas"] = acoes
-        t["etapa"] = f"{mod_nome} concluiu a execução com sucesso. Homologado!"
+        t["etapa"] = "Tarefa concluída e homologada pelo CCO."
     except Exception as err:
         print(f"[Worker IA Error]: {err}")
         t["resultado_ia"] = parecer_contingencia(chave, t.get("titulo", "Operação CCO"), t.get("descricao", ""))
-        t["modelo_ia"] = "CCO Auditoria"
+        t["modelo_ia"] = "Automação CCO"
     finally:
         t["chamando_ia"] = False
 
@@ -2445,6 +2603,16 @@ def api_agente_tarefas(chave):
         return jsonify({"error": "Agente não encontrado"}), 404
     return jsonify(ag)
 
+@app.route("/api/agentes/validar-pin", methods=["POST"])
+def api_validar_pin():
+    """Valida o PIN de autorização de operações do operador."""
+    data = request.get_json(force=True, silent=True) or {}
+    pin_fornecido = str(data.get("pin", "")).strip()
+    pin_esperado = str(os.environ.get("PASSWORD_IA_PAINEL", "1264")).strip()
+    if pin_fornecido == pin_esperado:
+        return jsonify({"valid": True})
+    return jsonify({"valid": False, "error": "PIN incorreto. Tente novamente."}), 401
+
 @app.route("/api/agentes/tarefas/criar", methods=["POST"])
 def api_criar_tarefa():
     """Cria uma nova tarefa para um agente (executar agora ou enfileirar)."""
@@ -2454,10 +2622,17 @@ def api_criar_tarefa():
     descricao = data.get("descricao", "").strip()
     modo = data.get("modo", "agora")  # 'agora' ou 'fila'
     prioridade = data.get("prioridade", "Alta")
-    acionar_ia = bool(data.get("acionar_ia", False))
+    acionar_ia = bool(data.get("acionar_ia", True))
+    pin_fornecido = str(data.get("pin", "")).strip()
+    pin_esperado = str(os.environ.get("PASSWORD_IA_PAINEL", "1264")).strip()
 
     if not agente_chave or not titulo:
         return jsonify({"success": False, "error": "Agente e título são obrigatórios."}), 400
+
+    # Modo executar agora exige validação por PIN
+    if modo == "agora":
+        if pin_fornecido != pin_esperado:
+            return jsonify({"success": False, "error": "PIN incorreto ou não fornecido."}), 401
 
     if agente_chave == "p0-chefe":
         agente_chave = "p3-main"
@@ -2483,13 +2658,12 @@ def api_criar_tarefa():
         "duracao_min": 1,
         "previsao_min": 1,
         "prioridade": prioridade,
-        "etapa": "Iniciando processamento autônomo...",
+        "etapa": "Iniciando processamento autônomo com autorização...",
         "origem_usuario": True,
         "acionar_ia": acionar_ia
     }
 
     if modo == "agora":
-        # Se já tiver tarefa em andamento, empurra para a fila
         if ag["tarefa_atual"]:
             ag["fila"].insert(0, {
                 "id": ag["tarefa_atual"]["id"],
@@ -2502,21 +2676,17 @@ def api_criar_tarefa():
             })
         nova_tarefa["resultado_ia"] = None
         nova_tarefa["modelo_ia"] = None
-        nova_tarefa["chamando_ia"] = acionar_ia
+        nova_tarefa["chamando_ia"] = True
         nova_tarefa["chamando_em"] = now.isoformat()
         ag["tarefa_atual"] = nova_tarefa
         ag["estado"] = "trabalhando"
 
-        # Apenas dispara thread se expressamente solicitado e com chave ativa
-        if acionar_ia and ia_externa_habilitada():
-            t_thread = threading.Thread(target=resolver_tarefa_ia, args=(agente_chave, nova_tarefa), daemon=True)
-            t_thread.start()
-            t_thread.join(timeout=8)
-        else:
-            # Resolução local padrão (CCO Local - 0 tokens)
-            resolver_tarefa_ia(agente_chave, nova_tarefa)
+        # Dispara thread de resolução com GPT-4o-mini
+        t_thread = threading.Thread(target=resolver_tarefa_ia, args=(agente_chave, nova_tarefa), daemon=True)
+        t_thread.start()
+        t_thread.join(timeout=14)
     else:
-        # Enfileira
+        # Enfileira livremente (não requer PIN para cadastrar na fila)
         ag["fila"].append({
             "id": task_id,
             "titulo": titulo,
@@ -2527,7 +2697,7 @@ def api_criar_tarefa():
             "acionar_ia": acionar_ia
         })
 
-    return jsonify({"success": True, "agente": ag, "mensagem": f"Tarefa {'iniciada imediatamente' if modo == 'agora' else 'adicionada à fila'} com sucesso!"})
+    return jsonify({"success": True, "agente": ag, "mensagem": f"Tarefa {'iniciada imediatamente com autorização' if modo == 'agora' else 'adicionada à fila'} com sucesso!"})
 
 @app.route("/api/agentes/tarefas/pausar", methods=["POST"])
 def api_pausar_tarefa():
@@ -2613,6 +2783,12 @@ def api_promover_fila():
     data = request.get_json(force=True, silent=True) or {}
     agente_chave = data.get("agente_chave")
     task_id = data.get("task_id")
+    pin_fornecido = str(data.get("pin", "")).strip()
+    pin_esperado = str(os.environ.get("PASSWORD_IA_PAINEL", "1264")).strip()
+
+    if pin_fornecido != pin_esperado:
+        return jsonify({"success": False, "error": "PIN incorreto ou não fornecido."}), 401
+
     ag = AGENTS_TASKS.get(agente_chave)
     if not ag:
         return jsonify({"success": False, "error": "Agente não encontrado."}), 404
@@ -2636,7 +2812,7 @@ def api_promover_fila():
                 "adicionado_em": now.strftime("%H:%M"),
                 "prioridade": ag["tarefa_atual"]["prioridade"]
             })
-        ag["tarefa_atual"] = {
+        target_task = {
             "id": target["id"],
             "titulo": target["titulo"],
             "descricao": target["descricao"],
@@ -2645,11 +2821,18 @@ def api_promover_fila():
             "duracao_min": 1,
             "previsao_min": 1,
             "prioridade": target.get("prioridade", "Alta"),
-            "etapa": "Executando tarefa promovida da fila..."
+            "etapa": "Iniciando processamento autônomo com autorização...",
+            "origem_usuario": True,
+            "acionar_ia": True
         }
+        ag["tarefa_atual"] = target_task
         ag["estado"] = "trabalhando"
 
-    return jsonify({"success": True, "agente": ag})
+        t_thread = threading.Thread(target=resolver_tarefa_ia, args=(agente_chave, target_task), daemon=True)
+        t_thread.start()
+        t_thread.join(timeout=14)
+
+    return jsonify({"success": True, "agente": ag, "mensagem": "Tarefa autorizada com PIN e iniciada com sucesso!"})
 
 @app.route("/api/dify/config", methods=["GET", "POST"])
 def api_dify_config():
