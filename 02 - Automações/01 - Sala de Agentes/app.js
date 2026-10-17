@@ -1,5 +1,5 @@
 /**
- * Sala de Agentes Autônomos — Barretos Inteligente CCO
+ * Sala de Agentes Autônomos — Barretos Inteligente HUB
  * Motor Executivo de Gestão de Agentes, Tarefas, Fila e Histórico
  */
 
@@ -427,7 +427,7 @@ function renderLiveTaskPane(agent) {
         <div style="background: rgba(125,54,236,0.1); border: 1px solid rgba(164,105,255,0.3); border-radius: 10px; padding: 13px; margin-bottom: 18px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px;">
             <span style="color: #d8b4fe; font-size: 11.5px; font-weight: 700; text-transform: uppercase; display: flex; align-items: center; gap: 6px;">
-              <i class="fa-solid fa-sparkles" style="color: #a469ff;"></i> Parecer do Agente (Automação CCO)
+              <i class="fa-solid fa-sparkles" style="color: #a469ff;"></i> Parecer do Agente (Automação HUB)
             </span>
             <span style="font-size: 10.5px; background: rgba(34,197,94,0.15); color: #4ade80; padding: 1px 7px; border-radius: 4px; font-weight: 600;">
               Resolvido com IA
@@ -559,7 +559,7 @@ async function promoteQueueTask(agentKey, taskId) {
   requestPinAuthorization({
     title: taskTitle,
     agentKey,
-    agentName: currentDrawerAgentData?.tipo || agent?.tipo || 'Agente CCO',
+    agentName: currentDrawerAgentData?.tipo || agent?.tipo || 'Agente HUB',
     onAuthorized: async (pin) => {
       try {
         const res = await request('POST', '/agentes/tarefas/promover-fila', {
@@ -610,12 +610,12 @@ function renderTaskHistoryPane(agent) {
           <i class="fa-solid fa-circle-check"></i> ${esc(item.status === 'concluido' ? 'CONCLUÍDO' : item.status.toUpperCase())}
         </span>
         <div style="display: flex; align-items: center; gap: 8px;">
-          ${item.modelo ? `<span style="font-size: 11px; background: rgba(164,105,255,0.14); color: #c499ff; padding: 2px 7px; border-radius: 4px; font-weight: 600;"><i class="fa-solid fa-sparkles"></i> Automação CCO</span>` : ''}
+          ${item.modelo ? `<span style="font-size: 11px; background: rgba(164,105,255,0.14); color: #c499ff; padding: 2px 7px; border-radius: 4px; font-weight: 600;"><i class="fa-solid fa-sparkles"></i> Automação HUB</span>` : ''}
           <span class="history-time"><i class="fa-regular fa-clock"></i> ${esc(item.concluido_em)} (${esc(item.duracao || '5 min')})</span>
         </div>
       </div>
       <h4 class="history-item-title">${esc(item.titulo)}</h4>
-      <div class="history-result-text" style="white-space: pre-wrap; line-height: 1.5; color: #d0cddb;">${esc(item.resultado || 'Execução homologada pelo CCO.')}</div>
+      <div class="history-result-text" style="white-space: pre-wrap; line-height: 1.5; color: #d0cddb;">${esc(item.resultado || 'Execução homologada pelo HUB.')}</div>
       ${(agent.chave === 'p3-book' || item.titulo.toLowerCase().includes('book')) ? `
         <div style="margin-top: 10px;">
           <a href="/book/" target="_blank" style="background: rgba(255,42,133,0.14); color: #ff66aa; border: 1px solid rgba(255,42,133,0.35); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 11.5px;">
@@ -706,7 +706,7 @@ function requestPinAuthorization({ title, agentKey, agentName, onAuthorized }) {
   const inputPin = $('#inputOperatorPin');
   const errorMsg = $('#pinErrorMessage');
 
-  const agentLabel = agentName || (dashboard.execucoes || []).find((e) => e.chave === agentKey)?.tipo || 'Agente CCO';
+  const agentLabel = agentName || (dashboard.execucoes || []).find((e) => e.chave === agentKey)?.tipo || 'Agente HUB';
   if ($('#pinAgentName')) $('#pinAgentName').textContent = agentLabel;
   if ($('#pinTaskTitle')) $('#pinTaskTitle').textContent = title || 'Execução de Tarefa';
 
@@ -798,7 +798,7 @@ function setupPinModalEvents() {
       requestPinAuthorization({
         title: titulo,
         agentKey: currentDrawerAgentKey,
-        agentName: currentDrawerAgentData?.tipo || 'Agente CCO',
+        agentName: currentDrawerAgentData?.tipo || 'Agente HUB',
         onAuthorized: async (pin) => {
           try {
             const res = await request('POST', '/agentes/tarefas/criar', {
@@ -911,7 +911,7 @@ function setupGlobalModalEvents() {
       requestPinAuthorization({
         title: titulo,
         agentKey: agente_chave,
-        agentName: agentObj?.tipo || 'Agente CCO',
+        agentName: agentObj?.tipo || 'Agente HUB',
         onAuthorized: async (pin) => {
           try {
             const res = await request('POST', '/agentes/tarefas/criar', {

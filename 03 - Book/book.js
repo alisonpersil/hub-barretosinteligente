@@ -23,7 +23,7 @@
     let searchQuery = '';
     let soundEnabled = true;
 
-    // Web Audio API Synthesizer para feedback sonoro executivo CCO
+    // Web Audio API Synthesizer para feedback sonoro executivo HUB
     let audioCtx = null;
     function playRetroBeep(type = 'click') {
         if (!soundEnabled) return;
@@ -88,7 +88,7 @@
                     id: 9,
                     title: "Auditoria de Backlog & Selo 'Detectado Exclusão' no Monitor Exati",
                     category: "Governança & Automação",
-                    badge: "Integridade CCO",
+                    badge: "Integridade HUB",
                     icon: "fa-shield-halved",
                     color: "pink",
                     impact: "Reconciliação multi-planilhas no Monitor Exati: chamados omitidos em novas extrações sem conclusão na base de 'Atendidos' são preservados no backlog ativo com o selo dinâmico 'Detectado Exclusão', ícone informativo e pop-up flutuante explicativo ao passar o mouse. Cada upload no painel dispara captura automática e despacho seguro para o backlog do agente Chefe.",

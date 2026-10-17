@@ -776,7 +776,7 @@ def api_upload_exati():
                 desc_tarefa = (
                     f"Planilha '{filename}' enviada pelo usuário para 'Base de dados/{subfolder}'. "
                     f"Resultado da sincronização: {status_txt}. "
-                    f"Parecer IA CCO: {ai_audit_info.get('parecer_cco', 'Aprovado sem pendências.')} "
+                    f"Parecer IA HUB: {ai_audit_info.get('parecer_cco', 'Aprovado sem pendências.')} "
                     f"Auditoria multi-arquivos com reconciliação automática e zero-loss de chamados (exclusões detectadas preservadas)."
                 )
                 if not sucesso and proc.stderr:
@@ -1160,8 +1160,8 @@ AGENTS_TASKS = {
                 "concluido_em": "10:24",
                 "duracao": "2 min",
                 "status": "concluido",
-                "modelo": "Automação CCO",
-                "resultado": "Agente 'O chefe' liderando a Sala de Operações CCO com integração e telemetria Git homologada."
+                "modelo": "Automação HUB",
+                "resultado": "Agente 'O chefe' liderando a Sala de Operações do HUB com integração e telemetria Git homologada."
             }
         ]
     },
@@ -1207,7 +1207,7 @@ AGENTS_TASKS = {
                 "concluido_em": "22:55",
                 "duracao": "4 min",
                 "status": "concluido",
-                "modelo": "Automação CCO",
+                "modelo": "Automação HUB",
                 "resultado": "2.804 atendimentos processados e indicadores atualizados."
             },
             {
@@ -1216,7 +1216,7 @@ AGENTS_TASKS = {
                 "concluido_em": "22:40",
                 "duracao": "2 min",
                 "status": "concluido",
-                "modelo": "Automação CCO",
+                "modelo": "Automação HUB",
                 "resultado": "Média de 15 ordens/dia validada sem desvios operacionais."
             }
         ]
@@ -1256,7 +1256,7 @@ AGENTS_TASKS = {
                 "concluido_em": "22:50",
                 "duracao": "5 min",
                 "status": "concluido",
-                "modelo": "Automação CCO",
+                "modelo": "Automação HUB",
                 "resultado": "Zero PDFs corrompidos encontrados; 454 arquivos validados."
             }
         ]
@@ -1296,7 +1296,7 @@ AGENTS_TASKS = {
                 "concluido_em": "22:45",
                 "duracao": "3 min",
                 "status": "concluido",
-                "modelo": "Automação CCO",
+                "modelo": "Automação HUB",
                 "resultado": "Aprovado: padding-top adicionado, texto 100% legível."
             }
         ]
@@ -1329,7 +1329,7 @@ AGENTS_TASKS = {
                 "concluido_em": "22:30",
                 "duracao": "4 min",
                 "status": "concluido",
-                "modelo": "Automação CCO",
+                "modelo": "Automação HUB",
                 "resultado": "Capítulo de Eficiência Operacional atualizado no Book."
             }
         ]
@@ -1385,7 +1385,7 @@ AGENTS_TASKS = {
                 "concluido_em": "22:10",
                 "duracao": "6 min",
                 "status": "concluido",
-                "modelo": "Automação CCO",
+                "modelo": "Automação HUB",
                 "resultado": "Cláusulas de garantia e metas de telegestão mapeadas."
             }
         ]
@@ -1481,7 +1481,7 @@ AGENTS_TASKS = {
         "fila": [
             {
                 "id": "tsk-hnd-01",
-                "titulo": "Sincronização de relatórios de campo com o painel do CCO",
+                "titulo": "Sincronização de relatórios de campo com o painel do HUB",
                 "descricao": "Transmissão segura de dados de ronda e fechamento de ordens de serviço.",
                 "adicionado_em": "22:55",
                 "prioridade": "Alta"
@@ -1496,23 +1496,23 @@ AGENTS_TASKS = {
 # ==============================================================================
 AGENT_SYSTEM_PROMPTS = {
     "p3-main": (
-        "Você é 'O chefe', o Líder Técnico Supremo e Agente Orquestrador do CCO da Concessão Barretos Inteligente. "
+        "Você é 'O chefe', o Líder Técnico Supremo e Agente Orquestrador do HUB Barretos Inteligente. "
         "Você opera com o motor OpenAI GPT-4o-mini e possui credenciais autorizadas pelo PIN do operador para inspecionar, auditar e alterar o repositório GitHub alisonpersil/hub-barretosinteligente. "
         "DIRETRIZES: 1. Você supervisiona todos os outros agentes (Exati, Ofícios, QA, Book) e coordena a integridade do código e dos relatórios. "
         "2. Você analisa branches, histórico de commits, arquivos alterados (git status) e valida se as implementações respeitam o padrão de arquitetura do Hub. "
         "3. Toda ordem que envolva alterar arquivos deve ser precisa, atômica e documentada. Você nunca inventa arquivos inexistentes. "
-        "4. Forneça parecer executivo em 4 blocos objetivos: Diagnóstico da Diretriz, Auditoria do Repositório Git & Arquivos, Ações Executadas / Alterações Aplicadas, e Parecer de Homologação CCO."
+        "4. Forneça parecer executivo em 4 blocos objetivos: Diagnóstico da Diretriz, Auditoria do Repositório Git & Arquivos, Ações Executadas / Alterações Aplicadas, e Parecer de Homologação HUB."
     ),
     "p0-chefe": (
-        "Você é 'O chefe', o Líder Técnico Supremo e Agente Orquestrador do CCO da Concessão Barretos Inteligente. "
+        "Você é 'O chefe', o Líder Técnico Supremo e Agente Orquestrador do HUB Barretos Inteligente. "
         "Você opera com o motor OpenAI GPT-4o-mini e possui credenciais autorizadas pelo PIN do operador para inspecionar, auditar e alterar o repositório GitHub alisonpersil/hub-barretosinteligente. "
         "DIRETRIZES: 1. Você supervisiona todos os outros agentes (Exati, Ofícios, QA, Book) e coordena a integridade do código e dos relatórios. "
         "2. Você analisa branches, histórico de commits, arquivos alterados (git status) e valida se as implementações respeitam o padrão de arquitetura do Hub. "
         "3. Toda ordem que envolva alterar arquivos deve ser precisa, atômica e documentada. Você nunca inventa arquivos inexistentes. "
-        "4. Forneça parecer executivo em 4 blocos objetivos: Diagnóstico da Diretriz, Auditoria do Repositório Git & Arquivos, Ações Executadas / Alterações Aplicadas, e Parecer de Homologação CCO."
+        "4. Forneça parecer executivo em 4 blocos objetivos: Diagnóstico da Diretriz, Auditoria do Repositório Git & Arquivos, Ações Executadas / Alterações Aplicadas, e Parecer de Homologação HUB."
     ),
     "p3-exati": (
-        "Você é o Agente Operacional Exati do Centro de Controle Operacional (CCO) da Concessão Barretos Inteligente. "
+        "Você é o Agente Operacional Exati da Concessão Barretos Inteligente integrado ao HUB Barretos Inteligente (atendendo à área de CCO). "
         "Seu motor é o OpenAI GPT-4o-mini e sua autoridade foi validada por PIN para intervir nos dados operacionais e de manutenção da iluminação pública de Barretos. "
         "DIRETRIZES: 1. Especialista técnico em ordens de serviço (OS) do Exati, atendimento ao cidadão (156 / aplicativo), SLA municipal de 7 dias, rondas noturnas e dimensionamento de equipes de campo. "
         "2. Foco prioritário no combate à reincidência de lâmpadas apagadas nos bairros críticos (ex: Cristiano de Carvalho, Zequinha Amêndola e vias arteriais) e causas elétricas (sobretensão, vandalismo, curto-circuito). "
@@ -1520,7 +1520,7 @@ AGENT_SYSTEM_PROMPTS = {
         "4. Forneça parecer técnico em 4 blocos: Diagnóstico Operacional do Parque, Cruzamento de Dados & SLA de Atendimento, Resolução de Campo & Despacho de Equipes, e Meta de Redução de Backlog."
     ),
     "p3-oficios": (
-        "Você é o Agente Auditor de Ofícios e Conformidade Regulatória do CCO Barretos Inteligente. "
+        "Você é o Agente Auditor de Ofícios e Conformidade Regulatória do HUB Barretos Inteligente. "
         "Você opera com o motor OpenAI GPT-4o-mini após validação de PIN para controlar a tramitação de documentos oficiais da Concessão. "
         "DIRETRIZES: 1. Você é o guardião dos 454 ofícios indexados da concessão com a Prefeitura Municipal de Barretos, Secretarias e órgãos reguladores. "
         "2. Monitoramento rígido dos prazos legais de resposta (alerta vermelho para vencimentos em menos de 15 dias). "
@@ -1533,7 +1533,7 @@ AGENT_SYSTEM_PROMPTS = {
         "DIRETRIZES: 1. Catalogar e eternizar os avanços tecnológicos, recordes de eficiência e melhorias operacionais da concessionária. "
         "2. Seguir à risca a identidade visual oficial da Concessão Barretos Inteligente (cores corporativas, sem referências descontextualizadas ou termos informais). "
         "3. Redigir resumos atraentes, de alto impacto e linguagem institucional voltada para a diretoria, prefeitura e munícipes. "
-        "4. Forneça parecer em 4 blocos: Marco Catalogado, Justificativa Estratégica & Impacto CCO, Arquivos Físicos Atualizados em Disco, e Visibilidade no Portal (/book/)."
+        "4. Forneça parecer em 4 blocos: Marco Catalogado, Justificativa Estratégica & Impacto no HUB, Arquivos Físicos Atualizados em Disco, e Visibilidade no Portal (/book/)."
     ),
     "p1-qa": (
         "Você é o Agente Sentinela de QA, Rotas e Integridade de Software do Hub Barretos Inteligente. "
@@ -1544,12 +1544,12 @@ AGENT_SYSTEM_PROMPTS = {
         "4. Forneça parecer em 4 blocos: Checklist Mobile & Viewports, Integridade das Rotas & Status HTTP, Correções Aplicadas no Código, e Parecer Técnico de Homologação."
     ),
     "p1-main": (
-        "Você é o Líder de Inovação do projeto Nova Insights do CCO Barretos Inteligente (GPT-4o-mini com PIN). "
+        "Você é o Líder de Inovação do projeto Nova Insights do HUB Barretos Inteligente (GPT-4o-mini com PIN). "
         "Você orquestra pesquisas analíticas, tendências em cidades inteligentes, automações avançadas e delegação para QA e pesquisa semântica. "
         "Resolva a tarefa fornecendo planejamento tático, divisão de responsabilidades e métricas esperadas de inovação em português."
     ),
     "p1-context": (
-        "Você é o Agente Pesquisador de Contexto do CCO Barretos Inteligente (GPT-4o-mini). "
+        "Você é o Agente Pesquisador de Contexto do HUB Barretos Inteligente (GPT-4o-mini). "
         "Sua função é realizar varredura semântica dos contratos de concessão administrativa, metas contratuais, aditivos e cláusulas de expansão do parque luminotécnico e telegestão. "
         "Resolva a tarefa correlacionando requisitos contratuais, marcos de entrega e cláusulas de segurança jurídica."
     ),
@@ -1559,7 +1559,7 @@ AGENT_SYSTEM_PROMPTS = {
         "Resolva a tarefa organizando notas estruturadas com referências cruzadas e sintaxe markdown clara."
     ),
     "p2-main": (
-        "Você é o Coordenador Geral do Orion Flow no ecossistema CCO (GPT-4o-mini com PIN). "
+        "Você é o Coordenador Geral do Orion Flow no ecossistema HUB (GPT-4o-mini com PIN). "
         "Você gerencia o handoff de tarefas de segundo plano, evitando concorrência indevida e assegurando execução fluida de processos assíncronos e filas de atendimento. "
         "Resolva a tarefa estruturando fluxogramas de processos, balanceamento de carga e diretrizes de execução assíncrona."
     ),
@@ -1574,7 +1574,7 @@ AGENT_SYSTEM_PROMPTS = {
         "Resolva a tarefa apresentando diagnóstico de causa raiz (root cause), pilha de erro (stack trace) e patch corretivo de código."
     ),
     "p2-handoff": (
-        "Você é o Agente Handoff do CCO Barretos Inteligente (GPT-4o-mini). "
+        "Você é o Agente Handoff do HUB Barretos Inteligente (GPT-4o-mini). "
         "Sua missão é fechar o ciclo entre o que é gerado pelas equipes de campo e a atualização das tabelas executivas no painel principal, garantindo sincronização sem perda de dados. "
         "Resolva a tarefa com relatório de conferência de dados, conferência de batimento de números e despacho final."
     )
@@ -1592,7 +1592,7 @@ def parecer_contingencia(agente_chave, titulo, descricao):
         )
     elif agente_chave == "p3-exati":
         return (
-            f"**Diagnóstico Operacional — Monitor Exati CCO:**\n\n"
+            f"**Diagnóstico Operacional — Monitor Exati HUB:**\n\n"
             f"1. **Análise de Dados:** A demanda '{titulo}' foi cruzada com o banco de 2.804 atendimentos e histórico de ordens da Concessão Barretos.\n"
             f"2. **Causa Raiz:** Identificada reincidência de sobretensão no circuito secundário e divergência cartográfica no logradouro.\n"
             f"3. **Resolução de Campo:** Ordem de serviço enviada para a Equipe 06 na ronda noturna com substituição de luminária LED 150W e regularização de SLA."
@@ -1620,8 +1620,8 @@ def parecer_contingencia(agente_chave, titulo, descricao):
         )
     else:
         return (
-            f"**Despacho Geral da Supervisão CCO:**\n\n"
-            f"A instrução '{titulo}' foi analisada e despachada para a malha de campo com monitoramento ativo de conformidade pelo CCO."
+            f"**Despacho Geral da Supervisão HUB:**\n\n"
+            f"A instrução '{titulo}' foi analisada e despachada para a malha de campo com monitoramento ativo de conformidade pelo HUB."
         )
 
 DIFY_CONFIG_FILE = os.path.join(BASE_DIR, "dify_config.json")
@@ -1734,11 +1734,11 @@ def chamar_gemini(agente_chave, titulo, descricao, acoes_executadas=None):
     """Executa a tarefa utilizando a API do Google Gemini com dados reais de execução física e contingência."""
     api_key = os.environ.get("GEMINI_API_KEY", "").strip()
     if not api_key:
-        return parecer_contingencia(agente_chave, titulo, descricao), "Contingência CCO"
+        return parecer_contingencia(agente_chave, titulo, descricao), "Contingência HUB"
     
     sys_prompt = AGENT_SYSTEM_PROMPTS.get(
         agente_chave,
-        "Você é um agente autônomo da plataforma Barretos Inteligente CCO. Resolva a tarefa com precisão técnica em português."
+        "Você é um agente autônomo da plataforma HUB Barretos Inteligente. Resolva a tarefa com precisão técnica em português."
     )
     
     if acoes_executadas:
@@ -1800,7 +1800,7 @@ def chamar_gemini(agente_chave, titulo, descricao, acoes_executadas=None):
                 continue
                 
     # Fallback estruturado de alta fidelidade
-    return parecer_contingencia(agente_chave, titulo, descricao), "Diagnóstico CCO"
+    return parecer_contingencia(agente_chave, titulo, descricao), "Diagnóstico HUB"
 
 def chamar_openai_agente(agente_chave, titulo, descricao, acoes_executadas=None):
     """
@@ -1823,7 +1823,7 @@ def chamar_openai_agente(agente_chave, titulo, descricao, acoes_executadas=None)
                 pass
 
     if not api_key:
-        return parecer_contingencia(agente_chave, titulo, descricao), "Automação CCO"
+        return parecer_contingencia(agente_chave, titulo, descricao), "Automação HUB"
 
     # Contexto em tempo real do repositório Git
     branch_atual = "main"
@@ -1841,7 +1841,7 @@ def chamar_openai_agente(agente_chave, titulo, descricao, acoes_executadas=None)
 
     sys_prompt = AGENT_SYSTEM_PROMPTS.get(
         agente_chave,
-        "Você é um agente autônomo do Centro de Controle Operacional (CCO) do Hub Barretos Inteligente. "
+        "Você é um agente autônomo do ecossistema HUB Barretos Inteligente (área operacional CCO). "
         "Você possui autorização para auditar o repositório e executar diretrizes técnicas com precisão."
     )
 
@@ -1852,14 +1852,14 @@ def chamar_openai_agente(agente_chave, titulo, descricao, acoes_executadas=None)
     user_content = (
         f"DIRETRIZ RECEBIDA PELO OPERADOR (AUTORIZADA COM PIN):\n"
         f"Título: {titulo}\n"
-        f"Detalhes: {descricao or 'Execução direta solicitada pelo operador do CCO.'}\n\n"
+        f"Detalhes: {descricao or 'Execução direta solicitada pelo operador do HUB.'}\n\n"
         f"ESTADO DO REPOSITÓRIO GIT:\n"
         f"- Repositório: alisonpersil/hub-barretosinteligente\n"
         f"- Branch Ativa: {branch_atual}\n"
         f"- Status do Git:\n{git_status_str}\n"
         f"- Últimos Commits:\n{git_log_str}\n"
         f"{acoes_texto}\n"
-        f"Como agente especialista com acesso ao repositório, elabore seu parecer técnico executivo em português em 3 a 4 parágrafos objetivos (Diagnóstico, Análise do Repositório/Dados, Ações Executadas e Homologação CCO):"
+        f"Como agente especialista com acesso ao repositório, elabore seu parecer técnico executivo em português em 3 a 4 parágrafos objetivos (Diagnóstico, Análise do Repositório/Dados, Ações Executadas e Homologação HUB):"
     )
 
     url = "https://api.openai.com/v1/chat/completions"
@@ -1896,7 +1896,7 @@ def chamar_openai_agente(agente_chave, titulo, descricao, acoes_executadas=None)
                         spec.loader.exec_module(ai_mod)
                         ai_mod.record_token_usage(usage, {
                             "modelo": "gpt-4o-mini",
-                            "origem": f"Agente CCO ({agente_chave})",
+                            "origem": f"Agente HUB ({agente_chave})",
                             "status": "APROVADO",
                             "resumo_executivo": titulo[:100]
                         })
@@ -1904,16 +1904,16 @@ def chamar_openai_agente(agente_chave, titulo, descricao, acoes_executadas=None)
                     print(f"[OpenAI Agent Usage Warning]: {e_tok}")
 
             if texto_resposta:
-                return texto_resposta, "Automação CCO"
+                return texto_resposta, "Automação HUB"
     except Exception as e:
         print(f"[OpenAI Agent Error ({agente_chave})]: {e}")
 
-    return parecer_contingencia(agente_chave, titulo, descricao), "Automação CCO"
+    return parecer_contingencia(agente_chave, titulo, descricao), "Automação HUB"
 
 def executar_acao_tarefa(titulo, descricao="", agente_chave=""):
     """
     Executa ações REAIS e FÍSICAS no ecossistema (arquivos em disco, banco de dados, JSON, relatórios, rotas).
-    GARANTIA DE CONFIABILIDADE CCO: Os agentes NUNCA mentem e toda instrução produz impacto imediato no sistema.
+    GARANTIA DE CONFIABILIDADE HUB: Os agentes NUNCA mentem e toda instrução produz impacto imediato no sistema.
     """
     import re
     texto = f"{titulo} {descricao}".strip()
@@ -1991,7 +1991,7 @@ def executar_acao_tarefa(titulo, descricao="", agente_chave=""):
             if m_clean and len(m_clean) > 4:
                 titulo_final = m_clean[0].upper() + m_clean[1:]
                 if not any(k in titulo_final.lower() for k in ["resiliência", "tratamento", "marco", "homologação", "comunicado"]):
-                    titulo_final = f"Homologação CCO: {titulo_final}"
+                    titulo_final = f"Homologação HUB: {titulo_final}"
             else:
                 titulo_final = f"Marco Operacional: {titulo}"
 
@@ -2079,7 +2079,7 @@ def executar_acao_tarefa(titulo, descricao="", agente_chave=""):
                         c_hb = f_hb.read()
                     c_hb = re.sub(
                         r'(<strong[^>]*id="hubAlertTitle"[^>]*>)[^<]*(</strong>)',
-                        r'\g<1>Design &amp; QA Homologado pelo CCO\g<2>',
+                        r'\g<1>Design &amp; QA Homologado pelo HUB\g<2>',
                         c_hb
                     )
                     c_hb = re.sub(
@@ -2125,7 +2125,7 @@ def executar_acao_tarefa(titulo, descricao="", agente_chave=""):
             os.makedirs(oficios_dir, exist_ok=True)
             log_oficios = {
                 "timestamp": datetime.now().isoformat(),
-                "executor": "Agente Auditor de Ofícios CCO",
+                "executor": "Agente Auditor de Ofícios HUB",
                 "total_documentos_auditados": 454,
                 "prazos_criticos_15_dias": 0,
                 "termos_garantia_led_validados": "5 anos de conformidade fabril atestada",
@@ -2147,7 +2147,7 @@ def executar_acao_tarefa(titulo, descricao="", agente_chave=""):
             os.makedirs(exati_dir, exist_ok=True)
             log_exati = {
                 "timestamp": datetime.now().isoformat(),
-                "executor": "Agente Operacional Exati CCO",
+                "executor": "Agente Operacional Exati HUB",
                 "base_atendimentos": 2804,
                 "sla_conformidade": "98.4%",
                 "bairro_foco": "Cristiano de Carvalho e adjacências",
@@ -2225,7 +2225,7 @@ def executar_acao_tarefa(titulo, descricao="", agente_chave=""):
                 
                 hub_content = re.sub(
                     r'(<strong[^>]*id="hubAlertTitle"[^>]*>)[^<]*(</strong>)',
-                    r'\g<1>Comunicado Operacional CCO\g<2>',
+                    r'\g<1>Comunicado Operacional HUB\g<2>',
                     hub_content
                 )
                 hub_content = re.sub(
@@ -2346,14 +2346,14 @@ def salvar_estado_agentes():
         print(f"[Estado Agentes] Falha ao salvar: {err}")
 
 def resolver_tarefa_ia(chave, t):
-    """Executa a ação física no repositório + motor OpenAI GPT-4o-mini, gravando o parecer executivo CCO."""
+    """Executa a ação física no repositório + motor OpenAI GPT-4o-mini, gravando o parecer executivo HUB."""
     if t.get("ia_executada"):
         return
     t["ia_executada"] = True
     try:
         acoes = executar_acao_tarefa(t["titulo"], t.get("descricao", ""), chave)
         resp = None
-        mod_nome = "Automação CCO"
+        mod_nome = "Automação HUB"
 
         # Execução prioritária com OpenAI GPT-4o-mini
         resp, mod_nome = chamar_openai_agente(chave, t["titulo"], t.get("descricao", ""), acoes_executadas=acoes)
@@ -2361,18 +2361,18 @@ def resolver_tarefa_ia(chave, t):
         if not resp:
             # Fallback de contingência
             resp = parecer_contingencia(chave, t["titulo"], t.get("descricao", ""))
-            mod_nome = "Automação CCO"
+            mod_nome = "Automação HUB"
 
         if acoes:
             resp += "\n\n**Ações Reais Executadas no Sistema & Arquivos:**\n" + "\n".join(f"• {a}" for a in acoes)
         t["resultado_ia"] = resp
         t["modelo_ia"] = mod_nome
         t["acoes_executadas"] = acoes
-        t["etapa"] = "Tarefa concluída e homologada pelo CCO."
+        t["etapa"] = "Tarefa concluída e homologada pelo HUB."
     except Exception as err:
         print(f"[Worker IA Error]: {err}")
-        t["resultado_ia"] = parecer_contingencia(chave, t.get("titulo", "Operação CCO"), t.get("descricao", ""))
-        t["modelo_ia"] = "Automação CCO"
+        t["resultado_ia"] = parecer_contingencia(chave, t.get("titulo", "Operação HUB"), t.get("descricao", ""))
+        t["modelo_ia"] = "Automação HUB"
     finally:
         t["chamando_ia"] = False
 
@@ -2405,7 +2405,7 @@ def avancar_agentes():
             resultado_final = t.get("resultado_ia")
             if not resultado_final:
                 resultado_final = parecer_contingencia(chave, t["titulo"], t.get("descricao", ""))
-            modelo_final = t.get("modelo_ia") or "CCO Automação Local"
+            modelo_final = t.get("modelo_ia") or "HUB Automação Local"
 
             ag["historico"].insert(0, {
                 "id": t["id"],
@@ -2681,8 +2681,8 @@ def api_concluir_tarefa():
             "concluido_em": now.strftime("%H:%M"),
             "duracao": f"{concluida.get('duracao_min', 1)} min",
             "status": "concluido",
-            "resultado": concluida.get("resultado_ia") or "Execução concluída e homologada pelo CCO.",
-            "modelo": concluida.get("modelo_ia") or "Automação CCO"
+            "resultado": concluida.get("resultado_ia") or "Execução concluída e homologada pelo HUB.",
+            "modelo": concluida.get("modelo_ia") or "Automação HUB"
         })
         ag["tarefa_atual"] = None
 
@@ -2979,7 +2979,7 @@ def api_book_criar_marco():
         "badge": data.get("badge", "Novo Marco"),
         "icon": data.get("icon", "fa-star"),
         "color": data.get("color", "pink"),
-        "impact": data.get("impact", "Marco catalogado e homologado pelo PMO/CCO."),
+        "impact": data.get("impact", "Marco catalogado e homologado pelo PMO & HUB."),
         "date": datetime.now().strftime("%B %Y").capitalize(),
         "author": data.get("author", "Agente Book & Alison Persil"),
         "version": f"v2.{new_id}.0"
@@ -3005,7 +3005,7 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     docs = get_all_documents()
     print("=" * 72)
-    print("        BARRETOS INTELIGENTE • CENTRAL HUB (PMO & CCO)")
+    print("        BARRETOS INTELIGENTE • CENTRAL HUB (PMO & HUB)")
     print("=" * 72)
     print(f"\n  [*] SERVIDOR INICIADO: http://localhost:{port}")
     print(f"      - HUB Central:       http://localhost:{port}/")
