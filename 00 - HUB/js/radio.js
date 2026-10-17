@@ -9,21 +9,34 @@
 
   const STORAGE_KEY = 'barretos_radio_active';
   const RADIO_EPOCH = 1700000000;
+  const RELEASE_BASE_URL = 'https://github.com/alisonpersil/hub-barretosinteligente/releases/download/radio-assets';
   const PLAYLIST = [
     {
       id: 'uZ3RFNMKcmg',
       name: 'Non Stop Pop FM [GTA V]',
       genre: 'Pop & Retrô Hits',
-      duration: 9987
+      duration: 9987,
+      audioUrl: '/api/radio/stream/uZ3RFNMKcmg.mp3',
+      directUrl: `${RELEASE_BASE_URL}/uZ3RFNMKcmg.mp3`
     },
     {
       id: 'ULcKRDTdUsY',
       name: 'Flash FM [GTA Vice City]',
       genre: '80s Flashback Classics',
-      duration: 3350
+      duration: 3350,
+      audioUrl: '/api/radio/stream/ULcKRDTdUsY.mp3',
+      directUrl: `${RELEASE_BASE_URL}/ULcKRDTdUsY.mp3`
+    },
+    {
+      id: '17oemNTh_nA',
+      name: 'Flash FM [GTA VI]',
+      genre: 'Synthwave & 80s Hits',
+      duration: 687,
+      audioUrl: '/api/radio/stream/17oemNTh_nA.mp3',
+      directUrl: `${RELEASE_BASE_URL}/17oemNTh_nA.mp3`
     }
   ];
-  const TOTAL_CYCLE = PLAYLIST.reduce((acc, t) => acc + t.duration, 0); // 13,337s
+  const TOTAL_CYCLE = PLAYLIST.reduce((acc, t) => acc + t.duration, 0); // 14,024s
 
   let isPlaying = false;
   let currentTrackIndex = 0;
@@ -32,6 +45,8 @@
   let heartbeatTimer = null;
   let audioWakeCtx = null;
   let wakeOsc = null;
+  let audioPlayer = null;
+  let useNativeAudio = true;
 
   /**
    * Mantém a aba ativa como "Media Tab" no Chrome/Edge/Safari mesmo minimizada
@@ -112,6 +127,12 @@
    */
   function forceResume() {
     if (!isPlaying) return;
+    if (useNativeAudio && audioPlayer) {
+      if (audioPlayer.paused) {
+        audioPlayer.play().catch(() => {});
+      }
+      return;
+    }
     const iframe = document.getElementById('youtubeRadioIframe');
     if (iframe && iframe.contentWindow) {
       try {
@@ -174,8 +195,32 @@
     };
   }
 
+  function getAudioPlayer() {
+    if (!audioPlayer) {
+      audioPlayer = new Audio();
+      audioPlayer.id = 'barretosRadioAudio';
+      audioPlayer.preload = 'auto';
+      audioPlayer.playsInline = true;
+      audioPlayer.setAttribute('playsinline', 'true');
+      audioPlayer.setAttribute('webkit-playsinline', 'true');
+
+      audioPlayer.addEventListener('ended', () => {
+        if (isPlaying) {
+          play(true);
+        }
+      });
+
+      audioPlayer.addEventListener('error', (e) => {
+        console.warn('[Barretos FM] Erro no stream de áudio nativo, acionando fallback YouTube...', e);
+        useNativeAudio = false;
+        playYouTubeFallback(true);
+      });
+    }
+    return audioPlayer;
+  }
+
   /**
-   * Contêiner visível para o compositor do navegador porém discreto
+   * Contêiner visível para o compositor do navegador porém discreto (Fallback YouTube)
    */
   function ensurePlayerContainer() {
     let wrapper = document.getElementById('youtubeRadioWrapper');
@@ -189,12 +234,11 @@
   }
 
   /**
-   * Inicia ou desmuta a transmissão contínua sincronizada.
+   * Fallback para iframe do YouTube caso os arquivos de áudio não estejam acessíveis
    */
-  function play(isAutoResume = false) {
+  function playYouTubeFallback(isAutoResume = false) {
     const wrapper = ensurePlayerContainer();
     const state = getGlobalState();
-
     currentTrackIndex = state.index ?? 0;
     const currentTrack = PLAYLIST[currentTrackIndex] || PLAYLIST[0];
 
@@ -214,7 +258,6 @@
       iframe.src = embedUrl;
     }
 
-    // Envia handshake e comandos de desmutar e tocar
     const sendCommands = () => {
       try {
         iframe.contentWindow.postMessage('{"event":"listening","id":1,"channel":"widget"}', '*');
@@ -232,6 +275,60 @@
     setTimeout(sendCommands, 250);
     setTimeout(sendCommands, 700);
     setTimeout(sendCommands, 1500);
+  }
+
+  /**
+   * Inicia ou desmuta a transmissão contínua sincronizada (Áudio Nativo HTML5 ou Fallback YouTube).
+   */
+  function play(isAutoResume = false) {
+    const state = getGlobalState();
+    currentTrackIndex = state.index ?? 0;
+    const currentTrack = PLAYLIST[currentTrackIndex] || PLAYLIST[0];
+
+    if (useNativeAudio) {
+      // Remove iframe se existia
+      const oldIframe = document.getElementById('youtubeRadioIframe');
+      if (oldIframe) {
+        try {
+          oldIframe.src = 'about:blank';
+          oldIframe.remove();
+        } catch (_) {}
+      }
+
+      const audio = getAudioPlayer();
+      const targetSrc = currentTrack.audioUrl;
+      let currentSrcPath = '';
+      try {
+        currentSrcPath = audio.src ? new URL(audio.src, window.location.href).pathname : '';
+      } catch (_) {
+        currentSrcPath = audio.src || '';
+      }
+
+      if (!audio.src || currentSrcPath !== targetSrc) {
+        audio.src = targetSrc;
+        audio.load();
+      }
+
+      const applySeekAndPlay = () => {
+        if (state.seekSeconds > 0 && Math.abs(audio.currentTime - state.seekSeconds) > 3) {
+          try {
+            audio.currentTime = state.seekSeconds;
+          } catch (_) {}
+        }
+        audio.play().catch((err) => {
+          console.warn('[Barretos FM] Autoplay aguardando interação do usuário:', err);
+        });
+      };
+
+      if (audio.readyState >= 1) {
+        applySeekAndPlay();
+      } else {
+        audio.addEventListener('loadedmetadata', applySeekAndPlay, { once: true });
+        audio.play().catch(() => {});
+      }
+    } else {
+      playYouTubeFallback(isAutoResume);
+    }
 
     isPlaying = true;
     try {
@@ -251,7 +348,7 @@
       showToast(`📻 Barretos FM: No ar — ${currentTrack.name}`, 3000);
     }
 
-    // Agenda a transição contínua para a próxima estação
+    // Agenda a transição contínua para a próxima faixa
     if (transitionTimer) clearTimeout(transitionTimer);
     const msRemaining = Math.max(1000, (state.remainingSeconds || 60) * 1000);
     transitionTimer = setTimeout(() => {
@@ -265,6 +362,12 @@
    * Muta a rádio.
    */
   function mute() {
+    if (audioPlayer) {
+      try {
+        audioPlayer.pause();
+      } catch (_) {}
+    }
+
     const iframe = document.getElementById('youtubeRadioIframe');
     if (iframe) {
       try {

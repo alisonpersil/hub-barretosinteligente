@@ -27,3 +27,10 @@ desktop.ini
 .DS_Store
 
 agentes_estado.json
+
+# Audio tracks (hosted on GitHub Releases to avoid Vercel 50MB limit)
+radio_tracks/
+*.mp3
+*.m4a
+*.wav
+*.opus

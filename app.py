@@ -10,6 +10,7 @@ import random
 import json
 import urllib.request
 import urllib.error
+import re
 from datetime import datetime, timedelta
 
 # Windows Console UTF-8 encoding support
@@ -1042,15 +1043,34 @@ RADIO_PLAYLIST = [
         "id": "uZ3RFNMKcmg",
         "name": "Non Stop Pop FM [GTA V]",
         "duration": 9987,
-        "genre": "Pop & Retrô Hits"
+        "genre": "Pop & Retrô Hits",
+        "audioUrl": "/api/radio/stream/uZ3RFNMKcmg.mp3"
     },
     {
         "id": "ULcKRDTdUsY",
         "name": "Flash FM [GTA Vice City]",
         "duration": 3350,
-        "genre": "80s Flashback Classics"
+        "genre": "80s Flashback Classics",
+        "audioUrl": "/api/radio/stream/ULcKRDTdUsY.mp3"
+    },
+    {
+        "id": "17oemNTh_nA",
+        "name": "Flash FM [GTA VI]",
+        "duration": 687,
+        "genre": "Synthwave & 80s Hits",
+        "audioUrl": "/api/radio/stream/17oemNTh_nA.mp3"
     }
 ]
+
+@app.route("/api/radio/stream/<track_id>.mp3")
+def api_radio_stream(track_id):
+    """Serve áudio MP3 localmente em alta performance (com Range) ou redireciona para a CDN do GitHub Releases."""
+    safe_id = re.sub(r"[^a-zA-Z0-9_-]", "", track_id)
+    local_file = os.path.join(BASE_DIR, "radio_tracks", f"{safe_id}.mp3")
+    if os.path.exists(local_file):
+        return send_file(local_file, mimetype="audio/mpeg", conditional=True)
+    github_release_url = f"https://github.com/alisonpersil/hub-barretosinteligente/releases/download/radio-assets/{safe_id}.mp3"
+    return redirect(github_release_url, code=302)
 
 @app.route("/api/radio/status")
 def api_radio_status():
