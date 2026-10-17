@@ -359,15 +359,22 @@ function renderLiveTaskPane(agent) {
   const t = agent.tarefa_atual;
   if (!t) {
     container.innerHTML = `
-      <div style="text-align: center; padding: 48px 20px; background: rgba(255,255,255,0.02); border-radius: 14px; border: 1px dashed rgba(164,105,255,0.25);">
-        <i class="fa-solid fa-mug-hot" style="font-size: 38px; color: #a469ff; margin-bottom: 14px; display: block;"></i>
-        <h3 style="color: #fff; font-size: 16px; margin: 0 0 6px;">Agente em Standby (Sem Tarefa Ativa)</h3>
-        <p style="color: #8f8a9e; font-size: 13px; max-width: 320px; margin: 0 auto 20px; line-height: 1.45;">
-          O agente completou as tarefas anteriores e está aguardando novas instruções.
+      <div style="text-align: center; padding: 42px 20px; background: rgba(255,255,255,0.02); border-radius: 14px; border: 1px dashed rgba(52,211,153,0.35);">
+        <div style="width: 52px; height: 52px; margin: 0 auto 14px; background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.3); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          <i class="fa-solid fa-shield-halved" style="font-size: 24px; color: #34d399;"></i>
+        </div>
+        <h3 style="color: #fff; font-size: 16px; margin: 0 0 6px;">Agente em Standby • Tokens Protegidos</h3>
+        <p style="color: #8f8a9e; font-size: 13px; max-width: 320px; margin: 0 auto 18px; line-height: 1.45;">
+          Zero tokens consumidos. As tarefas aguardam com segurança no Backlog e só executam após sua autorização com PIN.
         </p>
-        <button type="button" class="btn-dispatch-submit" style="max-width: 220px; margin: 0 auto;" onclick="switchDrawerTab('new-task')">
-          <i class="fa-solid fa-plus"></i> Atribuir Tarefa Agora
-        </button>
+        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+          <button type="button" class="btn-task-action" style="background: rgba(164,105,255,0.15); border: 1px solid rgba(164,105,255,0.35); color: #c499ff; padding: 8px 14px;" onclick="switchDrawerTab('task-queue')">
+            <i class="fa-solid fa-inbox"></i> Ver Backlog / Fila
+          </button>
+          <button type="button" class="btn-dispatch-submit" style="padding: 8px 14px;" onclick="switchDrawerTab('new-task')">
+            <i class="fa-solid fa-plus"></i> Nova Tarefa
+          </button>
+        </div>
       </div>
     `;
     return;
@@ -443,9 +450,9 @@ function renderLiveTaskPane(agent) {
       ` : ''}
 
       <div class="task-actions-row">
-        <button type="button" class="btn-task-action pause" id="btnDrawerTogglePause">
-          <i class="fa-solid ${isPaused ? 'fa-play' : 'fa-pause'}"></i>
-          <span>${isPaused ? 'Retomar' : 'Pausar'}</span>
+        <button type="button" class="btn-task-action" id="btnDrawerMoveBacklog" title="Pausar e mover para o Backlog para não consumir tokens" style="background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.35);">
+          <i class="fa-solid fa-inbox"></i>
+          <span>Mover para Backlog</span>
         </button>
         <button type="button" class="btn-task-action complete" id="btnDrawerCompleteTask">
           <i class="fa-solid fa-check"></i>
@@ -458,6 +465,18 @@ function renderLiveTaskPane(agent) {
       </div>
     </div>
   `;
+
+  $('#btnDrawerMoveBacklog')?.addEventListener('click', async () => {
+    try {
+      const res = await request('POST', '/agentes/tarefas/mover-backlog', { agente_chave: agent.chave });
+      await refresh();
+      await openAgentTaskDrawer(agent.chave);
+      switchDrawerTab('task-queue');
+      notice(res.mensagem || 'Tarefa guardada no Backlog com sucesso! Agente em Standby.');
+    } catch (e) {
+      notice(e.message, true);
+    }
+  });
 
   $('#btnDrawerTogglePause')?.addEventListener('click', async () => {
     try {
@@ -482,7 +501,7 @@ function renderLiveTaskPane(agent) {
       await request('POST', '/agentes/tarefas/concluir', { agente_chave: agent.chave });
       await refresh();
       await openAgentTaskDrawer(agent.chave);
-      notice('Tarefa concluída e arquivada com sucesso!');
+      notice('Tarefa concluída e arquivada com sucesso! Agente em Standby.');
     } catch (e) {
       notice(e.message, true);
     }
@@ -1119,6 +1138,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     const card = event.target.closest('[data-session]');
     if (card) selectSession(card.dataset.session).catch((error) => notice(error.message, true));
+  });
+
+  // Botão Topbar: Modo Standby Total (Trava de Segurança / Zero Consumo)
+  $('#btnPauseAllAgents')?.addEventListener('click', async () => {
+    try {
+      const res = await request('POST', '/agentes/pausar-todos');
+      await refresh();
+      if (currentDrawerAgentKey && $('#agentTaskDrawer')?.classList.contains('open')) {
+        await openAgentTaskDrawer(currentDrawerAgentKey);
+      }
+      notice(res.mensagem || 'Modo Standby Total ativado com sucesso! Todos os agentes em espera.');
+    } catch (e) {
+      notice(e.message, true);
+    }
   });
 
   refresh();

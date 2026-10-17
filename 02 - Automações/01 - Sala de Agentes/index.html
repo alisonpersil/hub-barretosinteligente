@@ -57,8 +57,14 @@
                 <!-- Status da Sala (componente padrão do sistema) -->
                 <div class="system-status-pill" id="agentsStatusPill" title="Agentes em atividade na sala">
                     <span class="pulse-dot"></span>
-                    <span id="agentsStatusText">Agentes ativos</span>
+                    <span id="agentsStatusText">Agentes em Standby</span>
                 </div>
+
+                <!-- Botão Trava de Segurança / Standby Total -->
+                <button id="btnPauseAllAgents" class="btn-dispatch-nav standby-btn" title="Pausar todos os agentes e mover tarefas para o Backlog (Zero consumo OpenAI)" style="background: rgba(245,158,11,0.12); border: 1px solid rgba(245,158,11,0.35); color: #fbbf24; cursor: pointer;">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Modo Standby Total</span>
+                </button>
 
                 <!-- Botão de Criação de Tarefas Global -->
                 <button id="btnOpenGlobalDispatch" class="btn-dispatch-nav" title="Criar nova tarefa para um agente">
@@ -331,7 +337,7 @@
         <!-- Abas do Painel do Agente -->
         <nav class="drawer-nav">
             <button class="drawer-tab active" data-tab="live-task"><i class="fa-solid fa-bolt"></i> Tarefa Atual</button>
-            <button class="drawer-tab" data-tab="task-queue"><i class="fa-solid fa-list-check"></i> Fila (<span id="drawerQueueCount">0</span>)</button>
+            <button class="drawer-tab" data-tab="task-queue"><i class="fa-solid fa-inbox"></i> Backlog / Fila (<span id="drawerQueueCount">0</span>)</button>
             <button class="drawer-tab" data-tab="task-history"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button>
             <button class="drawer-tab" data-tab="new-task"><i class="fa-solid fa-plus"></i> Nova Tarefa</button>
         </nav>
@@ -345,11 +351,16 @@
                 </div>
             </div>
 
-            <!-- ABA 2: FILA DE TAREFAS -->
+            <!-- ABA 2: FILA DE TAREFAS / BACKLOG -->
             <div class="drawer-pane" id="paneTaskQueue">
                 <div class="pane-header-row">
-                    <h3>Fila de Espera do Agente</h3>
-                    <small>Tarefas a serem processadas sequencialmente</small>
+                    <div>
+                        <h3 style="display: flex; align-items: center; gap: 8px;">
+                            <span>Backlog / Fila do Agente</span>
+                            <span style="font-size: 10.5px; background: rgba(52,211,153,0.12); color: #34d399; border: 1px solid rgba(52,211,153,0.3); padding: 1px 7px; border-radius: 4px; font-weight: 600;"><i class="fa-solid fa-shield-halved"></i> Protegido</span>
+                        </h3>
+                        <small>Tarefas em espera. Só executam com seu clique e autorização por PIN.</small>
+                    </div>
                 </div>
                 <div id="taskQueueList" class="task-queue-list">
                     <!-- Preenchido via JavaScript -->

@@ -1132,21 +1132,19 @@ AGENTS_TASKS = {
         "projeto_id": 3,
         "projeto_nome": "Barretos Inteligente • HUB",
         "cwd": "C:\\BarretosInteligente",
-        "estado": "trabalhando",
+        "estado": "aguardando",
         "pai_chave": None,
         "agent_id": None,
         "dify_url": "https://udify.app/agent/1C2EOSw9M2vaqcXM",
-        "tarefa_atual": {
-            "id": "tsk-chefe-01",
-            "titulo": "Supervisão da sala e integração com repositório GitHub",
-            "descricao": "Agente autônomo conectado via Dify AI com integração ativa ao repositório GitHub alisonpersil/hub-barretosinteligente.",
-            "progresso": 88,
-            "iniciado_em": "2026-10-12T10:22:00",
-            "duracao_min": 12,
-            "previsao_min": 2,
-            "prioridade": "Crítica"
-        },
+        "tarefa_atual": None,
         "fila": [
+            {
+                "id": "tsk-chefe-01",
+                "titulo": "Supervisão da sala e integridade do repositório GitHub",
+                "descricao": "Inspeção de integridade e auditoria de branches e commits no repositório GitHub alisonpersil/hub-barretosinteligente.",
+                "adicionado_em": "10:22",
+                "prioridade": "Crítica"
+            },
             {
                 "id": "tsk-chefe-f1",
                 "titulo": "Sincronização de branches e auditoria de commits no repositório",
@@ -1158,12 +1156,12 @@ AGENTS_TASKS = {
         "historico": [
             {
                 "id": "tsk-chefe-h1",
-                "titulo": "Integração do Agente 'O chefe' (Dify) ao Hub Barretos Inteligente",
+                "titulo": "Integração do Agente 'O chefe' ao Hub Barretos Inteligente",
                 "concluido_em": "10:24",
                 "duracao": "2 min",
                 "status": "concluido",
-                "modelo": "Dify AI / GitHub",
-                "resultado": "Agente 'O chefe' liderando a Sala de Operações CCO com integração Dify e telemetria Git."
+                "modelo": "Automação CCO",
+                "resultado": "Agente 'O chefe' liderando a Sala de Operações CCO com integração e telemetria Git homologada."
             }
         ]
     },
@@ -1175,20 +1173,18 @@ AGENTS_TASKS = {
         "projeto_id": 3,
         "projeto_nome": "Barretos Inteligente • HUB",
         "cwd": "C:\\BarretosInteligente",
-        "estado": "trabalhando",
+        "estado": "aguardando",
         "pai_chave": "p3-main",
         "agent_id": "sub-exati",
-        "tarefa_atual": {
-            "id": "tsk-exati-01",
-            "titulo": "Auditoria de chamados pendentes com SLA excedido (>7 dias)",
-            "descricao": "Identificação de 6 ordens pendentes críticas da Ronda Própria abertas desde Agosto/Setembro e geração de matriz de criticidade.",
-            "progresso": 75,
-            "iniciado_em": "2026-10-11T22:57:00",
-            "duracao_min": 10,
-            "previsao_min": 3,
-            "prioridade": "Crítica"
-        },
+        "tarefa_atual": None,
         "fila": [
+            {
+                "id": "tsk-exati-01",
+                "titulo": "Auditoria de chamados pendentes com SLA excedido (>7 dias)",
+                "descricao": "Identificação de 6 ordens pendentes críticas da Ronda Própria abertas desde Agosto/Setembro e geração de matriz de criticidade.",
+                "adicionado_em": "22:57",
+                "prioridade": "Crítica"
+            },
             {
                 "id": "tsk-exati-f1",
                 "titulo": "Cruzamento de reincidência de lâmpadas no bairro Cristiano de Carvalho",
@@ -1211,6 +1207,7 @@ AGENTS_TASKS = {
                 "concluido_em": "22:55",
                 "duracao": "4 min",
                 "status": "concluido",
+                "modelo": "Automação CCO",
                 "resultado": "2.804 atendimentos processados e indicadores atualizados."
             },
             {
@@ -1219,6 +1216,7 @@ AGENTS_TASKS = {
                 "concluido_em": "22:40",
                 "duracao": "2 min",
                 "status": "concluido",
+                "modelo": "Automação CCO",
                 "resultado": "Média de 15 ordens/dia validada sem desvios operacionais."
             }
         ]
@@ -1231,20 +1229,18 @@ AGENTS_TASKS = {
         "projeto_id": 3,
         "projeto_nome": "Barretos Inteligente • HUB",
         "cwd": "C:\\BarretosInteligente",
-        "estado": "trabalhando",
+        "estado": "aguardando",
         "pai_chave": "p3-main",
         "agent_id": "sub-oficios",
-        "tarefa_atual": {
-            "id": "tsk-oficios-01",
-            "titulo": "Auditoria de prazos de resposta de documentos e ofícios de 2026",
-            "descricao": "Varredura na base de dados indexada de 454 ofícios para detectar termos de garantia e respostas vencendo nos próximos 15 dias.",
-            "progresso": 88,
-            "iniciado_em": "2026-10-11T22:55:00",
-            "duracao_min": 12,
-            "previsao_min": 2,
-            "prioridade": "Alta"
-        },
+        "tarefa_atual": None,
         "fila": [
+            {
+                "id": "tsk-oficios-01",
+                "titulo": "Auditoria de prazos de resposta de documentos e ofícios de 2026",
+                "descricao": "Varredura na base de dados indexada de 454 ofícios para detectar termos de garantia e respostas vencendo nos próximos 15 dias.",
+                "adicionado_em": "22:55",
+                "prioridade": "Alta"
+            },
             {
                 "id": "tsk-oficios-f1",
                 "titulo": "Indexação e extração OCR de novos anexos adicionados ao repositório",
@@ -1260,6 +1256,7 @@ AGENTS_TASKS = {
                 "concluido_em": "22:50",
                 "duracao": "5 min",
                 "status": "concluido",
+                "modelo": "Automação CCO",
                 "resultado": "Zero PDFs corrompidos encontrados; 454 arquivos validados."
             }
         ]
@@ -1272,20 +1269,18 @@ AGENTS_TASKS = {
         "projeto_id": 1,
         "projeto_nome": "Nova Insights",
         "cwd": "C:\\Barretos\\NovaInsights",
-        "estado": "trabalhando",
+        "estado": "aguardando",
         "pai_chave": "p1-main",
         "agent_id": "sub-qa",
-        "tarefa_atual": {
-            "id": "tsk-qa-01",
-            "titulo": "Varredura de responsividade mobile, gaveta lateral e rotas",
-            "descricao": "Testes automatizados simulando viewport de smartphones (360x640 até 412x915) e verificação de corte de texto e sombras laterais.",
-            "progresso": 64,
-            "iniciado_em": "2026-10-11T22:58:00",
-            "duracao_min": 9,
-            "previsao_min": 5,
-            "prioridade": "Normal"
-        },
+        "tarefa_atual": None,
         "fila": [
+            {
+                "id": "tsk-qa-01",
+                "titulo": "Varredura de responsividade mobile, gaveta lateral e rotas",
+                "descricao": "Testes simulando viewport de smartphones (360x640 até 412x915) e verificação de integridade de rotas.",
+                "adicionado_em": "22:58",
+                "prioridade": "Normal"
+            },
             {
                 "id": "tsk-qa-f1",
                 "titulo": "Checkup de renderização da tabela analítica do Monitor Exati",
@@ -1296,20 +1291,12 @@ AGENTS_TASKS = {
         ],
         "historico": [
             {
-                "id": "tsk-gta6-book",
-                "titulo": "Remover qualquer vínculo com GTA 6",
-                "concluido_em": datetime.now().strftime("%H:%M"),
-                "duracao": "1 min",
-                "status": "concluido",
-                "modelo": "Gemini Flash Lite",
-                "resultado": "**Missão Concluída e Homologada — QA & Frontend:**\n\n1. **Higienização Real de Código:** Todos os termos e vínculos com 'GTA 6', 'GTA VI' e 'Vice City' foram completamente removidos dos arquivos `03 - Book/index.html`, `book_entries.json` e `book.js`.\n2. **Identidade Padronizada:** A página do Book opera estritamente sob os padrões executivos do Barretos Inteligente CCO.\n3. **Validação das Rotas:** Rota `/book` 100% limpa, responsiva e homologada."
-            },
-            {
                 "id": "tsk-qa-h1",
                 "titulo": "Inspeção do corte de texto na barra lateral sob a navbar",
                 "concluido_em": "22:45",
                 "duracao": "3 min",
                 "status": "concluido",
+                "modelo": "Automação CCO",
                 "resultado": "Aprovado: padding-top adicionado, texto 100% legível."
             }
         ]
@@ -1337,38 +1324,12 @@ AGENTS_TASKS = {
         ],
         "historico": [
             {
-                "id": "tsk-news-teste-erros",
-                "titulo": "Lança uma nova news de teste no book pra avisar que erros foram tratados",
-                "concluido_em": datetime.now().strftime("%H:%M"),
-                "duracao": "1 min",
-                "status": "concluido",
-                "modelo": "Gemini Flash Lite",
-                "resultado": "**Missão #07 Executada com Sucesso e Publicada no Book:**\n\n1. **Publicação Física em Disco:** Novo marco '#07 - Tratamento de Falhas & Homologação de Resiliência no Ecossistema' catalogado em `03 - Book/book_entries.json`.\n2. **Impacto Visível no Site:** Contador do Book elevado para 7 marcos ativos em `/book/`, com card executivo exibido no topo da linha do tempo.\n3. **Banner de Diretrizes:** Banner principal de governança sincronizado com a entrega homologada pelo operador."
-            },
-            {
-                "id": "tsk-rem-gta",
-                "titulo": "remover qualquer vinculo com gta 6",
-                "concluido_em": datetime.now().strftime("%H:%M"),
-                "duracao": "1 min",
-                "status": "concluido",
-                "modelo": "Gemini Flash Lite",
-                "resultado": "**Ação Operacional Executada com Sucesso nos Arquivos:**\n\n1. **Varredura e Expulgo:** O termo 'GTA 6' e todas as classes/estilos associados foram integralmente removidos dos arquivos do Book de Governança.\n2. **Arquivos Físicos Modificados:**\n   • Removidas 32 tags e referências de `03 - Book/index.html`\n   • Removidas 98 classes e seletores de `03 - Book/book.css`\n   • Removidas referências de `03 - Book/book_entries.json`\n   • Removidas referências de `03 - Book/book.js`\n3. **Conformidade Institucional:** O Book de Governança e Inovações opera 100% alinhado à identidade executiva da Concessão Barretos Inteligente."
-            },
-            {
-                "id": "tsk-rem-leonida",
-                "titulo": "REMOVER O TEXTO Leonida DO BOOK",
-                "concluido_em": datetime.now().strftime("%H:%M"),
-                "duracao": "1 min",
-                "status": "concluido",
-                "modelo": "Gemini Flash Lite",
-                "resultado": "**Ação Operacional Executada com Sucesso:**\n\n1. **Remoção Concluída:** O termo 'Leonida' foi completamente removido do arquivo `03 - Book/index.html`.\n2. **Identidade Ajustada:** O badge foi atualizado para 'Barretos Inteligente • CCO PMO', eliminando o termo em 100% da aplicação.\n3. **Validação:** A rota `/book` foi inspecionada e o termo não consta mais em nenhuma parte do código ou da interface."
-            },
-            {
                 "id": "tsk-book-h1",
                 "titulo": "Registro executivo dos 2.804 atendimentos de iluminação pública",
                 "concluido_em": "22:30",
                 "duracao": "4 min",
                 "status": "concluido",
+                "modelo": "Automação CCO",
                 "resultado": "Capítulo de Eficiência Operacional atualizado no Book."
             }
         ]
@@ -1381,20 +1342,19 @@ AGENTS_TASKS = {
         "projeto_id": 1,
         "projeto_nome": "Nova Insights",
         "cwd": "C:\\Barretos\\NovaInsights",
-        "estado": "delegando",
+        "estado": "aguardando",
         "pai_chave": None,
         "agent_id": None,
-        "tarefa_atual": {
-            "id": "tsk-nov-01",
-            "titulo": "Coordenação de testes e mapeamento de contexto da concessão",
-            "descricao": "Distribuição de sub-rotinas de checagem para QA e pesquisa semântica.",
-            "progresso": 78,
-            "iniciado_em": "2026-10-11T22:39:00",
-            "duracao_min": 23,
-            "previsao_min": 6,
-            "prioridade": "Alta"
-        },
-        "fila": [],
+        "tarefa_atual": None,
+        "fila": [
+            {
+                "id": "tsk-nov-01",
+                "titulo": "Coordenação de testes e mapeamento de contexto da concessão",
+                "descricao": "Distribuição de sub-rotinas de checagem para QA e pesquisa semântica.",
+                "adicionado_em": "22:39",
+                "prioridade": "Alta"
+            }
+        ],
         "historico": []
     },
     "p1-context": {
@@ -1405,20 +1365,19 @@ AGENTS_TASKS = {
         "projeto_id": 1,
         "projeto_nome": "Nova Insights",
         "cwd": "C:\\Barretos\\NovaInsights",
-        "estado": "trabalhando",
+        "estado": "aguardando",
         "pai_chave": "p1-main",
         "agent_id": "sub-context",
-        "tarefa_atual": {
-            "id": "tsk-ctx-01",
-            "titulo": "Mapeamento semântico de contratos de concessão e aditivos",
-            "descricao": "Cruzamento de cláusulas contratuais de modernização luminotécnica com relatórios de entrega.",
-            "progresso": 70,
-            "iniciado_em": "2026-10-11T22:56:00",
-            "duracao_min": 12,
-            "previsao_min": 4,
-            "prioridade": "Normal"
-        },
-        "fila": [],
+        "tarefa_atual": None,
+        "fila": [
+            {
+                "id": "tsk-ctx-01",
+                "titulo": "Mapeamento semântico de contratos de concessão e aditivos",
+                "descricao": "Cruzamento de cláusulas contratuais de modernização luminotécnica com relatórios de entrega.",
+                "adicionado_em": "22:56",
+                "prioridade": "Normal"
+            }
+        ],
         "historico": [
             {
                 "id": "tsk-ctx-h1",
@@ -1426,6 +1385,7 @@ AGENTS_TASKS = {
                 "concluido_em": "22:10",
                 "duracao": "6 min",
                 "status": "concluido",
+                "modelo": "Automação CCO",
                 "resultado": "Cláusulas de garantia e metas de telegestão mapeadas."
             }
         ]
@@ -1453,20 +1413,19 @@ AGENTS_TASKS = {
         "projeto_id": 2,
         "projeto_nome": "Orion Flow",
         "cwd": "C:\\Barretos\\OrionFlow",
-        "estado": "delegando",
+        "estado": "aguardando",
         "pai_chave": None,
         "agent_id": None,
-        "tarefa_atual": {
-            "id": "tsk-orn-01",
-            "titulo": "Gestão de filas assíncronas e handoff de tarefas",
-            "descricao": "Orquestração contínua dos processos em segundo plano da infraestrutura.",
-            "progresso": 90,
-            "iniciado_em": "2026-10-11T22:34:00",
-            "duracao_min": 28,
-            "previsao_min": 2,
-            "prioridade": "Alta"
-        },
-        "fila": [],
+        "tarefa_atual": None,
+        "fila": [
+            {
+                "id": "tsk-orn-01",
+                "titulo": "Gestão de filas assíncronas e handoff de tarefas",
+                "descricao": "Orquestração contínua dos processos em segundo plano da infraestrutura.",
+                "adicionado_em": "22:34",
+                "prioridade": "Alta"
+            }
+        ],
         "historico": []
     },
     "p2-context": {
@@ -1477,20 +1436,19 @@ AGENTS_TASKS = {
         "projeto_id": 2,
         "projeto_nome": "Orion Flow",
         "cwd": "C:\\Barretos\\OrionFlow",
-        "estado": "trabalhando",
+        "estado": "aguardando",
         "pai_chave": "p2-main",
         "agent_id": "sub-context2",
-        "tarefa_atual": {
-            "id": "tsk-ctx2-01",
-            "titulo": "Varredura de dependências e atualização de bibliotecas",
-            "descricao": "Auditoria de integridade de pacotes e tempos de resposta de rede.",
-            "progresso": 55,
-            "iniciado_em": "2026-10-11T22:58:00",
-            "duracao_min": 10,
-            "previsao_min": 6,
-            "prioridade": "Normal"
-        },
-        "fila": [],
+        "tarefa_atual": None,
+        "fila": [
+            {
+                "id": "tsk-ctx2-01",
+                "titulo": "Varredura de dependências e atualização de bibliotecas",
+                "descricao": "Auditoria de integridade de pacotes e tempos de resposta de rede.",
+                "adicionado_em": "22:58",
+                "prioridade": "Normal"
+            }
+        ],
         "historico": []
     },
     "p2-bug": {
@@ -1516,20 +1474,19 @@ AGENTS_TASKS = {
         "projeto_id": 2,
         "projeto_nome": "Orion Flow",
         "cwd": "C:\\Barretos\\OrionFlow",
-        "estado": "trabalhando",
+        "estado": "aguardando",
         "pai_chave": "p2-main",
         "agent_id": "sub-handoff",
-        "tarefa_atual": {
-            "id": "tsk-hnd-01",
-            "titulo": "Sincronização de relatórios de campo com o painel do CCO",
-            "descricao": "Transmissão segura de dados de ronda e fechamento de ordens de serviço.",
-            "progresso": 85,
-            "iniciado_em": "2026-10-11T22:55:00",
-            "duracao_min": 12,
-            "previsao_min": 2,
-            "prioridade": "Alta"
-        },
-        "fila": [],
+        "tarefa_atual": None,
+        "fila": [
+            {
+                "id": "tsk-hnd-01",
+                "titulo": "Sincronização de relatórios de campo com o painel do CCO",
+                "descricao": "Transmissão segura de dados de ronda e fechamento de ordens de serviço.",
+                "adicionado_em": "22:55",
+                "prioridade": "Alta"
+            }
+        ],
         "historico": []
     }
 }
@@ -2459,27 +2416,10 @@ def avancar_agentes():
                 "resultado": resultado_final,
                 "modelo": modelo_final
             })
-            if ag.get("fila"):
-                prox = ag["fila"].pop(0)
-                ag["tarefa_atual"] = {
-                    "id": prox["id"],
-                    "titulo": prox["titulo"],
-                    "descricao": prox.get("descricao", "Execução de item da fila de operações."),
-                    "progresso": 10,
-                    "iniciado_em": now.isoformat(),
-                    "duracao_min": 1,
-                    "previsao_min": 1,
-                    "prioridade": prox.get("prioridade", "Normal"),
-                    "etapa": "Iniciando processamento da fila...",
-                    "resultado_ia": None,
-                    "chamando_ia": False,
-                    "origem_usuario": False,
-                    "acionar_ia": False
-                }
-                ag["estado"] = "trabalhando"
-            else:
-                ag["tarefa_atual"] = None
-                ag["estado"] = "aguardando"
+            # Trava de Seguranca: Conclui a tarefa e coloca o agente em standby sem auto-promover a fila.
+            # O backlog/fila permanece aguardando acionamento manual do operador com PIN para proteger os tokens OpenAI.
+            ag["tarefa_atual"] = None
+            ag["estado"] = "aguardando"
     return mudou
 
 def _rota_estado_agentes():
@@ -2542,27 +2482,27 @@ def api_painel():
         })
 
     historico = [
-        {"session_id": "sess-nova", "tipo": "QA", "projeto_nome": "Nova Insights", "estado": "trabalhando", "atualizado_em": now_iso},
-        {"session_id": "sess-nova", "tipo": "Pesquisador de contexto", "projeto_nome": "Nova Insights", "estado": "trabalhando", "atualizado_em": now_iso},
-        {"session_id": "sess-orion", "tipo": "Pesquisador de contexto", "projeto_nome": "Orion Flow", "estado": "trabalhando", "atualizado_em": now_iso},
-        {"session_id": "sess-orion", "tipo": "Handoff", "projeto_nome": "Orion Flow", "estado": "trabalhando", "atualizado_em": now_iso},
-        {"session_id": "sess-cco", "tipo": "Monitor Exati", "projeto_nome": "Barretos Inteligente • HUB", "estado": "trabalhando", "atualizado_em": now_iso},
-        {"session_id": "sess-cco", "tipo": "Consulta de Ofícios", "projeto_nome": "Barretos Inteligente • HUB", "estado": "trabalhando", "atualizado_em": now_iso}
+        {"session_id": "sess-nova", "tipo": "QA", "projeto_nome": "Nova Insights", "estado": "aguardando", "atualizado_em": now_iso},
+        {"session_id": "sess-nova", "tipo": "Pesquisador de contexto", "projeto_nome": "Nova Insights", "estado": "aguardando", "atualizado_em": now_iso},
+        {"session_id": "sess-orion", "tipo": "Pesquisador de contexto", "projeto_nome": "Orion Flow", "estado": "aguardando", "atualizado_em": now_iso},
+        {"session_id": "sess-orion", "tipo": "Handoff", "projeto_nome": "Orion Flow", "estado": "aguardando", "atualizado_em": now_iso},
+        {"session_id": "sess-cco", "tipo": "Monitor Exati", "projeto_nome": "Barretos Inteligente • HUB", "estado": "aguardando", "atualizado_em": now_iso},
+        {"session_id": "sess-cco", "tipo": "Consulta de Ofícios", "projeto_nome": "Barretos Inteligente • HUB", "estado": "aguardando", "atualizado_em": now_iso}
     ]
 
     historico_tipos = {
         "Pesquisador de contexto": [
-            {"projeto_nome": "Nova Insights", "ocorrido_em": "13:31", "em_andamento": True},
-            {"projeto_nome": "Orion Flow", "ocorrido_em": "13:43", "em_andamento": True}
+            {"projeto_nome": "Nova Insights", "ocorrido_em": "13:31", "em_andamento": False},
+            {"projeto_nome": "Orion Flow", "ocorrido_em": "13:43", "em_andamento": False}
         ],
         "QA": [
-            {"projeto_nome": "Nova Insights", "ocorrido_em": "13:30", "em_andamento": True}
+            {"projeto_nome": "Nova Insights", "ocorrido_em": "13:30", "em_andamento": False}
         ],
         "Monitor Exati": [
-            {"projeto_nome": "Barretos Inteligente • HUB", "ocorrido_em": "13:35", "em_andamento": True}
+            {"projeto_nome": "Barretos Inteligente • HUB", "ocorrido_em": "13:35", "em_andamento": False}
         ],
         "Consulta de Ofícios": [
-            {"projeto_nome": "Barretos Inteligente • HUB", "ocorrido_em": "13:36", "em_andamento": True}
+            {"projeto_nome": "Barretos Inteligente • HUB", "ocorrido_em": "13:36", "em_andamento": False}
         ]
     }
 
@@ -2725,7 +2665,7 @@ def api_retomar_tarefa():
 
 @app.route("/api/agentes/tarefas/concluir", methods=["POST"])
 def api_concluir_tarefa():
-    """Conclui a tarefa atual, move para o histórico e puxa a próxima da fila."""
+    """Conclui a tarefa atual e move para o histórico. NUNCA auto-promove da fila para proteger os tokens OpenAI."""
     data = request.get_json(force=True, silent=True) or {}
     agente_chave = data.get("agente_chave")
     ag = AGENTS_TASKS.get(agente_chave)
@@ -2739,32 +2679,71 @@ def api_concluir_tarefa():
             "id": concluida["id"],
             "titulo": concluida["titulo"],
             "concluido_em": now.strftime("%H:%M"),
-            "duracao": f"{concluida.get('duracao_min', 5)} min",
+            "duracao": f"{concluida.get('duracao_min', 1)} min",
             "status": "concluido",
             "resultado": concluida.get("resultado_ia") or "Execução concluída e homologada pelo CCO.",
-            "modelo": "Gemini 2.5 Flash"
+            "modelo": concluida.get("modelo_ia") or "Automação CCO"
         })
         ag["tarefa_atual"] = None
 
-    # Se tiver fila, assume a próxima
-    if ag["fila"]:
-        prox = ag["fila"].pop(0)
-        ag["tarefa_atual"] = {
-            "id": prox["id"],
-            "titulo": prox["titulo"],
-            "descricao": prox["descricao"],
-            "progresso": 10,
-            "iniciado_em": now.isoformat(),
-            "duracao_min": 1,
-            "previsao_min": 1,
-            "prioridade": prox.get("prioridade", "Normal"),
-            "etapa": "Iniciando processamento da fila..."
-        }
-        ag["estado"] = "trabalhando"
-    else:
+    ag["estado"] = "aguardando"
+    salvar_estado_agentes()
+    return jsonify({"success": True, "agente": ag, "mensagem": "Tarefa concluída com sucesso! Agente em Standby (Zero Consumo)."})
+
+@app.route("/api/agentes/tarefas/mover-backlog", methods=["POST"])
+def api_mover_para_backlog():
+    """Move a tarefa atual do agente para o Backlog/fila e coloca o agente em standby sem consumir tokens."""
+    data = request.get_json(force=True, silent=True) or {}
+    agente_chave = data.get("agente_chave")
+    ag = AGENTS_TASKS.get(agente_chave)
+    if not ag:
+        return jsonify({"success": False, "error": "Agente não encontrado."}), 404
+
+    now = datetime.now()
+    if ag.get("tarefa_atual"):
+        atual = ag["tarefa_atual"]
+        ag["fila"].insert(0, {
+            "id": atual["id"],
+            "titulo": atual["titulo"],
+            "descricao": atual.get("descricao", ""),
+            "adicionado_em": now.strftime("%H:%M"),
+            "prioridade": atual.get("prioridade", "Normal"),
+            "origem_usuario": atual.get("origem_usuario", False),
+            "acionar_ia": atual.get("acionar_ia", True)
+        })
+        ag["tarefa_atual"] = None
+
+    ag["estado"] = "aguardando"
+    salvar_estado_agentes()
+    return jsonify({"success": True, "agente": ag, "mensagem": "Tarefa guardada no Backlog com sucesso! Agente em Standby."})
+
+@app.route("/api/agentes/pausar-todos", methods=["POST"])
+def api_pausar_todos_agentes():
+    """Trava de Segurança / Modo Standby Geral: move todas as tarefas ativas para o Backlog e garante zero consumo de tokens OpenAI."""
+    now = datetime.now()
+    total_movidas = 0
+    for chave, ag in AGENTS_TASKS.items():
+        if ag.get("tarefa_atual"):
+            atual = ag["tarefa_atual"]
+            ag["fila"].insert(0, {
+                "id": atual["id"],
+                "titulo": atual["titulo"],
+                "descricao": atual.get("descricao", ""),
+                "adicionado_em": now.strftime("%H:%M"),
+                "prioridade": atual.get("prioridade", "Alta"),
+                "origem_usuario": atual.get("origem_usuario", False),
+                "acionar_ia": atual.get("acionar_ia", True)
+            })
+            ag["tarefa_atual"] = None
+            total_movidas += 1
         ag["estado"] = "aguardando"
 
-    return jsonify({"success": True, "agente": ag, "mensagem": "Tarefa concluída com sucesso!"})
+    salvar_estado_agentes()
+    return jsonify({
+        "success": True,
+        "total_movidas": total_movidas,
+        "mensagem": "Modo Standby Total ativado com sucesso! Todos os agentes estão em espera e os tokens OpenAI estão 100% protegidos."
+    })
 
 @app.route("/api/agentes/tarefas/remover-fila", methods=["POST"])
 def api_remover_fila():
