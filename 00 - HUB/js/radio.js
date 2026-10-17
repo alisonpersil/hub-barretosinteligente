@@ -522,6 +522,14 @@
       const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
       if (!data) return;
 
+      if (data.type === 'USER_INTERACTION') {
+        if (isPlaying) {
+          startAudioWakeLock();
+          forceResume();
+        }
+        return;
+      }
+
       let playerState = null;
       if (data.event === 'onStateChange') {
         playerState = data.info;
@@ -594,14 +602,21 @@
     if (wasActive) {
       play(true);
 
-      const unlockOnFirstClick = () => {
+      const unlockOnInteraction = () => {
         if (isPlaying) {
           startAudioWakeLock();
           forceResume();
         }
-        document.removeEventListener('click', unlockOnFirstClick);
+        ['click', 'touchstart', 'pointerdown', 'keydown'].forEach(evt => {
+          document.removeEventListener(evt, unlockOnInteraction);
+          window.removeEventListener(evt, unlockOnInteraction);
+        });
       };
-      document.addEventListener('click', unlockOnFirstClick, { once: true });
+
+      ['click', 'touchstart', 'pointerdown', 'keydown'].forEach(evt => {
+        document.addEventListener(evt, unlockOnInteraction, { passive: true });
+        window.addEventListener(evt, unlockOnInteraction, { passive: true });
+      });
     }
   }
 

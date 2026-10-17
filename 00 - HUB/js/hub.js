@@ -289,8 +289,14 @@
                 currentIframePath = moduleFrame.contentWindow ? moduleFrame.contentWindow.location.pathname.replace(/\/$/, '') : '';
             } catch (_) {}
 
+            // Garante parâmetro ?embedded=1 no iframe para que app.py entregue o módulo sem loop de shell
+            let iframeSrc = urlPath;
+            if (!iframeSrc.includes('embedded=1')) {
+                iframeSrc += (iframeSrc.includes('?') ? '&' : '?') + 'embedded=1';
+            }
+
             if (currentIframePath !== cleanPath) {
-                moduleFrame.src = urlPath;
+                moduleFrame.src = iframeSrc;
             }
 
             // Atualiza barra de topo e título da aba
@@ -354,15 +360,37 @@
 
     // Comunicação bidirecional com os módulos embutidos (ex: navegação iniciada de dentro do iframe)
     window.addEventListener('message', (e) => {
-        if (e.data && e.data.type === 'NAVIGATE_HUB' && e.data.url) {
+        if (!e.data) return;
+
+        if (e.data.type === 'USER_INTERACTION') {
+            if (window.RadioBarretos && window.RadioBarretos.isPlaying()) {
+                window.RadioBarretos.resync();
+            }
+            return;
+        }
+
+        if (e.data.type === 'NAVIGATE_HUB' && e.data.url) {
             const target = e.data.url;
-            const cleanTarget = target.split('?')[0].replace(/\/$/, '') || '/';
-            if (cleanTarget === '' || cleanTarget === '/' || cleanTarget === '/hub') {
+            let targetPath = target;
+            let tabParam = null;
+            try {
+                const dummyUrl = new URL(target, window.location.origin);
+                targetPath = dummyUrl.pathname;
+                tabParam = dummyUrl.searchParams.get('tab');
+            } catch (_) {
+                targetPath = target.split('?')[0];
+            }
+
+            const cleanTarget = targetPath.replace(/\/$/, '') || '/';
+
+            if (tabParam && tabPanels[tabParam]) {
+                switchTab(tabParam);
+            } else if (cleanTarget === '' || cleanTarget === '/' || cleanTarget === '/hub') {
                 switchTab('home');
             } else if (MODULE_ROUTES[cleanTarget]) {
                 openModule(target);
             } else {
-                window.location.href = target;
+                openModule(target);
             }
         }
     });
@@ -421,12 +449,19 @@
     function initNavigationOnLoad() {
         bindModuleLinks();
 
+        const urlParams = new URLSearchParams(window.location.search);
+        const moduleParam = urlParams.get('module');
+        if (moduleParam) {
+            const decoded = decodeURIComponent(moduleParam);
+            openModule(decoded, true);
+            return;
+        }
+
         const currentPath = window.location.pathname.replace(/\/$/, '') || '/';
         if (MODULE_ROUTES[currentPath]) {
             openModule(window.location.pathname + window.location.search, false);
         } else {
             try {
-                const urlParams = new URLSearchParams(window.location.search);
                 const tabParam = urlParams.get('tab') || window.location.hash.replace('#', '');
                 if (tabParam && tabPanels[tabParam] && tabParam !== 'home') {
                     switchTab(tabParam, false);
