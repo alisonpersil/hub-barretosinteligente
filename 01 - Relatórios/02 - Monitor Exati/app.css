@@ -3320,8 +3320,8 @@ body {
   .grid-2 {
     display: flex !important;
     flex-wrap: wrap !important;
-    gap: 12px !important;
-    margin-bottom: 16px !important;
+    gap: 10px !important;
+    margin-bottom: 12px !important;
   }
 
   .col-7 { width: 58% !important; flex: 0 0 58% !important; }
@@ -3335,49 +3335,84 @@ body {
     background: #ffffff !important;
     border: 1px solid #cbd5e1 !important;
     border-radius: 6px !important;
-    padding: 12px !important;
+    padding: 8px 12px !important;
     box-shadow: none !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    margin-bottom: 12px !important;
+    margin-bottom: 10px !important;
   }
 
-  /* Cards que contêm tabelas devem quebrar páginas naturalmente */
-  .card:has(table),
-  .card:has(.table-responsive),
-  .card.table-card {
+  /* Cards de tabelas iniciam SEMPRE no topo de uma nova folha para que o título fique 100% junto da tabela */
+  .card.table-card,
+  #card-tabela-pendentes,
+  #card-tabela-analitico,
+  .card:has(#thead-backlog-tabela),
+  .card:has(#tabela-analitico),
+  .card:has(table.data-table) {
+    page-break-before: always !important;
+    break-before: page !important;
     page-break-inside: auto !important;
     break-inside: auto !important;
+    margin-top: 0 !important;
+  }
+
+  /* O título da tabela NUNCA se separa da tabela */
+  .card-header,
+  .card-title,
+  .card-subtitle,
+  #titulo-tabela-backlog,
+  #table-total-count {
+    page-break-after: avoid !important;
+    break-after: avoid !important;
   }
 
   .card-header h2, .card-header h3 {
     color: #0f172a !important;
-    font-size: 10pt !important;
+    font-size: 9.5pt !important;
+    margin-bottom: 2px !important;
   }
 
   .card-header p {
     color: #64748b !important;
-    font-size: 7.5pt !important;
+    font-size: 7.2pt !important;
   }
 
-  .chart-container {
-    height: 240px !important;
-    max-height: 240px !important;
+  /* Gráficos na 1ª folha: altura controlada para caberem perfeitamente no Cockpit executivo */
+  .chart-container,
+  .chart-wrapper,
+  .chart-wrapper-tall {
+    height: 180px !important;
+    max-height: 180px !important;
     position: relative !important;
+    margin-top: 6px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .backlog-timeline-kpis {
+    margin-top: 6px !important;
+    margin-bottom: 6px !important;
+    gap: 8px !important;
+  }
+
+  .timeline-kpi-item {
+    padding: 6px 10px !important;
   }
 
   canvas {
     max-width: 100% !important;
-    height: auto !important;
+    max-height: 180px !important;
+    height: 180px !important;
   }
 
-  /* Tabelas */
+  /* Densidade ultra-otimizada de tabelas: ~35 a 40 linhas cabem em 1 única folha */
   .table-responsive {
     overflow: visible !important;
     max-height: none !important;
     height: auto !important;
     width: 100% !important;
     display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   table,
@@ -3385,7 +3420,8 @@ body {
   .analitico-table {
     width: 100% !important;
     border-collapse: collapse !important;
-    font-size: 8pt !important;
+    font-size: 7pt !important;
+    line-height: 1.15 !important;
     page-break-inside: auto !important;
     break-inside: auto !important;
   }
@@ -3402,18 +3438,55 @@ body {
     background: #f1f5f9 !important;
     color: #0f172a !important;
     border-bottom: 2px solid #cbd5e1 !important;
-    padding: 6px 8px !important;
+    padding: 3.5px 5px !important;
+    font-size: 6.8pt !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.02em !important;
+    line-height: 1.15 !important;
   }
 
   td {
     border-bottom: 1px solid #e2e8f0 !important;
     color: #334155 !important;
-    padding: 5px 8px !important;
+    padding: 2.5px 5px !important;
+    font-size: 7pt !important;
+    line-height: 1.15 !important;
+    vertical-align: middle !important;
   }
 
   tr {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
+    height: auto !important;
+  }
+
+  /* Badges e pílulas compactas para não esticar a altura das linhas */
+  .badge,
+  .badge-pill,
+  .badge-exclusao,
+  .badge-origem,
+  .badge-pontos,
+  .badge-sla {
+    padding: 1px 4px !important;
+    font-size: 6.5pt !important;
+    line-height: 1 !important;
+    border-radius: 3px !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+    margin: 0 !important;
+  }
+
+  .badge-tooltip-popup,
+  .badge-info-icon,
+  .btn-action,
+  .card-actions,
+  .table-filter-bar,
+  .search-input,
+  .filter-btn,
+  .grafico-filter-banner,
+  .analitico-page-size-selector {
+    display: none !important;
   }
 
   /* Simulador em Impressão */
@@ -3426,10 +3499,6 @@ body {
   }
 
   .simulator-controls {
-    display: none !important;
-  }
-
-  .table-filter-bar {
     display: none !important;
   }
 }

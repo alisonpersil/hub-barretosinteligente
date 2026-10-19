@@ -1092,12 +1092,32 @@
         float: none !important;
     }
 
-    /* 3. Permitir que tabelas e seus cards quebrem páginas perfeitamente */
+    /* 3. Evitar orfandade de títulos e garantir que títulos fiquem com suas tabelas */
+    .card-header,
+    .card-title,
+    .card-subtitle,
+    .section-title,
+    .section-subtitle {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+    }
+
+    .card.table-card,
+    .table-page-break {
+        page-break-before: always !important;
+        break-before: page !important;
+        margin-top: 0 !important;
+    }
+
+    /* 4. Densidade ultra-otimizada para tabelas caberem de 35 a 45 linhas por folha */
     .card:has(table),
     .card:has(.table-responsive),
     .table-responsive,
     table,
-    .data-table {
+    .data-table,
+    .documents-table,
+    .qa-table,
+    .analitico-table {
         page-break-inside: auto !important;
         break-inside: auto !important;
     }
@@ -1107,6 +1127,68 @@
         max-height: none !important;
         height: auto !important;
         display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    table,
+    .data-table,
+    .documents-table,
+    .qa-table,
+    .analitico-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        font-size: 7pt !important;
+        line-height: 1.15 !important;
+    }
+
+    table th,
+    .data-table th,
+    .documents-table th,
+    .qa-table th,
+    .analitico-table th {
+        padding: 3.5px 5px !important;
+        font-size: 6.8pt !important;
+        font-weight: 700 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.02em !important;
+        line-height: 1.15 !important;
+        background: #f1f5f9 !important;
+        color: #0f172a !important;
+        border-bottom: 2px solid #cbd5e1 !important;
+    }
+
+    table td,
+    .data-table td,
+    .documents-table td,
+    .qa-table td,
+    .analitico-table td {
+        padding: 2.5px 5px !important;
+        font-size: 7pt !important;
+        line-height: 1.15 !important;
+        border-bottom: 1px solid #e2e8f0 !important;
+        color: #334155 !important;
+        vertical-align: middle !important;
+    }
+
+    /* Badges, tags e pílulas ultra-compactas para não esticar as linhas */
+    .badge,
+    .badge-pill,
+    .badge-exclusao,
+    .kpi-tag-mes,
+    .status-badge {
+        padding: 1.5px 5px !important;
+        font-size: 6.5pt !important;
+        line-height: 1 !important;
+        border-radius: 3px !important;
+        display: inline-block !important;
+        vertical-align: middle !important;
+        margin: 0 !important;
+    }
+
+    .badge-tooltip-popup,
+    .badge-info-icon {
+        display: none !important;
     }
 
     thead {
@@ -1120,6 +1202,7 @@
     tr {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
+        height: auto !important;
     }
 }
 
