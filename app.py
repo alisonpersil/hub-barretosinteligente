@@ -359,20 +359,6 @@ def hub_logo():
         return send_file(fallback, mimetype="image/png")
     return ("", 404)
 
-def should_serve_continuous_shell():
-    """
-    Verifica se a requisição do navegador é uma navegação direta de nível superior (top-level).
-    Nesse caso, serve o Shell Contínuo da Central HUB (index.html) para garantir
-    que a Rádio Barretos FM e o player de áudio nunca parem ao transitar no site.
-    Quando embutido em iframe (?embedded=1 ou Sec-Fetch-Dest: iframe) ou ?standalone=1,
-    serve o módulo correspondente.
-    """
-    if request.args.get("embedded") == "1" or request.args.get("standalone") == "1":
-        return False
-    if request.headers.get("Sec-Fetch-Dest") == "iframe":
-        return False
-    return True
-
 # ==============================================================================
 # Rotas: 01 - Consulta de Ofícios (/oficios)
 # ==============================================================================
@@ -380,14 +366,6 @@ def should_serve_continuous_shell():
 @app.route("/oficios/")
 def oficios_index():
     """Serve o sistema Consulta de Ofícios com assets inlined."""
-    if should_serve_continuous_shell():
-        hub_index_path = os.path.join(HUB_DIR, "index.html")
-        if os.path.exists(hub_index_path):
-            resp = make_response(send_file(hub_index_path))
-            resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
-            resp.headers["Pragma"] = "no-cache"
-            return resp
-
     css_path = os.path.join(OFICIOS_STATIC_DIR, "css", "style.css")
     js_path = os.path.join(OFICIOS_STATIC_DIR, "js", "app.js")
     
@@ -571,27 +549,12 @@ def upload_oficios():
 # ==============================================================================
 @app.route("/exati")
 def exati_redirect():
-    """Redireciona para /exati/ garantindo base href correto ou serve shell continuo."""
-    if should_serve_continuous_shell():
-        hub_index_path = os.path.join(HUB_DIR, "index.html")
-        if os.path.exists(hub_index_path):
-            resp = make_response(send_file(hub_index_path))
-            resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
-            resp.headers["Pragma"] = "no-cache"
-            return resp
+    """Redireciona para /exati/ garantindo base href correto."""
     return redirect("/exati/", code=302)
 
 @app.route("/exati/")
 def exati_index():
     """Serve o Painel Executivo do Monitor Exati."""
-    if should_serve_continuous_shell():
-        hub_index_path = os.path.join(HUB_DIR, "index.html")
-        if os.path.exists(hub_index_path):
-            resp = make_response(send_file(hub_index_path))
-            resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
-            resp.headers["Pragma"] = "no-cache"
-            return resp
-
     index_path = os.path.join(EXATI_DIR, "index.html")
     if os.path.exists(index_path):
         resp = make_response(send_file(index_path))
@@ -962,14 +925,6 @@ def bi_estoque_redirect():
 @app.route("/qa/")
 def qa_index():
     """Serve a página de Auditoria & QA do Site."""
-    if should_serve_continuous_shell():
-        hub_index_path = os.path.join(HUB_DIR, "index.html")
-        if os.path.exists(hub_index_path):
-            resp = make_response(send_file(hub_index_path))
-            resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
-            resp.headers["Pragma"] = "no-cache"
-            return resp
-
     index_path = os.path.join(QA_DIR, "index.html")
     if os.path.exists(index_path):
         return send_file(index_path)
@@ -995,14 +950,6 @@ def serve_qa_js_fallback():
 @app.route("/sala-agentes/")
 def sala_agentes_index():
     """Serve o painel executivo da Sala de Agentes Autônomos."""
-    if should_serve_continuous_shell():
-        hub_index_path = os.path.join(HUB_DIR, "index.html")
-        if os.path.exists(hub_index_path):
-            resp = make_response(send_file(hub_index_path))
-            resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
-            resp.headers["Pragma"] = "no-cache"
-            return resp
-
     index_path = os.path.join(SALA_DIR, "index.html")
     if os.path.exists(index_path):
         return send_file(index_path)
@@ -1031,14 +978,6 @@ def serve_sala_file(filename):
 @app.route("/admin/tokens")
 def painel_alison_index():
     """Serve o Painel Alison com autenticação restrita."""
-    if should_serve_continuous_shell():
-        hub_index_path = os.path.join(HUB_DIR, "index.html")
-        if os.path.exists(hub_index_path):
-            resp = make_response(send_file(hub_index_path))
-            resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
-            resp.headers["Pragma"] = "no-cache"
-            return resp
-
     index_path = os.path.join(PAINEL_ALISON_DIR, "index.html")
     if os.path.exists(index_path):
         resp = make_response(send_file(index_path))
@@ -2751,27 +2690,12 @@ def api_sessao_historico(session_id):
 # ==============================================================================
 @app.route("/book")
 def book_redirect():
-    """Redireciona /book para /book/ ou serve shell continuo."""
-    if should_serve_continuous_shell():
-        hub_index_path = os.path.join(HUB_DIR, "index.html")
-        if os.path.exists(hub_index_path):
-            resp = make_response(send_file(hub_index_path))
-            resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
-            resp.headers["Pragma"] = "no-cache"
-            return resp
+    """Redireciona /book para /book/."""
     return redirect("/book/", code=302)
 
 @app.route("/book/")
 def book_index():
     """Serve o Livro de Governança & Inovações (Book)."""
-    if should_serve_continuous_shell():
-        hub_index_path = os.path.join(HUB_DIR, "index.html")
-        if os.path.exists(hub_index_path):
-            resp = make_response(send_file(hub_index_path))
-            resp.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
-            resp.headers["Pragma"] = "no-cache"
-            return resp
-
     index_path = os.path.join(BOOK_DIR, "index.html")
     if os.path.exists(index_path):
         return send_file(index_path)

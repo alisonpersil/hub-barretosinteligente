@@ -474,46 +474,6 @@ body {
 }
 
 /* ==========================================================================
-   Toolbar Operacional Superior (Exclusiva para Ações e Status)
-   ========================================================================== */
-.exati-top-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 1.5rem;
-  background-color: var(--bg-main);
-  border-bottom: 1px solid var(--border-color);
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-[data-theme="dark"] .exati-top-toolbar {
-  background-color: #0b1120;
-  border-bottom-color: #1e2d4a;
-}
-
-.toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.sync-notice-label {
-  font-weight: 600;
-  color: var(--text-muted);
-  font-size: 0.73rem;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-}
-
-/* ==========================================================================
    Subnav Bar (Chips de Navegação 100% Largura - Design Executivo Premium)
    ========================================================================== */
 .subnav-bar {
@@ -531,11 +491,6 @@ body {
   background-color: #0d1527;
   border-bottom-color: #1e2d4a;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
-}
-
-html.is-embedded .subnav-bar,
-body.is-embedded .subnav-bar {
-  top: 0 !important;
 }
 
 .subnav-container {

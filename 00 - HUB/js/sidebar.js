@@ -6,64 +6,6 @@
 (function () {
     'use strict';
 
-    // 1. Se estiver rodando no nível superior diretamente (fora do Shell),
-    // redireciona para o Shell Contínuo para garantir reprodução musical ininterrupta
-    if (window.self === window.top) {
-        const path = window.location.pathname.replace(/\/$/, '') || '/';
-        const isModule = path.startsWith('/oficios') || path.startsWith('/exati') || 
-                         path.startsWith('/sala-agentes') || path.startsWith('/qa') || 
-                         path.startsWith('/painel-alison') || path.startsWith('/book');
-        if (isModule && !window.location.search.includes('standalone=1') && !window.location.search.includes('embedded=1')) {
-            const fullTarget = path + window.location.search + window.location.hash;
-            window.location.replace('/?module=' + encodeURIComponent(fullTarget));
-            return;
-        }
-    }
-
-    // 2. Se estiver embutido no Shell Contínuo da Central HUB
-    if (window.self !== window.top) {
-        document.documentElement.classList.add('is-embedded');
-        if (document.body) document.body.classList.add('is-embedded');
-        window.addEventListener('DOMContentLoaded', () => {
-            document.documentElement.classList.add('is-embedded');
-            if (document.body) document.body.classList.add('is-embedded');
-        });
-
-        // Notifica a janela mãe sobre qualquer interação (clique/toque/tecla) para desbloquear áudio instantaneamente
-        const notifyInteraction = () => {
-            try {
-                window.top.postMessage({ type: 'USER_INTERACTION' }, '*');
-            } catch (_) {}
-        };
-        document.addEventListener('click', notifyInteraction, { passive: true });
-        document.addEventListener('keydown', notifyInteraction, { passive: true });
-        document.addEventListener('touchstart', notifyInteraction, { passive: true });
-
-        // Intercepta cliques internos para coordenar navegação na janela mãe (Shell) sem recarregar o navegador
-        document.addEventListener('click', (e) => {
-            const link = e.target.closest('a');
-            if (!link) return;
-            const href = link.getAttribute('href');
-            if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
-            if (link.target === '_blank' || link.hasAttribute('download') || e.ctrlKey || e.metaKey || e.shiftKey) return;
-
-            try {
-                const targetUrl = new URL(href, window.location.href);
-                if (targetUrl.origin === window.location.origin) {
-                    const targetPath = targetUrl.pathname;
-                    if (targetPath === '/' || targetPath === '/hub' || 
-                        targetPath.startsWith('/oficios') || targetPath.startsWith('/exati') || 
-                        targetPath.startsWith('/sala-agentes') || targetPath.startsWith('/qa') || 
-                        targetPath.startsWith('/painel-alison') || targetPath.startsWith('/book') || 
-                        targetPath.startsWith('/bi')) {
-                        e.preventDefault();
-                        window.top.postMessage({ type: 'NAVIGATE_HUB', url: targetPath + targetUrl.search }, '*');
-                    }
-                }
-            } catch (_) {}
-        });
-    }
-
     function setupSidebar() {
         const btnToggleSidebar = document.getElementById('btnToggleSidebar');
         const hubSidebar = document.getElementById('hubSidebar');
