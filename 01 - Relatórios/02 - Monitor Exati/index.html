@@ -157,133 +157,136 @@
 
       <!-- Workspace Exati -->
       <div class="exati-content-area" style="flex: 1; min-width: 0; display: flex; flex-direction: column;">
-        <!-- ==================== SUBNAV BAR: CHIPS DE NAVEGAÇÃO ENTRE ABAS + BARRA OPERACIONAL EXECUTIVA ==================== -->
+        <!-- ==================== BARRA OPERACIONAL SUPERIOR (TOOLBAR EXECUTIVA) ==================== -->
+        <div class="exati-top-toolbar" id="exati-top-toolbar">
+          <div class="toolbar-left">
+            <!-- AVISO PEQUENO DE DATA E HORA DE ATUALIZAÇÃO DAS PLANILHAS -->
+            <div class="topbar-sync-notice" id="topbar-sync-notice" title="Status das planilhas importadas">
+              <span class="sync-pulse-dot"></span>
+              <div class="sync-notice-text">
+                <span class="sync-notice-label">Sincronização:</span>
+                <span class="sync-notice-val" id="topbar-sync-times">
+                  <span id="time-badge-atendidos">08/10 09:32</span> &bull; 
+                  <span id="time-badge-pendentes">08/10 09:55</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="toolbar-right">
+            <!-- DROPDOWN DE FILTRO DE PERÍODO -->
+            <div class="filter-dropdown-wrapper" id="filter-dropdown-wrapper">
+              <button class="nav-btn btn-filter-trigger" id="btn-filter-trigger" title="Filtrar período ou selecionar datas">
+                <i class="fa-solid fa-calendar-days"></i>
+                <span id="filter-btn-label">Ano 2026</span>
+                <i class="fa-solid fa-chevron-down chevron-icon"></i>
+              </button>
+
+              <!-- Popover do Filtro -->
+              <div class="filter-popover" id="filter-popover">
+                <div class="popover-title-row">
+                  <span class="popover-title">Filtrar Intervalo de Atendimentos</span>
+                  <button class="popover-close" id="btn-close-popover" title="Fechar painel">&times;</button>
+                </div>
+                
+                <div class="popover-section">
+                  <span class="popover-lbl">Atalhos Rápidos:</span>
+                  <div class="popover-presets">
+                    <button class="preset-btn active" data-preset="2026">Ano 2026</button>
+                    <button class="preset-btn" data-preset="30d">Últimos 30 Dias</button>
+                    <button class="preset-btn" data-preset="90d">Últimos 90 Dias</button>
+                    <button class="preset-btn" data-preset="2025">Ano 2025</button>
+                    <button class="preset-btn" data-preset="tudo">Histórico Total</button>
+                  </div>
+                </div>
+
+                <div class="popover-divider"></div>
+
+                <div class="popover-section">
+                  <span class="popover-lbl">Período Personalizado:</span>
+                  <div class="popover-dates-grid">
+                    <div class="popover-input-group">
+                      <label for="filtro-data-inicio">De:</label>
+                      <input type="date" id="filtro-data-inicio" class="date-input" value="2026-01-01">
+                    </div>
+                    <div class="popover-input-group">
+                      <label for="filtro-data-fim">Até:</label>
+                      <input type="date" id="filtro-data-fim" class="date-input" value="2026-10-09">
+                    </div>
+                  </div>
+                  <div class="popover-actions-row">
+                    <button class="btn-filter-apply" id="btn-aplicar-data">Aplicar Filtro</button>
+                    <button class="btn-filter-reset" id="btn-limpar-data" title="Resetar para Ano Atual">Resetar</button>
+                  </div>
+                </div>
+
+                <div class="popover-summary" id="popover-resumo-banner">
+                  Exibindo: Ano 2026 &bull; 2.804 atendimentos &bull; SLA Médio: 3d
+                </div>
+              </div>
+            </div>
+
+            <!-- BOTÃO IMPORTAR -->
+            <button id="btn-abrir-upload" class="nav-btn btn-import" title="Importar nova planilha do Exati (.xlsx)">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span class="btn-import-text">Importar</span>
+            </button>
+
+            <!-- BOTÃO EXPORTAR -->
+            <button id="btn-exportar-excel" class="nav-btn" title="Baixar relatório consolidado em Excel">
+              <i class="fa-solid fa-file-excel"></i>
+              <span>Exportar</span>
+            </button>
+
+            <!-- BOTÃO GERAR PDF -->
+            <button id="btn-imprimir-relatorio" class="nav-btn" title="Imprimir Relatório Executivo ou Salvar como PDF">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>PDF</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- ==================== SUBNAV BAR: CHIPS DE NAVEGAÇÃO ENTRE ABAS ==================== -->
         <nav class="subnav-bar">
-          <div class="subnav-wrapper">
-            <div class="subnav-container">
-              <button class="subnav-chip active" data-target="tab-cockpit" data-title="Cockpit Executivo">
-                <i class="fa-solid fa-gauge-high"></i>
-                <span>Cockpit</span>
-              </button>
+          <div class="subnav-container">
+            <button class="subnav-chip active" data-target="tab-cockpit" data-title="Cockpit Executivo">
+              <i class="fa-solid fa-gauge-high"></i>
+              <span>Cockpit</span>
+            </button>
 
-              <button class="subnav-chip" data-target="tab-simulador" data-title="Simulador Preditivo">
-                <i class="fa-solid fa-chart-line"></i>
-                <span>Simulador</span>
-                <span class="chip-badge highlight">Destaque</span>
-              </button>
+            <button class="subnav-chip" data-target="tab-simulador" data-title="Simulador Preditivo">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Simulador</span>
+              <span class="chip-badge highlight">Destaque</span>
+            </button>
 
-              <button class="subnav-chip" data-target="tab-backlog" data-title="Gestão do Backlog">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                <span>Backlog</span>
-                <span class="chip-badge alert" id="badge-backlog-count">26</span>
-              </button>
+            <button class="subnav-chip" data-target="tab-backlog" data-title="Gestão do Backlog">
+              <i class="fa-solid fa-clock-rotate-left"></i>
+              <span>Backlog</span>
+              <span class="chip-badge alert" id="badge-backlog-count">26</span>
+            </button>
 
-              <button class="subnav-chip" data-target="tab-bairros" data-title="Distribuição Bairros">
-                <i class="fa-solid fa-map-location-dot"></i>
-                <span>Bairros</span>
-              </button>
+            <button class="subnav-chip" data-target="tab-bairros" data-title="Distribuição Bairros">
+              <i class="fa-solid fa-map-location-dot"></i>
+              <span>Bairros</span>
+            </button>
 
-              <button class="subnav-chip" data-target="tab-analitico" data-title="Tabela Analítica (Full)" data-sub="Detalhamento linha a linha de todas as 2.884 solicitações (Atendimentos + Backlog), tempos de resolução e auditoria HUB">
-                <i class="fa-solid fa-table-list"></i>
-                <span>Tabela Analítica</span>
-                <span class="chip-badge highlight" id="badge-analitico-count">2.884</span>
-              </button>
+            <button class="subnav-chip" data-target="tab-analitico" data-title="Tabela Analítica (Full)" data-sub="Detalhamento linha a linha de todas as 2.884 solicitações (Atendimentos + Backlog), tempos de resolução e auditoria HUB">
+              <i class="fa-solid fa-table-list"></i>
+              <span>Tabela Analítica</span>
+              <span class="chip-badge highlight" id="badge-analitico-count">2.884</span>
+            </button>
 
-              <button class="subnav-chip highlight-star" data-target="tab-pitch" data-title="Resumo do Dia • Marcela" data-sub="Síntese diária da operação e decisões estratégicas para diretoria">
-                <i class="fa-solid fa-star"></i>
-                <span>Resumo do Dia</span>
-                <span class="chip-badge star-badge">Marcela</span>
-              </button>
+            <button class="subnav-chip highlight-star" data-target="tab-pitch" data-title="Resumo do Dia • Marcela" data-sub="Síntese diária da operação e decisões estratégicas para diretoria">
+              <i class="fa-solid fa-star"></i>
+              <span>Resumo do Dia</span>
+              <span class="chip-badge star-badge">Marcela</span>
+            </button>
 
-              <button class="subnav-chip" data-target="tab-powerbi" data-title="Guia Power BI (DAX)">
-                <i class="fa-solid fa-chart-simple"></i>
-                <span>Power BI (DAX)</span>
-              </button>
-            </div>
-
-            <!-- Ações Operacionais Exati: Sempre visíveis e integradas -->
-            <div class="subnav-actions">
-              <!-- AVISO PEQUENO DE DATA E HORA DE ATUALIZAÇÃO DAS PLANILHAS -->
-              <div class="topbar-sync-notice" id="topbar-sync-notice" title="Status das planilhas importadas">
-                <span class="sync-pulse-dot"></span>
-                <div class="sync-notice-text">
-                  <span class="sync-notice-val" id="topbar-sync-times">
-                    <span id="time-badge-atendidos">08/10 09:32</span> &bull; 
-                    <span id="time-badge-pendentes">08/10 09:55</span>
-                  </span>
-                </div>
-              </div>
-
-              <!-- DROPDOWN DE FILTRO DE PERÍODO -->
-              <div class="filter-dropdown-wrapper" id="filter-dropdown-wrapper">
-                <button class="nav-btn btn-filter-trigger" id="btn-filter-trigger" title="Filtrar período ou selecionar datas">
-                  <i class="fa-solid fa-calendar-days"></i>
-                  <span id="filter-btn-label">Ano 2026</span>
-                  <i class="fa-solid fa-chevron-down chevron-icon"></i>
-                </button>
-
-                <!-- Popover do Filtro -->
-                <div class="filter-popover" id="filter-popover">
-                  <div class="popover-title-row">
-                    <span class="popover-title">Filtrar Intervalo de Atendimentos</span>
-                    <button class="popover-close" id="btn-close-popover" title="Fechar painel">&times;</button>
-                  </div>
-                  
-                  <div class="popover-section">
-                    <span class="popover-lbl">Atalhos Rápidos:</span>
-                    <div class="popover-presets">
-                      <button class="preset-btn active" data-preset="2026">Ano 2026</button>
-                      <button class="preset-btn" data-preset="30d">Últimos 30 Dias</button>
-                      <button class="preset-btn" data-preset="90d">Últimos 90 Dias</button>
-                      <button class="preset-btn" data-preset="2025">Ano 2025</button>
-                      <button class="preset-btn" data-preset="tudo">Histórico Total</button>
-                    </div>
-                  </div>
-
-                  <div class="popover-divider"></div>
-
-                  <div class="popover-section">
-                    <span class="popover-lbl">Período Personalizado:</span>
-                    <div class="popover-dates-grid">
-                      <div class="popover-input-group">
-                        <label for="filtro-data-inicio">De:</label>
-                        <input type="date" id="filtro-data-inicio" class="date-input" value="2026-01-01">
-                      </div>
-                      <div class="popover-input-group">
-                        <label for="filtro-data-fim">Até:</label>
-                        <input type="date" id="filtro-data-fim" class="date-input" value="2026-10-09">
-                      </div>
-                    </div>
-                    <div class="popover-actions-row">
-                      <button class="btn-filter-apply" id="btn-aplicar-data">Aplicar Filtro</button>
-                      <button class="btn-filter-reset" id="btn-limpar-data" title="Resetar para Ano Atual">Resetar</button>
-                    </div>
-                  </div>
-
-                  <div class="popover-summary" id="popover-resumo-banner">
-                    Exibindo: Ano 2026 &bull; 2.804 atendimentos &bull; SLA Médio: 3d
-                  </div>
-                </div>
-              </div>
-
-              <!-- BOTÃO IMPORTAR -->
-              <button id="btn-abrir-upload" class="nav-btn btn-import" title="Importar nova planilha do Exati (.xlsx)">
-                <i class="fa-solid fa-cloud-arrow-up"></i>
-                <span class="btn-import-text">Importar</span>
-              </button>
-
-              <!-- BOTÃO EXPORTAR -->
-              <button id="btn-exportar-excel" class="nav-btn" title="Baixar relatório consolidado em Excel">
-                <i class="fa-solid fa-file-excel"></i>
-                <span>Exportar</span>
-              </button>
-
-              <!-- BOTÃO GERAR PDF -->
-              <button id="btn-imprimir-relatorio" class="nav-btn" title="Imprimir Relatório Executivo ou Salvar como PDF">
-                <i class="fa-solid fa-file-pdf"></i>
-                <span>PDF</span>
-              </button>
-            </div>
+            <button class="subnav-chip" data-target="tab-powerbi" data-title="Guia Power BI (DAX)">
+              <i class="fa-solid fa-chart-simple"></i>
+              <span>Power BI (DAX)</span>
+            </button>
           </div>
         </nav>
 
