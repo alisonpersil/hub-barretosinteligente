@@ -1020,5 +1020,108 @@
     }
 }
 
+/* ==========================================================================
+   REGRAS GLOBAIS DE IMPRESSÃO / EXPORTAÇÃO EM PDF (@media print)
+   Garante remoção da barra lateral, topo, endbar (.hub-footer) e widgets
+   em todas as páginas do ecossistema, evitando sobreposição em tabelas e dados.
+   ========================================================================== */
+@media print {
+    /* 1. Ocultar completamente a navegação de tela, sidebar e endbar oficial */
+    .hub-footer,
+    footer.hub-footer,
+    footer,
+    .hub-sidebar,
+    .sidebar,
+    .sidebar-backdrop,
+    .sidebar-toggle-btn,
+    .navbar,
+    .hub-navbar,
+    .topbar,
+    .subnav-bar,
+    .subnav-container,
+    .radio-toast,
+    .modal-overlay,
+    .toast,
+    .nav-btn,
+    .btn-header,
+    .filter-popover,
+    .btn-filter-trigger,
+    .filter-dropdown-wrapper {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    /* 2. Resetar containers de layout para fluxo paginado natural */
+    html, body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .hub-layout,
+    .hub-body-wrapper,
+    .hub-main-area,
+    .app-layout,
+    .main-container,
+    .exati-content-area,
+    .chat-content-area,
+    .content-body,
+    .main-content {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        position: static !important;
+        float: none !important;
+    }
+
+    /* 3. Permitir que tabelas e seus cards quebrem páginas perfeitamente */
+    .card:has(table),
+    .card:has(.table-responsive),
+    .table-responsive,
+    table,
+    .data-table {
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+    }
+
+    .table-responsive {
+        overflow: visible !important;
+        max-height: none !important;
+        height: auto !important;
+        display: block !important;
+    }
+
+    thead {
+        display: table-header-group !important;
+    }
+
+    tbody {
+        display: table-row-group !important;
+    }
+
+    tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+}
+
 
 

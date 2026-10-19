@@ -2961,3 +2961,80 @@ body {
     }
 }
 
+/* ==========================================================================
+   REGRAS DE IMPRESSÃO / EXPORTAÇÃO EM PDF (@media print)
+   ========================================================================== */
+@media print {
+    .hub-footer,
+    footer.hub-footer,
+    footer,
+    .hub-sidebar,
+    .sidebar,
+    .sidebar-backdrop,
+    .sidebar-toggle-btn,
+    .navbar,
+    .hub-navbar,
+    .topbar,
+    .radio-toast,
+    .chat-hero,
+    .prompt-box-wrapper,
+    .documents-header-controls,
+    .pagination-wrapper,
+    .modal-overlay {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    html, body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .app-layout,
+    .hub-main-area,
+    .main-container,
+    .documents-table-wrapper {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: visible !important;
+        position: static !important;
+    }
+
+    .documents-table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+    }
+
+    .documents-table thead {
+        display: table-header-group !important;
+    }
+
+    .documents-table tbody {
+        display: table-row-group !important;
+    }
+
+    .documents-table tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+}
+

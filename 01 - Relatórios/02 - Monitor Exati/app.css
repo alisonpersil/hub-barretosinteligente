@@ -2307,33 +2307,6 @@ body {
   opacity: 1;
 }
 
-/* Print Stylesheet (Exportar PDF Executivo) */
-@media print {
-  body {
-    background: #fff !important;
-    color: #000 !important;
-  }
-  .header-meta, .btn-header, .nav-tabs, .simulator-hero, .btn-refresh, .search-input, .modal-overlay {
-    display: none !important;
-  }
-  .app-container {
-    padding: 0 !important;
-    max-width: 100% !important;
-  }
-  .tab-content {
-    display: block !important;
-  }
-  .card, .kpi-card {
-    border: 1px solid #ddd !important;
-    box-shadow: none !important;
-    page-break-inside: avoid;
-    background: #fff !important;
-  }
-  .kpi-value, .kpi-title, .card-title {
-    color: #000 !important;
-  }
-}
-
 @media (max-width: 1024px) {
   .sidebar {
     position: fixed;
@@ -3136,31 +3109,65 @@ body {
     padding: 0 !important;
   }
 
-  /* Ocultar elementos de navegação de tela e botões */
+  /* Ocultar elementos de navegação de tela, sidebar, endbar oficial e botões */
   .sticky-header-wrapper,
   .navbar,
   .subnav-bar,
   .subnav-container,
   .sidebar,
+  .hub-sidebar,
+  .hub-footer,
+  footer,
+  .sidebar-backdrop,
+  .sidebar-toggle-btn,
   .topbar,
   .btn-sidebar-collapse,
   .modal-overlay,
   .toast,
+  .radio-toast,
   .btn-copy,
   .filter-popover,
   .btn-filter-trigger,
-  .filter-dropdown-wrapper {
+  .filter-dropdown-wrapper,
+  .nav-right,
+  .nav-btn,
+  .btn-header,
+  .search-input,
+  .btn-import,
+  .btn-export-excel,
+  #btn-exportar-analitico,
+  #btn-exportar-excel,
+  #btn-imprimir-relatorio,
+  #btn-abrir-upload,
+  #btn-toggle-theme,
+  #btnToggleSidebar,
+  #banner-filtro-grafico,
+  .filter-mode-switch,
+  .btn-clear-filter {
     display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
   }
 
-  /* Desbloquear containers flex e viewport */
+  /* Desbloquear containers flex e viewport para fluxo paginado natural sem sobreposição */
   .app-layout,
+  .hub-layout,
+  .hub-body-wrapper,
+  .hub-main-area,
+  .exati-content-area,
   .main-content,
   .content-body,
   .main-container {
     display: block !important;
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
     height: auto !important;
@@ -3168,6 +3175,7 @@ body {
     overflow: visible !important;
     position: static !important;
     background: transparent !important;
+    float: none !important;
   }
 
   /* Exibir Cabeçalho Executivo de Impressão */
@@ -3334,6 +3342,14 @@ body {
     margin-bottom: 12px !important;
   }
 
+  /* Cards que contêm tabelas devem quebrar páginas naturalmente */
+  .card:has(table),
+  .card:has(.table-responsive),
+  .card.table-card {
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
   .card-header h2, .card-header h3 {
     color: #0f172a !important;
     font-size: 10pt !important;
@@ -3358,13 +3374,28 @@ body {
   /* Tabelas */
   .table-responsive {
     overflow: visible !important;
+    max-height: none !important;
+    height: auto !important;
     width: 100% !important;
+    display: block !important;
   }
 
-  table {
+  table,
+  .data-table,
+  .analitico-table {
     width: 100% !important;
     border-collapse: collapse !important;
     font-size: 8pt !important;
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+  }
+
+  thead {
+    display: table-header-group !important;
+  }
+
+  tbody {
+    display: table-row-group !important;
   }
 
   th {
