@@ -919,6 +919,19 @@ def bi_estoque_redirect():
     return redirect(POWER_BI_ESTOQUE_URL, code=302)
 
 # ==============================================================================
+# Rotas: BI PMO (Redirecionamento Power BI)
+# ==============================================================================
+POWER_BI_PMO_URL = "https://app.powerbi.com/links/JFXSnNv-2H?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare"
+
+@app.route("/bi-pmo")
+@app.route("/bi-pmo/")
+@app.route("/pmo")
+@app.route("/pmo/")
+def bi_pmo_redirect():
+    """Redireciona para o painel oficial do BI PMO no Power BI."""
+    return redirect(POWER_BI_PMO_URL, code=302)
+
+# ==============================================================================
 # Rotas: 03 - QA do Site (/qa)
 # ==============================================================================
 @app.route("/qa")

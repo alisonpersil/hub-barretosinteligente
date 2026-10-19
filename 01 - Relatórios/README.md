@@ -23,7 +23,11 @@ Este diretório contém os relatórios executivos e ferramentas de inteligência
    - Relatório em Power BI com indicadores de estoque, materiais e almoxarifado operacional.
    - Acesso em nuvem integrado com autenticação Microsoft/Power BI.
 
-4. **[03 - QA do Site](./03%20-%20QA%20do%20Site/)**:
+4. **[BI PMO (Power BI)](https://app.powerbi.com/links/JFXSnNv-2H?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare)**:
+   - Dashboard em Power BI com indicadores de gestão de projetos (PMO), cronogramas e avanço físico-operacional.
+   - Acesso em nuvem integrado com autenticação Microsoft/Power BI.
+
+5. **[03 - QA do Site](./03%20-%20QA%20do%20Site/)**:
    - Painel executivo de auditoria contínua, telemetria de latência e validação de rotas do ecossistema CCO.
 
 ---

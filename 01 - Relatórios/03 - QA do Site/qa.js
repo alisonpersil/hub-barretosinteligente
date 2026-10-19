@@ -11,6 +11,7 @@
         { name: "Consulta de Ofícios", path: "/oficios", category: "Relatórios", target: 200 },
         { name: "Monitor Exati CCO", path: "/exati/", category: "Relatórios", target: 200 },
         { name: "BI Estoque (Power BI)", path: "/bi-estoque", category: "Relatórios", target: 302 },
+        { name: "BI PMO (Power BI)", path: "/bi-pmo", category: "Relatórios", target: 302 },
         { name: "QA do Site", path: "/qa", category: "Relatórios", target: 200 },
         { name: "Sala de Agentes Autônomos", path: "/sala-agentes", category: "Automações", target: 200 },
         { name: "Book de Governança", path: "/book/", category: "Book", target: 200 },
