@@ -19,15 +19,19 @@ Este diretório contém os relatórios executivos e ferramentas de inteligência
    - Gráficos por bairro, tipos de lâmpadas e motivos de cancelamento.
    - Suporte a importação direta de planilhas Excel do sistema Exati.
 
-3. **[BI Estoque (Power BI)](https://app.powerbi.com/links/31OdxYhV_S?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare)**:
+3. **[BI Financeiro (Power BI)](https://app.powerbi.com/links/XpQMjlIZWg?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare&bookmarkGuid=72ea6fc5-3f5b-43fd-a4a5-baad9b97a1fc)**:
+   - Relatório em Power BI com indicadores financeiros, orçamentários e fluxo da concessão.
+   - Acesso em nuvem integrado com autenticação Microsoft/Power BI.
+
+4. **[BI Estoque (Power BI)](https://app.powerbi.com/links/31OdxYhV_S?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare)**:
    - Relatório em Power BI com indicadores de estoque, materiais e almoxarifado operacional.
    - Acesso em nuvem integrado com autenticação Microsoft/Power BI.
 
-4. **[BI PMO (Power BI)](https://app.powerbi.com/links/JFXSnNv-2H?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare)**:
+5. **[BI PMO (Power BI)](https://app.powerbi.com/links/JFXSnNv-2H?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare)**:
    - Dashboard em Power BI com indicadores de gestão de projetos (PMO), cronogramas e avanço físico-operacional.
    - Acesso em nuvem integrado com autenticação Microsoft/Power BI.
 
-5. **[03 - QA do Site](./03%20-%20QA%20do%20Site/)**:
+6. **[03 - QA do Site](./03%20-%20QA%20do%20Site/)**:
    - Painel executivo de auditoria contínua, telemetria de latência e validação de rotas do ecossistema CCO.
 
 ---

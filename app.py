@@ -906,6 +906,19 @@ def fallback_logo_horizontal():
     return send_from_directory(EXATI_DIR, "logo-ipbarretos-horizontal-alta.png")
 
 # ==============================================================================
+# Rotas: BI Financeiro (Redirecionamento Power BI)
+# ==============================================================================
+POWER_BI_FINANCEIRO_URL = "https://app.powerbi.com/links/XpQMjlIZWg?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare&bookmarkGuid=72ea6fc5-3f5b-43fd-a4a5-baad9b97a1fc"
+
+@app.route("/bi-financeiro")
+@app.route("/bi-financeiro/")
+@app.route("/financeiro")
+@app.route("/financeiro/")
+def bi_financeiro_redirect():
+    """Redireciona para o painel oficial do BI Financeiro no Power BI."""
+    return redirect(POWER_BI_FINANCEIRO_URL, code=302)
+
+# ==============================================================================
 # Rotas: BI Estoque (Redirecionamento Power BI)
 # ==============================================================================
 POWER_BI_ESTOQUE_URL = "https://app.powerbi.com/links/31OdxYhV_S?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare"
