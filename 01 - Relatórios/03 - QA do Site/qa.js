@@ -13,6 +13,7 @@
         { name: "BI Financeiro (Power BI)", path: "/bi-financeiro", category: "Relatórios", target: 302 },
         { name: "BI Estoque (Power BI)", path: "/bi-estoque", category: "Relatórios", target: 302 },
         { name: "BI PMO (Power BI)", path: "/bi-pmo", category: "Relatórios", target: 302 },
+        { name: "BI Energia (Power BI)", path: "/bi-energia", category: "Relatórios", target: 302 },
         { name: "QA do Site", path: "/qa", category: "Relatórios", target: 200 },
         { name: "Sala de Agentes Autônomos", path: "/sala-agentes", category: "Automações", target: 200 },
         { name: "Book de Governança", path: "/book/", category: "Book", target: 200 },

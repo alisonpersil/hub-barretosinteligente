@@ -945,6 +945,19 @@ def bi_pmo_redirect():
     return redirect(POWER_BI_PMO_URL, code=302)
 
 # ==============================================================================
+# Rotas: BI Energia (Redirecionamento Power BI)
+# ==============================================================================
+POWER_BI_ENERGIA_URL = "https://app.powerbi.com/links/kLX_5olJoV?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare"
+
+@app.route("/bi-energia")
+@app.route("/bi-energia/")
+@app.route("/energia")
+@app.route("/energia/")
+def bi_energia_redirect():
+    """Redireciona para o painel oficial do BI Energia no Power BI."""
+    return redirect(POWER_BI_ENERGIA_URL, code=302)
+
+# ==============================================================================
 # Rotas: 03 - QA do Site (/qa)
 # ==============================================================================
 @app.route("/qa")

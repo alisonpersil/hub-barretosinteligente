@@ -63,6 +63,7 @@ O ecossistema **Barretos Inteligente** foi concebido para entregar portais e fer
     * `BI Financeiro` (`fa-coins`, acento âmbar, redireciona para Power BI).
     * `BI Estoque` (`fa-chart-column`, acento âmbar, redireciona para Power BI).
     * `BI PMO` (`fa-diagram-project`, acento âmbar, redireciona para Power BI).
+    * `BI Energia` (`fa-bolt`, acento âmbar, redireciona para Power BI).
     * `QA do Site` (`fa-shield-halved`, acento roxo).
     * `Painel Alison` (`fa-user-shield`, acento verde).
   * `Automações` (`fa-bolt`): Badge *"Sala de Agentes"*.
