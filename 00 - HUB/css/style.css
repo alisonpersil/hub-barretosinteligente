@@ -481,6 +481,44 @@ body {
     border-radius: 2px;
 }
 
+/* Divisores e Cabeçalhos de Seções do Submenu */
+.sidebar-submenu-heading {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-dim, #94a3b8);
+    padding: 8px 10px 4px 4px;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sidebar-submenu-heading:first-child {
+    padding-top: 2px;
+}
+
+.sidebar-submenu-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color, #e2e8f0);
+    opacity: 0.6;
+}
+
+[data-theme="dark"] .sidebar-submenu-heading {
+    color: #64748b;
+}
+
+[data-theme="dark"] .sidebar-submenu-heading::after {
+    background: var(--border-color, #1e2d4a);
+}
+
+.hub-sidebar.collapsed .sidebar-submenu-heading {
+    display: none !important;
+}
+
 .sidebar-subitem {
     display: flex;
     align-items: center;
@@ -715,7 +753,211 @@ body {
 }
 
 /* ==========================================================================
-   Portal Cards Grid (Os 2 Destaques Centrais)
+   Relatórios: Grade Executiva em 3 Colunas (BI, Programas, Sistema)
+   ========================================================================== */
+#panelRelatorios .hub-container {
+    max-width: 1200px;
+}
+
+.reports-columns-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    width: 100%;
+    margin: 0 auto;
+    align-items: start;
+}
+
+.reports-column {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border-color);
+    border-radius: 22px;
+    padding: 20px 18px 22px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-card);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.reports-column:hover {
+    border-color: rgba(37, 99, 235, 0.28);
+    box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="dark"] .reports-column {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .reports-column:hover {
+    border-color: rgba(59, 130, 246, 0.35);
+    box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.35);
+}
+
+/* Col Top Accent Line */
+.reports-column::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3.5px;
+    background: var(--accent-emerald);
+}
+
+.reports-column.col-bi::before {
+    background: #f59e0b;
+}
+
+.reports-column.col-programas::before {
+    background: var(--accent-blue);
+}
+
+.reports-column.col-sistema::before {
+    background: #8b5cf6;
+}
+
+/* Header da Coluna */
+.reports-column-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.col-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
+}
+
+.col-header-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+.col-header-icon.amber {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.col-header-icon.blue {
+    background: var(--accent-blue-glow);
+    color: var(--accent-blue);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+}
+
+.col-header-icon.purple {
+    background: rgba(139, 92, 246, 0.12);
+    color: #8b5cf6;
+    border: 1px solid rgba(139, 92, 246, 0.25);
+}
+
+.col-header-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.col-title {
+    font-size: 16.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+}
+
+.col-desc {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.col-badge {
+    padding: 3px 9px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
+.col-badge.amber {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+}
+
+.col-badge.blue {
+    background: var(--accent-blue-glow);
+    color: var(--accent-blue);
+}
+
+.col-badge.purple {
+    background: rgba(139, 92, 246, 0.12);
+    color: #8b5cf6;
+}
+
+[data-theme="dark"] .col-badge.amber {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fbbf24;
+}
+
+[data-theme="dark"] .col-badge.blue {
+    background: rgba(37, 99, 235, 0.2);
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .col-badge.purple {
+    background: rgba(139, 92, 246, 0.2);
+    color: #c084fc;
+}
+
+/* Lista de Cards dentro da Coluna */
+.reports-column-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+}
+
+.reports-column-cards .portal-card {
+    width: 100%;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+@media (max-width: 992px) {
+    .reports-columns-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .reports-column.col-sistema {
+        grid-column: span 2;
+    }
+}
+
+@media (max-width: 680px) {
+    .reports-columns-grid {
+        grid-template-columns: 1fr;
+    }
+    .reports-column.col-sistema {
+        grid-column: span 1;
+    }
+}
+
+/* ==========================================================================
+   Portal Cards Grid (Para Automações e Book)
    ========================================================================== */
 .portal-grid {
     display: grid;

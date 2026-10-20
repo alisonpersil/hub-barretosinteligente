@@ -592,6 +592,44 @@
     background: var(--border-color, #1e2d4a);
 }
 
+/* Divisores e Cabeçalhos de Seções do Submenu */
+.sidebar-submenu-heading {
+    font-size: 9.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-dim, #94a3b8);
+    padding: 8px 10px 4px 4px;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.sidebar-submenu-heading:first-child {
+    padding-top: 2px;
+}
+
+.sidebar-submenu-heading::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-color, #e2e8f0);
+    opacity: 0.6;
+}
+
+[data-theme="dark"] .sidebar-submenu-heading {
+    color: #64748b;
+}
+
+[data-theme="dark"] .sidebar-submenu-heading::after {
+    background: var(--border-color, #1e2d4a);
+}
+
+.hub-sidebar.collapsed .sidebar-submenu-heading {
+    display: none !important;
+}
+
 .sidebar-subitem {
     display: flex;
     align-items: center;

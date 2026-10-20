@@ -85,14 +85,7 @@
 
                             <!-- Submenu com as páginas vinculadas a Relatórios -->
                             <div class="sidebar-submenu" id="subRelatorios" style="display: none;">
-                                <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Acessar Consulta de Ofícios">
-                                    <i class="fa-solid fa-folder-open sub-icon green"></i>
-                                    <span class="sub-text">Consulta de Ofícios</span>
-                                </a>
-                                <a href="/exati" class="sidebar-subitem" id="sideLinkExati" title="Acessar Monitor Exati">
-                                    <i class="fa-solid fa-chart-line sub-icon blue"></i>
-                                    <span class="sub-text">Monitor Exati</span>
-                                </a>
+                                <div class="sidebar-submenu-heading"><i class="fa-solid fa-chart-pie"></i> BI</div>
                                 <a href="https://app.powerbi.com/links/XpQMjlIZWg?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare&bookmarkGuid=72ea6fc5-3f5b-43fd-a4a5-baad9b97a1fc" target="_blank" rel="noopener noreferrer" class="sidebar-subitem" id="sideLinkBIFinanceiro" title="Acessar BI Financeiro (Power BI)" data-created-at="2026-10-19">
                                     <i class="fa-solid fa-coins sub-icon amber"></i>
                                     <span class="sub-text">BI Financeiro</span>
@@ -108,6 +101,18 @@
                                     <span class="sub-text">BI PMO</span>
                                     <span class="sub-badge-novo">NOVO</span>
                                 </a>
+
+                                <div class="sidebar-submenu-heading"><i class="fa-solid fa-laptop-code"></i> Programas</div>
+                                <a href="/oficios" class="sidebar-subitem" id="sideLinkOficios" title="Acessar Consulta de Ofícios">
+                                    <i class="fa-solid fa-folder-open sub-icon green"></i>
+                                    <span class="sub-text">Consulta de Ofícios</span>
+                                </a>
+                                <a href="/exati" class="sidebar-subitem" id="sideLinkExati" title="Acessar Monitor Exati">
+                                    <i class="fa-solid fa-chart-line sub-icon blue"></i>
+                                    <span class="sub-text">Monitor Exati</span>
+                                </a>
+
+                                <div class="sidebar-submenu-heading"><i class="fa-solid fa-gears"></i> Sistema</div>
                                 <a href="/qa" class="sidebar-subitem" id="sideLinkQA" title="Acessar QA do Site">
                                     <i class="fa-solid fa-shield-halved sub-icon purple"></i>
                                     <span class="sub-text">QA do Site</span>
@@ -171,7 +176,7 @@
                                         <i class="fa-solid fa-chart-pie"></i>
                                     </div>
                                     <h2 class="portal-name">Relatórios</h2>
-                                    <p class="module-home-desc">Consulta de Ofícios, Monitor Exati, BI e QA</p>
+                                    <p class="module-home-desc">BI, Programas operacionais e Sistema</p>
                                     <div class="portal-action-btn">
                                         <span>Acessar Módulo</span>
                                         <i class="fa-solid fa-arrow-right"></i>
@@ -209,7 +214,7 @@
                         </div>
                     </section>
 
-                    <!-- PAINEL 1: RELATÓRIOS (Contém Consulta de Ofícios e Monitor Exati) -->
+                    <!-- PAINEL 1: RELATÓRIOS (Estruturado em 3 Colunas: BI, Programas e Sistema) -->
                     <section class="hub-tab-panel" id="panelRelatorios">
                         <div class="hub-container">
                             <div class="back-nav-bar">
@@ -221,103 +226,155 @@
 
                             <header class="hub-header">
                                 <h1 class="hub-title">Módulo de <span>Relatórios</span></h1>
-                                <p class="hub-subtitle">Painéis de inteligência documental e operações</p>
+                                <p class="hub-subtitle">Painéis de inteligência executiva, programas operacionais e governança</p>
                             </header>
 
-                            <div class="portal-grid">
-                                <!-- Card 1: Consulta de Ofícios -->
-                                <a href="/oficios" class="portal-card oficios-card" id="cardOficios" title="Acessar Consulta de Ofícios">
-                                    <div class="portal-card-glow"></div>
-                                    <div class="portal-icon-box">
-                                        <i class="fa-solid fa-folder-open"></i>
+                            <!-- Grade Executiva em 3 Colunas -->
+                            <div class="reports-columns-grid">
+                                <!-- Coluna 1: BI -->
+                                <div class="reports-column col-bi">
+                                    <div class="reports-column-header">
+                                        <div class="col-header-left">
+                                            <div class="col-header-icon amber">
+                                                <i class="fa-solid fa-chart-pie"></i>
+                                            </div>
+                                            <div class="col-header-info">
+                                                <h3 class="col-title">BI</h3>
+                                                <span class="col-desc">Dashboards Gerenciais</span>
+                                            </div>
+                                        </div>
+                                        <span class="col-badge amber">3 BIs</span>
                                     </div>
-                                    <h2 class="portal-name">Consulta de Ofícios</h2>
-                                    <div class="portal-action-btn" id="btnOpenOficios">
-                                        <span>Acessar Painel de Ofícios</span>
-                                        <i class="fa-solid fa-arrow-right"></i>
-                                    </div>
-                                </a>
+                                    <div class="reports-column-cards">
+                                        <!-- Card 1: BI Financeiro -->
+                                        <a href="https://app.powerbi.com/links/XpQMjlIZWg?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare&bookmarkGuid=72ea6fc5-3f5b-43fd-a4a5-baad9b97a1fc" target="_blank" rel="noopener noreferrer" class="portal-card bi-card" id="cardBIFinanceiro" title="Acessar BI Financeiro no Power BI" data-created-at="2026-10-19">
+                                            <div class="portal-card-glow glow-amber"></div>
+                                            <span class="portal-badge-novo"><span class="badge-dot"></span>NOVO</span>
+                                            <div class="portal-icon-box amber">
+                                                <i class="fa-solid fa-coins"></i>
+                                            </div>
+                                            <h2 class="portal-name">BI Financeiro</h2>
+                                            <div class="portal-action-btn amber" id="btnOpenBIFinanceiro">
+                                                <span>Acessar Power BI</span>
+                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                            </div>
+                                        </a>
 
-                                <!-- Card 2: Monitor Exati -->
-                                <a href="/exati" class="portal-card exati-card" id="cardExati" title="Acessar Monitor Exati">
-                                    <div class="portal-card-glow"></div>
-                                    <div class="portal-icon-box">
-                                        <i class="fa-solid fa-chart-line"></i>
-                                    </div>
-                                    <h2 class="portal-name">Monitor Exati</h2>
-                                    <div class="portal-action-btn blue" id="btnOpenExati">
-                                        <span>Acessar Monitor Exati</span>
-                                        <i class="fa-solid fa-arrow-right"></i>
-                                    </div>
-                                </a>
+                                        <!-- Card 2: BI Estoque -->
+                                        <a href="https://app.powerbi.com/links/31OdxYhV_S?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare" target="_blank" rel="noopener noreferrer" class="portal-card bi-card" id="cardBIEstoque" title="Acessar BI Estoque no Power BI" data-created-at="2026-10-15">
+                                            <div class="portal-card-glow glow-amber"></div>
+                                            <span class="portal-badge-novo"><span class="badge-dot"></span>NOVO</span>
+                                            <div class="portal-icon-box amber">
+                                                <i class="fa-solid fa-chart-column"></i>
+                                            </div>
+                                            <h2 class="portal-name">BI Estoque</h2>
+                                            <div class="portal-action-btn amber" id="btnOpenBIEstoque">
+                                                <span>Acessar Power BI</span>
+                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                            </div>
+                                        </a>
 
-                                <!-- Card 3: BI Financeiro -->
-                                <a href="https://app.powerbi.com/links/XpQMjlIZWg?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare&bookmarkGuid=72ea6fc5-3f5b-43fd-a4a5-baad9b97a1fc" target="_blank" rel="noopener noreferrer" class="portal-card bi-card" id="cardBIFinanceiro" title="Acessar BI Financeiro no Power BI" data-created-at="2026-10-19">
-                                    <div class="portal-card-glow glow-amber"></div>
-                                    <span class="portal-badge-novo"><span class="badge-dot"></span>NOVO</span>
-                                    <div class="portal-icon-box amber">
-                                        <i class="fa-solid fa-coins"></i>
+                                        <!-- Card 3: BI PMO -->
+                                        <a href="https://app.powerbi.com/links/JFXSnNv-2H?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare" target="_blank" rel="noopener noreferrer" class="portal-card bi-card" id="cardBIPMO" title="Acessar BI PMO no Power BI" data-created-at="2026-10-19">
+                                            <div class="portal-card-glow glow-amber"></div>
+                                            <span class="portal-badge-novo"><span class="badge-dot"></span>NOVO</span>
+                                            <div class="portal-icon-box amber">
+                                                <i class="fa-solid fa-diagram-project"></i>
+                                            </div>
+                                            <h2 class="portal-name">BI PMO</h2>
+                                            <div class="portal-action-btn amber" id="btnOpenBIPMO">
+                                                <span>Acessar Power BI</span>
+                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                            </div>
+                                        </a>
                                     </div>
-                                    <h2 class="portal-name">BI Financeiro</h2>
-                                    <div class="portal-action-btn amber" id="btnOpenBIFinanceiro">
-                                        <span>Acessar Power BI</span>
-                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                    </div>
-                                </a>
+                                </div>
 
-                                <!-- Card 4: BI Estoque -->
-                                <a href="https://app.powerbi.com/links/31OdxYhV_S?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare" target="_blank" rel="noopener noreferrer" class="portal-card bi-card" id="cardBIEstoque" title="Acessar BI Estoque no Power BI" data-created-at="2026-10-15">
-                                    <div class="portal-card-glow glow-amber"></div>
-                                    <span class="portal-badge-novo"><span class="badge-dot"></span>NOVO</span>
-                                    <div class="portal-icon-box amber">
-                                        <i class="fa-solid fa-chart-column"></i>
+                                <!-- Coluna 2: Programas -->
+                                <div class="reports-column col-programas">
+                                    <div class="reports-column-header">
+                                        <div class="col-header-left">
+                                            <div class="col-header-icon blue">
+                                                <i class="fa-solid fa-laptop-code"></i>
+                                            </div>
+                                            <div class="col-header-info">
+                                                <h3 class="col-title">Programas</h3>
+                                                <span class="col-desc">Operação & Processos</span>
+                                            </div>
+                                        </div>
+                                        <span class="col-badge blue">2 Ferramentas</span>
                                     </div>
-                                    <h2 class="portal-name">BI Estoque</h2>
-                                    <div class="portal-action-btn amber" id="btnOpenBIEstoque">
-                                        <span>Acessar Power BI</span>
-                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                    </div>
-                                </a>
+                                    <div class="reports-column-cards">
+                                        <!-- Card 1: Consulta de Ofícios -->
+                                        <a href="/oficios" class="portal-card oficios-card" id="cardOficios" title="Acessar Consulta de Ofícios">
+                                            <div class="portal-card-glow"></div>
+                                            <div class="portal-icon-box">
+                                                <i class="fa-solid fa-folder-open"></i>
+                                            </div>
+                                            <h2 class="portal-name">Consulta de Ofícios</h2>
+                                            <div class="portal-action-btn" id="btnOpenOficios">
+                                                <span>Acessar Painel de Ofícios</span>
+                                                <i class="fa-solid fa-arrow-right"></i>
+                                            </div>
+                                        </a>
 
-                                <!-- Card 5: BI PMO -->
-                                <a href="https://app.powerbi.com/links/JFXSnNv-2H?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare" target="_blank" rel="noopener noreferrer" class="portal-card bi-card" id="cardBIPMO" title="Acessar BI PMO no Power BI" data-created-at="2026-10-19">
-                                    <div class="portal-card-glow glow-amber"></div>
-                                    <span class="portal-badge-novo"><span class="badge-dot"></span>NOVO</span>
-                                    <div class="portal-icon-box amber">
-                                        <i class="fa-solid fa-diagram-project"></i>
+                                        <!-- Card 2: Monitor Exati -->
+                                        <a href="/exati" class="portal-card exati-card" id="cardExati" title="Acessar Monitor Exati">
+                                            <div class="portal-card-glow"></div>
+                                            <div class="portal-icon-box">
+                                                <i class="fa-solid fa-chart-line"></i>
+                                            </div>
+                                            <h2 class="portal-name">Monitor Exati</h2>
+                                            <div class="portal-action-btn blue" id="btnOpenExati">
+                                                <span>Acessar Monitor Exati</span>
+                                                <i class="fa-solid fa-arrow-right"></i>
+                                            </div>
+                                        </a>
                                     </div>
-                                    <h2 class="portal-name">BI PMO</h2>
-                                    <div class="portal-action-btn amber" id="btnOpenBIPMO">
-                                        <span>Acessar Power BI</span>
-                                        <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                                    </div>
-                                </a>
+                                </div>
 
-                                <!-- Card 6: QA do Site -->
-                                <a href="/qa" class="portal-card qa-card" id="cardQA" title="Acessar Auditoria & QA do Site">
-                                    <div class="portal-card-glow glow-purple"></div>
-                                    <div class="portal-icon-box purple">
-                                        <i class="fa-solid fa-shield-halved"></i>
+                                <!-- Coluna 3: Sistema -->
+                                <div class="reports-column col-sistema">
+                                    <div class="reports-column-header">
+                                        <div class="col-header-left">
+                                            <div class="col-header-icon purple">
+                                                <i class="fa-solid fa-gears"></i>
+                                            </div>
+                                            <div class="col-header-info">
+                                                <h3 class="col-title">Sistema</h3>
+                                                <span class="col-desc">Governança & Auditoria</span>
+                                            </div>
+                                        </div>
+                                        <span class="col-badge purple">2 Painéis</span>
                                     </div>
-                                    <h2 class="portal-name">QA do Site</h2>
-                                    <div class="portal-action-btn purple" id="btnOpenQA">
-                                        <span>Acessar Painel de QA</span>
-                                        <i class="fa-solid fa-arrow-right"></i>
-                                    </div>
-                                </a>
+                                    <div class="reports-column-cards">
+                                        <!-- Card 1: QA do Site -->
+                                        <a href="/qa" class="portal-card qa-card" id="cardQA" title="Acessar Auditoria & QA do Site">
+                                            <div class="portal-card-glow glow-purple"></div>
+                                            <div class="portal-icon-box purple">
+                                                <i class="fa-solid fa-shield-halved"></i>
+                                            </div>
+                                            <h2 class="portal-name">QA do Site</h2>
+                                            <div class="portal-action-btn purple" id="btnOpenQA">
+                                                <span>Acessar Painel de QA</span>
+                                                <i class="fa-solid fa-arrow-right"></i>
+                                            </div>
+                                        </a>
 
-                                <!-- Card 7: Painel Alison -->
-                                <a href="/painel-alison" class="portal-card alison-card" id="cardPainelAlison" title="Acessar Painel Alison (Acesso Restrito)">
-                                    <div class="portal-card-glow glow-green"></div>
-                                    <div class="portal-icon-box green">
-                                        <i class="fa-solid fa-user-shield"></i>
+                                        <!-- Card 2: Painel Alison -->
+                                        <a href="/painel-alison" class="portal-card alison-card" id="cardPainelAlison" title="Acessar Painel Alison (Acesso Restrito)">
+                                            <div class="portal-card-glow glow-green"></div>
+                                            <div class="portal-icon-box green">
+                                                <i class="fa-solid fa-user-shield"></i>
+                                            </div>
+                                            <h2 class="portal-name">Painel Alison</h2>
+                                            <div class="portal-action-btn green" id="btnOpenPainelAlison">
+                                                <span>Acessar Painel</span>
+                                                <i class="fa-solid fa-lock"></i>
+                                            </div>
+                                        </a>
                                     </div>
-                                    <h2 class="portal-name">Painel Alison</h2>
-                                    <div class="portal-action-btn green" id="btnOpenPainelAlison">
-                                        <span>Acessar Painel</span>
-                                        <i class="fa-solid fa-lock"></i>
-                                    </div>
-                                </a>
+                                </div>
                             </div>
                         </div>
                     </section>
