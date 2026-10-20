@@ -6,6 +6,10 @@ on:
       - "01 - Relatórios/02 - Monitor Exati/Base de dados/**"
   workflow_dispatch:
 
+concurrency:
+  group: ai-data-sync
+  cancel-in-progress: true
+
 jobs:
   audit_and_sync:
     runs-on: ubuntu-latest
@@ -43,5 +47,6 @@ jobs:
             echo "Nenhuma alteração para comitar."
           else
             git commit -m "chore(exati): auto-sync dashboard_data.json auditado por OpenAI GPT-4o-mini [skip ci]"
+            git pull --rebase origin main || true
             git push origin main
           fi
