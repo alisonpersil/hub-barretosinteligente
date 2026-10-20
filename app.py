@@ -908,7 +908,7 @@ def fallback_logo_horizontal():
 # ==============================================================================
 # Rotas: BI Financeiro (Redirecionamento Power BI)
 # ==============================================================================
-POWER_BI_FINANCEIRO_URL = "https://app.powerbi.com/links/XpQMjlIZWg?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare&bookmarkGuid=72ea6fc5-3f5b-43fd-a4a5-baad9b97a1fc"
+POWER_BI_FINANCEIRO_URL = "https://app.powerbi.com/groups/fe32f0b4-abda-4437-a452-a311f5356946/reports/6a7a61cd-3d1c-4f73-a174-f1cf32900cbd?ctid=8f24b6d2-08f5-4c1b-ad53-63695583dc0e&pbi_source=linkShare"
 
 @app.route("/bi-financeiro")
 @app.route("/bi-financeiro/")
