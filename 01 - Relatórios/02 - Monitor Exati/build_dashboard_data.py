@@ -2,7 +2,47 @@ import os
 import glob
 import json
 import re
+import subprocess
 from datetime import datetime, date
+try:
+    from zoneinfo import ZoneInfo
+    TZ_SP = ZoneInfo("America/Sao_Paulo")
+except Exception:
+    from datetime import timezone, timedelta
+    TZ_SP = timezone(timedelta(hours=-3))
+
+def get_sp_now():
+    return datetime.now(TZ_SP)
+
+def get_file_epoch_sp(file_path):
+    try:
+        res = subprocess.run(
+            ['git', 'log', '-1', '--format=%ct', '--', file_path],
+            capture_output=True, text=True, timeout=5
+        )
+        ts_str = res.stdout.strip()
+        if ts_str and ts_str.isdigit():
+            return int(ts_str)
+    except Exception:
+        pass
+    return int(os.path.getmtime(file_path)) if os.path.exists(file_path) else 0
+
+def get_file_mtime_sp(file_path):
+    try:
+        res = subprocess.run(
+            ['git', 'log', '-1', '--format=%ct', '--', file_path],
+            capture_output=True, text=True, timeout=5
+        )
+        ts_str = res.stdout.strip()
+        if ts_str and ts_str.isdigit():
+            epoch = int(ts_str)
+            return datetime.fromtimestamp(epoch, tz=TZ_SP)
+    except Exception:
+        pass
+    if os.path.exists(file_path):
+        return datetime.fromtimestamp(os.path.getmtime(file_path), tz=TZ_SP)
+    return get_sp_now()
+
 import pandas as pd
 import numpy as np
 
@@ -33,7 +73,7 @@ def read_excel_smart_header(file_path, max_rows_scan=10):
 # 1. Leitura e Consolidação da Base de ATENDIDOS (SGI / Histórico)
 # ==============================================================================
 print("1. Lendo base de Atendidos...")
-atendidos_files = sorted(glob.glob(os.path.join(base_dir, "Atendidos", "*.xls*")), key=os.path.getsize, reverse=True)
+atendidos_files = sorted(glob.glob(os.path.join(base_dir, "Atendidos", "*.xls*")), key=get_file_epoch_sp, reverse=True)
 cache_file = os.path.join(output_dir, "atendidos_cache.pkl")
 max_atendidos_mtime = max(os.path.getmtime(f) for f in atendidos_files) if atendidos_files else 0
 
@@ -103,7 +143,7 @@ if 'dt_inicio' not in df_a.columns:
 # ==============================================================================
 print("2. Lendo e consolidando todas as planilhas de Pendentes...")
 pendentes_files = glob.glob(os.path.join(base_dir, "Pendentes", "*.xlsx")) + glob.glob(os.path.join(base_dir, "Pendentes", "*.xls"))
-pendentes_files_sorted = sorted(pendentes_files, key=os.path.getmtime)  # Mais antigos primeiro para que o mais recente sobrescreva atributos
+pendentes_files_sorted = sorted(pendentes_files, key=get_file_epoch_sp)  # Mais antigos primeiro para que o mais recente sobrescreva atributos
 
 latest_pendentes_file = pendentes_files_sorted[-1] if pendentes_files_sorted else None
 latest_fname = os.path.basename(latest_pendentes_file) if latest_pendentes_file else ""
@@ -123,14 +163,14 @@ snapshots_map = {item['arquivo']: item for item in persistent_history}
 # 2.2 Dicionário de consolidação única de pendentes
 merged_pendentes = {}
 atendidos_reconciliados = []
-ref_now = datetime.now()
+ref_now = get_sp_now()
 p_map_latest = {}
 p_audit_latest = {}
 
 for pf in pendentes_files_sorted:
     fname = os.path.basename(pf)
     try:
-        mtime = datetime.fromtimestamp(os.path.getmtime(pf))
+        mtime = get_file_mtime_sp(pf)
         df_s = read_excel_smart_header(pf)
         s_map, s_audit = resolve_columns(df_s.columns, 'pendentes') if not df_s.empty else ({}, {})
         
@@ -460,9 +500,9 @@ for b in top_bairros_idx:
     sla_v = int(round(float(dias_b.mean()))) if len(dias_b) > 0 else 0
     top_bairros_sla.append(sla_v)
 
-latest_atendidos_file = sorted(atendidos_files, key=os.path.getmtime, reverse=True)[0] if atendidos_files else None
-at_mtime = datetime.fromtimestamp(os.path.getmtime(latest_atendidos_file)) if latest_atendidos_file else datetime.now()
-pe_mtime = datetime.fromtimestamp(os.path.getmtime(latest_pendentes_file)) if latest_pendentes_file else datetime.now()
+latest_atendidos_file = sorted(atendidos_files, key=get_file_epoch_sp, reverse=True)[0] if atendidos_files else None
+at_mtime = get_file_mtime_sp(latest_atendidos_file) if latest_atendidos_file else get_sp_now()
+pe_mtime = get_file_mtime_sp(latest_pendentes_file) if latest_pendentes_file else get_sp_now()
 
 atendidos_ts_str = at_mtime.strftime("%d/%m/%Y %H:%M")
 atendidos_ts_short = at_mtime.strftime("%d/%m %H:%M")
@@ -552,7 +592,7 @@ if not bairros_geral.empty:
 
 dashboard_data = {
     "metadata": {
-        "gerado_em": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        "gerado_em": get_sp_now().strftime("%d/%m/%Y %H:%M:%S"),
         "atendidos_arquivo": os.path.basename(latest_atendidos_file) if latest_atendidos_file else "Não encontrado",
         "atendidos_data_hora": atendidos_ts_str,
         "atendidos_data_hora_curta": atendidos_ts_short,

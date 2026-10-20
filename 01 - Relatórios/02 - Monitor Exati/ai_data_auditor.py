@@ -4,6 +4,15 @@ import json
 import urllib.request
 import urllib.error
 from datetime import datetime
+try:
+    from zoneinfo import ZoneInfo
+    TZ_SP = ZoneInfo("America/Sao_Paulo")
+except Exception:
+    from datetime import timezone, timedelta
+    TZ_SP = timezone(timedelta(hours=-3))
+
+def get_sp_now():
+    return datetime.now(TZ_SP)
 
 def get_openai_api_key():
     """Obtém a chave da OpenAI da variável de ambiente ou do arquivo .env local."""
@@ -65,7 +74,7 @@ def get_token_usage_stats():
 
 def render_consumo_markdown(data: dict) -> str:
     """Gera o relatório visual de consumo de tokens em formato GitHub Flavored Markdown."""
-    now_str = data.get("updated_at") or datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    now_str = data.get("updated_at") or get_sp_now().strftime("%d/%m/%Y %H:%M:%S")
     tot_req = data.get("total_requisicoes", 0)
     tot_tokens = data.get("total_tokens", 0)
     p_tokens = data.get("total_prompt_tokens", 0)
@@ -129,7 +138,7 @@ def render_consumo_markdown(data: dict) -> str:
 def record_token_usage(usage: dict, metadata: dict) -> dict:
     """Registra uma requisição em consumo_tokens.json e atualiza CONSUMO_TOKENS.md."""
     data = get_token_usage_stats()
-    now_dt = datetime.now()
+    now_dt = get_sp_now()
     now_str = now_dt.strftime("%d/%m/%Y %H:%M:%S")
 
     prompt_tokens = int(usage.get("prompt_tokens", 0))
