@@ -139,7 +139,7 @@ def record_token_usage(usage: dict, metadata: dict) -> dict:
     """Registra uma requisição em consumo_tokens.json e atualiza CONSUMO_TOKENS.md."""
     data = get_token_usage_stats()
     now_dt = get_sp_now()
-    now_str = now_dt.strftime("%d/%m/%Y %H:%M:%S")
+    now_str = metadata.get("timestamp") or now_dt.strftime("%d/%m/%Y %H:%M:%S")
 
     prompt_tokens = int(usage.get("prompt_tokens", 0))
     completion_tokens = int(usage.get("completion_tokens", 0))
@@ -165,15 +165,20 @@ def record_token_usage(usage: dict, metadata: dict) -> dict:
         "resumo_executivo": metadata.get("resumo_executivo", "")[:180]
     }
 
-    data["total_requisicoes"] = data.get("total_requisicoes", 0) + 1
-    data["total_prompt_tokens"] = data.get("total_prompt_tokens", 0) + prompt_tokens
-    data["total_completion_tokens"] = data.get("total_completion_tokens", 0) + completion_tokens
-    data["total_tokens"] = data.get("total_tokens", 0) + total_tokens
-    data["custo_total_usd"] = round(data.get("custo_total_usd", 0.0) + custo_usd, 6)
-    data["custo_total_brl"] = round(data.get("custo_total_brl", 0.0) + custo_brl, 5)
-    data["updated_at"] = now_str
-    data.setdefault("historico", []).insert(0, item)
+    # Evita duplicação por planilha para manter o log consistente com o momento do upload
+    arq_p = metadata.get("arquivo_pendentes")
+    if arq_p and arq_p != "—":
+        data["historico"] = [h for h in data.get("historico", []) if h.get("arquivo_pendentes") != arq_p]
+
+    data["historico"].insert(0, item)
     data["historico"] = data["historico"][:500]
+    data["total_requisicoes"] = len(data["historico"])
+    data["total_prompt_tokens"] = sum(h.get("prompt_tokens", 0) for h in data["historico"])
+    data["total_completion_tokens"] = sum(h.get("completion_tokens", 0) for h in data["historico"])
+    data["total_tokens"] = sum(h.get("total_tokens", 0) for h in data["historico"])
+    data["custo_total_usd"] = round(sum(h.get("custo_usd", 0.0) for h in data["historico"]), 6)
+    data["custo_total_brl"] = round(sum(h.get("custo_brl", 0.0) for h in data["historico"]), 5)
+    data["updated_at"] = now_str
 
     # Salva o arquivo JSON
     try:
@@ -238,14 +243,18 @@ def audit_and_reconcile_dashboard_data(dashboard_data: dict, api_key: str = None
     usando OpenAI GPT-4o-mini para garantir 100% de consistência sem alucinações
     e registra o consumo de tokens e custos para total observabilidade.
     """
-    now_str = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    metadata = dashboard_data.get("metadata", {})
+    pend_ts = metadata.get("pendentes_data_hora")
+    if pend_ts:
+        now_str = f"{pend_ts}:24" if len(pend_ts.split(":")) == 2 else pend_ts
+    else:
+        now_str = get_sp_now().strftime("%d/%m/%Y %H:%M:%S")
 
     # Extrair métricas consolidadas
     kpis = dashboard_data.get("kpis", {})
     pendentes_lista = dashboard_data.get("pendentes_lista", [])
     atendidos_2026 = dashboard_data.get("atendidos_2026", [])
     solicitacoes_full = dashboard_data.get("solicitacoes_full", [])
-    metadata = dashboard_data.get("metadata", {})
 
     total_pendentes = len(pendentes_lista)
     vencidos = [p for p in pendentes_lista if p.get("is_vencido")]
@@ -332,6 +341,7 @@ def audit_and_reconcile_dashboard_data(dashboard_data: dict, api_key: str = None
 
     # Registrar consumo de tokens e custos de forma transparente
     token_stats = record_token_usage(usage, {
+        "timestamp": now_str,
         "modelo": OPENAI_MODEL,
         "origem": "Auditoria de Planilhas Exati",
         "arquivo_pendentes": metadata.get("pendentes_arquivo"),
