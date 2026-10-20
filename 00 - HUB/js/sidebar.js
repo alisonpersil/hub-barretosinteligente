@@ -117,6 +117,43 @@
             document.head.appendChild(radioScript);
         }
 
+        // =========================================================================
+        // Ciclo de vida das tags [NOVO] (Auto-expiração em 14 dias)
+        // =========================================================================
+        function applyNewBadgesLifecycle() {
+            try {
+                const now = new Date();
+                document.querySelectorAll('[data-created-at]').forEach((item) => {
+                    const dateStr = item.getAttribute('data-created-at');
+                    if (!dateStr) return;
+                    const parts = dateStr.split('-');
+                    if (parts.length !== 3) return;
+                    const year = parseInt(parts[0], 10);
+                    const month = parseInt(parts[1], 10) - 1;
+                    const day = parseInt(parts[2], 10);
+                    const createdDate = new Date(year, month, day, 0, 0, 0);
+
+                    const maxDays = parseInt(item.getAttribute('data-new-days') || '14', 10);
+                    const diffMs = now.getTime() - createdDate.getTime();
+                    const diffDays = diffMs / (1000 * 60 * 60 * 24);
+
+                    const isNew = diffDays >= 0 && diffDays < maxDays;
+                    const badges = item.querySelectorAll('.portal-badge-novo, .sub-badge-novo');
+                    badges.forEach((badge) => {
+                        if (!isNew) {
+                            badge.style.display = 'none';
+                        } else {
+                            const daysLeft = Math.max(1, Math.ceil(maxDays - diffDays));
+                            badge.title = 'Novo item adicionado (' + daysLeft + ' dias restantes)';
+                        }
+                    });
+                });
+            } catch (err) {
+                console.warn('[Badge NOVO] Erro ao calcular ciclo de vida:', err);
+            }
+        }
+
+        applyNewBadgesLifecycle();
         initSidebarState();
     }
 

@@ -67,6 +67,10 @@ O ecossistema **Barretos Inteligente** foi concebido para entregar portais e fer
     * `Painel Alison` (`fa-user-shield`, acento verde).
   * `Automações` (`fa-bolt`): Badge *"Sala de Agentes"*.
   * `Book` (`fa-book-bookmark`): Badge *"Governança"*.
+* **✨ Etiquetas Temporárias [NOVO] (Ciclo de Vida de 14 Dias):**
+  * Novos relatórios e ferramentas recebem o atributo `data-created-at="AAAA-MM-DD"`.
+  * A tag `.sub-badge-novo` (na barra lateral) e `.portal-badge-novo` (nos cards da HUB) exibem visual executivo verde esmeralda com ponto pulsante.
+  * O motor autônomo em `sidebar.js` e `hub.js` compara a data atual com a de lançamento e oculta a tag automaticamente após 14 dias (`diffDays >= 14`).
 * **✅ Regra Obrigatória de Navegação por Módulo:**
   * Clicar no item de um **módulo** na sidebar SEMPRE leva à **aba do módulo na Central HUB**, nunca direto para uma página interna, independentemente da página em que o usuário esteja:
     * `Relatórios` → `/?tab=relatorios`

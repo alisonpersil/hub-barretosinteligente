@@ -522,6 +522,35 @@ body {
     color: #f59e0b;
 }
 
+/* Tag executiva [NOVO] para subitens */
+.sidebar-subitem .sub-badge-novo {
+    margin-left: auto;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    padding: 1.5px 5.5px;
+    border-radius: 4px;
+    line-height: 1.2;
+    text-transform: uppercase;
+    box-shadow: 0 1px 4px rgba(16, 185, 129, 0.35);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    transition: var(--transition, all 0.2s ease);
+}
+
+[data-theme="dark"] .sidebar-subitem .sub-badge-novo {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #ecfdf5;
+    box-shadow: 0 1px 6px rgba(16, 185, 129, 0.25);
+}
+
+.hub-sidebar.collapsed .sidebar-subitem .sub-badge-novo {
+    display: none !important;
+}
+
 .sidebar-spacer {
     flex: 1;
 }
@@ -728,6 +757,51 @@ body {
 
 .portal-card.exati-card .portal-card-glow {
     background: var(--accent-blue);
+}
+
+/* Tag executiva [NOVO] para cards da Central HUB */
+.portal-badge-novo {
+    position: absolute;
+    top: 13px;
+    right: 14px;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    padding: 3px 8.5px;
+    border-radius: 9999px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+    display: inline-flex;
+    align-items: center;
+    gap: 4.5px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    z-index: 5;
+    pointer-events: none;
+    line-height: 1.2;
+    transition: var(--transition);
+}
+
+.portal-badge-novo .badge-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 0 6px #ffffff;
+    animation: pulse-dot 1.8s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(0.65); }
+}
+
+[data-theme="dark"] .portal-badge-novo {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #ecfdf5;
+    box-shadow: 0 2px 10px rgba(16, 185, 129, 0.35);
+    border-color: rgba(52, 211, 153, 0.35);
 }
 
 .portal-card:hover {
