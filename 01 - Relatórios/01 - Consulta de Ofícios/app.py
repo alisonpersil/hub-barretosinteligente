@@ -5,6 +5,10 @@ import subprocess
 import threading
 import webbrowser
 import mimetypes
+import zipfile
+import io
+import shutil
+import csv
 from datetime import datetime
 
 # Windows Console UTF-8 encoding support
@@ -49,9 +53,9 @@ def format_file_size(size_bytes):
     else:
         return f"{size_bytes / (1024 * 1024):.2f} MB"
 
-def extract_category_and_year(filename):
-    """Categorize document and extract reference year if present."""
-    name_lower = filename.lower()
+def extract_category_and_year(name):
+    """Categorize document/protocol and extract reference year if present."""
+    name_lower = name.lower()
     
     year = None
     for y in ["2026", "2025", "2024", "2023", "2022", "2021", "2020"]:
@@ -59,82 +63,183 @@ def extract_category_and_year(filename):
             year = y
             break
             
-    if "ofício" in name_lower or "oficio" in name_lower:
+    if "videomonitoramento" in name_lower or "câmera" in name_lower or "camera" in name_lower or "facial" in name_lower or "monitoramento" in name_lower:
+        category = "Videomonitoramento"
+    elif "carport" in name_lower or "fotovoltaico" in name_lower:
+        category = "Fotovoltaico"
+    elif "pagamento" in name_lower or "parcela" in name_lower or "nf" in name_lower:
+        category = "Pagamento"
+    elif "iluminação" in name_lower or "iluminacao" in name_lower or "dimerização" in name_lower or "dimerizacao" in name_lower or "destaque" in name_lower or "ip " in name_lower or "loteamentos" in name_lower or "avenidas" in name_lower:
+        category = "Iluminação"
+    elif "reajuste" in name_lower or "prm" in name_lower:
+        category = "Reajuste PRM"
+    elif "termo" in name_lower or "aditivo" in name_lower:
+        category = "Termo Aditivo"
+    elif "ofício" in name_lower or "oficio" in name_lower:
         category = "Ofício"
     elif "anexo" in name_lower:
         category = "Anexo"
     elif "relatório" in name_lower or "relatorio" in name_lower:
         category = "Relatório"
-    elif "termo" in name_lower:
-        category = "Termo de Referência"
     elif "garantia" in name_lower:
         category = "Garantia"
-    elif "videomonitoramento" in name_lower or "câmera" in name_lower or "camera" in name_lower:
-        category = "Videomonitoramento"
-    elif "iluminação" in name_lower or "iluminacao" in name_lower:
-        category = "Iluminação"
-    elif "resposta" in name_lower:
-        category = "Resposta"
     else:
-        category = "Documento"
+        category = "Protocolo"
         
     return category, year
 
-def get_all_documents():
-    """Scan the documents directory recursively and return detailed metadata."""
-    documents = []
+def get_all_protocolos():
+    """Scan protocol folders and return detailed metadata for folders and their inner documents."""
+    protocolos_dir = os.path.join(DOCS_DIR, "Protocolos")
+    scan_root = protocolos_dir if os.path.isdir(protocolos_dir) else DOCS_DIR
     
-    if not os.path.exists(DOCS_DIR):
-        return documents
+    if not os.path.exists(scan_root):
+        return []
 
-    file_id = 1
-    for root, _, files in os.walk(DOCS_DIR):
-        for file in files:
-            full_path = os.path.abspath(os.path.join(root, file))
-            rel_path = os.path.relpath(full_path, DOCS_DIR).replace("\\", "/")
+    # Read _indice.csv if present
+    csv_path = os.path.join(scan_root, "_indice.csv")
+    indice_map = {}
+    if os.path.isfile(csv_path):
+        try:
+            with open(csv_path, "r", encoding="utf-8", errors="replace") as f:
+                reader = csv.reader(f, delimiter=";")
+                header = next(reader, None)
+                for row in reader:
+                    if len(row) >= 3:
+                        pasta = row[2].strip()
+                        if pasta not in indice_map:
+                            indice_map[pasta] = {
+                                "protocolo": row[0].strip().lstrip("\ufeff"),
+                                "assunto": row[1].strip()
+                            }
+        except Exception as e:
+            print("Erro ao ler _indice.csv:", e, file=sys.stderr)
+
+    protocolos = []
+    prot_id = 1
+    
+    try:
+        entries = sorted(os.listdir(scan_root))
+    except Exception as e:
+        print("Erro ao listar diretório de protocolos:", e, file=sys.stderr)
+        return []
+
+    for entry in entries:
+        full_path = os.path.join(scan_root, entry)
+        if not os.path.isdir(full_path) or entry.startswith("."):
+            continue
             
+        rel_folder = os.path.relpath(full_path, DOCS_DIR).replace("\\", "/")
+        category, year = extract_category_and_year(entry)
+        
+        name_lower = entry.lower()
+        if "(deferido)" in name_lower:
+            status = "Deferido"
+        elif "(indeferido)" in name_lower:
+            status = "Indeferido"
+        else:
+            status = None
+            
+        parts = entry.split(" - ", 1)
+        protocolo_code = parts[0].strip()
+        assunto = parts[1].strip() if len(parts) > 1 else entry
+        
+        csv_info = indice_map.get(entry)
+        if csv_info:
+            protocolo_code = csv_info.get("protocolo") or protocolo_code
+            assunto = csv_info.get("assunto") or assunto
+
+        files_list = []
+        folder_size = 0
+        latest_mtime = 0
+        earliest_ctime = float("inf")
+
+        try:
+            folder_stat = os.stat(full_path)
+            latest_mtime = folder_stat.st_mtime
+            earliest_ctime = folder_stat.st_ctime
+        except Exception:
+            pass
+
+        file_idx = 1
+        try:
+            folder_items = sorted(os.listdir(full_path))
+        except Exception:
+            folder_items = []
+
+        for f in folder_items:
+            f_path = os.path.join(full_path, f)
+            if not os.path.isfile(f_path) or f.startswith("."):
+                continue
             try:
-                stat = os.stat(full_path)
-                size_bytes = stat.st_size
-                ctime = stat.st_ctime
-                mtime = stat.st_mtime
-                
-                ctime_dt = datetime.fromtimestamp(ctime)
-                mtime_dt = datetime.fromtimestamp(mtime)
-                
-                ext = os.path.splitext(file)[1].lower()
-                category, year = extract_category_and_year(file)
-                
-                documents.append({
-                    "id": file_id,
-                    "name": file,
-                    "relative_path": rel_path,
-                    "full_path": full_path,
-                    "size_bytes": size_bytes,
-                    "size_formatted": format_file_size(size_bytes),
-                    "ctime": ctime,
-                    "ctime_formatted": ctime_dt.strftime("%d/%m/%Y %H:%M"),
-                    "mtime": mtime,
-                    "mtime_formatted": mtime_dt.strftime("%d/%m/%Y %H:%M"),
+                f_stat = os.stat(f_path)
+                f_size = f_stat.st_size
+                folder_size += f_size
+                if f_stat.st_mtime > latest_mtime:
+                    latest_mtime = f_stat.st_mtime
+                if f_stat.st_ctime < earliest_ctime:
+                    earliest_ctime = f_stat.st_ctime
+                    
+                ext = os.path.splitext(f)[1].lower()
+                rel_file = os.path.relpath(f_path, DOCS_DIR).replace("\\", "/")
+                files_list.append({
+                    "id": file_idx,
+                    "name": f,
+                    "relative_path": rel_file,
+                    "size_bytes": f_size,
+                    "size_formatted": format_file_size(f_size),
+                    "mtime": f_stat.st_mtime,
+                    "mtime_formatted": datetime.fromtimestamp(f_stat.st_mtime).strftime("%d/%m/%Y %H:%M"),
+                    "ctime": f_stat.st_ctime,
+                    "ctime_formatted": datetime.fromtimestamp(f_stat.st_ctime).strftime("%d/%m/%Y %H:%M"),
                     "extension": ext,
-                    "is_pdf": ext == ".pdf",
-                    "category": category,
-                    "year": year
+                    "is_pdf": ext == ".pdf"
                 })
-                file_id += 1
+                file_idx += 1
             except Exception as e:
-                print(f"Erro ao ler metadados do arquivo {file}: {e}", file=sys.stderr)
-                
-    return documents
+                pass
+
+        ctime_dt = datetime.fromtimestamp(earliest_ctime if earliest_ctime != float("inf") else 0)
+        mtime_dt = datetime.fromtimestamp(latest_mtime if latest_mtime > 0 else 0)
+
+        protocolos.append({
+            "id": prot_id,
+            "name": entry,
+            "folder_name": entry,
+            "protocolo": protocolo_code,
+            "assunto": assunto,
+            "status": status,
+            "relative_path": rel_folder,
+            "full_path": full_path,
+            "is_folder": True,
+            "is_pdf": False,
+            "total_files": len(files_list),
+            "size_bytes": folder_size,
+            "size_formatted": format_file_size(folder_size),
+            "ctime": earliest_ctime if earliest_ctime != float("inf") else 0,
+            "ctime_formatted": ctime_dt.strftime("%d/%m/%Y %H:%M"),
+            "mtime": latest_mtime,
+            "mtime_formatted": mtime_dt.strftime("%d/%m/%Y %H:%M"),
+            "category": category,
+            "year": year or "2026",
+            "files": files_list
+        })
+        prot_id += 1
+
+    return protocolos
+
+def get_all_documents():
+    """Alias for get_all_protocolos for compatibility."""
+    return get_all_protocolos()
 
 def get_safe_file_path(relative_path):
-    """Ensure relative path is safely within DOCS_DIR."""
+    """Ensure relative path is safely within DOCS_DIR, supporting folders and files."""
     import urllib.parse
     import unicodedata
 
     decoded_path = urllib.parse.unquote(relative_path).strip("/\\")
     safe_path = os.path.abspath(os.path.join(DOCS_DIR, decoded_path))
-    if safe_path.startswith(os.path.abspath(DOCS_DIR)) and os.path.isfile(safe_path):
+    if safe_path.startswith(os.path.abspath(DOCS_DIR)) and (os.path.isfile(safe_path) or os.path.isdir(safe_path)):
         return safe_path
 
     # Robust fallback: search by normalized filename ignoring accents
@@ -142,10 +247,17 @@ def get_safe_file_path(relative_path):
         return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn').lower()
 
     target_clean = strip_accents(os.path.basename(decoded_path))
-    for root, _, files in os.walk(DOCS_DIR):
-        for f in files:
-            if strip_accents(f) == target_clean:
-                return os.path.join(root, f)
+    parent_clean = strip_accents(os.path.basename(os.path.dirname(decoded_path)))
+    
+    for root, dirs, files in os.walk(DOCS_DIR):
+        for item in dirs + files:
+            if strip_accents(item) == target_clean:
+                cand = os.path.join(root, item)
+                if parent_clean:
+                    if strip_accents(os.path.basename(os.path.dirname(cand))) == parent_clean:
+                        return cand
+                else:
+                    return cand
 
     return None
 
@@ -220,12 +332,15 @@ def system_status():
     })
 
 @app.route("/api/oficios")
+@app.route("/api/protocolos")
 def api_oficios():
-    """Return all documents with full metadata."""
-    docs = get_all_documents()
+    """Return all protocols with full metadata and inner documents."""
+    docs = get_all_protocolos()
+    total_docs = sum(p.get("total_files", 0) for p in docs)
     return jsonify({
         "success": True,
         "count": len(docs),
+        "total_documents": total_docs,
         "documents": docs
     })
 
@@ -261,6 +376,54 @@ def download_pdf(subpath):
         as_attachment=True,
         download_name=os.path.basename(safe_path)
     )
+
+@app.route("/api/protocolo/download-zip/<path:subpath>")
+def download_protocolo_zip(subpath):
+    """Download an entire protocol folder as a zipped archive."""
+    safe_path = get_safe_file_path(subpath)
+    if not safe_path or not os.path.isdir(safe_path):
+        abort(404, description="Protocolo não encontrado.")
+        
+    memory_file = io.BytesIO()
+    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+        for root, _, files in os.walk(safe_path):
+            for file in files:
+                file_full = os.path.join(root, file)
+                rel = os.path.relpath(file_full, safe_path)
+                zf.write(file_full, rel)
+    memory_file.seek(0)
+    zip_name = f"{os.path.basename(safe_path)}.zip"
+    return send_file(
+        memory_file,
+        mimetype="application/zip",
+        as_attachment=True,
+        download_name=zip_name
+    )
+
+@app.route("/api/protocolo/delete", methods=["POST", "DELETE"])
+@app.route("/api/oficios/delete", methods=["POST", "DELETE"])
+def delete_protocolo():
+    """Remove a protocol folder permanently."""
+    data = request.get_json(silent=True) or request.form
+    rel_path = data.get("relative_path")
+    if not rel_path:
+        return jsonify({"success": False, "error": "Caminho do protocolo não fornecido."}), 400
+
+    try:
+        safe_path = get_safe_file_path(rel_path)
+        if not safe_path or not os.path.isdir(safe_path):
+            return jsonify({"success": False, "error": "Protocolo não encontrado."}), 404
+            
+        folder_name = os.path.basename(safe_path)
+        shutil.rmtree(safe_path)
+        run_git_sync_background(f"chore: excluir protocolo {folder_name}")
+
+        return jsonify({
+            "success": True,
+            "message": f"Protocolo '{folder_name}' removido com sucesso."
+        })
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 GITHUB_REPO = os.environ.get("GITHUB_REPO", "alisonpersil/consulta-oficios")
 

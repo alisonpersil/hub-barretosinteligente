@@ -11,7 +11,7 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Consulta de Ofícios | PMO</title>
+    <title>Consulta de Protocolos | PMO</title>
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/static/img/favicon.png">
     <link rel="apple-touch-icon" href="/static/img/favicon.png">
@@ -28,7 +28,7 @@
         {{ inline_css | safe }}
     </style>
     {% else %}
-    <link rel="stylesheet" href="/static/css/style.css?v=20261010_v3">
+    <link rel="stylesheet" href="/static/css/style.css?v=20261021_v4">
     {% endif %}
 </head>
 <body>
@@ -45,15 +45,15 @@
                     </a>
                     <div class="brand-divider"></div>
                     <div class="brand-text">
-                        <span class="brand-title">Consulta de Ofícios</span>
+                        <span class="brand-title">Consulta de Protocolos</span>
                     </div>
                 </div>
             </div>
 
             <div class="nav-right">
-                <div class="stat-pill" title="Total de ofícios indexados no sistema">
-                    <i class="fa-solid fa-folder-open"></i>
-                    <span id="headerDocCount">47 documentos</span>
+                <div class="stat-pill" title="Total de protocolos indexados no acervo">
+                    <i class="fa-solid fa-folder-closed"></i>
+                    <span id="headerDocCount">21 protocolos</span>
                 </div>
                 <button id="btnOpenImportModal" class="nav-btn btn-import" title="Importar novos ofícios (1 arquivo ou em lote)">
                     <i class="fa-solid fa-cloud-arrow-up"></i>
@@ -182,11 +182,11 @@
             <section class="chat-hero">
                 <div class="ai-avatar-badge">
                     <i class="fa-solid fa-sparkles"></i>
-                    <span>Pesquisa Inteligente de Ofícios</span>
+                    <span>Pesquisa Inteligente de Protocolos</span>
                 </div>
-                <h1 class="hero-title">Como posso ajudar com seus ofícios hoje?</h1>
+                <h1 class="hero-title">Como posso ajudar com seus protocolos hoje?</h1>
                 <p class="hero-subtitle">
-                    Digite qualquer termo, número do ofício ou ano para consultar imediatamente.
+                    Digite o número do protocolo, assunto, termo ou nome de arquivo para consultar imediatamente.
                 </p>
 
                 <!-- ChatGPT-Style Prompt Search Box -->
@@ -199,7 +199,7 @@
                             type="text" 
                             id="searchInput" 
                             class="prompt-input" 
-                            placeholder="Pesquise por qualquer ofício (ex: '2024-001', 'videomonitoramento', 'garantia')..." 
+                            placeholder="Pesquise por protocolo, assunto, arquivo ou termo (ex: '10245', 'carport', 'FGTS', 'deferido')..." 
                             autocomplete="off"
                             spellcheck="false"
                         >
@@ -222,26 +222,32 @@
                         <button class="chip active" data-filter="all">
                             <i class="fa-solid fa-layer-group"></i> Todos
                         </button>
-                        <button class="chip" data-filter="2024">
-                            <i class="fa-solid fa-calendar"></i> Ofícios 2024
+                        <button class="chip" data-filter="2026">
+                            <i class="fa-solid fa-calendar"></i> 2026
                         </button>
-                        <button class="chip" data-filter="2023">
-                            <i class="fa-solid fa-calendar-days"></i> Ofícios 2023
-                        </button>
-                        <button class="chip" data-filter="videomonitoramento">
-                            <i class="fa-solid fa-video"></i> Videomonitoramento
-                        </button>
-                        <button class="chip" data-filter="garantia">
-                            <i class="fa-solid fa-shield-halved"></i> Garantia
+                        <button class="chip" data-filter="pagamento">
+                            <i class="fa-solid fa-money-check-dollar"></i> Pagamento
                         </button>
                         <button class="chip" data-filter="iluminacao">
                             <i class="fa-solid fa-lightbulb"></i> Iluminação
                         </button>
-                        <button class="chip" data-filter="relatorio">
-                            <i class="fa-solid fa-chart-pie"></i> Relatórios
+                        <button class="chip" data-filter="videomonitoramento">
+                            <i class="fa-solid fa-video"></i> Videomonitoramento
                         </button>
-                        <button class="chip" data-filter="anexo">
-                            <i class="fa-solid fa-paperclip"></i> Anexos
+                        <button class="chip" data-filter="fotovoltaico">
+                            <i class="fa-solid fa-solar-panel"></i> Fotovoltaico
+                        </button>
+                        <button class="chip" data-filter="deferido">
+                            <i class="fa-solid fa-circle-check"></i> Deferido
+                        </button>
+                        <button class="chip" data-filter="indeferido">
+                            <i class="fa-solid fa-circle-xmark"></i> Indeferido
+                        </button>
+                        <button class="chip" data-filter="reajuste">
+                            <i class="fa-solid fa-chart-line"></i> Reajuste PRM
+                        </button>
+                        <button class="chip" data-filter="aditivo">
+                            <i class="fa-solid fa-file-contract"></i> Termo Aditivo
                         </button>
                     </div>
                 </div>
@@ -282,10 +288,10 @@
 
                         <!-- View Layout Toggle -->
                         <div class="view-toggle">
-                            <button id="btnViewCards" class="view-btn active" title="Visualização em Cartões">
+                            <button id="btnViewCards" class="view-btn" title="Visualização em Cartões">
                                 <i class="fa-solid fa-table-cells-large"></i>
                             </button>
-                            <button id="btnViewList" class="view-btn" title="Visualização em Lista/Tabela">
+                            <button id="btnViewList" class="view-btn active" title="Visualização em Lista/Tabela">
                                 <i class="fa-solid fa-list-ul"></i>
                             </button>
                         </div>
@@ -311,20 +317,20 @@
                 </div>
 
                 <!-- Documents Container: Cards Grid View -->
-                <div id="documentsCardsContainer" class="documents-grid">
+                <div id="documentsCardsContainer" class="documents-grid hidden">
                     <!-- Populated dynamically via JS -->
                 </div>
 
                 <!-- Documents Container: Table View -->
-                <div id="documentsTableContainer" class="documents-table-wrapper hidden">
+                <div id="documentsTableContainer" class="documents-table-wrapper">
                     <table class="documents-table">
                         <thead>
                             <tr>
-                                <th style="width: 45%;">Nome do Ofício</th>
-                                <th style="width: 15%;">Data Modificação</th>
-                                <th style="width: 15%;">Data Criação</th>
-                                <th style="width: 10%;">Tamanho</th>
-                                <th style="width: 15%; text-align: right;">Ações</th>
+                                <th style="width: 38%;">Protocolo / Pasta</th>
+                                <th style="width: 26%;">Assunto</th>
+                                <th style="width: 12%;">Arquivos</th>
+                                <th style="width: 12%;">Modificação</th>
+                                <th style="width: 12%; text-align: right;">Ações</th>
                             </tr>
                         </thead>
                         <tbody id="documentsTableBody">
@@ -355,59 +361,110 @@
         </div> <!-- /.hub-main-area -->
         </div> <!-- /.hub-body-wrapper -->
 
-        <!-- PDF Preview Modal -->
+        <!-- Protocol & Document Explorer Modal -->
         <div id="previewModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
-            <div class="modal-container">
+            <div class="modal-container protocol-modal-container">
                 <!-- Modal Top Header -->
                 <div class="modal-header">
                     <div class="modal-title-area">
-                        <div class="modal-doc-icon">
-                            <i class="fa-solid fa-file-pdf"></i>
+                        <div class="modal-doc-icon protocol-folder-icon">
+                            <i class="fa-solid fa-folder-open"></i>
                         </div>
                         <div class="modal-doc-info">
-                            <h3 id="modalDocTitle" class="modal-doc-title">Nome do Ofício.pdf</h3>
+                            <h3 id="modalDocTitle" class="modal-doc-title">Nome do Protocolo</h3>
                             <div class="modal-doc-meta" id="modalDocMeta">
-                                <span><i class="fa-regular fa-clock"></i> Modificado: 15/02/2024</span>
-                                <span>&bull;</span>
-                                <span><i class="fa-solid fa-hard-drive"></i> 640 KB</span>
+                                <!-- Populated dynamically: Badges for Year, Category, Status, File count, Total Size -->
                             </div>
                         </div>
                     </div>
 
                     <div class="modal-actions">
-                        <button id="btnModalDelete" class="btn-modal-action btn-danger-action" title="Excluir este ofício">
+                        <button id="btnModalDownloadZip" class="btn-modal-action btn-zip-action" title="Baixar todos os arquivos da pasta em um único ZIP">
+                            <i class="fa-solid fa-file-zipper"></i>
+                            <span>Baixar ZIP</span>
+                        </button>
+                        <button id="btnModalDelete" class="btn-modal-action btn-danger-action" title="Excluir este protocolo">
                             <i class="fa-solid fa-trash-can"></i>
                             <span>Excluir</span>
                         </button>
-                        <button id="btnModalDownload" class="btn-modal-action" title="Baixar arquivo">
-                            <i class="fa-solid fa-download"></i>
-                            <span>Baixar</span>
-                        </button>
-                        <a id="btnModalNewTab" href="#" target="_blank" class="btn-modal-action" title="Abrir em tela cheia / nova aba">
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                            <span>Nova Aba</span>
-                        </a>
                         <button id="btnModalClose" class="btn-modal-close" title="Fechar visualização (Esc)">
                             <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Modal Body (PDF Viewer) -->
-                <div class="modal-body">
-                    <!-- Mobile Friendly Notice / Direct Open Button -->
-                    <div class="mobile-pdf-notice">
-                        <a id="btnMobileOpenPdf" href="#" target="_blank" class="btn-mobile-pdf">
-                            <i class="fa-solid fa-file-pdf"></i>
-                            <span>Abrir Documento Completo</span>
-                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
-                        </a>
-                    </div>
-                    <div id="modalLoading" class="modal-pdf-loading">
-                        <div class="spinner"></div>
-                        <p>Carregando pré-visualização do PDF...</p>
-                    </div>
-                    <iframe id="pdfViewerFrame" class="pdf-iframe" src="" title="Pré-visualização do PDF"></iframe>
+                <!-- Modal Body: Split View (List of Files + Integrated PDF Previewer) -->
+                <div class="protocol-modal-body">
+                    <!-- Left Column: File List inside the Protocol -->
+                    <aside class="protocol-files-panel" id="protocolFilesPanel">
+                        <div class="protocol-files-top">
+                            <div class="protocol-files-search">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                                <input type="text" id="protocolFilesSearchInput" placeholder="Filtrar arquivos do protocolo..." autocomplete="off">
+                                <button id="btnClearProtocolFilesSearch" class="btn-clear-mini hidden" title="Limpar filtro"><i class="fa-solid fa-xmark"></i></button>
+                            </div>
+                            <div class="protocol-files-stats">
+                                <span id="protocolFilesCount">Documentos neste protocolo</span>
+                            </div>
+                        </div>
+
+                        <div class="protocol-files-list-container">
+                            <ul class="protocol-files-list" id="protocolFilesList">
+                                <!-- Populated dynamically via JS -->
+                            </ul>
+                        </div>
+                    </aside>
+
+                    <!-- Right Column: Document Viewer -->
+                    <section class="protocol-preview-panel" id="protocolPreviewPanel">
+                        <div class="protocol-preview-toolbar" id="protocolPreviewToolbar">
+                            <div class="preview-doc-title-group">
+                                <button id="btnBackToFilesList" class="btn-back-files" title="Voltar para lista de arquivos">
+                                    <i class="fa-solid fa-arrow-left"></i>
+                                    <span>Lista</span>
+                                </button>
+                                <div class="preview-file-icon">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                </div>
+                                <div class="preview-file-texts">
+                                    <h4 id="activeDocName" class="active-doc-name">Selecione um documento</h4>
+                                    <span id="activeDocMeta" class="active-doc-meta">-- KB &bull; PDF</span>
+                                </div>
+                            </div>
+
+                            <div class="preview-toolbar-actions">
+                                <button id="btnActiveDocDownload" class="btn-preview-action" title="Baixar este arquivo">
+                                    <i class="fa-solid fa-download"></i>
+                                    <span>Baixar PDF</span>
+                                </button>
+                                <a id="btnActiveDocNewTab" href="#" target="_blank" class="btn-preview-action" title="Abrir documento em nova aba">
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                    <span>Nova Aba</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="protocol-preview-content">
+                            <!-- Mobile Friendly Notice / Direct Open Button -->
+                            <div class="mobile-pdf-notice">
+                                <a id="btnMobileOpenPdf" href="#" target="_blank" class="btn-mobile-pdf">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                    <span>Abrir Documento Completo</span>
+                                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                </a>
+                            </div>
+                            <div id="modalLoading" class="modal-pdf-loading hidden">
+                                <div class="spinner"></div>
+                                <p>Carregando documento...</p>
+                            </div>
+                            <div id="emptyFileSelectedState" class="empty-file-selected hidden">
+                                <i class="fa-solid fa-file-circle-question"></i>
+                                <h4>Nenhum documento selecionado</h4>
+                                <p>Selecione um dos arquivos na lista à esquerda para pré-visualizar.</p>
+                            </div>
+                            <iframe id="pdfViewerFrame" class="pdf-iframe" src="" title="Pré-visualização do Documento"></iframe>
+                        </div>
+                    </section>
                 </div>
             </div>
         </div>

@@ -10,7 +10,7 @@ const state = {
     searchTerm: '',
     activeFilterChip: 'all',
     currentSort: 'mtime_desc',
-    currentView: 'cards', // 'cards' | 'table'
+    currentView: 'table', // 'table' | 'cards' (Padrão: Lista)
     activeModalDoc: null,
     docToDelete: null,
     currentPage: 1,
@@ -44,16 +44,27 @@ const btnRefresh = document.getElementById('btnRefresh');
 const btnThemeToggle = document.getElementById('btnThemeToggle');
 const headerDocCount = document.getElementById('headerDocCount');
 
-// Preview Modal Elements
+// Protocol & Preview Modal Elements
 const previewModal = document.getElementById('previewModal');
 const modalDocTitle = document.getElementById('modalDocTitle');
 const modalDocMeta = document.getElementById('modalDocMeta');
+const btnModalDownloadZip = document.getElementById('btnModalDownloadZip');
+const btnModalDelete = document.getElementById('btnModalDelete');
+const btnModalClose = document.getElementById('btnModalClose');
+const protocolFilesPanel = document.getElementById('protocolFilesPanel');
+const protocolFilesSearchInput = document.getElementById('protocolFilesSearchInput');
+const btnClearProtocolFilesSearch = document.getElementById('btnClearProtocolFilesSearch');
+const protocolFilesCount = document.getElementById('protocolFilesCount');
+const protocolFilesList = document.getElementById('protocolFilesList');
+const protocolPreviewPanel = document.getElementById('protocolPreviewPanel');
+const activeDocName = document.getElementById('activeDocName');
+const activeDocMeta = document.getElementById('activeDocMeta');
+const btnActiveDocDownload = document.getElementById('btnActiveDocDownload');
+const btnActiveDocNewTab = document.getElementById('btnActiveDocNewTab');
+const btnBackToFilesList = document.getElementById('btnBackToFilesList');
+const emptyFileSelectedState = document.getElementById('emptyFileSelectedState');
 const pdfViewerFrame = document.getElementById('pdfViewerFrame');
 const modalLoading = document.getElementById('modalLoading');
-const btnModalClose = document.getElementById('btnModalClose');
-const btnModalDownload = document.getElementById('btnModalDownload');
-const btnModalNewTab = document.getElementById('btnModalNewTab');
-const btnModalDelete = document.getElementById('btnModalDelete');
 const btnMobileOpenPdf = document.getElementById('btnMobileOpenPdf');
 const toastContainer = document.getElementById('toastContainer');
 
@@ -215,7 +226,7 @@ function setupEventListeners() {
         btnThemeToggle.addEventListener('click', toggleTheme);
     }
 
-    // Preview Modal Events
+    // Protocol Explorer Modal Events
     if (btnModalClose) btnModalClose.addEventListener('click', closeModal);
     if (previewModal) {
         previewModal.addEventListener('click', (e) => {
@@ -229,15 +240,48 @@ function setupEventListeners() {
         });
     }
 
-    if (btnModalDownload) {
-        btnModalDownload.addEventListener('click', () => {
-            if (state.activeModalDoc) downloadDocument(state.activeModalDoc);
+    if (btnModalDownloadZip) {
+        btnModalDownloadZip.addEventListener('click', () => {
+            if (state.activeModalDoc) downloadProtocolZip(state.activeModalDoc);
         });
     }
 
     if (btnModalDelete) {
         btnModalDelete.addEventListener('click', () => {
             if (state.activeModalDoc) openDeleteModal(state.activeModalDoc);
+        });
+    }
+
+    if (protocolFilesSearchInput) {
+        protocolFilesSearchInput.addEventListener('input', (e) => {
+            const term = e.target.value.trim().toLowerCase();
+            if (btnClearProtocolFilesSearch) {
+                btnClearProtocolFilesSearch.classList.toggle('hidden', !term);
+            }
+            filterProtocolFilesList(term);
+        });
+    }
+
+    if (btnClearProtocolFilesSearch) {
+        btnClearProtocolFilesSearch.addEventListener('click', () => {
+            if (protocolFilesSearchInput) {
+                protocolFilesSearchInput.value = '';
+                btnClearProtocolFilesSearch.classList.add('hidden');
+                filterProtocolFilesList('');
+                protocolFilesSearchInput.focus();
+            }
+        });
+    }
+
+    if (btnBackToFilesList) {
+        btnBackToFilesList.addEventListener('click', () => {
+            if (protocolPreviewPanel) protocolPreviewPanel.classList.remove('mobile-visible');
+        });
+    }
+
+    if (btnActiveDocDownload) {
+        btnActiveDocDownload.addEventListener('click', () => {
+            if (state.activeModalFile) downloadDocument(state.activeModalFile);
         });
     }
 
@@ -374,7 +418,7 @@ function setupEventListeners() {
 async function loadDocuments(forceFetch = false) {
     if (!forceFetch && window.INITIAL_DOCS && Array.isArray(window.INITIAL_DOCS) && window.INITIAL_DOCS.length > 0) {
         state.allDocuments = window.INITIAL_DOCS;
-        if (headerDocCount) headerDocCount.textContent = `${window.INITIAL_DOCS.length} documentos`;
+        if (headerDocCount) headerDocCount.textContent = `${window.INITIAL_DOCS.length} protocolos`;
         if (loadingState) loadingState.classList.add('hidden');
         applyFiltersAndRender();
         return;
@@ -391,20 +435,33 @@ async function loadDocuments(forceFetch = false) {
 
         if (data.success && Array.isArray(data.documents)) {
             state.allDocuments = data.documents;
-            if (headerDocCount) headerDocCount.textContent = `${data.count} documentos`;
+            if (headerDocCount) headerDocCount.textContent = `${data.count} protocolos`;
             applyFiltersAndRender();
         } else {
-            showToast('Erro ao carregar lista de ofícios', 'error');
+            showToast('Erro ao carregar lista de protocolos', 'error');
         }
     } catch (error) {
-        console.error('Erro ao buscar documentos:', error);
+        console.error('Erro ao buscar protocolos:', error);
         showToast('Não foi possível conectar ao servidor', 'error');
     } finally {
         if (loadingState) loadingState.classList.add('hidden');
     }
 }
 
-// Download file
+// Download full protocol as ZIP archive
+function downloadProtocolZip(protocol) {
+    showToast(`Preparando arquivo ZIP de "${protocol.name}"...`, 'info');
+    const pathParts = (protocol.relative_path || protocol.name).split('/').map(encodeURIComponent).join('/');
+    const downloadUrl = `/api/protocolo/download-zip/${pathParts}`;
+    const a = document.createElement('a');
+    a.href = downloadUrl;
+    a.download = `${protocol.folder_name || protocol.name}.zip`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+// Download individual document file
 function downloadDocument(doc) {
     showToast(`Iniciando download de "${doc.name}"...`, 'info');
     const pathParts = (doc.relative_path || doc.name).split('/').map(encodeURIComponent).join('/');
@@ -436,16 +493,42 @@ function applyFiltersAndRender(resetPage = true) {
     const searchNormalized = normalizeText(state.searchTerm);
     const searchTokens = searchNormalized.split(/\s+/).filter(t => t.length > 0);
 
-    // 1. Text Search Filter
+    // 1. Text Search Filter (Matches Protocol name, code, subject, and inner file names!)
     if (searchTokens.length > 0) {
         result = result.filter(doc => {
-            const docNameNormalized = normalizeText(doc.name);
-            const docCategoryNormalized = normalizeText(doc.category);
-            return searchTokens.every(token => 
-                docNameNormalized.includes(token) || 
-                docCategoryNormalized.includes(token)
+            const docNameNorm = normalizeText(doc.name);
+            const docCategoryNorm = normalizeText(doc.category);
+            const docProtNorm = normalizeText(doc.protocolo);
+            const docAssuntoNorm = normalizeText(doc.assunto);
+
+            // Check if matches top-level protocol info
+            const matchesProtocol = searchTokens.every(token => 
+                docNameNorm.includes(token) || 
+                docCategoryNorm.includes(token) ||
+                docProtNorm.includes(token) ||
+                docAssuntoNorm.includes(token)
             );
+
+            if (matchesProtocol) {
+                doc.matched_file_name = null;
+                return true;
+            }
+
+            // Check if any file inside matches
+            if (doc.files && Array.isArray(doc.files)) {
+                for (const f of doc.files) {
+                    const fNameNorm = normalizeText(f.name);
+                    if (searchTokens.every(token => fNameNorm.includes(token))) {
+                        doc.matched_file_name = f.name;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         });
+    } else {
+        result.forEach(doc => { doc.matched_file_name = null; });
     }
 
     // 2. Chip Filter
@@ -454,13 +537,17 @@ function applyFiltersAndRender(resetPage = true) {
         result = result.filter(doc => {
             const nameNorm = normalizeText(doc.name);
             const catNorm = normalizeText(doc.category);
-            if (filterKey === '2024') return nameNorm.includes('2024') || doc.year === '2024';
-            if (filterKey === '2023') return nameNorm.includes('2023') || doc.year === '2023';
-            if (filterKey === 'videomonitoramento') return nameNorm.includes('videomonitoramento') || nameNorm.includes('camera') || nameNorm.includes('câmera');
-            if (filterKey === 'garantia') return nameNorm.includes('garantia');
-            if (filterKey === 'iluminacao') return nameNorm.includes('ilumina');
-            if (filterKey === 'relatorio') return nameNorm.includes('relat') || catNorm.includes('relat');
-            if (filterKey === 'anexo') return nameNorm.includes('anexo') || catNorm.includes('anexo');
+            const statusNorm = normalizeText(doc.status);
+
+            if (filterKey === '2026') return nameNorm.includes('2026') || doc.year === '2026';
+            if (filterKey === 'pagamento') return catNorm.includes('pagamento') || nameNorm.includes('pagamento') || nameNorm.includes('parcela');
+            if (filterKey === 'iluminacao') return catNorm.includes('ilumina') || nameNorm.includes('ilumina') || nameNorm.includes('dimeriza') || nameNorm.includes('destaque');
+            if (filterKey === 'videomonitoramento') return catNorm.includes('videomonitoramento') || nameNorm.includes('videomonitoramento') || nameNorm.includes('camera') || nameNorm.includes('câmera') || nameNorm.includes('facial');
+            if (filterKey === 'fotovoltaico') return catNorm.includes('fotovoltaico') || nameNorm.includes('fotovoltaico') || nameNorm.includes('carport');
+            if (filterKey === 'deferido') return statusNorm === 'deferido' || nameNorm.includes('(deferido)');
+            if (filterKey === 'indeferido') return statusNorm === 'indeferido' || nameNorm.includes('(indeferido)');
+            if (filterKey === 'reajuste') return catNorm.includes('reajuste') || nameNorm.includes('reajuste') || nameNorm.includes('prm');
+            if (filterKey === 'aditivo') return catNorm.includes('aditivo') || nameNorm.includes('aditivo') || nameNorm.includes('termo');
             return true;
         });
 
@@ -512,7 +599,7 @@ function renderResults() {
 
     if (count === 0) {
         if (resultsCounter) {
-            resultsCounter.innerHTML = `Nenhum ofício encontrado`;
+            resultsCounter.innerHTML = `Nenhum protocolo encontrado`;
         }
         if (documentsCardsContainer) documentsCardsContainer.classList.add('hidden');
         if (documentsTableContainer) documentsTableContainer.classList.add('hidden');
@@ -535,8 +622,10 @@ function renderResults() {
     const endIndex = Math.min(startIndex + state.pageSize, count);
     const pagedDocuments = state.filteredDocuments.slice(startIndex, endIndex);
 
+    const totalDocsInFiltered = state.filteredDocuments.reduce((sum, p) => sum + (p.total_files || (p.files ? p.files.length : 1)), 0);
+
     if (resultsCounter) {
-        resultsCounter.innerHTML = `Exibindo <strong>${startIndex + 1}–${endIndex}</strong> de <strong>${count}</strong> ofícios`;
+        resultsCounter.innerHTML = `Exibindo <strong>${startIndex + 1}–${endIndex}</strong> de <strong>${count}</strong> protocolos (${totalDocsInFiltered} documentos indexados)`;
     }
 
     if (state.currentView === 'cards') {
@@ -683,7 +772,7 @@ function escapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
-// Render Cards View
+// Render Cards View (Visual idêntico ao layout padrão, com ícone de pasta e suporte a múltiplos documentos)
 function renderCardsView(documents = state.filteredDocuments) {
     if (!documentsCardsContainer) return;
     documentsCardsContainer.innerHTML = '';
@@ -693,21 +782,32 @@ function renderCardsView(documents = state.filteredDocuments) {
         const card = document.createElement('div');
         card.className = 'doc-card';
 
-        const fileIconClass = doc.is_pdf ? 'fa-solid fa-file-pdf' : 'fa-solid fa-file-lines';
         const highlightedTitle = highlightText(doc.name, state.searchTerm);
+        const statusBadge = doc.status 
+            ? `<span class="doc-badge status-${doc.status.toLowerCase()}">${escapeHtml(doc.status)}</span>` 
+            : '';
+
+        const matchedHintHtml = doc.matched_file_name 
+            ? `<div class="doc-matched-file-hint" title="Contém este documento"><i class="fa-solid fa-file-pdf"></i> Arquivo: <strong>${highlightText(doc.matched_file_name, state.searchTerm)}</strong></div>`
+            : '';
 
         card.innerHTML = `
             <div>
                 <div class="doc-card-header">
-                    <div class="doc-icon-wrapper">
-                        <i class="${fileIconClass}"></i>
+                    <div class="doc-icon-wrapper is-folder" title="Pasta de Protocolo">
+                        <i class="fa-solid fa-folder"></i>
                     </div>
                     <div class="doc-card-title-group">
                         <div class="doc-badges">
                             ${doc.year ? `<span class="doc-badge year">${doc.year}</span>` : ''}
                             <span class="doc-badge category">${escapeHtml(doc.category)}</span>
+                            ${statusBadge}
+                            <span class="doc-badge file-count" title="${doc.total_files} documentos no protocolo">
+                                <i class="fa-regular fa-file-lines"></i> ${doc.total_files} doc${doc.total_files !== 1 ? 's' : ''}
+                            </span>
                         </div>
                         <h4 class="doc-title" title="${escapeHtml(doc.name)}">${highlightedTitle}</h4>
+                        ${matchedHintHtml}
                     </div>
                 </div>
 
@@ -722,31 +822,39 @@ function renderCardsView(documents = state.filteredDocuments) {
                     </div>
                     <div class="meta-item full-width">
                         <span class="meta-label"><i class="fa-solid fa-hard-drive"></i> Tamanho</span>
-                        <span class="meta-value">${doc.size_formatted}</span>
+                        <span class="meta-value">${doc.total_files} arquivo${doc.total_files !== 1 ? 's' : ''} &bull; ${doc.size_formatted}</span>
                     </div>
                 </div>
             </div>
 
             <div class="doc-card-actions">
-                <button class="btn-card-action btn-preview" title="Visualizar documento">
+                <button class="btn-card-action btn-preview" title="Abrir e selecionar arquivos do protocolo">
                     <i class="fa-regular fa-eye"></i>
                     <span>Ver</span>
                 </button>
-                <button class="btn-card-action btn-download" title="Baixar arquivo">
+                <button class="btn-card-action btn-download" title="Baixar todos os arquivos da pasta em ZIP">
                     <i class="fa-solid fa-download"></i>
                     <span>Baixar</span>
                 </button>
-                <button class="btn-card-action btn-delete" title="Excluir documento permanentemente">
+                <button class="btn-card-action btn-delete" title="Excluir pasta do protocolo permanentemente">
                     <i class="fa-regular fa-trash-can"></i>
                     <span>Excluir</span>
                 </button>
             </div>
         `;
 
-        card.querySelector('.btn-preview').addEventListener('click', () => openPreviewModal(doc));
-        card.querySelector('.doc-title').addEventListener('click', () => openPreviewModal(doc));
-        card.querySelector('.btn-download').addEventListener('click', () => downloadDocument(doc));
-        card.querySelector('.btn-delete').addEventListener('click', () => openDeleteModal(doc));
+        // Event listeners
+        const btnPreview = card.querySelector('.btn-preview');
+        const docTitle = card.querySelector('.doc-title');
+        const iconWrapper = card.querySelector('.doc-icon-wrapper');
+        const btnDownload = card.querySelector('.btn-download');
+        const btnDelete = card.querySelector('.btn-delete');
+
+        if (btnPreview) btnPreview.addEventListener('click', () => openPreviewModal(doc));
+        if (docTitle) docTitle.addEventListener('click', () => openPreviewModal(doc));
+        if (iconWrapper) iconWrapper.addEventListener('click', () => openPreviewModal(doc));
+        if (btnDownload) btnDownload.addEventListener('click', () => downloadProtocolZip(doc));
+        if (btnDelete) btnDelete.addEventListener('click', () => openDeleteModal(doc));
 
         fragment.appendChild(card);
     });
@@ -762,34 +870,57 @@ function renderTableView(documents = state.filteredDocuments) {
 
     documents.forEach(doc => {
         const tr = document.createElement('tr');
-        const fileIconClass = doc.is_pdf ? 'fa-solid fa-file-pdf' : 'fa-solid fa-file-lines';
         const highlightedTitle = highlightText(doc.name, state.searchTerm);
+        const statusBadge = doc.status 
+            ? `<span class="doc-badge status-${doc.status.toLowerCase()}" style="font-size: 0.65rem;">${escapeHtml(doc.status)}</span>` 
+            : '';
+
+        const matchedHintHtml = doc.matched_file_name 
+            ? `<div class="doc-matched-file-hint" style="margin-top: 4px; font-size: 0.72rem;"><i class="fa-solid fa-file-pdf"></i> ${highlightText(doc.matched_file_name, state.searchTerm)}</div>`
+            : '';
 
         tr.innerHTML = `
             <td>
                 <div class="table-doc-title-cell">
-                    <i class="${fileIconClass} table-doc-icon"></i>
+                    <div class="doc-icon-wrapper is-folder" style="width: 36px; height: 36px; font-size: 1.1rem; flex-shrink: 0; cursor: pointer;">
+                        <i class="fa-solid fa-folder"></i>
+                    </div>
                     <div>
-                        <span class="table-doc-title" title="${escapeHtml(doc.name)}">${highlightedTitle}</span>
-                        <div class="doc-badges" style="margin-top: 3px;">
+                        <span class="table-doc-title" title="${escapeHtml(doc.name)}" style="cursor: pointer; font-weight: 600;">${highlightedTitle}</span>
+                        <div class="doc-badges" style="margin-top: 4px;">
                             ${doc.year ? `<span class="doc-badge year" style="font-size: 0.65rem;">${doc.year}</span>` : ''}
                             <span class="doc-badge category" style="font-size: 0.65rem;">${escapeHtml(doc.category)}</span>
+                            ${statusBadge}
                         </div>
+                        ${matchedHintHtml}
                     </div>
                 </div>
             </td>
-            <td><strong>${doc.mtime_formatted}</strong></td>
-            <td>${doc.ctime_formatted}</td>
-            <td>${doc.size_formatted}</td>
+            <td>
+                <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">
+                    ${escapeHtml(doc.assunto || doc.name)}
+                </div>
+            </td>
+            <td>
+                <span class="doc-badge file-count" style="font-size: 0.75rem;">
+                    <i class="fa-regular fa-file-lines"></i> ${doc.total_files} docs
+                </span>
+                <div style="font-size: 0.72rem; color: var(--text-tertiary); margin-top: 2px;">
+                    ${doc.size_formatted}
+                </div>
+            </td>
+            <td>
+                <strong style="font-size: 0.85rem;">${doc.mtime_formatted}</strong>
+            </td>
             <td>
                 <div class="table-actions">
-                    <button class="btn-table-action primary btn-table-preview" title="Visualizar documento">
+                    <button class="btn-table-action primary btn-table-preview" title="Visualizar arquivos do protocolo">
                         <i class="fa-regular fa-eye"></i>
                     </button>
-                    <button class="btn-table-action btn-table-download" title="Baixar arquivo">
+                    <button class="btn-table-action btn-table-download" title="Baixar todos os arquivos (ZIP)">
                         <i class="fa-solid fa-download"></i>
                     </button>
-                    <button class="btn-table-action btn-table-delete" title="Excluir arquivo">
+                    <button class="btn-table-action btn-table-delete" title="Excluir pasta do protocolo">
                         <i class="fa-regular fa-trash-can"></i>
                     </button>
                 </div>
@@ -798,7 +929,8 @@ function renderTableView(documents = state.filteredDocuments) {
 
         tr.querySelector('.btn-table-preview').addEventListener('click', () => openPreviewModal(doc));
         tr.querySelector('.table-doc-title').addEventListener('click', () => openPreviewModal(doc));
-        tr.querySelector('.btn-table-download').addEventListener('click', () => downloadDocument(doc));
+        tr.querySelector('.doc-icon-wrapper').addEventListener('click', () => openPreviewModal(doc));
+        tr.querySelector('.btn-table-download').addEventListener('click', () => downloadProtocolZip(doc));
         tr.querySelector('.btn-table-delete').addEventListener('click', () => openDeleteModal(doc));
 
         fragment.appendChild(tr);
@@ -808,41 +940,203 @@ function renderTableView(documents = state.filteredDocuments) {
 }
 
 // ==========================================================================
-// Preview Modal Handling
+// Protocol & Document Explorer Modal Handling
 // ==========================================================================
-function openPreviewModal(doc) {
-    state.activeModalDoc = doc;
+function openPreviewModal(protocol) {
+    state.activeModalDoc = protocol;
+    state.activeModalFile = null;
 
     if (modalDocTitle) {
-        modalDocTitle.textContent = doc.name;
-        modalDocTitle.title = doc.name;
+        modalDocTitle.textContent = protocol.name;
+        modalDocTitle.title = protocol.name;
     }
+
     if (modalDocMeta) {
+        const statusBadge = protocol.status 
+            ? `<span class="doc-badge status-${protocol.status.toLowerCase()}">${escapeHtml(protocol.status)}</span>` 
+            : '';
+
         modalDocMeta.innerHTML = `
-            <span><i class="fa-regular fa-clock"></i> Modificado: ${doc.mtime_formatted}</span>
-            <span>&bull;</span>
-            <span><i class="fa-regular fa-calendar-plus"></i> Criado: ${doc.ctime_formatted}</span>
-            <span>&bull;</span>
-            <span><i class="fa-solid fa-hard-drive"></i> ${doc.size_formatted}</span>
+            ${protocol.year ? `<span class="doc-badge year">${protocol.year}</span>` : ''}
+            <span class="doc-badge category">${escapeHtml(protocol.category)}</span>
+            ${statusBadge}
+            <span class="doc-badge file-count">
+                <i class="fa-regular fa-file-lines"></i> ${protocol.total_files} arquivo${protocol.total_files !== 1 ? 's' : ''}
+            </span>
+            <span style="font-size: 0.8rem; color: var(--text-tertiary);">
+                <i class="fa-solid fa-hard-drive"></i> ${protocol.size_formatted}
+            </span>
         `;
     }
 
-    const pathParts = (doc.relative_path || doc.name).split('/').map(encodeURIComponent).join('/');
-    const previewUrl = `/api/pdf/preview/${pathParts}`;
-    if (btnModalNewTab) btnModalNewTab.href = previewUrl;
-    if (btnMobileOpenPdf) btnMobileOpenPdf.href = previewUrl;
+    // Reset files search
+    if (protocolFilesSearchInput) {
+        protocolFilesSearchInput.value = '';
+    }
+    if (btnClearProtocolFilesSearch) {
+        btnClearProtocolFilesSearch.classList.add('hidden');
+    }
 
-    if (modalLoading) modalLoading.classList.remove('hidden');
-    if (pdfViewerFrame) pdfViewerFrame.src = previewUrl;
+    // Populate inner file list
+    const files = Array.isArray(protocol.files) ? protocol.files : [];
+    renderProtocolFilesList(files);
+
+    // Auto-select document: matched file or first file
+    let targetFile = null;
+    if (protocol.matched_file_name) {
+        targetFile = files.find(f => f.name === protocol.matched_file_name);
+    }
+    if (!targetFile && files.length > 0) {
+        targetFile = files[0];
+    }
+
+    if (targetFile) {
+        selectProtocolFile(targetFile);
+    } else {
+        // Empty protocol folder
+        if (activeDocName) activeDocName.textContent = 'Nenhum documento encontrado';
+        if (activeDocMeta) activeDocMeta.textContent = '--';
+        if (pdfViewerFrame) {
+            pdfViewerFrame.classList.add('hidden');
+            pdfViewerFrame.src = '';
+        }
+        if (emptyFileSelectedState) emptyFileSelectedState.classList.remove('hidden');
+    }
 
     if (previewModal) previewModal.classList.remove('hidden');
     document.body.style.overflow = 'hidden';
 }
 
+// Render list of files inside the protocol
+function renderProtocolFilesList(files) {
+    if (!protocolFilesList) return;
+    protocolFilesList.innerHTML = '';
+
+    if (protocolFilesCount) {
+        protocolFilesCount.textContent = `${files.length} documento${files.length !== 1 ? 's' : ''} no protocolo`;
+    }
+
+    if (!files.length) {
+        protocolFilesList.innerHTML = `
+            <li class="protocol-files-empty">
+                <i class="fa-solid fa-folder-open"></i>
+                <p>Nenhum arquivo nesta pasta de protocolo.</p>
+            </li>
+        `;
+        return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    files.forEach((file, index) => {
+        const li = document.createElement('li');
+        li.className = 'protocol-file-item';
+        li.dataset.path = file.relative_path;
+        li.dataset.name = file.name;
+
+        li.innerHTML = `
+            <span class="file-num-pill">${index + 1}</span>
+            <div class="file-item-icon">
+                <i class="fa-solid fa-file-pdf"></i>
+            </div>
+            <div class="file-item-info">
+                <span class="file-item-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</span>
+                <span class="file-item-meta">${file.size_formatted} &bull; ${file.mtime_formatted || ''}</span>
+            </div>
+            <button class="btn-file-quick-download" title="Baixar este arquivo" aria-label="Baixar ${escapeHtml(file.name)}">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        `;
+
+        li.addEventListener('click', (e) => {
+            if (e.target.closest('.btn-file-quick-download')) return;
+            selectProtocolFile(file);
+        });
+
+        const btnQuick = li.querySelector('.btn-file-quick-download');
+        if (btnQuick) {
+            btnQuick.addEventListener('click', (e) => {
+                e.stopPropagation();
+                downloadDocument(file);
+            });
+        }
+
+        fragment.appendChild(li);
+    });
+
+    protocolFilesList.appendChild(fragment);
+}
+
+// Select and preview a specific file from the protocol
+function selectProtocolFile(file) {
+    if (!file) return;
+    state.activeModalFile = file;
+
+    // Highlight active item in list
+    if (protocolFilesList) {
+        const allItems = protocolFilesList.querySelectorAll('.protocol-file-item');
+        allItems.forEach(item => {
+            item.classList.toggle('active', item.dataset.path === file.relative_path);
+        });
+    }
+
+    // Update viewer toolbar
+    if (activeDocName) {
+        activeDocName.textContent = file.name;
+        activeDocName.title = file.name;
+    }
+    if (activeDocMeta) {
+        activeDocMeta.textContent = `${file.size_formatted} • Modificado em ${file.mtime_formatted || ''} • PDF`;
+    }
+
+    const pathParts = (file.relative_path || file.name).split('/').map(encodeURIComponent).join('/');
+    const previewUrl = `/api/pdf/preview/${pathParts}`;
+
+    if (btnActiveDocNewTab) btnActiveDocNewTab.href = previewUrl;
+    if (btnMobileOpenPdf) btnMobileOpenPdf.href = previewUrl;
+
+    if (emptyFileSelectedState) emptyFileSelectedState.classList.add('hidden');
+    if (modalLoading) modalLoading.classList.remove('hidden');
+
+    if (pdfViewerFrame) {
+        pdfViewerFrame.classList.remove('hidden');
+        pdfViewerFrame.src = previewUrl;
+    }
+
+    // Mobile slide to preview pane
+    if (window.innerWidth <= 768 && protocolPreviewPanel) {
+        protocolPreviewPanel.classList.add('mobile-visible');
+    }
+}
+
+// Filter the protocol files inside the modal
+function filterProtocolFilesList(term) {
+    if (!protocolFilesList) return;
+    const items = protocolFilesList.querySelectorAll('.protocol-file-item');
+    let visibleCount = 0;
+
+    items.forEach(item => {
+        const name = normalizeText(item.dataset.name || '');
+        const matches = !term || name.includes(term);
+        item.style.display = matches ? '' : 'none';
+        if (matches) visibleCount++;
+    });
+
+    if (protocolFilesCount) {
+        if (!term) {
+            protocolFilesCount.textContent = `${items.length} documento${items.length !== 1 ? 's' : ''} no protocolo`;
+        } else {
+            protocolFilesCount.textContent = `${visibleCount} de ${items.length} documento${items.length !== 1 ? 's' : ''}`;
+        }
+    }
+}
+
 function closeModal() {
     if (previewModal) previewModal.classList.add('hidden');
     if (pdfViewerFrame) pdfViewerFrame.src = '';
+    if (protocolPreviewPanel) protocolPreviewPanel.classList.remove('mobile-visible');
     state.activeModalDoc = null;
+    state.activeModalFile = null;
     document.body.style.overflow = '';
 }
 
@@ -879,7 +1173,7 @@ async function confirmDelete() {
         const headers = { 'Content-Type': 'application/json' };
         if (token) headers['X-GitHub-Token'] = token;
 
-        const response = await fetch('/api/oficios/delete', {
+        const response = await fetch('/api/protocolo/delete', {
             method: 'POST',
             headers: headers,
             body: JSON.stringify({ relative_path: doc.relative_path })
@@ -888,30 +1182,30 @@ async function confirmDelete() {
 
         if (data.success) {
             state.allDocuments = state.allDocuments.filter(d => d.relative_path !== doc.relative_path && d.name !== doc.name);
-            if (headerDocCount) headerDocCount.textContent = `${state.allDocuments.length} documentos`;
+            if (headerDocCount) headerDocCount.textContent = `${state.allDocuments.length} protocolos`;
             applyFiltersAndRender();
             closeDeleteModal();
             if (state.activeModalDoc && state.activeModalDoc.relative_path === doc.relative_path) {
                 closeModal();
             }
-            showToast(data.message || 'Ofício removido com sucesso!', 'success');
+            showToast(data.message || 'Protocolo removido com sucesso!', 'success');
         } else {
             if (data.error === 'github_token_required') {
                 showToast(data.message, 'error');
                 closeDeleteModal();
                 openImportModal();
                 if (importNoticeAlert && importNoticeMessage) {
-                    importNoticeMessage.innerHTML = 'Para excluir ofícios permanentemente no Vercel, informe o <strong>GitHub Personal Access Token</strong> nas configurações abaixo ou adicione a variável <code>GITHUB_TOKEN</code> no painel da Vercel.';
+                    importNoticeMessage.innerHTML = 'Para excluir protocolos permanentemente no Vercel, informe o <strong>GitHub Personal Access Token</strong> nas configurações abaixo ou adicione a variável <code>GITHUB_TOKEN</code> no painel da Vercel.';
                     importNoticeAlert.classList.remove('hidden');
                 }
                 toggleGithubSettings(true);
             } else {
-                showToast(data.error || 'Erro ao excluir documento', 'error');
+                showToast(data.error || 'Erro ao excluir protocolo', 'error');
             }
         }
     } catch (err) {
         console.error('Erro ao excluir:', err);
-        showToast('Erro de conexão ao excluir ofício', 'error');
+        showToast('Erro de conexão ao excluir protocolo', 'error');
     } finally {
         btnConfirmDelete.disabled = false;
         btnConfirmDelete.innerHTML = originalHtml;
