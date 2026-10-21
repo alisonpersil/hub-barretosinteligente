@@ -7,11 +7,13 @@
 const state = {
     allDocuments: [],
     filteredDocuments: [],
+    activeMainTab: 'protocolos', // 'protocolos' | 'oficios' | 'todos'
     searchTerm: '',
     activeFilterChip: 'all',
     currentSort: 'mtime_desc',
     currentView: 'table', // 'table' | 'cards' (Padrão: Lista)
     activeModalDoc: null,
+    activeModalFile: null,
     docToDelete: null,
     currentPage: 1,
     pageSize: 15
@@ -20,6 +22,11 @@ const state = {
 let selectedImportFiles = [];
 
 // DOM Elements
+const moduleTabBtns = document.querySelectorAll('.module-tab-btn');
+const badgeCountProtocolos = document.getElementById('badgeCountProtocolos');
+const badgeCountOficios = document.getElementById('badgeCountOficios');
+const badgeCountTodos = document.getElementById('badgeCountTodos');
+
 const searchInput = document.getElementById('searchInput');
 const btnClearSearch = document.getElementById('btnClearSearch');
 const btnSearchSubmit = document.getElementById('btnSearchSubmit');
@@ -177,6 +184,17 @@ function setupEventListeners() {
         }
     });
 
+    // Module Tabs: Protocolos vs Ofícios vs Todos
+    moduleTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            moduleTabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            state.activeMainTab = btn.dataset.mainTab || 'protocolos';
+            updateModuleTabCounts();
+            applyFiltersAndRender(true);
+        });
+    });
+
     // Filter Chips
     filterChips.forEach(chip => {
         chip.addEventListener('click', () => {
@@ -216,7 +234,7 @@ function setupEventListeners() {
             loadDocuments(true).then(() => {
                 setTimeout(() => {
                     if (icon) icon.classList.remove('fa-spin');
-                    showToast('Lista de ofícios atualizada!', 'success');
+                    showToast('Lista de documentos atualizada!', 'success');
                 }, 400);
             });
         });
@@ -242,7 +260,13 @@ function setupEventListeners() {
 
     if (btnModalDownloadZip) {
         btnModalDownloadZip.addEventListener('click', () => {
-            if (state.activeModalDoc) downloadProtocolZip(state.activeModalDoc);
+            if (state.activeModalDoc) {
+                if (state.activeModalDoc.doc_type === 'oficio') {
+                    downloadDocument(state.activeModalDoc);
+                } else {
+                    downloadProtocolZip(state.activeModalDoc);
+                }
+            }
         });
     }
 
@@ -412,13 +436,33 @@ function setupEventListeners() {
     }
 }
 
+function updateModuleTabCounts() {
+    const protCount = state.allDocuments.filter(d => d.doc_type === 'protocolo').length;
+    const oficiosCount = state.allDocuments.filter(d => d.doc_type === 'oficio').length;
+    const totalCount = state.allDocuments.length;
+
+    if (badgeCountProtocolos) badgeCountProtocolos.textContent = protCount;
+    if (badgeCountOficios) badgeCountOficios.textContent = oficiosCount;
+    if (badgeCountTodos) badgeCountTodos.textContent = totalCount;
+
+    if (headerDocCount) {
+        if (state.activeMainTab === 'protocolos') {
+            headerDocCount.textContent = `${protCount} protocolos`;
+        } else if (state.activeMainTab === 'oficios') {
+            headerDocCount.textContent = `${oficiosCount} ofícios`;
+        } else {
+            headerDocCount.textContent = `${totalCount} documentos`;
+        }
+    }
+}
+
 // ==========================================================================
 // Data Fetching & API
 // ==========================================================================
 async function loadDocuments(forceFetch = false) {
     if (!forceFetch && window.INITIAL_DOCS && Array.isArray(window.INITIAL_DOCS) && window.INITIAL_DOCS.length > 0) {
         state.allDocuments = window.INITIAL_DOCS;
-        if (headerDocCount) headerDocCount.textContent = `${window.INITIAL_DOCS.length} protocolos`;
+        updateModuleTabCounts();
         if (loadingState) loadingState.classList.add('hidden');
         applyFiltersAndRender();
         return;
@@ -435,13 +479,13 @@ async function loadDocuments(forceFetch = false) {
 
         if (data.success && Array.isArray(data.documents)) {
             state.allDocuments = data.documents;
-            if (headerDocCount) headerDocCount.textContent = `${data.count} protocolos`;
+            updateModuleTabCounts();
             applyFiltersAndRender();
         } else {
-            showToast('Erro ao carregar lista de protocolos', 'error');
+            showToast('Erro ao carregar lista de documentos', 'error');
         }
     } catch (error) {
-        console.error('Erro ao buscar protocolos:', error);
+        console.error('Erro ao buscar documentos:', error);
         showToast('Não foi possível conectar ao servidor', 'error');
     } finally {
         if (loadingState) loadingState.classList.add('hidden');
@@ -485,11 +529,38 @@ function normalizeText(text) {
         .toLowerCase();
 }
 
+function getTypeWords(count = 1) {
+    if (state.activeMainTab === 'protocolos') {
+        return {
+            single: 'protocolo',
+            plural: count === 1 ? 'protocolo' : 'protocolos'
+        };
+    } else if (state.activeMainTab === 'oficios') {
+        return {
+            single: 'ofício',
+            plural: count === 1 ? 'ofício' : 'ofícios'
+        };
+    } else {
+        return {
+            single: 'item',
+            plural: count === 1 ? 'item' : 'itens'
+        };
+    }
+}
+
 function applyFiltersAndRender(resetPage = true) {
     if (resetPage) {
         state.currentPage = 1;
     }
     let result = [...state.allDocuments];
+
+    // 0. Main Tab Filter (Protocolos vs Ofícios vs Todos)
+    if (state.activeMainTab === 'protocolos') {
+        result = result.filter(doc => doc.doc_type === 'protocolo');
+    } else if (state.activeMainTab === 'oficios') {
+        result = result.filter(doc => doc.doc_type === 'oficio');
+    }
+
     const searchNormalized = normalizeText(state.searchTerm);
     const searchTokens = searchNormalized.split(/\s+/).filter(t => t.length > 0);
 
@@ -501,7 +572,7 @@ function applyFiltersAndRender(resetPage = true) {
             const docProtNorm = normalizeText(doc.protocolo);
             const docAssuntoNorm = normalizeText(doc.assunto);
 
-            // Check if matches top-level protocol info
+            // Check if matches top-level info
             const matchesProtocol = searchTokens.every(token => 
                 docNameNorm.includes(token) || 
                 docCategoryNorm.includes(token) ||
@@ -596,10 +667,11 @@ function getFilterLabel(filterKey) {
 function renderResults() {
     const total = state.allDocuments.length;
     const count = state.filteredDocuments.length;
+    const typeWords = getTypeWords(count);
 
     if (count === 0) {
         if (resultsCounter) {
-            resultsCounter.innerHTML = `Nenhum protocolo encontrado`;
+            resultsCounter.innerHTML = `Nenhum ${typeWords.single} encontrado`;
         }
         if (documentsCardsContainer) documentsCardsContainer.classList.add('hidden');
         if (documentsTableContainer) documentsTableContainer.classList.add('hidden');
@@ -625,7 +697,7 @@ function renderResults() {
     const totalDocsInFiltered = state.filteredDocuments.reduce((sum, p) => sum + (p.total_files || (p.files ? p.files.length : 1)), 0);
 
     if (resultsCounter) {
-        resultsCounter.innerHTML = `Exibindo <strong>${startIndex + 1}–${endIndex}</strong> de <strong>${count}</strong> protocolos (${totalDocsInFiltered} documentos indexados)`;
+        resultsCounter.innerHTML = `Exibindo <strong>${startIndex + 1}–${endIndex}</strong> de <strong>${count}</strong> ${typeWords.plural} (${totalDocsInFiltered} documentos indexados)`;
     }
 
     if (state.currentView === 'cards') {
@@ -652,10 +724,12 @@ function renderPagination(totalPages, totalItems, fromItem, toItem) {
 
     paginationContainer.classList.remove('hidden');
 
+    const typeWords = getTypeWords(totalItems);
+
     const infoHtml = `
         <div class="pagination-info">
             Página <strong>${state.currentPage}</strong> de <strong>${totalPages}</strong>
-            <span>(${totalItems} ofícios no total)</span>
+            <span>(${totalItems} ${typeWords.plural} no total)</span>
         </div>
     `;
 
@@ -772,7 +846,7 @@ function escapeHtml(str) {
         .replace(/'/g, '&#039;');
 }
 
-// Render Cards View (Visual idêntico ao layout padrão, com ícone de pasta e suporte a múltiplos documentos)
+// Render Cards View (Visual idêntico ao layout padrão, com ícone de pasta/PDF e suporte a múltiplos documentos ou arquivo único)
 function renderCardsView(documents = state.filteredDocuments) {
     if (!documentsCardsContainer) return;
     documentsCardsContainer.innerHTML = '';
@@ -781,6 +855,11 @@ function renderCardsView(documents = state.filteredDocuments) {
     documents.forEach(doc => {
         const card = document.createElement('div');
         card.className = 'doc-card';
+
+        const isOficio = doc.doc_type === 'oficio';
+        const typeBadge = isOficio 
+            ? `<span class="doc-badge type-oficio"><i class="fa-solid fa-file-pdf"></i> Ofício</span>` 
+            : `<span class="doc-badge type-protocolo"><i class="fa-solid fa-folder-tree"></i> Protocolo</span>`;
 
         const highlightedTitle = highlightText(doc.name, state.searchTerm);
         const statusBadge = doc.status 
@@ -794,17 +873,19 @@ function renderCardsView(documents = state.filteredDocuments) {
         card.innerHTML = `
             <div>
                 <div class="doc-card-header">
-                    <div class="doc-icon-wrapper is-folder" title="Pasta de Protocolo">
-                        <i class="fa-solid fa-folder"></i>
+                    <div class="doc-icon-wrapper ${isOficio ? 'is-oficio' : 'is-folder'}" title="${isOficio ? 'Documento de Ofício' : 'Pasta de Protocolo'}">
+                        <i class="fa-solid ${isOficio ? 'fa-file-pdf' : 'fa-folder'}"></i>
                     </div>
                     <div class="doc-card-title-group">
                         <div class="doc-badges">
+                            ${typeBadge}
                             ${doc.year ? `<span class="doc-badge year">${doc.year}</span>` : ''}
                             <span class="doc-badge category">${escapeHtml(doc.category)}</span>
                             ${statusBadge}
+                            ${!isOficio ? `
                             <span class="doc-badge file-count" title="${doc.total_files} documentos no protocolo">
                                 <i class="fa-regular fa-file-lines"></i> ${doc.total_files} doc${doc.total_files !== 1 ? 's' : ''}
-                            </span>
+                            </span>` : ''}
                         </div>
                         <h4 class="doc-title" title="${escapeHtml(doc.name)}">${highlightedTitle}</h4>
                         ${matchedHintHtml}
@@ -822,21 +903,21 @@ function renderCardsView(documents = state.filteredDocuments) {
                     </div>
                     <div class="meta-item full-width">
                         <span class="meta-label"><i class="fa-solid fa-hard-drive"></i> Tamanho</span>
-                        <span class="meta-value">${doc.total_files} arquivo${doc.total_files !== 1 ? 's' : ''} &bull; ${doc.size_formatted}</span>
+                        <span class="meta-value">${isOficio ? doc.size_formatted : `${doc.total_files} arquivo${doc.total_files !== 1 ? 's' : ''} &bull; ${doc.size_formatted}`}</span>
                     </div>
                 </div>
             </div>
 
             <div class="doc-card-actions">
-                <button class="btn-card-action btn-preview" title="Abrir e selecionar arquivos do protocolo">
+                <button class="btn-card-action btn-preview" title="${isOficio ? 'Visualizar arquivo PDF' : 'Abrir e selecionar arquivos do protocolo'}">
                     <i class="fa-regular fa-eye"></i>
                     <span>Ver</span>
                 </button>
-                <button class="btn-card-action btn-download" title="Baixar todos os arquivos da pasta em ZIP">
+                <button class="btn-card-action btn-download" title="${isOficio ? 'Baixar arquivo PDF' : 'Baixar todos os arquivos da pasta em ZIP'}">
                     <i class="fa-solid fa-download"></i>
                     <span>Baixar</span>
                 </button>
-                <button class="btn-card-action btn-delete" title="Excluir pasta do protocolo permanentemente">
+                <button class="btn-card-action btn-delete" title="${isOficio ? 'Excluir ofício permanentemente' : 'Excluir pasta do protocolo permanentemente'}">
                     <i class="fa-regular fa-trash-can"></i>
                     <span>Excluir</span>
                 </button>
@@ -853,7 +934,15 @@ function renderCardsView(documents = state.filteredDocuments) {
         if (btnPreview) btnPreview.addEventListener('click', () => openPreviewModal(doc));
         if (docTitle) docTitle.addEventListener('click', () => openPreviewModal(doc));
         if (iconWrapper) iconWrapper.addEventListener('click', () => openPreviewModal(doc));
-        if (btnDownload) btnDownload.addEventListener('click', () => downloadProtocolZip(doc));
+        if (btnDownload) {
+            btnDownload.addEventListener('click', () => {
+                if (isOficio) {
+                    downloadDocument(doc);
+                } else {
+                    downloadProtocolZip(doc);
+                }
+            });
+        }
         if (btnDelete) btnDelete.addEventListener('click', () => openDeleteModal(doc));
 
         fragment.appendChild(card);
@@ -870,6 +959,11 @@ function renderTableView(documents = state.filteredDocuments) {
 
     documents.forEach(doc => {
         const tr = document.createElement('tr');
+        const isOficio = doc.doc_type === 'oficio';
+        const typeBadge = isOficio 
+            ? `<span class="doc-badge type-oficio" style="font-size: 0.65rem;"><i class="fa-solid fa-file-pdf"></i> Ofício</span>` 
+            : `<span class="doc-badge type-protocolo" style="font-size: 0.65rem;"><i class="fa-solid fa-folder-tree"></i> Protocolo</span>`;
+
         const highlightedTitle = highlightText(doc.name, state.searchTerm);
         const statusBadge = doc.status 
             ? `<span class="doc-badge status-${doc.status.toLowerCase()}" style="font-size: 0.65rem;">${escapeHtml(doc.status)}</span>` 
@@ -882,12 +976,13 @@ function renderTableView(documents = state.filteredDocuments) {
         tr.innerHTML = `
             <td>
                 <div class="table-doc-title-cell">
-                    <div class="doc-icon-wrapper is-folder" style="width: 36px; height: 36px; font-size: 1.1rem; flex-shrink: 0; cursor: pointer;">
-                        <i class="fa-solid fa-folder"></i>
+                    <div class="doc-icon-wrapper ${isOficio ? 'is-oficio' : 'is-folder'}" style="width: 36px; height: 36px; font-size: 1.1rem; flex-shrink: 0; cursor: pointer;" title="${isOficio ? 'Documento de Ofício' : 'Pasta de Protocolo'}">
+                        <i class="fa-solid ${isOficio ? 'fa-file-pdf' : 'fa-folder'}"></i>
                     </div>
                     <div>
                         <span class="table-doc-title" title="${escapeHtml(doc.name)}" style="cursor: pointer; font-weight: 600;">${highlightedTitle}</span>
                         <div class="doc-badges" style="margin-top: 4px;">
+                            ${typeBadge}
                             ${doc.year ? `<span class="doc-badge year" style="font-size: 0.65rem;">${doc.year}</span>` : ''}
                             <span class="doc-badge category" style="font-size: 0.65rem;">${escapeHtml(doc.category)}</span>
                             ${statusBadge}
@@ -902,9 +997,13 @@ function renderTableView(documents = state.filteredDocuments) {
                 </div>
             </td>
             <td>
+                ${isOficio ? `
+                <span class="doc-badge file-count" style="font-size: 0.75rem; background: var(--bg-surface-secondary); color: var(--text-secondary); border-color: var(--border-subtle);">
+                    <i class="fa-solid fa-file-pdf" style="color: #ef4444;"></i> 1 arquivo
+                </span>` : `
                 <span class="doc-badge file-count" style="font-size: 0.75rem;">
                     <i class="fa-regular fa-file-lines"></i> ${doc.total_files} docs
-                </span>
+                </span>`}
                 <div style="font-size: 0.72rem; color: var(--text-tertiary); margin-top: 2px;">
                     ${doc.size_formatted}
                 </div>
@@ -914,13 +1013,13 @@ function renderTableView(documents = state.filteredDocuments) {
             </td>
             <td>
                 <div class="table-actions">
-                    <button class="btn-table-action primary btn-table-preview" title="Visualizar arquivos do protocolo">
+                    <button class="btn-table-action primary btn-table-preview" title="${isOficio ? 'Visualizar arquivo PDF' : 'Visualizar arquivos do protocolo'}">
                         <i class="fa-regular fa-eye"></i>
                     </button>
-                    <button class="btn-table-action btn-table-download" title="Baixar todos os arquivos (ZIP)">
+                    <button class="btn-table-action btn-table-download" title="${isOficio ? 'Baixar arquivo PDF' : 'Baixar todos os arquivos (ZIP)'}">
                         <i class="fa-solid fa-download"></i>
                     </button>
-                    <button class="btn-table-action btn-table-delete" title="Excluir pasta do protocolo">
+                    <button class="btn-table-action btn-table-delete" title="${isOficio ? 'Excluir ofício' : 'Excluir pasta do protocolo'}">
                         <i class="fa-regular fa-trash-can"></i>
                     </button>
                 </div>
@@ -930,7 +1029,13 @@ function renderTableView(documents = state.filteredDocuments) {
         tr.querySelector('.btn-table-preview').addEventListener('click', () => openPreviewModal(doc));
         tr.querySelector('.table-doc-title').addEventListener('click', () => openPreviewModal(doc));
         tr.querySelector('.doc-icon-wrapper').addEventListener('click', () => openPreviewModal(doc));
-        tr.querySelector('.btn-table-download').addEventListener('click', () => downloadProtocolZip(doc));
+        tr.querySelector('.btn-table-download').addEventListener('click', () => {
+            if (isOficio) {
+                downloadDocument(doc);
+            } else {
+                downloadProtocolZip(doc);
+            }
+        });
         tr.querySelector('.btn-table-delete').addEventListener('click', () => openDeleteModal(doc));
 
         fragment.appendChild(tr);
@@ -942,29 +1047,56 @@ function renderTableView(documents = state.filteredDocuments) {
 // ==========================================================================
 // Protocol & Document Explorer Modal Handling
 // ==========================================================================
-function openPreviewModal(protocol) {
-    state.activeModalDoc = protocol;
+function openPreviewModal(doc) {
+    state.activeModalDoc = doc;
     state.activeModalFile = null;
 
+    const modalContainer = previewModal ? previewModal.querySelector('.protocol-modal-container') : null;
+    const isOficio = doc.doc_type === 'oficio';
+
+    if (modalContainer) {
+        if (isOficio) {
+            modalContainer.classList.add('is-single-file');
+        } else {
+            modalContainer.classList.remove('is-single-file');
+        }
+    }
+
     if (modalDocTitle) {
-        modalDocTitle.textContent = protocol.name;
-        modalDocTitle.title = protocol.name;
+        modalDocTitle.textContent = doc.name;
+        modalDocTitle.title = doc.name;
+    }
+
+    if (btnModalDownloadZip) {
+        if (isOficio) {
+            btnModalDownloadZip.innerHTML = '<i class="fa-solid fa-download"></i> <span>Baixar PDF</span>';
+            btnModalDownloadZip.title = 'Baixar arquivo PDF';
+        } else {
+            btnModalDownloadZip.innerHTML = '<i class="fa-solid fa-file-zipper"></i> <span>Baixar ZIP</span>';
+            btnModalDownloadZip.title = 'Baixar todos os arquivos da pasta em ZIP';
+        }
     }
 
     if (modalDocMeta) {
-        const statusBadge = protocol.status 
-            ? `<span class="doc-badge status-${protocol.status.toLowerCase()}">${escapeHtml(protocol.status)}</span>` 
+        const typeBadge = isOficio 
+            ? `<span class="doc-badge type-oficio"><i class="fa-solid fa-file-pdf"></i> Ofício</span>` 
+            : `<span class="doc-badge type-protocolo"><i class="fa-solid fa-folder-tree"></i> Protocolo</span>`;
+
+        const statusBadge = doc.status 
+            ? `<span class="doc-badge status-${doc.status.toLowerCase()}">${escapeHtml(doc.status)}</span>` 
             : '';
 
         modalDocMeta.innerHTML = `
-            ${protocol.year ? `<span class="doc-badge year">${protocol.year}</span>` : ''}
-            <span class="doc-badge category">${escapeHtml(protocol.category)}</span>
+            ${typeBadge}
+            ${doc.year ? `<span class="doc-badge year">${doc.year}</span>` : ''}
+            <span class="doc-badge category">${escapeHtml(doc.category)}</span>
             ${statusBadge}
+            ${!isOficio ? `
             <span class="doc-badge file-count">
-                <i class="fa-regular fa-file-lines"></i> ${protocol.total_files} arquivo${protocol.total_files !== 1 ? 's' : ''}
-            </span>
+                <i class="fa-regular fa-file-lines"></i> ${doc.total_files} arquivo${doc.total_files !== 1 ? 's' : ''}
+            </span>` : ''}
             <span style="font-size: 0.8rem; color: var(--text-tertiary);">
-                <i class="fa-solid fa-hard-drive"></i> ${protocol.size_formatted}
+                <i class="fa-solid fa-hard-drive"></i> ${doc.size_formatted}
             </span>
         `;
     }
@@ -978,16 +1110,19 @@ function openPreviewModal(protocol) {
     }
 
     // Populate inner file list
-    const files = Array.isArray(protocol.files) ? protocol.files : [];
+    const files = Array.isArray(doc.files) ? doc.files : [];
     renderProtocolFilesList(files);
 
-    // Auto-select document: matched file or first file
+    // Auto-select document: matched file or first file or direct doc
     let targetFile = null;
-    if (protocol.matched_file_name) {
-        targetFile = files.find(f => f.name === protocol.matched_file_name);
+    if (doc.matched_file_name) {
+        targetFile = files.find(f => f.name === doc.matched_file_name);
     }
     if (!targetFile && files.length > 0) {
         targetFile = files[0];
+    }
+    if (!targetFile && isOficio) {
+        targetFile = doc;
     }
 
     if (targetFile) {
@@ -1132,7 +1267,13 @@ function filterProtocolFilesList(term) {
 }
 
 function closeModal() {
-    if (previewModal) previewModal.classList.add('hidden');
+    if (previewModal) {
+        previewModal.classList.add('hidden');
+        const modalContainer = previewModal.querySelector('.protocol-modal-container');
+        if (modalContainer) {
+            modalContainer.classList.remove('is-single-file');
+        }
+    }
     if (pdfViewerFrame) pdfViewerFrame.src = '';
     if (protocolPreviewPanel) protocolPreviewPanel.classList.remove('mobile-visible');
     state.activeModalDoc = null;
@@ -1182,13 +1323,14 @@ async function confirmDelete() {
 
         if (data.success) {
             state.allDocuments = state.allDocuments.filter(d => d.relative_path !== doc.relative_path && d.name !== doc.name);
-            if (headerDocCount) headerDocCount.textContent = `${state.allDocuments.length} protocolos`;
+            updateModuleTabCounts();
             applyFiltersAndRender();
             closeDeleteModal();
             if (state.activeModalDoc && state.activeModalDoc.relative_path === doc.relative_path) {
                 closeModal();
             }
-            showToast(data.message || 'Protocolo removido com sucesso!', 'success');
+            const isOficio = doc.doc_type === 'oficio';
+            showToast(data.message || `${isOficio ? 'Ofício' : 'Protocolo'} removido com sucesso!`, 'success');
         } else {
             if (data.error === 'github_token_required') {
                 showToast(data.message, 'error');

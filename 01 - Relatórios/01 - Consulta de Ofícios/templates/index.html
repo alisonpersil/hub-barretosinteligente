@@ -182,12 +182,33 @@
             <section class="chat-hero">
                 <div class="ai-avatar-badge">
                     <i class="fa-solid fa-sparkles"></i>
-                    <span>Pesquisa Inteligente de Protocolos</span>
+                    <span>Consulta e Gestão Documental</span>
                 </div>
-                <h1 class="hero-title">Como posso ajudar com seus protocolos hoje?</h1>
+                <h1 class="hero-title">Como posso ajudar com seus documentos hoje?</h1>
                 <p class="hero-subtitle">
-                    Digite o número do protocolo, assunto, termo ou nome de arquivo para consultar imediatamente.
+                    Selecione entre Protocolos ou Ofícios e pesquise por número, assunto ou arquivo.
                 </p>
+
+                <!-- Abas Superiores: Ofícios e Protocolos -->
+                <div class="module-tabs-wrapper">
+                    <div class="module-tabs-nav">
+                        <button class="module-tab-btn" data-main-tab="oficios" id="tabOficios" title="Ver somente ofícios">
+                            <i class="fa-solid fa-file-signature"></i>
+                            <span>Ofícios</span>
+                            <span class="tab-pill" id="badgeCountOficios">{{ oficios_count|default(47) }}</span>
+                        </button>
+                        <button class="module-tab-btn active" data-main-tab="protocolos" id="tabProtocolos" title="Ver somente pastas de protocolos">
+                            <i class="fa-solid fa-folder-tree"></i>
+                            <span>Protocolos</span>
+                            <span class="tab-pill" id="badgeCountProtocolos">{{ protocolos_count|default(21) }}</span>
+                        </button>
+                        <button class="module-tab-btn" data-main-tab="todos" id="tabTodos" title="Ver todos os itens">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span>Todos</span>
+                            <span class="tab-pill" id="badgeCountTodos">{{ doc_count|default(68) }}</span>
+                        </button>
+                    </div>
+                </div>
 
                 <!-- ChatGPT-Style Prompt Search Box -->
                 <div class="prompt-box-wrapper">
@@ -199,7 +220,7 @@
                             type="text" 
                             id="searchInput" 
                             class="prompt-input" 
-                            placeholder="Pesquise por protocolo, assunto, arquivo ou termo (ex: '10245', 'carport', 'FGTS', 'deferido')..." 
+                            placeholder="Pesquise por protocolo, ofício, assunto, arquivo ou termo (ex: '10245', 'carport', 'FGTS', 'deferido')..." 
                             autocomplete="off"
                             spellcheck="false"
                         >

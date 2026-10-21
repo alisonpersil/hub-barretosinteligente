@@ -3578,4 +3578,110 @@ body {
     }
 }
 
+/* ==========================================================================
+   Abas Superiores: Protocolos vs Ofícios & Badges de Tipo
+   ========================================================================== */
+.module-tabs-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 0.5rem;
+}
+
+.module-tabs-nav {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-secondary);
+    padding: 5px;
+    border-radius: 14px;
+    border: 1px solid var(--border-color);
+    gap: 6px;
+    box-shadow: var(--shadow-sm);
+}
+
+.module-tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 18px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.module-tab-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.module-tab-btn.active {
+    background: var(--bg-card);
+    color: var(--primary);
+    border-color: var(--border-color);
+    box-shadow: var(--shadow-sm);
+}
+
+.module-tab-btn .tab-pill {
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: var(--bg-secondary);
+    color: var(--text-tertiary);
+    font-weight: 600;
+}
+
+.module-tab-btn.active .tab-pill {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+/* Badges de Tipo: Protocolo e Ofício */
+.doc-badge.type-protocolo {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+.doc-badge.type-oficio {
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
+[data-theme="dark"] .doc-badge.type-protocolo {
+    background: rgba(37, 99, 235, 0.22);
+    color: #93c5fd;
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+[data-theme="dark"] .doc-badge.type-oficio {
+    background: rgba(239, 68, 68, 0.22);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* Modal single file behavior for direct Ofício preview */
+.protocol-modal-container.is-single-file .protocol-files-panel {
+    display: none !important;
+}
+
+.protocol-modal-container.is-single-file .protocol-preview-panel {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+}
+
+.protocol-modal-container.is-single-file #btnBackToFilesList {
+    display: none !important;
+}
+
+
 

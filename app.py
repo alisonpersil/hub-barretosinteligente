@@ -281,6 +281,7 @@ def get_all_protocolos():
 
         protocolos.append({
             "id": prot_id,
+            "doc_type": "protocolo",
             "name": entry,
             "folder_name": entry,
             "protocolo": protocolo_code,
@@ -305,9 +306,82 @@ def get_all_protocolos():
 
     return protocolos
 
+def get_all_oficios():
+    """Scan and index documents in Base de dados Ofícios/Ofícios."""
+    oficios_dir = os.path.join(DOCS_DIR, "Ofícios")
+    if not os.path.isdir(oficios_dir):
+        oficios_dir = os.path.join(DOCS_DIR, "Oficios")
+        if not os.path.isdir(oficios_dir):
+            return []
+
+    documents = []
+    doc_id = 1
+    try:
+        entries = sorted(os.listdir(oficios_dir))
+    except Exception as e:
+        print("Erro ao listar diretório de ofícios:", e, file=sys.stderr)
+        return []
+
+    for entry in entries:
+        if entry.startswith(".") or entry.lower() == "_indice.csv":
+            continue
+        full_path = os.path.join(oficios_dir, entry)
+        if not os.path.isfile(full_path):
+            continue
+
+        try:
+            f_stat = os.stat(full_path)
+            f_size = f_stat.st_size
+            rel_file = os.path.relpath(full_path, DOCS_DIR).replace("\\", "/")
+            ext = os.path.splitext(entry)[1].lower()
+            category, year = extract_category_and_year(entry)
+
+            documents.append({
+                "id": doc_id,
+                "doc_type": "oficio",
+                "name": entry,
+                "folder_name": None,
+                "protocolo": None,
+                "assunto": entry,
+                "status": None,
+                "relative_path": rel_file,
+                "full_path": full_path,
+                "is_folder": False,
+                "is_pdf": ext == ".pdf",
+                "total_files": 1,
+                "size_bytes": f_size,
+                "size_formatted": format_file_size(f_size),
+                "ctime": f_stat.st_ctime,
+                "ctime_formatted": datetime.fromtimestamp(f_stat.st_ctime).strftime("%d/%m/%Y %H:%M"),
+                "mtime": f_stat.st_mtime,
+                "mtime_formatted": datetime.fromtimestamp(f_stat.st_mtime).strftime("%d/%m/%Y %H:%M"),
+                "category": category,
+                "year": year or "2024",
+                "files": [{
+                    "id": 1,
+                    "name": entry,
+                    "relative_path": rel_file,
+                    "size_bytes": f_size,
+                    "size_formatted": format_file_size(f_size),
+                    "mtime": f_stat.st_mtime,
+                    "mtime_formatted": datetime.fromtimestamp(f_stat.st_mtime).strftime("%d/%m/%Y %H:%M"),
+                    "ctime": f_stat.st_ctime,
+                    "ctime_formatted": datetime.fromtimestamp(f_stat.st_ctime).strftime("%d/%m/%Y %H:%M"),
+                    "extension": ext,
+                    "is_pdf": ext == ".pdf"
+                }]
+            })
+            doc_id += 1
+        except Exception as e:
+            continue
+
+    return documents
+
 def get_all_documents():
-    """Alias for get_all_protocolos for compatibility."""
-    return get_all_protocolos()
+    """Return both protocolos and oficios."""
+    protocolos = get_all_protocolos()
+    oficios = get_all_oficios()
+    return protocolos + oficios
 
 def get_safe_file_path(relative_path):
     """Ensure relative path is safely within DOCS_DIR, supporting folders and files."""
@@ -499,7 +573,9 @@ def oficios_index():
         except Exception as e:
             print("Erro ao ler app.js:", e, file=sys.stderr)
             
-    docs = get_all_protocolos()
+    protocolos = get_all_protocolos()
+    oficios = get_all_oficios()
+    docs = protocolos + oficios
     total_docs = sum(p.get("total_files", 0) for p in docs)
     return render_template(
         "index.html",
@@ -507,6 +583,8 @@ def oficios_index():
         inline_js=js_content,
         initial_documents=docs,
         doc_count=len(docs),
+        protocolos_count=len(protocolos),
+        oficios_count=len(oficios),
         total_files_count=total_docs
     )
 
@@ -535,12 +613,16 @@ def system_status():
 @app.route("/api/oficios")
 @app.route("/api/protocolos")
 def api_oficios():
-    """Retorna lista de protocolos indexados e documentos internos."""
-    docs = get_all_protocolos()
+    """Retorna lista de protocolos e ofícios indexados e documentos internos."""
+    protocolos = get_all_protocolos()
+    oficios = get_all_oficios()
+    docs = protocolos + oficios
     total_docs = sum(p.get("total_files", 0) for p in docs)
     return jsonify({
         "success": True,
         "count": len(docs),
+        "protocolos_count": len(protocolos),
+        "oficios_count": len(oficios),
         "total_documents": total_docs,
         "documents": docs
     })
@@ -612,17 +694,27 @@ def delete_protocolo():
 
     try:
         safe_path = get_safe_file_path(rel_path)
-        if not safe_path or not os.path.isdir(safe_path):
-            return jsonify({"success": False, "error": "Protocolo não encontrado."}), 404
+        if not safe_path:
+            return jsonify({"success": False, "error": "Item não encontrado."}), 404
             
-        folder_name = os.path.basename(safe_path)
-        shutil.rmtree(safe_path)
-        run_git_sync_background(f"chore: excluir protocolo {folder_name}")
-
-        return jsonify({
-            "success": True,
-            "message": f"Protocolo '{folder_name}' removido com sucesso."
-        })
+        if os.path.isdir(safe_path):
+            folder_name = os.path.basename(safe_path)
+            shutil.rmtree(safe_path)
+            run_git_sync_background(f"chore: excluir protocolo {folder_name}")
+            return jsonify({
+                "success": True,
+                "message": f"Protocolo '{folder_name}' removido com sucesso."
+            })
+        elif os.path.isfile(safe_path):
+            file_name = os.path.basename(safe_path)
+            os.remove(safe_path)
+            run_git_sync_background(f"chore: excluir oficio {file_name}")
+            return jsonify({
+                "success": True,
+                "message": f"Ofício '{file_name}' removido com sucesso."
+            })
+        else:
+            return jsonify({"success": False, "error": "Item não encontrado."}), 404
     except Exception as e:
         return jsonify({"success": False, "error": str(e)}), 500
 
