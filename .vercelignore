@@ -1,5 +1,15 @@
-# Ignore heavy binary documents and datasets from Vercel function bundle
+# Exclude all heavy binary documents and spreadsheets from Vercel deployment
+# Files remain hosted in GitHub and accessed dynamically via GitHub Raw / API
+*.pdf
+*.PDF
 **/*.pdf
 **/*.PDF
-01 - Relatórios/02 - Monitor Exati/Base de dados/Atendidos/**
-01 - Relatorios/02 - Monitor Exati/Base de dados/Atendidos/**
+*.xls
+*.xlsx
+**/*.xls
+**/*.xlsx
+*.pkl
+**/*.pkl
+atendidos_cache.pkl
+**/Atendidos/**
+**/Base de dados/Atendidos/**

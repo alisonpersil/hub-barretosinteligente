@@ -1,0 +1,12 @@
+[project]
+name = "hub-barretosinteligente"
+version = "1.0.0"
+requires-python = ">=3.10"
+dependencies = [
+    "Flask>=3.0.0",
+    "Werkzeug>=3.0.0",
+    "pypdf>=4.0.0"
+]
+
+[tool.vercel.scripts]
+build = "python scripts/vercel_build.py --vercel"
