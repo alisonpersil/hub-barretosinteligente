@@ -11,7 +11,16 @@ import json
 import urllib.request
 import urllib.error
 import re
+import csv
 from datetime import datetime, timedelta
+
+try:
+    from pypdf import PdfReader
+except ImportError:
+    try:
+        from PyPDF2 import PdfReader
+    except ImportError:
+        PdfReader = None
 
 # Windows Console UTF-8 encoding support
 if sys.platform == "win32":
@@ -165,6 +174,157 @@ def extract_category_and_year(name):
         
     return category, year
 
+MONTHS_PT = {
+    'janeiro': 1, 'fevereiro': 2, 'marco': 3, 'março': 3, 'abril': 4,
+    'maio': 5, 'junho': 6, 'julho': 7, 'agosto': 8, 'setembro': 9,
+    'outubro': 10, 'novembro': 11, 'dezembro': 12,
+    'jan': 1, 'fev': 2, 'mar': 3, 'abr': 4, 'mai': 5, 'jun': 6,
+    'jul': 7, 'ago': 8, 'set': 9, 'out': 10, 'nov': 11, 'dez': 12
+}
+
+def parse_date_parts(d, m, y):
+    try:
+        day = int(d)
+        if isinstance(m, str):
+            m_clean = m.lower().replace('ç', 'c').strip()
+            month = MONTHS_PT.get(m_clean, None)
+            if not month:
+                month = int(m)
+        else:
+            month = int(m)
+        year = int(y)
+        if 1 <= day <= 31 and 1 <= month <= 12 and 2020 <= year <= 2035:
+            return datetime(year, month, day)
+    except Exception:
+        pass
+    return None
+
+def extract_date_from_filename(filename):
+    # Match DD-MM-YYYY or DD_MM_YYYY or DD.MM.YYYY
+    m = re.search(r'\b(\d{2})[-_.](\d{2})[-_.](202\d)\b', filename)
+    if m:
+        dt = parse_date_parts(m.group(1), m.group(2), m.group(3))
+        if dt:
+            return dt, f"nome do arquivo ({m.group(0)})"
+    # Match YYYY-MM-DD or YYYYMMDD
+    m2 = re.search(r'\b(202\d)[-_.](\d{2})[-_.](\d{2})\b', filename)
+    if m2:
+        dt = parse_date_parts(m2.group(3), m2.group(2), m2.group(1))
+        if dt:
+            return dt, f"nome do arquivo ({m2.group(0)})"
+    return None, None
+
+def clean_pdf_text_for_dates(text):
+    if not text:
+        return ""
+    # Fix split numbers often produced by pdf kerning (e.g. '202 6' -> '2026')
+    cleaned = re.sub(r'(?<=\b202)\s+(?=\d\b)', '', text)
+    cleaned = re.sub(r'(\d)\s+(\d)', r'\1\2', cleaned)
+    cleaned = re.sub(r'[ \t]+', ' ', cleaned)
+    return cleaned
+
+def extract_date_from_pdf_text(file_path):
+    if not PdfReader:
+        return None, None
+    try:
+        abs_p = os.path.abspath(file_path)
+        if os.name == 'nt' and not abs_p.startswith('\\\\?\\'):
+            abs_p = '\\\\?\\' + abs_p
+            
+        reader = PdfReader(abs_p)
+        raw_text = ""
+        num_pages = min(len(reader.pages), 3)
+        for i in range(num_pages):
+            raw_text += (reader.pages[i].extract_text() or "") + "\n"
+            
+        text = clean_pdf_text_for_dates(raw_text)
+        
+        # 1. Barretos, 28 de abril de 2026 / Barretos-SP, 28 de abril de 2026
+        m = re.search(r'Barretos\s*(?:-\s*SP|/\s*SP)?[,\s]+(\d{1,2})\s+de\s+([a-zA-ZçÇ]+)\s+de\s+(202\d)', text, re.IGNORECASE)
+        if m:
+            dt = parse_date_parts(m.group(1), m.group(2), m.group(3))
+            if dt:
+                return dt, f"texto PDF ({m.group(0).strip()})"
+                
+        # 2. General DD de Mês de YYYY
+        m = re.search(r'\b(\d{1,2})\s+de\s+(janeiro|fevereiro|março|marco|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\s+de\s+(202\d)', text, re.IGNORECASE)
+        if m:
+            dt = parse_date_parts(m.group(1), m.group(2), m.group(3))
+            if dt:
+                return dt, f"texto PDF ({m.group(0).strip()})"
+
+        # 3. YYYY-MM-DD
+        m = re.search(r'\b(202\d)-(\d{2})-(\d{2})\b', text)
+        if m:
+            dt = parse_date_parts(m.group(3), m.group(2), m.group(1))
+            if dt:
+                return dt, f"texto PDF ({m.group(0)})"
+
+        # 4. Standard DD/MM/YYYY
+        m = re.search(r'\b(\d{2})/(\d{2})/(202\d)\b', text)
+        if m:
+            dt = parse_date_parts(m.group(1), m.group(2), m.group(3))
+            if dt:
+                return dt, f"texto PDF ({m.group(0)})"
+    except Exception:
+        pass
+    return None, None
+
+_PROTOCOL_DATE_CACHE = {}
+
+def extract_protocol_date(folder_path, files):
+    """
+    Extract real official date for protocol folder based on user priority:
+    1. Check files in numerical order (01, 02, etc.):
+       - Check PDF text for date (e.g. Barretos, 28 de abril de 2026)
+       - Check filename for date pattern (e.g. Tramite 28-04-2026)
+    2. Check folder name for month indicator (e.g. 'Pagamento Abr-2026' -> 01/04/2026)
+    3. Fallback to folder mtime
+    Cached in-memory to ensure sub-millisecond execution after initial load.
+    """
+    cache_key = (folder_path, len(files))
+    if cache_key in _PROTOCOL_DATE_CACHE:
+        return _PROTOCOL_DATE_CACHE[cache_key]
+
+    sorted_files = sorted(files)
+    
+    # Priority 1: Check files in numerical order
+    for f in sorted_files:
+        f_lower = f.lower()
+        full_p = os.path.join(folder_path, f)
+        
+        # Check PDF text if it's a PDF
+        if f_lower.endswith('.pdf'):
+            dt, src = extract_date_from_pdf_text(full_p)
+            if dt:
+                _PROTOCOL_DATE_CACHE[cache_key] = (dt, f"{f} -> {src}")
+                return dt, f"{f} -> {src}"
+                
+        # Check filename for date pattern
+        dt, src = extract_date_from_filename(f)
+        if dt:
+            _PROTOCOL_DATE_CACHE[cache_key] = (dt, f"{f} -> {src}")
+            return dt, f"{f} -> {src}"
+            
+    # Priority 2: Check folder name for month indicator (e.g. 'Pagamento Abr-2026')
+    folder_name = os.path.basename(folder_path)
+    m = re.search(r'(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)[a-z]*[-_ ]?(202\d)', folder_name, re.IGNORECASE)
+    if m:
+        dt = parse_date_parts(1, m.group(1), m.group(2))
+        if dt:
+            _PROTOCOL_DATE_CACHE[cache_key] = (dt, f"pasta -> {m.group(0)}")
+            return dt, f"pasta -> {m.group(0)}"
+            
+    # Priority 3: Fallback to folder stats
+    try:
+        st = os.stat(folder_path)
+        dt = datetime.fromtimestamp(st.st_mtime)
+        _PROTOCOL_DATE_CACHE[cache_key] = (dt, "mtime da pasta")
+        return dt, "mtime da pasta"
+    except Exception:
+        dt = datetime.now()
+        return dt, "data atual"
+
 def get_all_protocolos():
     """Scan protocol folders and return detailed metadata for folders and their inner documents."""
     protocolos_dir = os.path.join(DOCS_DIR, "Protocolos")
@@ -276,8 +436,10 @@ def get_all_protocolos():
             except Exception as e:
                 pass
 
-        ctime_dt = datetime.fromtimestamp(earliest_ctime if earliest_ctime != float("inf") else 0)
-        mtime_dt = datetime.fromtimestamp(latest_mtime if latest_mtime > 0 else 0)
+        # Extract real document date for the protocol
+        protocol_dt, date_source = extract_protocol_date(full_path, folder_items)
+        doc_date_str = protocol_dt.strftime("%d/%m/%Y")
+        doc_date_ts = protocol_dt.timestamp()
 
         protocolos.append({
             "id": prot_id,
@@ -294,16 +456,23 @@ def get_all_protocolos():
             "total_files": len(files_list),
             "size_bytes": folder_size,
             "size_formatted": format_file_size(folder_size),
-            "ctime": earliest_ctime if earliest_ctime != float("inf") else 0,
-            "ctime_formatted": ctime_dt.strftime("%d/%m/%Y %H:%M"),
-            "mtime": latest_mtime,
-            "mtime_formatted": mtime_dt.strftime("%d/%m/%Y %H:%M"),
+            "doc_date": doc_date_str,
+            "doc_date_formatted": doc_date_str,
+            "doc_date_ts": doc_date_ts,
+            "doc_date_source": date_source,
+            "ctime": doc_date_ts,
+            "ctime_formatted": doc_date_str,
+            "mtime": doc_date_ts,
+            "mtime_formatted": doc_date_str,
+            "raw_mtime": latest_mtime,
             "category": category,
-            "year": year or "2026",
+            "year": year or str(protocol_dt.year),
             "files": files_list
         })
         prot_id += 1
 
+    # Sort protocols chronologically by real document date descending by default (mais recente primeiro)
+    protocolos.sort(key=lambda p: p.get("doc_date_ts", 0), reverse=True)
     return protocolos
 
 def get_all_oficios():
@@ -336,6 +505,8 @@ def get_all_oficios():
             ext = os.path.splitext(entry)[1].lower()
             category, year = extract_category_and_year(entry)
 
+            doc_date_str = datetime.fromtimestamp(f_stat.st_mtime).strftime("%d/%m/%Y")
+
             documents.append({
                 "id": doc_id,
                 "doc_type": "oficio",
@@ -351,10 +522,13 @@ def get_all_oficios():
                 "total_files": 1,
                 "size_bytes": f_size,
                 "size_formatted": format_file_size(f_size),
+                "doc_date": doc_date_str,
+                "doc_date_formatted": doc_date_str,
+                "doc_date_ts": f_stat.st_mtime,
                 "ctime": f_stat.st_ctime,
                 "ctime_formatted": datetime.fromtimestamp(f_stat.st_ctime).strftime("%d/%m/%Y %H:%M"),
                 "mtime": f_stat.st_mtime,
-                "mtime_formatted": datetime.fromtimestamp(f_stat.st_mtime).strftime("%d/%m/%Y %H:%M"),
+                "mtime_formatted": doc_date_str,
                 "category": category,
                 "year": year or "2024",
                 "files": [{
@@ -376,6 +550,7 @@ def get_all_oficios():
             continue
 
     return documents
+
 
 def get_all_documents():
     """Return both protocolos and oficios."""

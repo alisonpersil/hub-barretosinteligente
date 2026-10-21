@@ -908,12 +908,8 @@ function renderCardsView(documents = state.filteredDocuments) {
 
                 <div class="doc-metadata-panel">
                     <div class="meta-item">
-                        <span class="meta-label"><i class="fa-regular fa-clock"></i> Modificação</span>
-                        <span class="meta-value">${doc.mtime_formatted}</span>
-                    </div>
-                    <div class="meta-item">
-                        <span class="meta-label"><i class="fa-regular fa-calendar-plus"></i> Criação</span>
-                        <span class="meta-value">${doc.ctime_formatted}</span>
+                        <span class="meta-label"><i class="fa-regular fa-calendar-days"></i> Data</span>
+                        <span class="meta-value">${doc.doc_date_formatted || doc.mtime_formatted}</span>
                     </div>
                     <div class="meta-item full-width">
                         <span class="meta-label"><i class="fa-solid fa-hard-drive"></i> Tamanho</span>
@@ -1022,8 +1018,8 @@ function renderTableView(documents = state.filteredDocuments) {
                     ${doc.size_formatted}
                 </div>
             </td>
-            <td>
-                <strong style="font-size: 0.85rem;">${doc.mtime_formatted}</strong>
+            <td style="white-space: nowrap;">
+                <strong style="font-size: 0.85rem;"><i class="fa-regular fa-calendar-days" style="color: var(--primary); margin-right: 5px; font-size: 0.78rem;"></i>${doc.doc_date_formatted || doc.mtime_formatted}</strong>
             </td>
             <td>
                 <div class="table-actions">
@@ -1102,6 +1098,7 @@ function openPreviewModal(doc) {
 
         modalDocMeta.innerHTML = `
             ${typeBadge}
+            ${doc.doc_date_formatted ? `<span class="doc-badge date" style="background: rgba(14, 165, 233, 0.12); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.3); font-weight: 600;"><i class="fa-regular fa-calendar-days"></i> ${doc.doc_date_formatted}</span>` : ''}
             ${doc.year ? `<span class="doc-badge year">${doc.year}</span>` : ''}
             <span class="doc-badge category">${escapeHtml(doc.category)}</span>
             ${statusBadge}
