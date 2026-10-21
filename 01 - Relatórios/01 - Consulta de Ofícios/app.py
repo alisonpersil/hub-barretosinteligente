@@ -594,7 +594,7 @@ def get_all_protocolos():
 def get_all_oficios():
     """Scan and index documents in Base de dados Ofícios/Ofícios."""
     cached = load_docs_index()
-    if cached and "oficios" in cached and len(cached["oficios"]) > 0:
+    if cached and "oficios" in cached:
         return cached["oficios"]
 
     oficios_dir = os.path.join(DOCS_DIR, "Ofícios")
