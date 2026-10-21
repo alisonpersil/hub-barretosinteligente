@@ -2972,26 +2972,6 @@
       ]
     }
   ],
-  "oficios": [
-    {
-      "id": 1792612068249,
-      "doc_type": "oficio",
-      "name": "OFICIO-TESTE-AUTOMATIZADO-2026.pdf",
-      "relative_path": "Ofícios/OFICIO-TESTE-AUTOMATIZADO-2026.pdf",
-      "size_bytes": 317,
-      "size_formatted": "317 B",
-      "ctime": 1792612068.249931,
-      "ctime_formatted": "21/10/2026 19:47",
-      "mtime": 1792612068.249931,
-      "mtime_formatted": "21/10/2026",
-      "doc_date": "21/10/2026",
-      "doc_date_formatted": "21/10/2026",
-      "doc_date_ts": 1792612068.249931,
-      "extension": ".pdf",
-      "is_pdf": true,
-      "category": "Ofício",
-      "year": "2026"
-    }
-  ],
+  "oficios": [],
   "generated_at": "2026-10-21"
 }
