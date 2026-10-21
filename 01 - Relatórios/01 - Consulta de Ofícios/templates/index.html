@@ -298,8 +298,12 @@
                             <select id="sortSelect" class="sort-select">
                                 <option value="mtime_desc">Data do Documento (Mais recente)</option>
                                 <option value="mtime_asc">Data do Documento (Mais antigo)</option>
-                                <option value="name_asc">Nome (A &rarr; Z)</option>
-                                <option value="name_desc">Nome (Z &rarr; A)</option>
+                                <option value="name_asc">Protocolo / Pasta (A &rarr; Z / 0 &rarr; 9)</option>
+                                <option value="name_desc">Protocolo / Pasta (Z &rarr; A / 9 &rarr; 0)</option>
+                                <option value="assunto_asc">Assunto (A &rarr; Z)</option>
+                                <option value="assunto_desc">Assunto (Z &rarr; A)</option>
+                                <option value="files_desc">Arquivos (Mais arquivos primeiro)</option>
+                                <option value="files_asc">Arquivos (Menos arquivos primeiro)</option>
                                 <option value="size_desc">Tamanho (Maior primeiro)</option>
                                 <option value="size_asc">Tamanho (Menor primeiro)</option>
                             </select>
@@ -345,10 +349,30 @@
                     <table class="documents-table">
                         <thead>
                             <tr>
-                                <th style="width: 38%;">Protocolo / Pasta</th>
-                                <th style="width: 26%;">Assunto</th>
-                                <th style="width: 12%;">Arquivos</th>
-                                <th style="width: 12%;">Data</th>
+                                <th class="sortable-th" data-sort="name" style="width: 38%; cursor: pointer;" title="Clique para ordenar por Protocolo / Pasta">
+                                    <div class="th-content">
+                                        <span>Protocolo / Pasta</span>
+                                        <i class="fa-solid fa-sort sort-icon"></i>
+                                    </div>
+                                </th>
+                                <th class="sortable-th" data-sort="assunto" style="width: 26%; cursor: pointer;" title="Clique para ordenar por Assunto">
+                                    <div class="th-content">
+                                        <span>Assunto</span>
+                                        <i class="fa-solid fa-sort sort-icon"></i>
+                                    </div>
+                                </th>
+                                <th class="sortable-th" data-sort="arquivos" style="width: 12%; cursor: pointer;" title="Clique para ordenar por Quantidade de Arquivos">
+                                    <div class="th-content">
+                                        <span>Arquivos</span>
+                                        <i class="fa-solid fa-sort sort-icon"></i>
+                                    </div>
+                                </th>
+                                <th class="sortable-th active" data-sort="data" style="width: 12%; cursor: pointer;" title="Clique para ordenar por Data do Documento">
+                                    <div class="th-content">
+                                        <span>Data</span>
+                                        <i class="fa-solid fa-sort-down sort-icon"></i>
+                                    </div>
+                                </th>
                                 <th style="width: 12%; text-align: right;">Ações</th>
                             </tr>
                         </thead>

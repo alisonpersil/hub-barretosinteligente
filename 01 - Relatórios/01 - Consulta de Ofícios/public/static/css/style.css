@@ -991,6 +991,45 @@ body {
     border-bottom: 1px solid var(--border-color);
 }
 
+.documents-table th.sortable-th {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.documents-table th.sortable-th:hover {
+    color: #60a5fa !important;
+    background-color: rgba(59, 130, 246, 0.08) !important;
+}
+
+.documents-table th.sortable-th.active {
+    color: #38bdf8 !important;
+    background-color: rgba(56, 189, 248, 0.08);
+}
+
+.documents-table th.sortable-th .th-content {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.documents-table th.sortable-th .sort-icon {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+    opacity: 0.5;
+    transition: color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.documents-table th.sortable-th:hover .sort-icon {
+    opacity: 1;
+    color: #60a5fa;
+}
+
+.documents-table th.sortable-th.active .sort-icon {
+    opacity: 1;
+    color: #38bdf8;
+}
+
 .documents-table td {
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--border-subtle);

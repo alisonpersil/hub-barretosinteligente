@@ -224,9 +224,21 @@ function setupEventListeners() {
     if (sortSelect) {
         sortSelect.addEventListener('change', (e) => {
             state.currentSort = e.target.value;
+            updateSortHeadersUI();
             applyFiltersAndRender();
         });
     }
+
+    // Interactive Table Header Sorting
+    const sortableHeaders = document.querySelectorAll('.documents-table th.sortable-th');
+    sortableHeaders.forEach(th => {
+        th.addEventListener('click', () => {
+            const sortKey = th.getAttribute('data-sort');
+            if (sortKey) {
+                handleHeaderSort(sortKey);
+            }
+        });
+    });
 
     if (btnViewCards) {
         btnViewCards.addEventListener('click', () => setViewMode('cards'));
@@ -646,28 +658,113 @@ function applyFiltersAndRender(resetPage = true) {
     result.sort((a, b) => {
         switch (state.currentSort) {
             case 'name_asc':
-                return a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' });
+                return a.name.localeCompare(b.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
             case 'name_desc':
-                return b.name.localeCompare(a.name, 'pt-BR', { sensitivity: 'base' });
+                return b.name.localeCompare(a.name, 'pt-BR', { numeric: true, sensitivity: 'base' });
+            case 'assunto_asc': {
+                const aAssunto = a.assunto || a.name || '';
+                const bAssunto = b.assunto || b.name || '';
+                return aAssunto.localeCompare(bAssunto, 'pt-BR', { numeric: true, sensitivity: 'base' });
+            }
+            case 'assunto_desc': {
+                const aAssunto = a.assunto || a.name || '';
+                const bAssunto = b.assunto || b.name || '';
+                return bAssunto.localeCompare(aAssunto, 'pt-BR', { numeric: true, sensitivity: 'base' });
+            }
+            case 'files_desc':
+            case 'arquivos_desc': {
+                const aCount = a.total_files || (a.files ? a.files.length : 1);
+                const bCount = b.total_files || (b.files ? b.files.length : 1);
+                return (bCount - aCount) || ((b.size_bytes || 0) - (a.size_bytes || 0));
+            }
+            case 'files_asc':
+            case 'arquivos_asc': {
+                const aCount = a.total_files || (a.files ? a.files.length : 1);
+                const bCount = b.total_files || (b.files ? b.files.length : 1);
+                return (aCount - bCount) || ((a.size_bytes || 0) - (b.size_bytes || 0));
+            }
             case 'ctime_desc':
-                return b.ctime - a.ctime;
+                return (b.doc_date_ts || b.ctime || 0) - (a.doc_date_ts || a.ctime || 0);
             case 'ctime_asc':
-                return a.ctime - b.ctime;
+                return (a.doc_date_ts || a.ctime || 0) - (b.doc_date_ts || b.ctime || 0);
             case 'mtime_desc':
-                return b.mtime - a.mtime;
+            case 'data_desc':
+                return (b.doc_date_ts || b.mtime || 0) - (a.doc_date_ts || a.mtime || 0);
             case 'mtime_asc':
-                return a.mtime - b.mtime;
+            case 'data_asc':
+                return (a.doc_date_ts || a.mtime || 0) - (b.doc_date_ts || b.mtime || 0);
             case 'size_desc':
-                return b.size_bytes - a.size_bytes;
+                return (b.size_bytes || 0) - (a.size_bytes || 0);
             case 'size_asc':
-                return a.size_bytes - b.size_bytes;
+                return (a.size_bytes || 0) - (b.size_bytes || 0);
             default:
-                return b.mtime - a.mtime;
+                return (b.doc_date_ts || b.mtime || 0) - (a.doc_date_ts || a.mtime || 0);
         }
     });
 
     state.filteredDocuments = result;
     renderResults();
+}
+
+function updateSortHeadersUI() {
+    const current = state.currentSort;
+    const sortableHeaders = document.querySelectorAll('.documents-table th.sortable-th');
+
+    sortableHeaders.forEach(th => {
+        const sortType = th.getAttribute('data-sort');
+        const icon = th.querySelector('.sort-icon');
+        let isActive = false;
+        let isAsc = false;
+
+        if (sortType === 'name' && (current === 'name_asc' || current === 'name_desc')) {
+            isActive = true;
+            isAsc = (current === 'name_asc');
+        } else if (sortType === 'assunto' && (current === 'assunto_asc' || current === 'assunto_desc')) {
+            isActive = true;
+            isAsc = (current === 'assunto_asc');
+        } else if (sortType === 'arquivos' && (current === 'files_desc' || current === 'files_asc' || current === 'arquivos_desc' || current === 'arquivos_asc')) {
+            isActive = true;
+            isAsc = (current === 'files_asc' || current === 'arquivos_asc');
+        } else if (sortType === 'data' && (current === 'mtime_desc' || current === 'mtime_asc' || current === 'data_desc' || current === 'data_asc')) {
+            isActive = true;
+            isAsc = (current === 'mtime_asc' || current === 'data_asc');
+        }
+
+        if (isActive) {
+            th.classList.add('active');
+            if (icon) {
+                icon.className = `fa-solid ${isAsc ? 'fa-sort-up' : 'fa-sort-down'} sort-icon`;
+            }
+        } else {
+            th.classList.remove('active');
+            if (icon) {
+                icon.className = 'fa-solid fa-sort sort-icon';
+            }
+        }
+    });
+}
+
+function handleHeaderSort(sortKey) {
+    let nextSort = '';
+
+    if (sortKey === 'name') {
+        nextSort = (state.currentSort === 'name_asc') ? 'name_desc' : 'name_asc';
+    } else if (sortKey === 'assunto') {
+        nextSort = (state.currentSort === 'assunto_asc') ? 'assunto_desc' : 'assunto_asc';
+    } else if (sortKey === 'arquivos') {
+        nextSort = (state.currentSort === 'files_desc' || state.currentSort === 'arquivos_desc') ? 'files_asc' : 'files_desc';
+    } else if (sortKey === 'data') {
+        nextSort = (state.currentSort === 'mtime_desc' || state.currentSort === 'data_desc') ? 'mtime_asc' : 'mtime_desc';
+    }
+
+    if (nextSort) {
+        state.currentSort = nextSort;
+        if (sortSelect) {
+            sortSelect.value = nextSort;
+        }
+        updateSortHeadersUI();
+        applyFiltersAndRender(false);
+    }
 }
 
 function getFilterLabel(filterKey) {
@@ -679,6 +776,7 @@ function getFilterLabel(filterKey) {
 // Rendering Results & Pagination (15 por página)
 // ==========================================================================
 function renderResults() {
+    updateSortHeadersUI();
     const total = state.allDocuments.length;
     const count = state.filteredDocuments.length;
     const typeWords = getTypeWords(count);
