@@ -2747,6 +2747,7 @@ function renderPendentesTable() {
 // ==========================================
 let analiticoState = {
   search: '',
+  mesFilter: 'todos',     // 'todos', '2026-10', '2026-09', etc.
   slaFilter: 'todos',     // 'todos', 'com_rec', 'no_prazo', 'atrasado', 'ronda'
   tmaFilter: 'todas',     // 'todas', 'rapido', 'padrao', 'limite', 'critico'
   equipeFilter: 'todas',  // 'todas' ou nome da equipe
@@ -2840,6 +2841,16 @@ function initAnaliticoTable() {
     });
   }
 
+  // Select Mês
+  const selectMes = document.getElementById('filtro-analitico-mes');
+  if (selectMes) {
+    selectMes.addEventListener('change', (e) => {
+      analiticoState.mesFilter = e.target.value;
+      analiticoState.currentPage = 1;
+      applyAnaliticoFilters();
+    });
+  }
+
   // Select SLA
   const selectSla = document.getElementById('filtro-analitico-sla');
   if (selectSla) {
@@ -2890,6 +2901,11 @@ function initAnaliticoTable() {
         return;
       }
 
+      if (chip.hasAttribute('data-mes')) {
+        const mesVal = chip.getAttribute('data-mes');
+        analiticoState.mesFilter = mesVal;
+        if (selectMes) selectMes.value = mesVal;
+      }
       if (chip.hasAttribute('data-origem')) {
         const origVal = chip.getAttribute('data-origem');
         analiticoState.origemFilter = origVal;
@@ -2991,6 +3007,7 @@ function initAnaliticoTable() {
 
 function resetAnaliticoFilters() {
   analiticoState.search = '';
+  analiticoState.mesFilter = 'todos';
   analiticoState.slaFilter = 'todos';
   analiticoState.tmaFilter = 'todas';
   analiticoState.equipeFilter = 'todas';
@@ -2999,6 +3016,7 @@ function resetAnaliticoFilters() {
 
   const inputBusca = document.getElementById('busca-analitico');
   const btnLimpar = document.getElementById('btn-limpar-busca');
+  const selectMes = document.getElementById('filtro-analitico-mes');
   const selectSla = document.getElementById('filtro-analitico-sla');
   const selectTma = document.getElementById('filtro-analitico-tma');
   const selectEquipe = document.getElementById('filtro-analitico-equipe');
@@ -3007,6 +3025,7 @@ function resetAnaliticoFilters() {
 
   if (inputBusca) inputBusca.value = '';
   if (btnLimpar) btnLimpar.style.display = 'none';
+  if (selectMes) selectMes.value = 'todos';
   if (selectSla) selectSla.value = 'todos';
   if (selectTma) selectTma.value = 'todas';
   if (selectEquipe) selectEquipe.value = 'todas';
@@ -3019,6 +3038,7 @@ function resetAnaliticoFilters() {
 function applyAnaliticoFilters() {
   const rawList = getAnaliticoFullList();
   const q = (analiticoState.search || '').trim().toLowerCase();
+  const mesF = analiticoState.mesFilter || 'todos';
   const slaF = analiticoState.slaFilter;
   const tmaF = analiticoState.tmaFilter;
   const eqF = analiticoState.equipeFilter;
@@ -3026,12 +3046,23 @@ function applyAnaliticoFilters() {
 
   // Filtragem
   const filtered = rawList.filter(r => {
-    // 0. Filtro Temporal Global (dateFilterState)
-    // Se o usuário digitou uma busca específica (ex: '1827690', número de OS ou texto),
-    // ignoramos a restrição de data para garantir localização instantânea de qualquer chamado.
-    if (!q && r.data_iso) {
-      if (dateFilterState.inicio && r.data_iso < dateFilterState.inicio) return false;
-      if (dateFilterState.fim && r.data_iso > dateFilterState.fim) return false;
+    // 0. Filtro por Mês Específico (quando selecionado pelo usuário)
+    if (mesF !== 'todos') {
+      const parts = mesF.split('-');
+      const yyyy = parts[0];
+      const mm = parts[1];
+      const matchMes = (r.data_iso && r.data_iso.startsWith(mesF)) ||
+                       (r.dt_fim && (r.dt_fim.includes(`/${mm}/${yyyy}`) || r.dt_fim.endsWith(`/${yyyy}`))) ||
+                       (r.dt_rec && (r.dt_rec.includes(`/${mm}/${yyyy}`) || r.dt_rec.endsWith(`/${yyyy}`)));
+      if (!matchMes) return false;
+    } else {
+      // 0b. Filtro Temporal Global (dateFilterState)
+      // Se o usuário digitou uma busca específica (ex: '1827690', número de OS ou texto),
+      // ignoramos a restrição de data para garantir localização instantânea de qualquer chamado.
+      if (!q && r.data_iso) {
+        if (dateFilterState.inicio && r.data_iso < dateFilterState.inicio) return false;
+        if (dateFilterState.fim && r.data_iso > dateFilterState.fim) return false;
+      }
     }
 
     // 1. SLA Filter
@@ -3184,14 +3215,30 @@ function sortAndRenderAnalitico() {
   const col = analiticoState.sortCol;
   const dir = analiticoState.sortDir === 'asc' ? 1 : -1;
 
+  const parseBrDateToIso = (str) => {
+    if (!str) return '';
+    const parts = str.trim().split(' ');
+    const dParts = parts[0].split('/');
+    if (dParts.length === 3) {
+      const yyyy = dParts[2];
+      const mm = dParts[1].padStart(2, '0');
+      const dd = dParts[0].padStart(2, '0');
+      return `${yyyy}-${mm}-${dd} ${parts[1] || '00:00'}`;
+    }
+    return str;
+  };
+
   analiticoState.filteredData.sort((a, b) => {
     let valA = a[col];
     let valB = b[col];
 
     if (col === 'dias' || col === 'horas') {
-      valA = (valA === null || valA === undefined) ? -999 : valA;
-      valB = (valB === null || valB === undefined) ? -999 : valB;
-      return (valA - valB) * dir;
+      const isNullA = (valA === null || valA === undefined);
+      const isNullB = (valB === null || valB === undefined);
+      if (isNullA && isNullB) return 0;
+      if (isNullA) return 1; // nulos/rondas sempre no final
+      if (isNullB) return -1;
+      return (Number(valA) - Number(valB)) * dir;
     }
 
     if (col === 'os') {
@@ -3199,9 +3246,14 @@ function sortAndRenderAnalitico() {
     }
 
     if (col === 'dt_rec' || col === 'dt_fim') {
-      valA = valA || '';
-      valB = valB || '';
-      return valA.localeCompare(valB) * dir;
+      const isNullA = !valA;
+      const isNullB = !valB;
+      if (isNullA && isNullB) return 0;
+      if (isNullA) return 1;
+      if (isNullB) return -1;
+      const isoA = parseBrDateToIso(valA);
+      const isoB = parseBrDateToIso(valB);
+      return isoA.localeCompare(isoB) * dir;
     }
 
     valA = (valA || '').toString().toLowerCase();
@@ -3320,18 +3372,21 @@ function renderAnaliticoTable() {
         tmaBadge = `<span class="tma-badge tma-badge-ontime" title="${escapeHtml(r.tempo_restante_texto || 'Dentro do prazo')}"><i class="fa-solid fa-clock"></i> ${dInt}d <small>(Restam)</small></span>`;
       }
     } else if (r.dias === null || r.dias === undefined) {
-      tmaBadge = `<span class="badge badge-secondary" title="Atendimento originado em ronda interna"><i class="fa-solid fa-shield-halved"></i> Ronda</span>`;
+      tmaBadge = `<span class="badge badge-secondary" title="Atendimento originado em ronda interna (Sem chamado)"><i class="fa-solid fa-shield-halved"></i> Ronda</span>`;
     } else {
       const dInt = Math.round(r.dias);
       const hInt = r.horas ? Math.round(r.horas) : Math.round(r.dias * 24);
+      const recDate = r.dt_rec || 'Não informada';
+      const fimDate = r.dt_fim || 'Não informada';
+      const tooltipFormula = `SLA / Tempo de Resolução: ${dInt} dias (~${hInt}h) | Conclusão: ${fimDate} - Reclamação: ${recDate}`;
       if (r.dias <= 1.0) {
-        tmaBadge = `<span class="tma-badge tma-badge-quick" title="SLA cumprido em até 24h"><i class="fa-solid fa-bolt"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
+        tmaBadge = `<span class="tma-badge tma-badge-quick" title="${escapeHtml(tooltipFormula)}"><i class="fa-solid fa-bolt"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
       } else if (r.dias <= 3.0) {
-        tmaBadge = `<span class="tma-badge tma-badge-ontime" title="SLA dentro da meta normal"><i class="fa-solid fa-stopwatch"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
+        tmaBadge = `<span class="tma-badge tma-badge-ontime" title="${escapeHtml(tooltipFormula)}"><i class="fa-solid fa-stopwatch"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
       } else if (r.dias <= 7.0) {
-        tmaBadge = `<span class="tma-badge tma-badge-warning" title="SLA no limite contratual (≤ 7d)"><i class="fa-solid fa-triangle-exclamation"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
+        tmaBadge = `<span class="tma-badge tma-badge-warning" title="${escapeHtml(tooltipFormula)}"><i class="fa-solid fa-triangle-exclamation"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
       } else {
-        tmaBadge = `<span class="tma-badge tma-badge-danger" title="Acima do prazo limite (> 7d)"><i class="fa-solid fa-circle-exclamation"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
+        tmaBadge = `<span class="tma-badge tma-badge-danger" title="${escapeHtml(tooltipFormula)}"><i class="fa-solid fa-circle-exclamation"></i> ${dInt}d <small>(${hInt}h)</small></span>`;
       }
     }
 

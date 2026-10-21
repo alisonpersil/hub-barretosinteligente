@@ -219,7 +219,7 @@ class CidadaoOnlineClient:
 def sync_cidadao_online(
     docs_index_path=None,
     data_inicial=DEFAULT_DATA_INICIAL,
-    ano_minimo=2026,
+    ano_minimo=None,
     github_token=None,
     github_repo=DEFAULT_GITHUB_REPO,
     dry_run=False,
@@ -257,10 +257,10 @@ def sync_cidadao_online(
     if docs_index_path and os.path.exists(docs_index_path):
         candidates.append(docs_index_path)
     candidates.extend([
-        "/tmp/docs_index.json",
         os.path.join(os.getcwd(), "01 - Relatórios", "01 - Consulta de Ofícios", "docs_index.json"),
         os.path.join(os.path.dirname(__file__), "..", "01 - Relatórios", "01 - Consulta de Ofícios", "docs_index.json"),
-        os.path.join(os.getcwd(), "docs_index.json")
+        os.path.join(os.getcwd(), "docs_index.json"),
+        "/tmp/docs_index.json"
     ])
 
     actual_index_path = None
@@ -517,12 +517,18 @@ def sync_cidadao_online(
         except Exception as e:
             logger(f"[ERRO] Falha ao salvar arquivo local docs_index.json: {e}")
 
-        # Também salvar em /tmp/docs_index.json se estiver na Vercel
-        try:
-            with open("/tmp/docs_index.json", "w", encoding="utf-8") as f:
-                json.dump(hub_data, f, ensure_ascii=False, indent=2)
-        except Exception:
-            pass
+        # Também salvar nas outras localizações do repositório
+        for extra_path in [
+            os.path.join(os.getcwd(), "01 - Relatórios", "01 - Consulta de Ofícios", "Base de dados Ofícios", "docs_index.json"),
+            os.path.join(os.getcwd(), "docs_index.json"),
+            "/tmp/docs_index.json"
+        ]:
+            try:
+                os.makedirs(os.path.dirname(extra_path), exist_ok=True)
+                with open(extra_path, "w", encoding="utf-8") as f_ex:
+                    json.dump(hub_data, f_ex, ensure_ascii=False, indent=2)
+            except Exception:
+                pass
 
         # Sincronizar docs_index.json no GitHub se token disponível
         token = github_token or os.environ.get("GITHUB_TOKEN") or os.environ.get("PMO_GITHUB_TOKEN")

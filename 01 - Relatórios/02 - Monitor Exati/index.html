@@ -1281,6 +1281,23 @@
           </div>
 
           <div class="analitico-select-group">
+            <label for="filtro-analitico-mes" class="filter-label"><i class="fa-solid fa-calendar-days" style="color: var(--primary);"></i> Mês:</label>
+            <select id="filtro-analitico-mes" class="custom-select" style="font-weight: 600; color: var(--primary);">
+              <option value="todos">Todos os Meses (2026)</option>
+              <option value="2026-10">Outubro / 2026 (SLA: 9d)</option>
+              <option value="2026-09">Setembro / 2026 (SLA: 2d)</option>
+              <option value="2026-08">Agosto / 2026 (SLA: 1d)</option>
+              <option value="2026-07">Julho / 2026 (SLA: 1d)</option>
+              <option value="2026-06">Junho / 2026 (SLA: 2d)</option>
+              <option value="2026-05">Maio / 2026 (SLA: 1d)</option>
+              <option value="2026-04">Abril / 2026 (SLA: 2d)</option>
+              <option value="2026-03">Março / 2026 (SLA: 2d)</option>
+              <option value="2026-02">Fevereiro / 2026 (SLA: 5d)</option>
+              <option value="2026-01">Janeiro / 2026 (SLA: 8d)</option>
+            </select>
+          </div>
+
+          <div class="analitico-select-group">
             <label for="filtro-analitico-sla" class="filter-label">SLA:</label>
             <select id="filtro-analitico-sla" class="custom-select">
               <option value="todos">Todos os Status (Full)</option>
@@ -1334,6 +1351,8 @@
         <!-- Chips de 1 Clique para Filtro Imediato -->
         <div class="analitico-quick-chips">
           <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-dim); margin-right: 2px;">Atalhos rápidos:</span>
+          <button class="quick-chip" data-mes="2026-10" id="btn-quick-outubro" style="border-color: rgba(245, 158, 11, 0.4); color: #f59e0b;"><i class="fa-solid fa-calendar-day"></i> Outubro/2026 (SLA: 9d)</button>
+          <button class="quick-chip" data-mes="2026-09" id="btn-quick-setembro"><i class="fa-solid fa-calendar"></i> Setembro/2026 (SLA: 2d)</button>
           <button class="quick-chip" data-sla="pendentes" id="btn-quick-backlog"><i class="fa-solid fa-clock-rotate-left"></i> Backlog (<span id="analitico-chip-backlog">30</span>)</button>
           <button class="quick-chip" data-sla="exclusao" style="border-color: rgba(239, 68, 68, 0.4); color: #ef4444;" id="btn-quick-exclusao"><i class="fa-solid fa-triangle-exclamation"></i> Detectado Exclusão (<span id="analitico-chip-exclusao">1</span>)</button>
           <button class="quick-chip" data-origem="callcenter"><i class="fa-solid fa-headset"></i> Call Center</button>
@@ -1372,7 +1391,7 @@
                 <th data-sort="origem" class="sortable">Origem <span class="sort-icon">↕</span></th>
                 <th data-sort="dt_rec" class="sortable">Data Reclamação <span class="sort-icon">↕</span></th>
                 <th data-sort="dt_fim" class="sortable">Data Conclusão <span class="sort-icon">↕</span></th>
-                <th data-sort="dias" class="sortable active-sort desc">SLA / Resolução (Dias) <span class="sort-icon">▼</span></th>
+                <th data-sort="dias" class="sortable active-sort desc" style="background: rgba(16, 185, 129, 0.08); color: #10b981;" title="Tempo de Resolução: Data Conclusão - Data Reclamação"><i class="fa-solid fa-stopwatch" style="margin-right: 4px;"></i>SLA (Dias / Horas) <span class="sort-icon">▼</span></th>
                 <th data-sort="sla" class="sortable">Status SLA <span class="sort-icon">↕</span></th>
                 <th data-sort="eq" class="sortable">Equipe <span class="sort-icon">↕</span></th>
                 <th data-sort="bairro" class="sortable">Bairro <span class="sort-icon">↕</span></th>
