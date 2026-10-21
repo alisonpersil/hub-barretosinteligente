@@ -33,8 +33,8 @@ from datetime import datetime
 
 # Credenciais e URLs padrão
 DEFAULT_BASE_URL = "https://cidadaoonline.barretos.sp.gov.br"
-DEFAULT_USER = "49023977000113"
-DEFAULT_PASS = "1234"
+DEFAULT_USER = os.environ.get("CIDADAO_USER", "49023977000113")
+DEFAULT_PASS = os.environ.get("CIDADAO_PASS", "1234")
 DEFAULT_DATA_INICIAL = "2020-01-01"
 DEFAULT_GITHUB_REPO = os.environ.get("GITHUB_REPO", "alisonpersil/hub-barretosinteligente")
 
@@ -104,6 +104,45 @@ def format_size(bytes_num: int) -> str:
         return f"{bytes_num / 1024:.1f} KB"
     else:
         return f"{bytes_num / (1024 * 1024):.2f} MB"
+
+
+def github_api_commit_file(token, repo_path, file_bytes, commit_message, repo=None, branch="storage"):
+    """Cria/atualiza um arquivo no GitHub (por padrão no branch 'storage') via REST API."""
+    repo = repo or DEFAULT_GITHUB_REPO
+    quote = lambda p: "/".join(urllib.parse.quote(part) for part in p.strip("/").split("/"))
+    repo_path = repo_path.replace("\\", "/")
+    url = f"https://api.github.com/repos/{repo}/contents/{quote(repo_path)}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "Hub-BarretosInteligente-Sync",
+    }
+
+    sha = None
+    try:
+        req_get = urllib.request.Request(f"{url}?ref={branch}", headers=headers)
+        with urllib.request.urlopen(req_get, timeout=60) as resp:
+            sha = json.loads(resp.read().decode("utf-8")).get("sha")
+    except urllib.error.HTTPError as e:
+        if e.code != 404:
+            raise
+    except Exception:
+        pass
+
+    payload = {
+        "message": commit_message,
+        "content": base64.b64encode(file_bytes).decode("utf-8"),
+        "branch": branch,
+    }
+    if sha:
+        payload["sha"] = sha
+    req_put = urllib.request.Request(
+        url, data=json.dumps(payload).encode("utf-8"),
+        headers={**headers, "Content-Type": "application/json"}, method="PUT",
+    )
+    with urllib.request.urlopen(req_put, timeout=180) as resp:
+        return json.loads(resp.read().decode("utf-8"))
+
 
 
 class CidadaoOnlineClient:
@@ -223,7 +262,8 @@ def sync_cidadao_online(
     github_token=None,
     github_repo=DEFAULT_GITHUB_REPO,
     dry_run=False,
-    logger=print
+    logger=print,
+    commit_index=True
 ) -> dict:
     """
     Executa a sincronização completa entre Cidadão Online e o Hub.
@@ -471,7 +511,6 @@ def sync_cidadao_online(
             token = github_token or os.environ.get("GITHUB_TOKEN") or os.environ.get("PMO_GITHUB_TOKEN")
             if token:
                 try:
-                    from app import github_api_commit_file
                     repo_rel_path = f"01 - Relatórios/01 - Consulta de Ofícios/Base de dados Ofícios/Protocolos/{folder_name}/{final_filename}"
                     github_api_commit_file(
                         token=token,
@@ -535,9 +574,8 @@ def sync_cidadao_online(
 
         # Sincronizar docs_index.json no GitHub se token disponível
         token = github_token or os.environ.get("GITHUB_TOKEN") or os.environ.get("PMO_GITHUB_TOKEN")
-        if token:
+        if token and commit_index:
             try:
-                from app import github_api_commit_file
                 idx_bytes = json.dumps(hub_data, ensure_ascii=False, indent=2).encode("utf-8")
                 github_api_commit_file(
                     token=token,
@@ -569,17 +607,19 @@ def sync_cidadao_online(
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Sincronizador Cidadão Online Barretos -> Hub PMO")
-    parser.add_argument("--ano", type=int, default=2026, help="Ano mínimo dos protocolos (padrão: 2026)")
+    parser.add_argument("--ano", type=int, default=0, help="Ano mínimo dos protocolos (padrão: 0 = todos)")
     parser.add_argument("--inicio", type=str, default=DEFAULT_DATA_INICIAL, help="Data inicial YYYY-MM-DD")
     parser.add_argument("--dry-run", action="store_true", help="Executar teste sem salvar arquivos ou commits")
     parser.add_argument("--index", type=str, default=None, help="Caminho personalizado de docs_index.json")
     parser.add_argument("--token", type=str, default=None, help="GitHub Personal Access Token")
+    parser.add_argument("--no-index-commit", action="store_true", help="Não commitar docs_index.json no branch storage (o workflow commita no main)")
     args = parser.parse_args()
 
     sync_cidadao_online(
         docs_index_path=args.index,
         data_inicial=args.inicio,
-        ano_minimo=args.ano,
+        ano_minimo=args.ano or None,
         github_token=args.token,
-        dry_run=args.dry_run
+        dry_run=args.dry_run,
+        commit_index=not args.no_index_commit
     )

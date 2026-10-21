@@ -1,0 +1,55 @@
+name: "Sincronização Cidadão Online (diária 08:00)"
+
+on:
+  schedule:
+    # 11:00 UTC = 08:00 em Brasília (America/Sao_Paulo, UTC-3)
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-cidadao-online
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      TZ: "America/Sao_Paulo"
+      PYTHONIOENCODING: "utf-8"
+      GITHUB_REPO: ${{ github.repository }}
+
+    steps:
+      - name: Checkout (main)
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      # O script usa só a biblioteca padrão do Python (não precisa de pip install).
+      # - Protocolos novos e status atualizados -> docs_index.json (commitado no main abaixo)
+      # - PDFs novos -> commitados direto no branch 'storage' via API (sem duplicar os que já existem)
+      - name: Sincronizar protocolos e anexos
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: python "02 - Automações/sync_cidadao_online.py" --no-index-commit
+
+      - name: Commit do docs_index.json no main
+        run: |
+          git config user.name "Barretos Inteligente Sync"
+          git config user.email "sync@barretosinteligente.com.br"
+          git add -- \
+            "docs_index.json" \
+            "01 - Relatórios/01 - Consulta de Ofícios/docs_index.json" \
+            "01 - Relatórios/01 - Consulta de Ofícios/Base de dados Ofícios/docs_index.json"
+          if git diff --staged --quiet; then
+            echo "Nenhum protocolo ou anexo novo. Nada a commitar."
+          else
+            git commit -m "chore(protocolos): sincronização diária Cidadão Online"
+            git pull --rebase origin main
+            git push origin main
+          fi
