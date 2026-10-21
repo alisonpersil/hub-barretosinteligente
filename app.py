@@ -1310,6 +1310,41 @@ def upload_oficios():
         "synced": True
     })
 
+@app.route("/api/sync/cidadao-online", methods=["POST", "GET"])
+def api_sync_cidadao_online():
+    """Executa a rotina de sincronização entre o Cidadão Online de Barretos e o Hub."""
+    token = (
+        request.headers.get("X-GitHub-Token")
+        or os.environ.get("GITHUB_TOKEN")
+        or os.environ.get("GH_TOKEN")
+        or os.environ.get("PMO_GITHUB_TOKEN")
+        or ""
+    ).strip()
+
+    ano_minimo = request.args.get("ano", type=int, default=2026)
+    data_inicial = request.args.get("data_inicial", default="2020-01-01")
+
+    try:
+        automacoes_dir = os.path.join(BASE_DIR, "02 - Automações")
+        if automacoes_dir not in sys.path:
+            sys.path.insert(0, automacoes_dir)
+        from sync_cidadao_online import sync_cidadao_online as do_sync
+        
+        docs_index_path = os.path.join(DOCS_DIR, "docs_index.json")
+        res = do_sync(
+            docs_index_path=docs_index_path,
+            data_inicial=data_inicial,
+            ano_minimo=ano_minimo,
+            github_token=token or None,
+            github_repo=GITHUB_REPO,
+            dry_run=False
+        )
+        return jsonify(res)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 # ==============================================================================
 # Rotas: 02 - Monitor Exati (/exati)
 # ==============================================================================

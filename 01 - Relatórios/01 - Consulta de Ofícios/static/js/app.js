@@ -50,6 +50,7 @@ const loadingState = document.getElementById('loadingState');
 const btnClearSearchEmpty = document.getElementById('btnClearSearchEmpty');
 
 const btnRefresh = document.getElementById('btnRefresh');
+const btnSyncCidadao = document.getElementById('btnSyncCidadao');
 const btnThemeToggle = document.getElementById('btnThemeToggle');
 const headerDocCount = document.getElementById('headerDocCount');
 
@@ -262,6 +263,53 @@ function setupEventListeners() {
                     showToast('Lista de documentos atualizada!', 'success');
                 }, 400);
             });
+        });
+    }
+
+    if (btnSyncCidadao) {
+        btnSyncCidadao.addEventListener('click', async () => {
+            const icon = btnSyncCidadao.querySelector('i');
+            const textSpan = btnSyncCidadao.querySelector('.btn-sync-text');
+            const oldText = textSpan ? textSpan.textContent : 'Sincronizar Portal';
+
+            btnSyncCidadao.disabled = true;
+            btnSyncCidadao.classList.add('syncing');
+            if (icon) icon.className = 'fa-solid fa-spinner fa-spin';
+            if (textSpan) textSpan.textContent = 'Sincronizando...';
+
+            showToast('Conectando ao Cidadão Online de Barretos...', 'info');
+
+            try {
+                const token = localStorage.getItem('pmo_github_token') || '';
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['X-GitHub-Token'] = token;
+
+                const res = await fetch('/api/sync/cidadao-online?ano=2026', {
+                    method: 'POST',
+                    headers: headers
+                });
+
+                if (!res.ok) {
+                    throw new Error(`Erro ${res.status}: falha na comunicação com o servidor`);
+                }
+
+                const data = await res.json();
+                if (data.status === 'success') {
+                    const msg = `Sincronização concluída! ${data.protocols_added || 0} novo(s) protocolo(s), ${data.statuses_updated || 0} status atualizado(s) e ${data.files_added || 0} novo(s) anexo(s).`;
+                    showToast(msg, 'success', 6000);
+                    await loadDocuments(true);
+                } else {
+                    showToast(data.message || data.error || 'Erro na sincronização.', 'error', 5000);
+                }
+            } catch (err) {
+                console.error('Erro na sincronização Cidadão Online:', err);
+                showToast(`Erro ao sincronizar: ${err.message}`, 'error', 5000);
+            } finally {
+                btnSyncCidadao.disabled = false;
+                btnSyncCidadao.classList.remove('syncing');
+                if (icon) icon.className = 'fa-solid fa-arrows-rotate';
+                if (textSpan) textSpan.textContent = oldText;
+            }
         });
     }
 
@@ -1017,8 +1065,9 @@ function renderCardsView(documents = state.filteredDocuments) {
             : `<span class="doc-badge type-protocolo"><i class="fa-solid fa-folder-tree"></i> Protocolo</span>`;
 
         const highlightedTitle = highlightText(doc.name, state.searchTerm);
+        const statusSlug = doc.status ? normalizeText(doc.status).replace(/\s+/g, '-') : '';
         const statusBadge = doc.status 
-            ? `<span class="doc-badge status-${doc.status.toLowerCase()}">${escapeHtml(doc.status)}</span>` 
+            ? `<span class="doc-badge status-${statusSlug}">${escapeHtml(doc.status)}</span>` 
             : '';
 
         const matchedHintHtml = doc.matched_file_name 
@@ -1116,8 +1165,9 @@ function renderTableView(documents = state.filteredDocuments) {
             : `<span class="doc-badge type-protocolo" style="font-size: 0.65rem;"><i class="fa-solid fa-folder-tree"></i> Protocolo</span>`;
 
         const highlightedTitle = highlightText(doc.name, state.searchTerm);
+        const statusSlug = doc.status ? normalizeText(doc.status).replace(/\s+/g, '-') : '';
         const statusBadge = doc.status 
-            ? `<span class="doc-badge status-${doc.status.toLowerCase()}" style="font-size: 0.65rem;">${escapeHtml(doc.status)}</span>` 
+            ? `<span class="doc-badge status-${statusSlug}" style="font-size: 0.65rem;">${escapeHtml(doc.status)}</span>` 
             : '';
 
         const matchedHintHtml = doc.matched_file_name 
@@ -1233,8 +1283,9 @@ function openPreviewModal(doc) {
             ? `<span class="doc-badge type-oficio"><i class="fa-solid fa-file-pdf"></i> Ofício</span>` 
             : `<span class="doc-badge type-protocolo"><i class="fa-solid fa-folder-tree"></i> Protocolo</span>`;
 
+        const statusSlug = doc.status ? normalizeText(doc.status).replace(/\s+/g, '-') : '';
         const statusBadge = doc.status 
-            ? `<span class="doc-badge status-${doc.status.toLowerCase()}">${escapeHtml(doc.status)}</span>` 
+            ? `<span class="doc-badge status-${statusSlug}">${escapeHtml(doc.status)}</span>` 
             : '';
 
         modalDocMeta.innerHTML = `
