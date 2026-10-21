@@ -34,3 +34,9 @@ radio_tracks/
 *.m4a
 *.wav
 *.opus
+
+# Protocol PDFs (hosted on GitHub 'storage' branch to avoid Vercel Lambda 250MB limit)
+Base de dados Ofícios/Protocolos/**/*.pdf
+01 - Relatórios/01 - Consulta de Ofícios/Base de dados Ofícios/Protocolos/**/*.pdf
+01 - Relatorios/01 - Consulta de Ofícios/Base de dados Ofícios/Protocolos/**/*.pdf
+

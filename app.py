@@ -350,81 +350,96 @@ def normalize_repo_docs_path(subpath):
     return f"{prefix}/{subpath}"
 
 def fetch_file_from_github(subpath, token=None):
-    """Fetch file content from GitHub repository with token authentication."""
+    """Fetch file content from GitHub repository with token authentication (trying storage branch then main)."""
     repo_path = normalize_repo_docs_path(subpath)
     encoded_path = urllib.parse.quote(repo_path.replace("\\", "/"), safe="/")
-    url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{encoded_path}"
     headers = {"User-Agent": "BarretosHub"}
     if token:
         headers["Authorization"] = f"Bearer {token}"
-    try:
-        req = urllib.request.Request(url, headers=headers)
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            return resp.read(), os.path.basename(repo_path)
-    except Exception as e:
+
+    for branch in ["storage", "main"]:
+        url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/{branch}/{encoded_path}"
         try:
-            api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{urllib.parse.quote(repo_path.replace('\\', '/'))}"
+            req = urllib.request.Request(url, headers=headers)
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                return resp.read(), os.path.basename(repo_path)
+        except Exception:
+            pass
+
+    # Fallback to GitHub Contents API
+    for branch in ["storage", "main"]:
+        try:
+            api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{urllib.parse.quote(repo_path.replace('\\', '/'))}?ref={branch}"
             api_headers = {"User-Agent": "BarretosHub", "Accept": "application/vnd.github.v3.raw"}
             if token:
                 api_headers["Authorization"] = f"Bearer {token}"
             req2 = urllib.request.Request(api_url, headers=api_headers)
             with urllib.request.urlopen(req2, timeout=30) as resp2:
                 return resp2.read(), os.path.basename(repo_path)
-        except Exception as e2:
-            print(f"Erro ao buscar '{subpath}' no GitHub: {e} / {e2}", file=sys.stderr)
-            return None, os.path.basename(repo_path)
+        except Exception:
+            pass
+
+    return None, os.path.basename(repo_path)
 
 def github_api_delete_item(token, rel_path, commit_message=None):
-    """Delete a file or folder from GitHub repo using GitHub REST API."""
+    """Delete a file or folder from GitHub repo using GitHub REST API across storage and main branches."""
     repo_path = normalize_repo_docs_path(rel_path)
     encoded_path = urllib.parse.quote(repo_path.replace("\\", "/"))
-    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}"
     headers = {
         "Authorization": f"Bearer {token}",
         "Accept": "application/vnd.github.v3+json",
         "User-Agent": "BarretosHub"
     }
 
-    req = urllib.request.Request(url, headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        if e.code == 404:
-            return True
-        raise e
+    for branch in ["storage", "main"]:
+        url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}?ref={branch}"
+        req = urllib.request.Request(url, headers=headers)
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+        except urllib.error.HTTPError as e:
+            if e.code == 404:
+                continue
+            data = None
 
-    if isinstance(data, list):
-        msg = commit_message or f"chore: excluir pasta {os.path.basename(rel_path)}"
-        for item in data:
-            item_path = item.get("path")
-            item_type = item.get("type")
-            item_sha = item.get("sha")
-            if item_type == "file":
-                del_req = urllib.request.Request(
-                    f"https://api.github.com/repos/{GITHUB_REPO}/contents/{urllib.parse.quote(item_path)}",
-                    data=json.dumps({"message": msg, "sha": item_sha, "branch": "main"}).encode("utf-8"),
-                    headers={**headers, "Content-Type": "application/json"},
-                    method="DELETE"
-                )
-                try:
-                    with urllib.request.urlopen(del_req, timeout=30):
-                        pass
-                except Exception as ed:
-                    print(f"Erro ao excluir arquivo {item_path} do GitHub:", ed, file=sys.stderr)
-            elif item_type == "dir":
-                github_api_delete_item(token, item_path, msg)
-        return True
-    elif isinstance(data, dict):
-        msg = commit_message or f"chore: excluir arquivo {os.path.basename(rel_path)}"
-        del_req = urllib.request.Request(
-            url,
-            data=json.dumps({"message": msg, "sha": data["sha"], "branch": "main"}).encode("utf-8"),
-            headers={**headers, "Content-Type": "application/json"},
-            method="DELETE"
-        )
-        with urllib.request.urlopen(del_req, timeout=30):
-            return True
+        if not data:
+            continue
+
+        if isinstance(data, list):
+            msg = commit_message or f"chore: excluir pasta {os.path.basename(rel_path)}"
+            for item in data:
+                item_path = item.get("path")
+                item_type = item.get("type")
+                item_sha = item.get("sha")
+                if item_type == "file":
+                    del_req = urllib.request.Request(
+                        f"https://api.github.com/repos/{GITHUB_REPO}/contents/{urllib.parse.quote(item_path)}",
+                        data=json.dumps({"message": msg, "sha": item_sha, "branch": branch}).encode("utf-8"),
+                        headers={**headers, "Content-Type": "application/json"},
+                        method="DELETE"
+                    )
+                    try:
+                        with urllib.request.urlopen(del_req, timeout=30):
+                            pass
+                    except Exception as ed:
+                        print(f"Erro ao excluir arquivo {item_path} do GitHub ({branch}):", ed, file=sys.stderr)
+                elif item_type == "dir":
+                    github_api_delete_item(token, item_path, msg)
+        elif isinstance(data, dict):
+            msg = commit_message or f"chore: excluir arquivo {os.path.basename(rel_path)}"
+            del_req = urllib.request.Request(
+                f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}",
+                data=json.dumps({"message": msg, "sha": data["sha"], "branch": branch}).encode("utf-8"),
+                headers={**headers, "Content-Type": "application/json"},
+                method="DELETE"
+            )
+            try:
+                with urllib.request.urlopen(del_req, timeout=30):
+                    pass
+            except Exception as ed:
+                print(f"Erro ao excluir arquivo {rel_path} do GitHub ({branch}):", ed, file=sys.stderr)
+
+    return True
 
 def remove_from_docs_index(rel_path):
     target = rel_path.replace("\\", "/").strip("/")
@@ -808,7 +823,7 @@ def github_api_commit_file(token, repo_path, file_bytes, commit_message):
     encoded_path = "/".join(urllib.parse.quote(part) for part in repo_path.strip("/").split("/"))
     
     url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}"
-    url_parent = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_parent}"
+    url_parent = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_parent}?ref=storage"
     
     sha = None
     try:
@@ -830,7 +845,8 @@ def github_api_commit_file(token, repo_path, file_bytes, commit_message):
 
     payload = {
         "message": commit_message,
-        "content": base64.b64encode(file_bytes).decode("utf-8")
+        "content": base64.b64encode(file_bytes).decode("utf-8"),
+        "branch": "storage"
     }
     if sha:
         payload["sha"] = sha

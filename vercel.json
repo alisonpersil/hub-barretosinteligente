@@ -1,22 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "python scripts/vercel_build.py --vercel",
-  "build": {
-    "env": {
-      "VERCEL_SUPPORT_LARGE_FUNCTIONS": "1"
-    }
-  },
-  "env": {
-    "VERCEL_SUPPORT_LARGE_FUNCTIONS": "1"
-  },
-  "functions": {
-    "api/index.py": {
-      "excludeFiles": "{**/*.pdf,**/*.PDF,**/*.xls,**/*.xlsx,**/*.pkl,*.pdf,*.PDF,*.xls,*.xlsx,*.pkl}"
-    },
-    "api/**/*.py": {
-      "excludeFiles": "{**/*.pdf,**/*.PDF,**/*.xls,**/*.xlsx,**/*.pkl,*.pdf,*.PDF,*.xls,*.xlsx,*.pkl}"
-    }
-  },
   "headers": [
     {
       "source": "/exati/(.*)",
