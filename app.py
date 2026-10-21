@@ -326,11 +326,15 @@ def extract_protocol_date(folder_path, files):
         return dt, "data atual"
 
 def load_docs_index():
-    candidates = [
+    candidates = []
+    tmp_index = "/tmp/docs_index.json"
+    if os.path.isfile(tmp_index):
+        candidates.append(tmp_index)
+    candidates.extend([
         os.path.join(DOCS_DIR, "docs_index.json"),
         os.path.join(OFICIOS_DIR, "docs_index.json"),
         os.path.join(BASE_DIR, "docs_index.json")
-    ]
+    ])
     for c in candidates:
         if os.path.isfile(c):
             try:
@@ -441,71 +445,87 @@ def github_api_delete_item(token, rel_path, commit_message=None):
 
     return True
 
-def remove_from_docs_index(rel_path):
+def save_docs_index(data, token=None, commit_msg=None):
+    is_vercel = bool(os.environ.get("VERCEL"))
+    if is_vercel:
+        try:
+            with open("/tmp/docs_index.json", "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+        except Exception as e:
+            print("Erro ao salvar /tmp/docs_index.json:", e, file=sys.stderr)
+            
+        if token:
+            try:
+                idx_bytes = json.dumps(data, ensure_ascii=False, indent=2).encode("utf-8")
+                github_api_commit_file(
+                    token=token,
+                    repo_path="01 - Relatórios/01 - Consulta de Ofícios/docs_index.json",
+                    file_bytes=idx_bytes,
+                    commit_message=commit_msg or "chore: atualizar docs_index.json"
+                )
+            except Exception as eg:
+                print("Erro ao sincronizar docs_index.json no GitHub:", eg, file=sys.stderr)
+    else:
+        for c in [os.path.join(DOCS_DIR, "docs_index.json"), os.path.join(OFICIOS_DIR, "docs_index.json"), os.path.join(BASE_DIR, "docs_index.json")]:
+            if os.path.isfile(c) or os.path.exists(os.path.dirname(c)):
+                try:
+                    with open(c, "w", encoding="utf-8") as f:
+                        json.dump(data, f, ensure_ascii=False, indent=2)
+                except Exception as e:
+                    print(f"Erro ao salvar {c}:", e, file=sys.stderr)
+
+def remove_from_docs_index(rel_path, token=None):
     target = rel_path.replace("\\", "/").strip("/")
     target_name = os.path.basename(target)
-    for c in [os.path.join(DOCS_DIR, "docs_index.json"), os.path.join(OFICIOS_DIR, "docs_index.json"), os.path.join(BASE_DIR, "docs_index.json")]:
-        if os.path.isfile(c):
-            try:
-                with open(c, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                data["protocolos"] = [p for p in data.get("protocolos", []) if p.get("relative_path") != target and p.get("folder_name") != target_name and p.get("name") != target_name]
-                data["oficios"] = [o for o in data.get("oficios", []) if o.get("relative_path") != target and o.get("name") != target_name]
-                with open(c, "w", encoding="utf-8") as f:
-                    json.dump(data, f, ensure_ascii=False, indent=2)
-            except Exception as e:
-                print("Erro ao atualizar docs_index.json após exclusão:", e, file=sys.stderr)
+    data = load_docs_index() or {"protocolos": [], "oficios": []}
+    data["protocolos"] = [p for p in data.get("protocolos", []) if p.get("relative_path") != target and p.get("folder_name") != target_name and p.get("name") != target_name]
+    data["oficios"] = [o for o in data.get("oficios", []) if o.get("relative_path") != target and o.get("name") != target_name]
+    save_docs_index(data, token=token, commit_msg=f"chore: remover {target_name} de docs_index.json")
 
-def add_to_docs_index(doc_item, is_protocol=False, protocol_name=None):
-    for c in [os.path.join(DOCS_DIR, "docs_index.json"), os.path.join(OFICIOS_DIR, "docs_index.json"), os.path.join(BASE_DIR, "docs_index.json")]:
-        if os.path.isfile(c):
-            try:
-                with open(c, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                if is_protocol and protocol_name:
-                    found = False
-                    for p in data.get("protocolos", []):
-                        if p.get("folder_name") == protocol_name or p.get("name") == protocol_name:
-                            p.setdefault("files", []).append(doc_item)
-                            p["total_files"] = len(p["files"])
-                            found = True
-                            break
-                    if not found:
-                        now_dt = datetime.now()
-                        data.setdefault("protocolos", []).insert(0, {
-                            "id": int(now_dt.timestamp() * 1000),
-                            "doc_type": "protocolo",
-                            "name": protocol_name,
-                            "folder_name": protocol_name,
-                            "protocolo": protocol_name.split(" - ")[0],
-                            "assunto": protocol_name.split(" - ")[1] if " - " in protocol_name else protocol_name,
-                            "status": None,
-                            "relative_path": f"Protocolos/{protocol_name}",
-                            "full_path": None,
-                            "is_folder": True,
-                            "is_pdf": False,
-                            "total_files": 1,
-                            "size_bytes": doc_item.get("size_bytes", 0),
-                            "size_formatted": doc_item.get("size_formatted", "0 KB"),
-                            "doc_date": now_dt.strftime("%d/%m/%Y"),
-                            "doc_date_formatted": now_dt.strftime("%d/%m/%Y"),
-                            "doc_date_ts": now_dt.timestamp(),
-                            "doc_date_source": "importação recente",
-                            "ctime": now_dt.timestamp(),
-                            "ctime_formatted": now_dt.strftime("%d/%m/%Y"),
-                            "mtime": now_dt.timestamp(),
-                            "mtime_formatted": now_dt.strftime("%d/%m/%Y"),
-                            "raw_mtime": now_dt.timestamp(),
-                            "category": "Protocolo",
-                            "year": str(now_dt.year),
-                            "files": [doc_item]
-                        })
-                else:
-                    data.setdefault("oficios", []).insert(0, doc_item)
-                with open(c, "w", encoding="utf-8") as f:
-                    json.dump(data, f, ensure_ascii=False, indent=2)
-            except Exception as e:
-                print("Erro ao atualizar docs_index.json após upload:", e, file=sys.stderr)
+def add_to_docs_index(doc_item, is_protocol=False, protocol_name=None, token=None):
+    data = load_docs_index() or {"protocolos": [], "oficios": []}
+    if is_protocol and protocol_name:
+        found = False
+        for p in data.get("protocolos", []):
+            if p.get("folder_name") == protocol_name or p.get("name") == protocol_name:
+                p.setdefault("files", []).append(doc_item)
+                p["total_files"] = len(p["files"])
+                found = True
+                break
+        if not found:
+            now_dt = datetime.now()
+            data.setdefault("protocolos", []).insert(0, {
+                "id": int(now_dt.timestamp() * 1000),
+                "doc_type": "protocolo",
+                "name": protocol_name,
+                "folder_name": protocol_name,
+                "protocolo": protocol_name.split(" - ")[0],
+                "assunto": protocol_name.split(" - ")[1] if " - " in protocol_name else protocol_name,
+                "status": None,
+                "relative_path": f"Protocolos/{protocol_name}",
+                "full_path": None,
+                "is_folder": True,
+                "is_pdf": False,
+                "total_files": 1,
+                "size_bytes": doc_item.get("size_bytes", 0),
+                "size_formatted": doc_item.get("size_formatted", "0 KB"),
+                "doc_date": now_dt.strftime("%d/%m/%Y"),
+                "doc_date_formatted": now_dt.strftime("%d/%m/%Y"),
+                "doc_date_ts": now_dt.timestamp(),
+                "doc_date_source": "importação recente",
+                "ctime": now_dt.timestamp(),
+                "ctime_formatted": now_dt.strftime("%d/%m/%Y"),
+                "mtime": now_dt.timestamp(),
+                "mtime_formatted": now_dt.strftime("%d/%m/%Y"),
+                "raw_mtime": now_dt.timestamp(),
+                "category": "Protocolo",
+                "year": str(now_dt.year),
+                "files": [doc_item]
+            })
+    else:
+        data.setdefault("oficios", []).insert(0, doc_item)
+
+    save_docs_index(data, token=token, commit_msg=f"chore: adicionar {doc_item.get('name')} em docs_index.json")
 
 def get_all_protocolos():
     """Scan protocol folders and return detailed metadata for folders and their inner documents."""
@@ -1160,7 +1180,7 @@ def delete_protocolo():
             print("Erro ao excluir item do GitHub via API:", eg, file=sys.stderr)
 
     # Remove do índice de documentos
-    remove_from_docs_index(rel_path)
+    remove_from_docs_index(rel_path, token=token)
 
     return jsonify({
         "success": True,
@@ -1221,21 +1241,21 @@ def upload_oficios():
 
                 # Sanitize folder name
                 folder_name = re.sub(r'[<>:"/\\|?*]', '_', folder_name).strip()
-                target_dir = os.path.join(DOCS_DIR, "Protocolos", folder_name)
-                os.makedirs(target_dir, exist_ok=True)
-                save_path = os.path.join(target_dir, filename)
                 rel_path = f"Protocolos/{folder_name}/{filename}"
                 repo_path = f"{docs_rel_path}/Protocolos/{folder_name}/{filename}"
                 commit_msg = f"feat: importar documento em protocolo {folder_name}/{filename}"
             else:
-                target_dir = os.path.join(DOCS_DIR, "Ofícios")
-                os.makedirs(target_dir, exist_ok=True)
-                save_path = os.path.join(target_dir, filename)
                 rel_path = f"Ofícios/{filename}"
                 repo_path = f"{docs_rel_path}/Ofícios/{filename}"
                 commit_msg = f"feat: importar oficio {filename}"
 
             if is_vercel:
+                tmp_dir = os.path.join("/tmp", "oficios_upload")
+                os.makedirs(tmp_dir, exist_ok=True)
+                save_path = os.path.join(tmp_dir, filename)
+                with open(save_path, "wb") as f:
+                    f.write(file_bytes)
+
                 github_api_commit_file(
                     token=token,
                     repo_path=repo_path,
@@ -1243,6 +1263,9 @@ def upload_oficios():
                     commit_message=commit_msg
                 )
             else:
+                target_dir = os.path.join(DOCS_DIR, "Protocolos", folder_name) if destination in ["protocolos", "protocolo"] else os.path.join(DOCS_DIR, "Ofícios")
+                os.makedirs(target_dir, exist_ok=True)
+                save_path = os.path.join(target_dir, filename)
                 with open(save_path, "wb") as f:
                     f.write(file_bytes)
 
@@ -1270,7 +1293,7 @@ def upload_oficios():
                 "year": year or str(now_dt.year)
             }
             saved_docs.append(doc_entry)
-            add_to_docs_index(doc_entry, is_protocol=(destination in ["protocolos", "protocolo"]), protocol_name=(folder_name if destination in ["protocolos", "protocolo"] else None))
+            add_to_docs_index(doc_entry, is_protocol=(destination in ["protocolos", "protocolo"]), protocol_name=(folder_name if destination in ["protocolos", "protocolo"] else None), token=token)
 
         except Exception as e:
             errors.append(f"{filename}: {str(e)}")

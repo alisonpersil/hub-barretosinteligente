@@ -1119,21 +1119,21 @@ def upload_oficios():
 
                 # Sanitize folder name
                 folder_name = re.sub(r'[<>:"/\\|?*]', '_', folder_name).strip()
-                target_dir = os.path.join(DOCS_DIR, "Protocolos", folder_name)
-                os.makedirs(target_dir, exist_ok=True)
-                save_path = os.path.join(target_dir, filename)
                 rel_path = f"Protocolos/{folder_name}/{filename}"
                 repo_path = f"01 - Relatórios/01 - Consulta de Ofícios/Base de dados Ofícios/Protocolos/{folder_name}/{filename}"
                 commit_msg = f"feat: importar documento em protocolo {folder_name}/{filename}"
             else:
-                target_dir = os.path.join(DOCS_DIR, "Ofícios")
-                os.makedirs(target_dir, exist_ok=True)
-                save_path = os.path.join(target_dir, filename)
                 rel_path = f"Ofícios/{filename}"
                 repo_path = f"01 - Relatórios/01 - Consulta de Ofícios/Base de dados Ofícios/Ofícios/{filename}"
                 commit_msg = f"feat: importar oficio {filename}"
 
             if is_vercel:
+                tmp_dir = os.path.join("/tmp", "oficios_upload")
+                os.makedirs(tmp_dir, exist_ok=True)
+                save_path = os.path.join(tmp_dir, filename)
+                with open(save_path, "wb") as f:
+                    f.write(file_bytes)
+
                 github_api_commit_file(
                     token=token,
                     repo_path=repo_path,
@@ -1141,6 +1141,9 @@ def upload_oficios():
                     commit_message=commit_msg
                 )
             else:
+                target_dir = os.path.join(DOCS_DIR, "Protocolos", folder_name) if destination in ["protocolos", "protocolo"] else os.path.join(DOCS_DIR, "Ofícios")
+                os.makedirs(target_dir, exist_ok=True)
+                save_path = os.path.join(target_dir, filename)
                 with open(save_path, "wb") as f:
                     f.write(file_bytes)
 
