@@ -1222,6 +1222,15 @@ function openPreviewModal(doc) {
     const files = Array.isArray(doc.files) ? doc.files : [];
     renderProtocolFilesList(files);
 
+    // Ensure mobile starts on the file list for multi-file protocols
+    if (protocolPreviewPanel) {
+        if (isOficio) {
+            protocolPreviewPanel.classList.add('mobile-visible');
+        } else {
+            protocolPreviewPanel.classList.remove('mobile-visible');
+        }
+    }
+
     // Auto-select document: matched file or first file or direct doc
     let targetFile = null;
     if (doc.matched_file_name) {
@@ -1235,7 +1244,8 @@ function openPreviewModal(doc) {
     }
 
     if (targetFile) {
-        selectProtocolFile(targetFile);
+        // Only slide to preview on mobile if it is a single oficio! For protocols, user starts on file list.
+        selectProtocolFile(targetFile, isOficio);
     } else {
         // Empty protocol folder
         if (activeDocName) activeDocName.textContent = 'Nenhum documento encontrado';
@@ -1287,14 +1297,19 @@ function renderProtocolFilesList(files) {
                 <span class="file-item-name" title="${escapeHtml(file.name)}">${escapeHtml(file.name)}</span>
                 <span class="file-item-meta">${file.size_formatted} &bull; ${file.mtime_formatted || ''}</span>
             </div>
-            <button class="btn-file-quick-download" title="Baixar este arquivo" aria-label="Baixar ${escapeHtml(file.name)}">
-                <i class="fa-solid fa-download"></i>
-            </button>
+            <div class="file-item-actions">
+                <button class="btn-file-quick-download" title="Baixar este arquivo" aria-label="Baixar ${escapeHtml(file.name)}">
+                    <i class="fa-solid fa-download"></i>
+                </button>
+                <div class="file-item-chevron">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </div>
+            </div>
         `;
 
         li.addEventListener('click', (e) => {
             if (e.target.closest('.btn-file-quick-download')) return;
-            selectProtocolFile(file);
+            selectProtocolFile(file, true);
         });
 
         const btnQuick = li.querySelector('.btn-file-quick-download');
@@ -1312,7 +1327,7 @@ function renderProtocolFilesList(files) {
 }
 
 // Select and preview a specific file from the protocol
-function selectProtocolFile(file) {
+function selectProtocolFile(file, autoSlideMobile = true) {
     if (!file) return;
     state.activeModalFile = file;
 
@@ -1333,6 +1348,12 @@ function selectProtocolFile(file) {
         activeDocMeta.textContent = `${file.size_formatted} • Modificado em ${file.mtime_formatted || ''} • PDF`;
     }
 
+    // Update back button text with file count
+    if (btnBackToFilesList) {
+        const totalFiles = (state.activeModalDoc && state.activeModalDoc.files) ? state.activeModalDoc.files.length : '';
+        btnBackToFilesList.innerHTML = `<i class="fa-solid fa-arrow-left"></i> <span>Voltar à Lista (${totalFiles})</span>`;
+    }
+
     const pathParts = (file.relative_path || file.name).split('/').map(encodeURIComponent).join('/');
     const previewUrl = `/api/pdf/preview/${pathParts}`;
 
@@ -1347,8 +1368,8 @@ function selectProtocolFile(file) {
         pdfViewerFrame.src = previewUrl;
     }
 
-    // Mobile slide to preview pane
-    if (window.innerWidth <= 768 && protocolPreviewPanel) {
+    // Mobile slide to preview pane only when requested
+    if (autoSlideMobile && window.innerWidth <= 868 && protocolPreviewPanel) {
         protocolPreviewPanel.classList.add('mobile-visible');
     }
 }
