@@ -4117,6 +4117,80 @@ body {
     color: var(--primary);
 }
 
+/* Responsive Module Tabs for Mobile (Locked proportions, zero overflow) */
+@media (max-width: 768px) {
+    .module-tabs-wrapper {
+        padding: 0 4px;
+        box-sizing: border-box;
+        margin-bottom: 0.6rem;
+    }
+
+    .module-tabs-nav {
+        width: 100%;
+        max-width: 420px;
+        display: flex;
+        justify-content: space-between;
+        padding: 3px;
+        gap: 3px;
+        border-radius: 12px;
+        box-sizing: border-box;
+    }
+
+    .module-tab-btn {
+        flex: 1 1 0;
+        min-width: 0;
+        justify-content: center;
+        padding: 6px 4px;
+        font-size: 0.78rem;
+        gap: 4px;
+        border-radius: 8px;
+    }
+
+    .module-tab-btn i {
+        font-size: 0.74rem;
+        flex-shrink: 0;
+    }
+
+    .module-tab-btn span {
+        font-size: 0.78rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .module-tab-btn .tab-pill {
+        font-size: 0.66rem;
+        padding: 1px 5px;
+        border-radius: 6px;
+        min-width: 16px;
+        text-align: center;
+        flex-shrink: 0;
+        line-height: 1.2;
+    }
+}
+
+@media (max-width: 390px) {
+    .module-tab-btn {
+        padding: 5px 2px;
+        font-size: 0.72rem;
+        gap: 3px;
+    }
+
+    .module-tab-btn i {
+        font-size: 0.68rem;
+    }
+
+    .module-tab-btn span {
+        font-size: 0.72rem;
+    }
+
+    .module-tab-btn .tab-pill {
+        font-size: 0.62rem;
+        padding: 1px 4px;
+        min-width: 14px;
+    }
+}
+
 /* Badges de Tipo: Protocolo e Ofício */
 .doc-badge.type-protocolo {
     background: #eff6ff;
