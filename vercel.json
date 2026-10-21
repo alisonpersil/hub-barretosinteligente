@@ -1,5 +1,16 @@
 {
   "version": 2,
+  "functions": {
+    "api/index.py": {
+      "excludeFiles": "{**/*.pdf,**/*.PDF,01 - Relatórios/02 - Monitor Exati/Base de dados/Atendidos/**}"
+    },
+    "api/*.py": {
+      "excludeFiles": "{**/*.pdf,**/*.PDF,01 - Relatórios/02 - Monitor Exati/Base de dados/Atendidos/**}"
+    },
+    "api/**/*.py": {
+      "excludeFiles": "{**/*.pdf,**/*.PDF,01 - Relatórios/02 - Monitor Exati/Base de dados/Atendidos/**}"
+    }
+  },
   "headers": [
     {
       "source": "/exati/(.*)",

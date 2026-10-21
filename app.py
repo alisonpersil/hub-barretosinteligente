@@ -325,8 +325,179 @@ def extract_protocol_date(folder_path, files):
         dt = datetime.now()
         return dt, "data atual"
 
+def load_docs_index():
+    candidates = [
+        os.path.join(DOCS_DIR, "docs_index.json"),
+        os.path.join(OFICIOS_DIR, "docs_index.json"),
+        os.path.join(BASE_DIR, "docs_index.json")
+    ]
+    for c in candidates:
+        if os.path.isfile(c):
+            try:
+                with open(c, "r", encoding="utf-8") as f:
+                    return json.load(f)
+            except Exception as e:
+                print("Erro ao carregar docs_index.json:", e, file=sys.stderr)
+    return None
+
+def normalize_repo_docs_path(subpath):
+    subpath = urllib.parse.unquote(subpath).replace("\\", "/").strip("/")
+    prefix = "01 - Relatórios/01 - Consulta de Ofícios/Base de dados Ofícios"
+    if subpath.startswith("01 - Relatórios") or subpath.startswith("01 - Relatorios"):
+        return subpath
+    if subpath.startswith("Base de dados"):
+        return f"01 - Relatórios/01 - Consulta de Ofícios/{subpath}"
+    return f"{prefix}/{subpath}"
+
+def fetch_file_from_github(subpath, token=None):
+    """Fetch file content from GitHub repository with token authentication."""
+    repo_path = normalize_repo_docs_path(subpath)
+    encoded_path = urllib.parse.quote(repo_path.replace("\\", "/"), safe="/")
+    url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/main/{encoded_path}"
+    headers = {"User-Agent": "BarretosHub"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    try:
+        req = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return resp.read(), os.path.basename(repo_path)
+    except Exception as e:
+        try:
+            api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{urllib.parse.quote(repo_path.replace('\\', '/'))}"
+            api_headers = {"User-Agent": "BarretosHub", "Accept": "application/vnd.github.v3.raw"}
+            if token:
+                api_headers["Authorization"] = f"Bearer {token}"
+            req2 = urllib.request.Request(api_url, headers=api_headers)
+            with urllib.request.urlopen(req2, timeout=30) as resp2:
+                return resp2.read(), os.path.basename(repo_path)
+        except Exception as e2:
+            print(f"Erro ao buscar '{subpath}' no GitHub: {e} / {e2}", file=sys.stderr)
+            return None, os.path.basename(repo_path)
+
+def github_api_delete_item(token, rel_path, commit_message=None):
+    """Delete a file or folder from GitHub repo using GitHub REST API."""
+    repo_path = normalize_repo_docs_path(rel_path)
+    encoded_path = urllib.parse.quote(repo_path.replace("\\", "/"))
+    url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{encoded_path}"
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "BarretosHub"
+    }
+
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return True
+        raise e
+
+    if isinstance(data, list):
+        msg = commit_message or f"chore: excluir pasta {os.path.basename(rel_path)}"
+        for item in data:
+            item_path = item.get("path")
+            item_type = item.get("type")
+            item_sha = item.get("sha")
+            if item_type == "file":
+                del_req = urllib.request.Request(
+                    f"https://api.github.com/repos/{GITHUB_REPO}/contents/{urllib.parse.quote(item_path)}",
+                    data=json.dumps({"message": msg, "sha": item_sha, "branch": "main"}).encode("utf-8"),
+                    headers={**headers, "Content-Type": "application/json"},
+                    method="DELETE"
+                )
+                try:
+                    with urllib.request.urlopen(del_req, timeout=30):
+                        pass
+                except Exception as ed:
+                    print(f"Erro ao excluir arquivo {item_path} do GitHub:", ed, file=sys.stderr)
+            elif item_type == "dir":
+                github_api_delete_item(token, item_path, msg)
+        return True
+    elif isinstance(data, dict):
+        msg = commit_message or f"chore: excluir arquivo {os.path.basename(rel_path)}"
+        del_req = urllib.request.Request(
+            url,
+            data=json.dumps({"message": msg, "sha": data["sha"], "branch": "main"}).encode("utf-8"),
+            headers={**headers, "Content-Type": "application/json"},
+            method="DELETE"
+        )
+        with urllib.request.urlopen(del_req, timeout=30):
+            return True
+
+def remove_from_docs_index(rel_path):
+    target = rel_path.replace("\\", "/").strip("/")
+    target_name = os.path.basename(target)
+    for c in [os.path.join(DOCS_DIR, "docs_index.json"), os.path.join(OFICIOS_DIR, "docs_index.json"), os.path.join(BASE_DIR, "docs_index.json")]:
+        if os.path.isfile(c):
+            try:
+                with open(c, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                data["protocolos"] = [p for p in data.get("protocolos", []) if p.get("relative_path") != target and p.get("folder_name") != target_name and p.get("name") != target_name]
+                data["oficios"] = [o for o in data.get("oficios", []) if o.get("relative_path") != target and o.get("name") != target_name]
+                with open(c, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+            except Exception as e:
+                print("Erro ao atualizar docs_index.json após exclusão:", e, file=sys.stderr)
+
+def add_to_docs_index(doc_item, is_protocol=False, protocol_name=None):
+    for c in [os.path.join(DOCS_DIR, "docs_index.json"), os.path.join(OFICIOS_DIR, "docs_index.json"), os.path.join(BASE_DIR, "docs_index.json")]:
+        if os.path.isfile(c):
+            try:
+                with open(c, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                if is_protocol and protocol_name:
+                    found = False
+                    for p in data.get("protocolos", []):
+                        if p.get("folder_name") == protocol_name or p.get("name") == protocol_name:
+                            p.setdefault("files", []).append(doc_item)
+                            p["total_files"] = len(p["files"])
+                            found = True
+                            break
+                    if not found:
+                        now_dt = datetime.now()
+                        data.setdefault("protocolos", []).insert(0, {
+                            "id": int(now_dt.timestamp() * 1000),
+                            "doc_type": "protocolo",
+                            "name": protocol_name,
+                            "folder_name": protocol_name,
+                            "protocolo": protocol_name.split(" - ")[0],
+                            "assunto": protocol_name.split(" - ")[1] if " - " in protocol_name else protocol_name,
+                            "status": None,
+                            "relative_path": f"Protocolos/{protocol_name}",
+                            "full_path": None,
+                            "is_folder": True,
+                            "is_pdf": False,
+                            "total_files": 1,
+                            "size_bytes": doc_item.get("size_bytes", 0),
+                            "size_formatted": doc_item.get("size_formatted", "0 KB"),
+                            "doc_date": now_dt.strftime("%d/%m/%Y"),
+                            "doc_date_formatted": now_dt.strftime("%d/%m/%Y"),
+                            "doc_date_ts": now_dt.timestamp(),
+                            "doc_date_source": "importação recente",
+                            "ctime": now_dt.timestamp(),
+                            "ctime_formatted": now_dt.strftime("%d/%m/%Y"),
+                            "mtime": now_dt.timestamp(),
+                            "mtime_formatted": now_dt.strftime("%d/%m/%Y"),
+                            "raw_mtime": now_dt.timestamp(),
+                            "category": "Protocolo",
+                            "year": str(now_dt.year),
+                            "files": [doc_item]
+                        })
+                else:
+                    data.setdefault("oficios", []).insert(0, doc_item)
+                with open(c, "w", encoding="utf-8") as f:
+                    json.dump(data, f, ensure_ascii=False, indent=2)
+            except Exception as e:
+                print("Erro ao atualizar docs_index.json após upload:", e, file=sys.stderr)
+
 def get_all_protocolos():
     """Scan protocol folders and return detailed metadata for folders and their inner documents."""
+    cached = load_docs_index()
+    if cached and "protocolos" in cached and len(cached["protocolos"]) > 0:
+        return cached["protocolos"]
+
     protocolos_dir = os.path.join(DOCS_DIR, "Protocolos")
     scan_root = protocolos_dir if os.path.isdir(protocolos_dir) else DOCS_DIR
     
@@ -477,6 +648,10 @@ def get_all_protocolos():
 
 def get_all_oficios():
     """Scan and index documents in Base de dados Ofícios/Ofícios."""
+    cached = load_docs_index()
+    if cached and "oficios" in cached and len(cached["oficios"]) > 0:
+        return cached["oficios"]
+
     oficios_dir = os.path.join(DOCS_DIR, "Ofícios")
     if not os.path.isdir(oficios_dir):
         oficios_dir = os.path.join(DOCS_DIR, "Oficios")
@@ -806,92 +981,176 @@ def api_oficios():
 def preview_pdf(subpath):
     """Visualizador inline de PDF no navegador."""
     safe_path = get_safe_file_path(subpath)
-    if not safe_path:
-        abort(404, description="Documento não encontrado.")
-    
-    mimetype, _ = mimetypes.guess_type(safe_path)
-    if not mimetype:
-        mimetype = "application/pdf" if safe_path.lower().endswith(".pdf") else "application/octet-stream"
-        
-    response = send_file(
-        safe_path,
-        mimetype=mimetype,
-        as_attachment=False,
-        download_name=os.path.basename(safe_path)
+    if safe_path and os.path.isfile(safe_path):
+        mimetype, _ = mimetypes.guess_type(safe_path)
+        if not mimetype:
+            mimetype = "application/pdf" if safe_path.lower().endswith(".pdf") else "application/octet-stream"
+            
+        response = send_file(
+            safe_path,
+            mimetype=mimetype,
+            as_attachment=False,
+            download_name=os.path.basename(safe_path)
+        )
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
+
+    # Fallback para GitHub (quando hospedado remotamente ou no Vercel)
+    token = (
+        request.headers.get("X-GitHub-Token")
+        or os.environ.get("GITHUB_TOKEN")
+        or os.environ.get("GH_TOKEN")
+        or os.environ.get("PMO_GITHUB_TOKEN")
     )
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    return response
+    file_bytes, filename = fetch_file_from_github(subpath, token)
+    if file_bytes:
+        mimetype, _ = mimetypes.guess_type(filename)
+        if not mimetype:
+            mimetype = "application/pdf" if filename.lower().endswith(".pdf") else "application/octet-stream"
+        response = send_file(
+            io.BytesIO(file_bytes),
+            mimetype=mimetype,
+            as_attachment=False,
+            download_name=filename
+        )
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        return response
+
+    abort(404, description="Documento não encontrado.")
 
 @app.route("/api/pdf/download/<path:subpath>")
 def download_pdf(subpath):
     """Download direto do documento PDF."""
     safe_path = get_safe_file_path(subpath)
-    if not safe_path:
-        abort(404, description="Documento não encontrado.")
-        
-    return send_file(
-        safe_path,
-        as_attachment=True,
-        download_name=os.path.basename(safe_path)
+    if safe_path and os.path.isfile(safe_path):
+        return send_file(
+            safe_path,
+            as_attachment=True,
+            download_name=os.path.basename(safe_path)
+        )
+
+    # Fallback para GitHub
+    token = (
+        request.headers.get("X-GitHub-Token")
+        or os.environ.get("GITHUB_TOKEN")
+        or os.environ.get("GH_TOKEN")
+        or os.environ.get("PMO_GITHUB_TOKEN")
     )
+    file_bytes, filename = fetch_file_from_github(subpath, token)
+    if file_bytes:
+        return send_file(
+            io.BytesIO(file_bytes),
+            as_attachment=True,
+            download_name=filename
+        )
+
+    abort(404, description="Documento não encontrado.")
 
 @app.route("/api/protocolo/download-zip/<path:subpath>")
 def download_protocolo_zip(subpath):
     """Download do protocolo completo em arquivo ZIP."""
     safe_path = get_safe_file_path(subpath)
-    if not safe_path or not os.path.isdir(safe_path):
-        abort(404, description="Protocolo não encontrado.")
-        
-    memory_file = io.BytesIO()
-    with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
-        for root, _, files in os.walk(safe_path):
-            for file in files:
-                file_full = os.path.join(root, file)
-                rel = os.path.relpath(file_full, safe_path)
-                zf.write(file_full, rel)
-    memory_file.seek(0)
-    zip_name = f"{os.path.basename(safe_path)}.zip"
-    return send_file(
-        memory_file,
-        mimetype="application/zip",
-        as_attachment=True,
-        download_name=zip_name
+    if safe_path and os.path.isdir(safe_path):
+        memory_file = io.BytesIO()
+        with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+            for root, _, files in os.walk(safe_path):
+                for file in files:
+                    file_full = os.path.join(root, file)
+                    rel = os.path.relpath(file_full, safe_path)
+                    zf.write(file_full, rel)
+        memory_file.seek(0)
+        zip_name = f"{os.path.basename(safe_path)}.zip"
+        return send_file(
+            memory_file,
+            mimetype="application/zip",
+            as_attachment=True,
+            download_name=zip_name
+        )
+
+    # Fallback para GitHub (quando os arquivos estão no repositório GitHub)
+    token = (
+        request.headers.get("X-GitHub-Token")
+        or os.environ.get("GITHUB_TOKEN")
+        or os.environ.get("GH_TOKEN")
+        or os.environ.get("PMO_GITHUB_TOKEN")
     )
+    folder_name = os.path.basename(subpath.replace("\\", "/").strip("/"))
+    idx_data = load_docs_index() or {}
+    matched_files = []
+    for p in idx_data.get("protocolos", []):
+        if p.get("folder_name") == folder_name or p.get("name") == folder_name or p.get("relative_path") == subpath:
+            matched_files = p.get("files", [])
+            break
+
+    if matched_files:
+        memory_file = io.BytesIO()
+        with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
+            for f in matched_files:
+                f_rel = f.get("relative_path")
+                f_bytes, f_name = fetch_file_from_github(f_rel, token)
+                if f_bytes:
+                    zf.writestr(f.get("name", f_name), f_bytes)
+        memory_file.seek(0)
+        return send_file(
+            memory_file,
+            mimetype="application/zip",
+            as_attachment=True,
+            download_name=f"{folder_name}.zip"
+        )
+
+    abort(404, description="Protocolo não encontrado.")
 
 @app.route("/api/protocolo/delete", methods=["POST", "DELETE"])
 @app.route("/api/oficios/delete", methods=["POST", "DELETE"])
 def delete_protocolo():
-    """Remove uma pasta de protocolo permanentemente."""
+    """Remove uma pasta de protocolo ou ofício permanentemente (local e no GitHub)."""
     data = request.get_json(silent=True) or request.form
     rel_path = data.get("relative_path")
     if not rel_path:
-        return jsonify({"success": False, "error": "Caminho do protocolo não fornecido."}), 400
+        return jsonify({"success": False, "error": "Caminho do item não fornecido."}), 400
 
-    try:
-        safe_path = get_safe_file_path(rel_path)
-        if not safe_path:
-            return jsonify({"success": False, "error": "Item não encontrado."}), 404
-            
-        if os.path.isdir(safe_path):
-            folder_name = os.path.basename(safe_path)
-            shutil.rmtree(safe_path)
-            run_git_sync_background(f"chore: excluir protocolo {folder_name}")
-            return jsonify({
-                "success": True,
-                "message": f"Protocolo '{folder_name}' removido com sucesso."
-            })
-        elif os.path.isfile(safe_path):
-            file_name = os.path.basename(safe_path)
-            os.remove(safe_path)
-            run_git_sync_background(f"chore: excluir oficio {file_name}")
-            return jsonify({
-                "success": True,
-                "message": f"Ofício '{file_name}' removido com sucesso."
-            })
-        else:
-            return jsonify({"success": False, "error": "Item não encontrado."}), 404
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+    is_vercel = bool(os.environ.get("VERCEL"))
+    token = (
+        request.headers.get("X-GitHub-Token")
+        or os.environ.get("GITHUB_TOKEN")
+        or os.environ.get("GH_TOKEN")
+        or os.environ.get("PMO_GITHUB_TOKEN")
+    )
+
+    deleted_locally = False
+    safe_path = get_safe_file_path(rel_path)
+    if safe_path and os.path.exists(safe_path):
+        try:
+            if os.path.isdir(safe_path):
+                folder_name = os.path.basename(safe_path)
+                shutil.rmtree(safe_path)
+                deleted_locally = True
+                if not is_vercel:
+                    run_git_sync_background(f"chore: excluir protocolo {folder_name}")
+            elif os.path.isfile(safe_path):
+                file_name = os.path.basename(safe_path)
+                os.remove(safe_path)
+                deleted_locally = True
+                if not is_vercel:
+                    run_git_sync_background(f"chore: excluir oficio {file_name}")
+        except Exception as el:
+            print("Erro ao excluir localmente:", el, file=sys.stderr)
+
+    # Exclui diretamente no repositório GitHub via API usando o Token configurado
+    if token:
+        try:
+            github_api_delete_item(token, rel_path)
+        except Exception as eg:
+            print("Erro ao excluir item do GitHub via API:", eg, file=sys.stderr)
+
+    # Remove do índice de documentos
+    remove_from_docs_index(rel_path)
+
+    return jsonify({
+        "success": True,
+        "message": f"'{os.path.basename(rel_path)}' removido com sucesso."
+    })
+
 
 @app.route("/api/oficios/upload", methods=["POST"])
 def upload_oficios():
@@ -975,7 +1234,7 @@ def upload_oficios():
             now_dt = datetime.now()
             category, year = extract_category_and_year(filename)
             
-            saved_docs.append({
+            doc_entry = {
                 "id": int(now_dt.timestamp() * 1000) + len(saved_docs),
                 "doc_type": "protocolo" if destination in ["protocolos", "protocolo"] else "oficio",
                 "name": filename,
@@ -985,12 +1244,18 @@ def upload_oficios():
                 "ctime": now_dt.timestamp(),
                 "ctime_formatted": now_dt.strftime("%d/%m/%Y %H:%M"),
                 "mtime": now_dt.timestamp(),
-                "mtime_formatted": now_dt.strftime("%d/%m/%Y %H:%M"),
+                "mtime_formatted": now_dt.strftime("%d/%m/%Y"),
+                "doc_date": now_dt.strftime("%d/%m/%Y"),
+                "doc_date_formatted": now_dt.strftime("%d/%m/%Y"),
+                "doc_date_ts": now_dt.timestamp(),
                 "extension": ".pdf",
                 "is_pdf": True,
                 "category": category,
-                "year": year
-            })
+                "year": year or str(now_dt.year)
+            }
+            saved_docs.append(doc_entry)
+            add_to_docs_index(doc_entry, is_protocol=(destination in ["protocolos", "protocolo"]), protocol_name=(folder_name if destination in ["protocolos", "protocolo"] else None))
+
         except Exception as e:
             errors.append(f"{filename}: {str(e)}")
 

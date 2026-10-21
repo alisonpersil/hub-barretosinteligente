@@ -1,0 +1,5 @@
+# Ignore heavy binary documents and datasets from Vercel function bundle
+**/*.pdf
+**/*.PDF
+01 - Relatórios/02 - Monitor Exati/Base de dados/Atendidos/**
+01 - Relatorios/02 - Monitor Exati/Base de dados/Atendidos/**
