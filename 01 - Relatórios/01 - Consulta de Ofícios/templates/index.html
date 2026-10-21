@@ -490,7 +490,7 @@
             </div>
         </div>
 
-        <!-- Import Ofícios Modal -->
+        <!-- Import Documents Modal -->
         <div id="importModal" class="modal-overlay hidden" aria-hidden="true">
             <div class="modal-container import-modal-container">
                 <div class="modal-header">
@@ -498,7 +498,7 @@
                         <div class="modal-badge import-badge">
                             <i class="fa-solid fa-cloud-arrow-up"></i> Upload de Documentos
                         </div>
-                        <h2 class="modal-title">Importar Ofícios</h2>
+                        <h2 class="modal-title" id="importModalTitle">Importar Documentos</h2>
                         <span class="modal-subtitle">Envie um ou múltiplos arquivos PDF, ou selecione uma pasta inteira.</span>
                     </div>
                     <div class="modal-actions">
@@ -520,7 +520,42 @@
                         </div>
                     </div>
 
-                    <!-- Import Type Switcher -->
+                    <!-- 1. Destino do Upload: Ofícios vs Protocolos -->
+                    <div class="import-destination-wrapper">
+                        <label class="import-destination-label">
+                            <i class="fa-solid fa-location-arrow"></i>
+                            <span>Carregar arquivos em:</span>
+                        </label>
+                        <div class="import-destination-tabs" role="radiogroup" aria-label="Destino do Upload">
+                            <button type="button" class="dest-tab-btn active" data-destination="oficios" id="destOficios" title="Salvar diretamente na pasta de Ofícios">
+                                <i class="fa-solid fa-file-signature"></i>
+                                <span>Ofícios</span>
+                            </button>
+                            <button type="button" class="dest-tab-btn" data-destination="protocolos" id="destProtocolos" title="Salvar na pasta de Protocolos">
+                                <i class="fa-solid fa-folder-tree"></i>
+                                <span>Protocolos</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Nome do Protocolo (visível quando destino for Protocolos) -->
+                    <div id="protocolDestinationInputGroup" class="protocol-destination-group hidden">
+                        <label for="protocolFolderNameInput" class="protocol-destination-field-label">
+                            <i class="fa-solid fa-folder-open"></i>
+                            <span>Pasta do Protocolo de Destino:</span>
+                            <span class="field-hint">(selecione um existente ou digite o nome de um novo)</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="protocolFolderNameInput" 
+                            list="existingProtocolosDatalist" 
+                            placeholder="Ex: 10245-2026-GRL - Pagamento Abr-2026..." 
+                            autocomplete="off"
+                        >
+                        <datalist id="existingProtocolosDatalist"></datalist>
+                    </div>
+
+                    <!-- 2. Import Type Switcher (Arquivos vs Pasta) -->
                     <div class="import-tabs">
                         <button id="tabImportFiles" class="import-tab active" type="button">
                             <i class="fa-solid fa-file-pdf"></i> Arquivos (1 ou vários)

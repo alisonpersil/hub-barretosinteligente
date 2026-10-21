@@ -740,10 +740,12 @@ def upload_oficios():
             "message": "Para que os ofícios sejam salvos permanentemente no Vercel, informe o GitHub Token nas configurações ou variáveis de ambiente."
         }), 403
 
+    destination = (request.form.get("destination") or "oficios").lower().strip()
+    protocol_name = (request.form.get("protocol_name") or "").strip()
+    webkit_rel = (request.form.get("webkit_relative_path") or "").strip().replace("\\", "/")
+
     saved_docs = []
     errors = []
-    target_dir = os.path.join(DOCS_DIR, "Ofícios")
-    os.makedirs(target_dir, exist_ok=True)
 
     for file in files:
         if not file or not file.filename:
@@ -755,27 +757,52 @@ def upload_oficios():
 
         try:
             file_bytes = file.read()
-            if is_vercel:
-                docs_rel_path = os.path.relpath(DOCS_DIR, BASE_DIR).replace("\\", "/")
+            docs_rel_path = os.path.relpath(DOCS_DIR, BASE_DIR).replace("\\", "/")
+            
+            if destination in ["protocolos", "protocolo"]:
+                # Determine protocol folder name
+                folder_name = protocol_name
+                if not folder_name and webkit_rel:
+                    parts = webkit_rel.split("/")
+                    if len(parts) > 1 and parts[0]:
+                        folder_name = parts[0]
+                if not folder_name:
+                    folder_name = os.path.splitext(filename)[0]
+
+                # Sanitize folder name
+                folder_name = re.sub(r'[<>:"/\\|?*]', '_', folder_name).strip()
+                target_dir = os.path.join(DOCS_DIR, "Protocolos", folder_name)
+                os.makedirs(target_dir, exist_ok=True)
+                save_path = os.path.join(target_dir, filename)
+                rel_path = f"Protocolos/{folder_name}/{filename}"
+                repo_path = f"{docs_rel_path}/Protocolos/{folder_name}/{filename}"
+                commit_msg = f"feat: importar documento em protocolo {folder_name}/{filename}"
+            else:
+                target_dir = os.path.join(DOCS_DIR, "Ofícios")
+                os.makedirs(target_dir, exist_ok=True)
+                save_path = os.path.join(target_dir, filename)
+                rel_path = f"Ofícios/{filename}"
                 repo_path = f"{docs_rel_path}/Ofícios/{filename}"
+                commit_msg = f"feat: importar oficio {filename}"
+
+            if is_vercel:
                 github_api_commit_file(
                     token=token,
                     repo_path=repo_path,
                     file_bytes=file_bytes,
-                    commit_message=f"feat: importar oficio {filename}"
+                    commit_message=commit_msg
                 )
             else:
-                save_path = os.path.join(target_dir, filename)
                 with open(save_path, "wb") as f:
                     f.write(file_bytes)
 
             size_bytes = len(file_bytes)
             now_dt = datetime.now()
             category, year = extract_category_and_year(filename)
-            rel_path = f"Ofícios/{filename}"
             
             saved_docs.append({
                 "id": int(now_dt.timestamp() * 1000) + len(saved_docs),
+                "doc_type": "protocolo" if destination in ["protocolos", "protocolo"] else "oficio",
                 "name": filename,
                 "relative_path": rel_path,
                 "size_bytes": size_bytes,
@@ -793,11 +820,12 @@ def upload_oficios():
             errors.append(f"{filename}: {str(e)}")
 
     if not is_vercel and saved_docs:
-        run_git_sync_background(f"feat: importar {len(saved_docs)} ofício(s)")
+        run_git_sync_background(f"feat: importar {len(saved_docs)} documento(s) em {destination}")
 
     return jsonify({
         "success": len(saved_docs) > 0,
         "count": len(saved_docs),
+        "destination": destination,
         "documents": saved_docs,
         "errors": errors,
         "synced": True

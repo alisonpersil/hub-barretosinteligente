@@ -20,6 +20,8 @@ const state = {
 };
 
 let selectedImportFiles = [];
+let currentImportDestination = 'oficios'; // 'oficios' | 'protocolos'
+let currentImportMode = 'files'; // 'files' | 'folder'
 
 // DOM Elements
 const moduleTabBtns = document.querySelectorAll('.module-tab-btn');
@@ -83,6 +85,13 @@ const btnCancelImport = document.getElementById('btnCancelImport');
 const btnStartImport = document.getElementById('btnStartImport');
 const tabImportFiles = document.getElementById('tabImportFiles');
 const tabImportFolder = document.getElementById('tabImportFolder');
+const destTabBtns = document.querySelectorAll('.dest-tab-btn');
+const destOficios = document.getElementById('destOficios');
+const destProtocolos = document.getElementById('destProtocolos');
+const protocolDestinationInputGroup = document.getElementById('protocolDestinationInputGroup');
+const protocolFolderNameInput = document.getElementById('protocolFolderNameInput');
+const existingProtocolosDatalist = document.getElementById('existingProtocolosDatalist');
+const importModalTitle = document.getElementById('importModalTitle');
 const dropZone = document.getElementById('dropZone');
 const dropZoneTitle = document.getElementById('dropZoneTitle');
 const dropZoneDesc = document.getElementById('dropZoneDesc');
@@ -330,25 +339,30 @@ function setupEventListeners() {
         });
     }
 
+    // Destination Tabs Switcher (Ofícios vs Protocolos)
+    destTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            destTabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentImportDestination = btn.dataset.destination || 'oficios';
+            updateImportDestinationUI();
+        });
+    });
+
     // Import Tabs Switcher (Files vs Folder)
-    let currentImportMode = 'files';
     if (tabImportFiles && tabImportFolder) {
         tabImportFiles.addEventListener('click', () => {
             tabImportFiles.classList.add('active');
             tabImportFolder.classList.remove('active');
             currentImportMode = 'files';
-            if (dropZoneTitle) dropZoneTitle.textContent = 'Arraste seus PDFs aqui ou clique para selecionar';
-            if (dropZoneDesc) dropZoneDesc.textContent = 'Você pode selecionar vários arquivos de uma só vez (PDF)';
-            if (btnBrowseFiles) btnBrowseFiles.innerHTML = '<i class="fa-solid fa-folder-open"></i> Selecionar Arquivos';
+            updateImportDestinationUI();
         });
 
         tabImportFolder.addEventListener('click', () => {
             tabImportFolder.classList.add('active');
             tabImportFiles.classList.remove('active');
             currentImportMode = 'folder';
-            if (dropZoneTitle) dropZoneTitle.textContent = 'Arraste uma pasta inteira ou clique para procurar';
-            if (dropZoneDesc) dropZoneDesc.textContent = 'Todos os arquivos PDF da pasta serão indexados';
-            if (btnBrowseFiles) btnBrowseFiles.innerHTML = '<i class="fa-solid fa-folder-tree"></i> Selecionar Pasta';
+            updateImportDestinationUI();
         });
     }
 
@@ -1359,10 +1373,83 @@ async function confirmDelete() {
 // ==========================================================================
 function openImportModal() {
     if (importModal) {
+        // Sync destination with current active tab
+        currentImportDestination = state.activeMainTab === 'oficios' ? 'oficios' : 'protocolos';
+        destTabBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.destination === currentImportDestination);
+        });
+
+        // Populate datalist with existing protocol names for auto-complete
+        if (existingProtocolosDatalist) {
+            existingProtocolosDatalist.innerHTML = '';
+            const protNames = state.allDocuments
+                .filter(d => d.doc_type === 'protocolo')
+                .map(d => d.name)
+                .filter((v, i, a) => a.indexOf(v) === i)
+                .sort();
+            protNames.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                existingProtocolosDatalist.appendChild(opt);
+            });
+        }
+
+        if (protocolFolderNameInput) {
+            protocolFolderNameInput.value = '';
+        }
+
+        updateImportDestinationUI();
+
         importModal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
         checkSystemStatus();
     }
+}
+
+function updateImportDestinationUI() {
+    const isProt = currentImportDestination === 'protocolos';
+    const isFolder = currentImportMode === 'folder';
+
+    if (protocolDestinationInputGroup) {
+        // Show folder name input only if destination is Protocolos and mode is individual files
+        protocolDestinationInputGroup.classList.toggle('hidden', !isProt || isFolder);
+    }
+
+    if (importModalTitle) {
+        importModalTitle.textContent = isProt ? 'Importar Protocolos' : 'Importar Ofícios';
+    }
+
+    if (dropZoneTitle) {
+        if (isProt) {
+            dropZoneTitle.textContent = isFolder 
+                ? 'Arraste uma pasta de protocolo aqui ou clique para procurar' 
+                : 'Arraste os PDFs do protocolo aqui ou clique para selecionar';
+        } else {
+            dropZoneTitle.textContent = isFolder 
+                ? 'Arraste a pasta com ofícios aqui ou clique para procurar' 
+                : 'Arraste seus PDFs de Ofício aqui ou clique para selecionar';
+        }
+    }
+
+    if (dropZoneDesc) {
+        if (isProt) {
+            dropZoneDesc.textContent = isFolder 
+                ? 'A pasta completa será importada como um novo protocolo (o nome da pasta será o protocolo)' 
+                : 'Os arquivos serão salvos na pasta de protocolo indicada acima';
+        } else {
+            dropZoneDesc.textContent = isFolder 
+                ? 'Todos os arquivos PDF da pasta serão indexados na pasta de Ofícios' 
+                : 'Você pode selecionar vários arquivos de uma só vez (PDF)';
+        }
+    }
+
+    if (btnBrowseFiles) {
+        btnBrowseFiles.innerHTML = isFolder 
+            ? '<i class="fa-solid fa-folder-tree"></i> Selecionar Pasta' 
+            : '<i class="fa-solid fa-folder-open"></i> Selecionar Arquivos';
+    }
+
+    renderImportFileList();
 }
 
 function closeImportModal() {
@@ -1411,7 +1498,8 @@ function renderImportFileList() {
     if (importFileCount) importFileCount.textContent = `${selectedImportFiles.length} arquivo(s) selecionado(s)`;
     if (btnStartImport) {
         btnStartImport.disabled = false;
-        btnStartImport.innerHTML = `<i class="fa-solid fa-upload"></i> <span>Importar ${selectedImportFiles.length} Ofício(s)</span>`;
+        const targetLabel = currentImportDestination === 'oficios' ? 'Ofício(s)' : 'Documento(s) para Protocolo';
+        btnStartImport.innerHTML = `<i class="fa-solid fa-upload"></i> <span>Importar ${selectedImportFiles.length} ${targetLabel}</span>`;
     }
 
     if (importFileList) {
@@ -1449,9 +1537,13 @@ async function startImportUpload() {
 
     const totalFiles = selectedImportFiles.length;
     let successCount = 0;
-    const uploadedDocs = [];
     const errors = [];
     const token = localStorage.getItem('pmo_github_token') || '';
+    const destination = currentImportDestination;
+    let baseProtocolFolder = '';
+    if (destination === 'protocolos' && protocolFolderNameInput && protocolFolderNameInput.value.trim()) {
+        baseProtocolFolder = protocolFolderNameInput.value.trim();
+    }
 
     for (let i = 0; i < totalFiles; i++) {
         const file = selectedImportFiles[i];
@@ -1459,7 +1551,17 @@ async function startImportUpload() {
         if (importProgressFill) importProgressFill.style.width = `${Math.max(10, percent)}%`;
         if (importProgressLabel) importProgressLabel.textContent = `Enviando arquivo ${i + 1} de ${totalFiles}: ${file.name}...`;
 
-        // Check file size: Vercel serverless limit is ~4.5 MB (4,718,592 bytes)
+        let fileProtFolder = baseProtocolFolder;
+        if (!fileProtFolder && file.webkitRelativePath) {
+            const parts = file.webkitRelativePath.split('/');
+            if (parts.length > 1 && parts[0]) {
+                fileProtFolder = parts[0];
+            }
+        }
+        if (!fileProtFolder && destination === 'protocolos') {
+            fileProtFolder = file.name.replace(/\.[^/.]+$/, "");
+        }
+
         const MAX_VERCEL_BYTES = 4.3 * 1024 * 1024;
 
         try {
@@ -1474,8 +1576,10 @@ async function startImportUpload() {
                 }
                 const base64Content = btoa(binary);
 
-                const repoPath = `Base de dados Ofícios/Ofícios/${file.name}`;
-                const ghUrl = `https://api.github.com/repos/alisonpersil/consulta-oficios/contents/${encodeURIComponent(repoPath)}`;
+                const repoPath = destination === 'oficios'
+                    ? `01 - Relatórios/01 - Consulta de Ofícios/Base de dados Ofícios/Ofícios/${file.name}`
+                    : `01 - Relatórios/01 - Consulta de Ofícios/Base de dados Ofícios/Protocolos/${fileProtFolder}/${file.name}`;
+                const ghUrl = `https://api.github.com/repos/alisonpersil/hub-barretosinteligente/contents/${encodeURIComponent(repoPath)}`;
 
                 let sha = null;
                 try {
@@ -1492,7 +1596,7 @@ async function startImportUpload() {
                 } catch (_) {}
 
                 const ghBody = {
-                    message: `feat: importar oficio ${file.name}`,
+                    message: `feat: importar ${destination === 'oficios' ? 'oficio' : 'protocolo'} ${file.name}`,
                     content: base64Content
                 };
                 if (sha) ghBody.sha = sha;
@@ -1513,21 +1617,19 @@ async function startImportUpload() {
                 }
 
                 successCount++;
-                uploadedDocs.push({
-                    name: file.name,
-                    size_formatted: `${(file.size / 1024).toFixed(1)} KB`,
-                    relative_path: `Ofícios/${file.name}`,
-                    ctime_formatted: new Date().toLocaleDateString('pt-BR') + ' ' + new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}),
-                    category: 'Ofício',
-                    year: '2026',
-                    is_pdf: true
-                });
             } else if (file.size > MAX_VERCEL_BYTES && !token) {
                 errors.push(`${file.name}: Arquivo possui ${(file.size / (1024 * 1024)).toFixed(2)} MB (limite na Vercel é de 4.5 MB por arquivo). Configure o GitHub Token para upload direto ou comprima o PDF.`);
             } else {
-                // Send individually to /api/oficios/upload
+                // Send to /api/oficios/upload
                 const singleFormData = new FormData();
                 singleFormData.append('files', file);
+                singleFormData.append('destination', destination);
+                if (fileProtFolder) {
+                    singleFormData.append('protocol_name', fileProtFolder);
+                }
+                if (file.webkitRelativePath) {
+                    singleFormData.append('webkit_relative_path', file.webkitRelativePath);
+                }
 
                 const headers = {};
                 if (token) headers['X-GitHub-Token'] = token;
@@ -1555,13 +1657,12 @@ async function startImportUpload() {
                 }
 
                 const data = await response.json();
-                if (data.success && data.documents && data.documents.length) {
-                    successCount += data.documents.length;
-                    uploadedDocs.push(...data.documents);
+                if (data.success) {
+                    successCount += (data.count || 1);
                 } else if (data.error === 'github_token_required') {
                     showToast(data.message, 'error');
                     if (importNoticeAlert && importNoticeMessage) {
-                        importNoticeMessage.innerHTML = 'Para que os ofícios sejam salvos permanentemente no Vercel, informe o <strong>GitHub Personal Access Token</strong> nas configurações abaixo ou adicione a variável <code>GITHUB_TOKEN</code> no painel da Vercel.';
+                        importNoticeMessage.innerHTML = 'Para que os documentos sejam salvos permanentemente no Vercel, informe o <strong>GitHub Personal Access Token</strong> nas configurações abaixo ou adicione a variável <code>GITHUB_TOKEN</code> no painel da Vercel.';
                         importNoticeAlert.classList.remove('hidden');
                     }
                     toggleGithubSettings(true);
@@ -1579,24 +1680,21 @@ async function startImportUpload() {
 
     if (importProgressFill) importProgressFill.style.width = '100%';
 
-    if (uploadedDocs.length > 0) {
-        uploadedDocs.forEach(newDoc => {
-            const existingIdx = state.allDocuments.findIndex(d => d.name === newDoc.name);
-            if (existingIdx >= 0) {
-                state.allDocuments[existingIdx] = newDoc;
-            } else {
-                state.allDocuments.unshift(newDoc);
-            }
+    if (successCount > 0) {
+        await loadDocuments(true);
+        state.activeMainTab = destination;
+        moduleTabBtns.forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.mainTab === destination);
         });
-        if (headerDocCount) headerDocCount.textContent = `${state.allDocuments.length} documentos`;
-        applyFiltersAndRender();
+        applyFiltersAndRender(true);
     }
 
     if (errors.length === 0) {
         if (importProgressLabel) importProgressLabel.textContent = 'Upload concluído com sucesso!';
         setTimeout(() => {
             closeImportModal();
-            showToast(`${successCount} ofício(s) importado(s) com sucesso!`, 'success');
+            const destName = destination === 'oficios' ? 'Ofícios' : 'Protocolos';
+            showToast(`${successCount} documento(s) importado(s) com sucesso em ${destName}!`, 'success');
         }, 600);
     } else {
         if (importProgressLabel) importProgressLabel.textContent = `Concluído: ${successCount} salvos, ${errors.length} com erro.`;

@@ -2077,6 +2077,128 @@ body {
     background: rgba(255, 255, 255, 0.1);
 }
 
+/* ==========================================================================
+   Destino do Upload (Ofícios vs Protocolos)
+   ========================================================================== */
+.import-destination-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.import-destination-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.import-destination-tabs {
+    display: flex;
+    background-color: var(--bg-card-hover);
+    padding: 4px;
+    border-radius: 12px;
+    gap: 6px;
+    border: 1px solid var(--border-subtle);
+}
+
+.dest-tab-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    padding: 0.65rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dest-tab-btn:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.dest-tab-btn.active[data-destination="oficios"] {
+    background-color: #fef2f2;
+    color: #dc2626;
+    border-color: #fecaca;
+    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.12);
+    font-weight: 700;
+}
+
+.dest-tab-btn.active[data-destination="protocolos"] {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.12);
+    font-weight: 700;
+}
+
+[data-theme="dark"] .dest-tab-btn.active[data-destination="oficios"] {
+    background-color: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+[data-theme="dark"] .dest-tab-btn.active[data-destination="protocolos"] {
+    background-color: rgba(37, 99, 235, 0.2);
+    color: #93c5fd;
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.protocol-destination-group {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s ease;
+}
+
+.protocol-destination-field-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.45rem;
+    flex-wrap: wrap;
+}
+
+.protocol-destination-field-label .field-hint {
+    font-size: 0.74rem;
+    color: var(--text-tertiary);
+    font-weight: normal;
+}
+
+#protocolFolderNameInput {
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 0.88rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    box-sizing: border-box;
+}
+
+#protocolFolderNameInput:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
 /* Import Type Switcher Tabs */
 .import-tabs {
     display: flex;
@@ -2085,6 +2207,7 @@ body {
     border-radius: 12px;
     gap: 6px;
     border: 1px solid var(--border-subtle);
+    margin-bottom: 1.25rem;
 }
 
 .import-tab {
