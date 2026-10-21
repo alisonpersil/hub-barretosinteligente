@@ -128,7 +128,10 @@ const btnConfirmDelete = document.getElementById('btnConfirmDelete');
 // ==========================================================================
 // Initialization
 // ==========================================================================
+let appInitialized = false;
 function initApp() {
+    if (appInitialized) return;
+    appInitialized = true;
     initTheme();
     loadDocuments();
     setupEventListeners();
@@ -232,12 +235,13 @@ function setupEventListeners() {
     // Interactive Table Header Sorting
     const sortableHeaders = document.querySelectorAll('.documents-table th.sortable-th');
     sortableHeaders.forEach(th => {
-        th.addEventListener('click', () => {
+        th.onclick = (e) => {
+            e.preventDefault();
             const sortKey = th.getAttribute('data-sort');
             if (sortKey) {
                 handleHeaderSort(sortKey);
             }
-        });
+        };
     });
 
     if (btnViewCards) {
@@ -688,17 +692,26 @@ function applyFiltersAndRender(resetPage = true) {
             case 'ctime_asc':
                 return (a.doc_date_ts || a.ctime || 0) - (b.doc_date_ts || b.ctime || 0);
             case 'mtime_desc':
-            case 'data_desc':
-                return (b.doc_date_ts || b.mtime || 0) - (a.doc_date_ts || a.mtime || 0);
+            case 'data_desc': {
+                const diff = (b.doc_date_ts || b.mtime || 0) - (a.doc_date_ts || a.mtime || 0);
+                if (diff !== 0) return diff;
+                return (b.name || '').localeCompare(a.name || '', 'pt-BR', { numeric: true });
+            }
             case 'mtime_asc':
-            case 'data_asc':
-                return (a.doc_date_ts || a.mtime || 0) - (b.doc_date_ts || b.mtime || 0);
+            case 'data_asc': {
+                const diff = (a.doc_date_ts || a.mtime || 0) - (b.doc_date_ts || b.mtime || 0);
+                if (diff !== 0) return diff;
+                return (a.name || '').localeCompare(b.name || '', 'pt-BR', { numeric: true });
+            }
             case 'size_desc':
                 return (b.size_bytes || 0) - (a.size_bytes || 0);
             case 'size_asc':
                 return (a.size_bytes || 0) - (b.size_bytes || 0);
-            default:
-                return (b.doc_date_ts || b.mtime || 0) - (a.doc_date_ts || a.mtime || 0);
+            default: {
+                const diff = (b.doc_date_ts || b.mtime || 0) - (a.doc_date_ts || a.mtime || 0);
+                if (diff !== 0) return diff;
+                return (b.name || '').localeCompare(a.name || '', 'pt-BR', { numeric: true });
+            }
         }
     });
 
@@ -715,20 +728,32 @@ function updateSortHeadersUI() {
         const icon = th.querySelector('.sort-icon');
         let isActive = false;
         let isAsc = false;
+        let titleText = '';
 
         if (sortType === 'name' && (current === 'name_asc' || current === 'name_desc')) {
             isActive = true;
             isAsc = (current === 'name_asc');
+            titleText = isAsc ? 'Ordenado por Nome (A→Z). Clique para ordenar de Z→A' : 'Ordenado por Nome (Z→A). Clique para ordenar de A→Z';
         } else if (sortType === 'assunto' && (current === 'assunto_asc' || current === 'assunto_desc')) {
             isActive = true;
             isAsc = (current === 'assunto_asc');
+            titleText = isAsc ? 'Ordenado por Assunto (A→Z). Clique para ordenar de Z→A' : 'Ordenado por Assunto (Z→A). Clique para ordenar de A→Z';
         } else if (sortType === 'arquivos' && (current === 'files_desc' || current === 'files_asc' || current === 'arquivos_desc' || current === 'arquivos_asc')) {
             isActive = true;
             isAsc = (current === 'files_asc' || current === 'arquivos_asc');
+            titleText = isAsc ? 'Ordenado: Menos arquivos primeiro. Clique para Mais arquivos' : 'Ordenado: Mais arquivos primeiro. Clique para Menos arquivos';
         } else if (sortType === 'data' && (current === 'mtime_desc' || current === 'mtime_asc' || current === 'data_desc' || current === 'data_asc')) {
             isActive = true;
             isAsc = (current === 'mtime_asc' || current === 'data_asc');
+            titleText = isAsc ? 'Ordenado: Mais antiga primeiro. Clique para ordenar do Mais recente' : 'Ordenado: Mais recente primeiro. Clique para ordenar do Mais antigo';
+        } else {
+            if (sortType === 'name') titleText = 'Clique para ordenar por Protocolo / Pasta';
+            if (sortType === 'assunto') titleText = 'Clique para ordenar por Assunto';
+            if (sortType === 'arquivos') titleText = 'Clique para ordenar por Quantidade de Arquivos';
+            if (sortType === 'data') titleText = 'Clique para ordenar por Data do Documento';
         }
+
+        th.setAttribute('title', titleText);
 
         if (isActive) {
             th.classList.add('active');
@@ -754,7 +779,11 @@ function handleHeaderSort(sortKey) {
     } else if (sortKey === 'arquivos') {
         nextSort = (state.currentSort === 'files_desc' || state.currentSort === 'arquivos_desc') ? 'files_asc' : 'files_desc';
     } else if (sortKey === 'data') {
-        nextSort = (state.currentSort === 'mtime_desc' || state.currentSort === 'data_desc') ? 'mtime_asc' : 'mtime_desc';
+        if (state.currentSort === 'mtime_desc' || state.currentSort === 'data_desc') {
+            nextSort = 'mtime_asc';
+        } else {
+            nextSort = 'mtime_desc';
+        }
     }
 
     if (nextSort) {
@@ -763,7 +792,21 @@ function handleHeaderSort(sortKey) {
             sortSelect.value = nextSort;
         }
         updateSortHeadersUI();
-        applyFiltersAndRender(false);
+        applyFiltersAndRender(true);
+
+        if (sortKey === 'data') {
+            if (nextSort === 'mtime_desc') {
+                showToast('Ordenado: Data mais recente primeiro', 'info');
+            } else {
+                showToast('Ordenado: Data mais antiga primeiro', 'info');
+            }
+        } else if (sortKey === 'name') {
+            showToast(nextSort === 'name_asc' ? 'Ordenado por Nome (A→Z)' : 'Ordenado por Nome (Z→A)', 'info');
+        } else if (sortKey === 'assunto') {
+            showToast(nextSort === 'assunto_asc' ? 'Ordenado por Assunto (A→Z)' : 'Ordenado por Assunto (Z→A)', 'info');
+        } else if (sortKey === 'arquivos') {
+            showToast(nextSort === 'files_desc' ? 'Ordenado: Mais arquivos primeiro' : 'Ordenado: Menos arquivos primeiro', 'info');
+        }
     }
 }
 
