@@ -305,12 +305,15 @@ def sync_cidadao_online(
     summary["protocols_total_portal"] = len(portal_protocols)
     logger(f"[SYNC] Total de protocolos encontrados no portal: {len(portal_protocols)}")
 
-    # Base de dados local de anexos
-    parent_dir = os.path.dirname(actual_index_path)
-    if os.path.basename(parent_dir).strip().lower() in ["base de dados ofícios", "base de dados oficios"]:
-        base_docs_dir = os.path.join(parent_dir, "Protocolos")
+    # Base de dados local de anexos (sempre dentro do repositório; /tmp apenas na Vercel)
+    repo_root = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+    if os.environ.get("VERCEL"):
+        base_docs_dir = os.path.join("/tmp", "Base de dados Ofícios", "Protocolos")
     else:
-        base_docs_dir = os.path.join(parent_dir, "Base de dados Ofícios", "Protocolos")
+        base_docs_dir = os.path.join(
+            repo_root, "01 - Relatórios", "01 - Consulta de Ofícios",
+            "Base de dados Ofícios", "Protocolos"
+        )
 
     has_changes = False
 
