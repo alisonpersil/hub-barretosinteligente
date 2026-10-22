@@ -3353,7 +3353,7 @@ body {
   #card-tabela-analitico,
   .card:has(#thead-backlog-tabela),
   .card:has(#tabela-analitico),
-  .card:has(table.data-table) {
+  .card:has(table.data-table):not(.luminarias-main-card):not(#lum-main-card) {
     page-break-before: always !important;
     break-before: page !important;
     page-break-inside: auto !important;
@@ -3505,6 +3505,370 @@ body {
 
   .simulator-controls {
     display: none !important;
+  }
+
+  /* ========================================================
+     RELATÓRIO EXECUTIVO: ABA LUMINÁRIAS EM EXATAS 2 PÁGINAS
+     ======================================================== */
+  .print-only {
+    display: block !important;
+  }
+
+  .no-print,
+  #lum-drilldown-card,
+  .luminarias-drilldown-card {
+    display: none !important;
+    visibility: hidden !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #tab-luminarias {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  /* Impedir quebra de página antes do card da tabela na aba Luminárias */
+  #tab-luminarias .luminarias-main-card,
+  #lum-main-card {
+    page-break-before: avoid !important;
+    break-before: avoid !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Desfazer o grid de tela para controle sequencial por página */
+  #tab-luminarias .luminarias-layout-grid {
+    display: block !important;
+    width: 100% !important;
+    gap: 0 !important;
+  }
+
+  /* ----------------------------------------------------
+     PÁGINA 1: KPIs + CARD DA TABELA (100% LARGURA)
+     ---------------------------------------------------- */
+  #tab-luminarias .luminarias-kpi-grid {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 8px !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  #tab-luminarias .luminarias-kpi-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    padding: 7px 10px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  #tab-luminarias .luminarias-card-label {
+    font-size: 7.2pt !important;
+    color: #475569 !important;
+    margin-bottom: 3px !important;
+    font-weight: 600 !important;
+  }
+
+  #tab-luminarias .luminarias-card-value-row {
+    margin-bottom: 3px !important;
+  }
+
+  #tab-luminarias .luminarias-val {
+    font-size: 14pt !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+  }
+
+  #tab-luminarias .luminarias-unit {
+    font-size: 7.5pt !important;
+    color: #64748b !important;
+  }
+
+  #tab-luminarias .luminarias-card-sub {
+    font-size: 6.6pt !important;
+    color: #64748b !important;
+    margin-top: 1px !important;
+    line-height: 1.15 !important;
+  }
+
+  #tab-luminarias .luminarias-main-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    padding: 8px 12px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  #tab-luminarias .card-header {
+    margin-bottom: 6px !important;
+  }
+
+  #tab-luminarias .card-title {
+    font-size: 9.5pt !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+  }
+
+  #tab-luminarias .card-subtitle {
+    font-size: 6.8pt !important;
+    color: #64748b !important;
+  }
+
+  /* Seletor de operação vira badge executivo limpo no print */
+  #tab-luminarias .lum-op-toggle {
+    display: inline-flex !important;
+    margin: 4px 0 6px 0 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    border: none !important;
+    gap: 6px !important;
+  }
+
+  #tab-luminarias .lum-op-btn {
+    display: none !important;
+  }
+
+  #tab-luminarias .lum-op-btn.active {
+    display: inline-flex !important;
+    align-items: center !important;
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1px solid #cbd5e1 !important;
+    padding: 2px 7px !important;
+    font-size: 6.8pt !important;
+    font-weight: 700 !important;
+    border-radius: 4px !important;
+  }
+
+  #tab-luminarias .luminarias-bar-container {
+    height: 7px !important;
+    margin: 4px 0 8px 0 !important;
+    background: #e2e8f0 !important;
+    box-shadow: none !important;
+  }
+
+  #tab-luminarias .luminarias-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    margin-top: 2px !important;
+  }
+
+  #tab-luminarias .luminarias-table th {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border-bottom: 1.5px solid #cbd5e1 !important;
+    padding: 3px 5px !important;
+    font-size: 6.8pt !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+  }
+
+  #tab-luminarias .luminarias-table td {
+    padding: 2.8px 5px !important;
+    font-size: 7pt !important;
+    color: #334155 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    line-height: 1.15 !important;
+  }
+
+  #tab-luminarias .lum-dot {
+    width: 6px !important;
+    height: 6px !important;
+    display: inline-block !important;
+    margin-right: 4px !important;
+    border-radius: 50% !important;
+  }
+
+  #tab-luminarias .pot-tag {
+    font-size: 7pt !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+  }
+
+  #tab-luminarias .lum-row-hint {
+    display: none !important;
+  }
+
+  /* ----------------------------------------------------
+     PÁGINA 2: QUEBRA OBRIGATÓRIA PARA CARDS + METODOLOGIA
+     ---------------------------------------------------- */
+  #tab-luminarias .luminarias-page2-wrapper {
+    page-break-before: always !important;
+    break-before: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    display: block !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* Cabeçalho no topo da Página 2 */
+  .lum-print-page2-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border-bottom: 2px solid #0f172a !important;
+    padding-bottom: 8px !important;
+    margin-bottom: 10px !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .lum-print-section-title {
+    display: block !important;
+    margin-bottom: 8px !important;
+    page-break-after: avoid !important;
+    break-after: avoid !important;
+  }
+
+  .lum-print-section-title h3 {
+    font-size: 9pt !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+  }
+
+  /* Os 3 cards da direita organizados em 3 colunas perfeitamente alinhadas */
+  #tab-luminarias .luminarias-side-cards {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+    width: 100% !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  #tab-luminarias .luminarias-insight-card {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    padding: 8px 10px !important;
+    display: flex !important;
+    gap: 8px !important;
+    align-items: flex-start !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  #tab-luminarias .lum-insight-icon-box {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 5px !important;
+    font-size: 0.82rem !important;
+    flex-shrink: 0 !important;
+  }
+
+  #tab-luminarias .lum-insight-title {
+    font-size: 7.8pt !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin-bottom: 2px !important;
+  }
+
+  #tab-luminarias .lum-insight-text {
+    font-size: 6.9pt !important;
+    color: #475569 !important;
+    line-height: 1.3 !important;
+    margin: 0 !important;
+  }
+
+  /* Card de Metodologia e Cálculo Manual na Página 2 */
+  #tab-luminarias .lum-fonte-card {
+    background: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+    border-left: 3.5px solid #0284c7 !important;
+    border-radius: 6px !important;
+    padding: 10px 14px !important;
+    box-shadow: none !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-top: 4px !important;
+  }
+
+  #tab-luminarias .lum-fonte-card-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-bottom: 6px !important;
+    padding-bottom: 6px !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  #tab-luminarias .lum-fonte-icon {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 0.85rem !important;
+    background: #e0f2fe !important;
+    color: #0284c7 !important;
+  }
+
+  #tab-luminarias .lum-fonte-title {
+    font-size: 8.5pt !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+  }
+
+  #tab-luminarias .lum-fonte-subtitle {
+    font-size: 6.8pt !important;
+    color: #64748b !important;
+  }
+
+  #tab-luminarias .lum-fonte-body {
+    font-size: 7.2pt !important;
+    line-height: 1.35 !important;
+    color: #334155 !important;
+  }
+
+  #tab-luminarias .lum-fonte-intro {
+    margin-bottom: 6px !important;
+    font-size: 7.2pt !important;
+  }
+
+  #tab-luminarias .lum-fonte-rules {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 5px 14px !important;
+    margin: 4px 0 8px 12px !important;
+    padding: 0 !important;
+  }
+
+  #tab-luminarias .lum-fonte-rules li {
+    font-size: 6.9pt !important;
+    line-height: 1.3 !important;
+    margin-bottom: 0 !important;
+  }
+
+  #tab-luminarias .lum-fonte-body code {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border: 1px solid #e2e8f0 !important;
+    font-size: 6.5pt !important;
+  }
+
+  #tab-luminarias .lum-fonte-footer {
+    border-top: 1px solid #e2e8f0 !important;
+    margin-top: 6px !important;
+    padding-top: 5px !important;
+    font-size: 6.6pt !important;
+    color: #475569 !important;
+    font-weight: 600 !important;
   }
 }
 
@@ -6246,62 +6610,113 @@ canvas {
 }
 
 /* Nota explicativa de auditoria e cálculo manual */
-.lum-fonte-note {
-  margin-top: 20px;
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: var(--bg-card-sub, rgba(148, 163, 184, 0.08));
+/* Classes de Impressão */
+.print-only {
+  display: none !important;
+}
+
+/* Wrapper da coluna direita (na tela) / Página 2 (no PDF) */
+.luminarias-page2-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Card de Metodologia e Cálculo Manual (Auditoria SGI) */
+.lum-fonte-card {
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
-  font-size: 0.82rem;
-  color: var(--text-secondary);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.05));
   transition: all 0.2s ease;
 }
 
-.lum-fonte-note summary {
-  cursor: pointer;
-  font-weight: 600;
-  color: var(--text-main);
+.lum-fonte-card-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  user-select: none;
+  gap: 12px;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-color);
 }
 
-.lum-fonte-note summary i {
+.lum-fonte-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(14, 165, 233, 0.12);
   color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  flex-shrink: 0;
 }
 
-.lum-fonte-note[open] {
-  padding-bottom: 14px;
+[data-theme="light"] .lum-fonte-icon {
+  background: #e0f2fe;
+  color: #0284c7;
+}
+
+.lum-fonte-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  line-height: 1.25;
+}
+
+.lum-fonte-subtitle {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  margin: 2px 0 0 0;
 }
 
 .lum-fonte-body {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border-color);
-  line-height: 1.6;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
 }
 
-.lum-fonte-body ul {
-  margin: 8px 0 8px 20px;
+.lum-fonte-intro {
+  margin-bottom: 10px;
 }
 
-.lum-fonte-body li {
-  margin-bottom: 4px;
+.lum-fonte-rules {
+  margin: 0 0 12px 18px;
+  padding: 0;
+}
+
+.lum-fonte-rules li {
+  margin-bottom: 6px;
+}
+
+.lum-fonte-rules strong {
+  color: var(--text-main);
 }
 
 .lum-fonte-body code {
   font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 0.78rem;
-  padding: 2px 5px;
+  font-size: 0.76rem;
+  padding: 1px 5px;
   border-radius: 4px;
   background: rgba(148, 163, 184, 0.15);
   color: var(--text-main);
 }
 
+.lum-fonte-footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
 .lum-fonte-meta {
-  margin-top: 8px;
-  font-size: 0.75rem;
   color: var(--text-dim);
 }
 

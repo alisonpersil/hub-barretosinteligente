@@ -1015,10 +1015,11 @@
       </div>
 
       <!-- CORPO PRINCIPAL: TABELA DE POTÊNCIA (ESQUERDA) + CARDS DE INSIGHTS (DIREITA) -->
+      <!-- CORPO PRINCIPAL: PÁGINA 1 (TABELA) + PÁGINA 2 (DIRETRIZES & METODOLOGIA) -->
       <div class="luminarias-layout-grid">
         
-        <!-- LADO ESQUERDO: TABELA DE EQUIPAMENTOS POR POTÊNCIA -->
-        <div class="card luminarias-main-card">
+        <!-- PÁGINA 1 NO PDF: TABELA DE EQUIPAMENTOS POR POTÊNCIA (100% LARGURA) -->
+        <div class="card luminarias-main-card" id="lum-main-card">
           <div class="card-header" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
             <div>
               <h2 class="card-title" style="font-size: 1.15rem; font-weight: 700;">
@@ -1055,62 +1056,104 @@
               </tbody>
             </table>
           </div>
-
-          <details class="lum-fonte-note" id="lum-fonte-note">
-            <summary><i class="fa-solid fa-circle-check"></i> Como este número é calculado (conferência manual)</summary>
-            <div class="lum-fonte-body">
-              <p>Fonte: coluna <strong>Materiais</strong> da planilha de Atendidos do SGI. Cada item segue o padrão <code>Op:Operação, LUMINÁRIA LED 70W - ARGOS AR-N, Qtd:1.00</code>.</p>
-              <ul>
-                <li>Data considerada: <strong>Data Inicial Atendimento</strong>, dentro do filtro de datas do topo.</li>
-                <li>Soma-se o campo <strong>Qtd</strong> de cada item <code>LUMINÁRIA LED xxW</code> ou <code>PROJETOR xxW</code>.</li>
-                <li><strong>Substituído</strong> no formato <code>ANTIGA // NOVA</code>: conta-se a luminária NOVA (após <code>//</code>).</li>
-                <li>Linhas de atributo técnico (ex.: <code>Tipo de Lâmpada: LED, Potência da Lâmpada: 80.0</code>) não são contadas como equipamento.</li>
-              </ul>
-              <p id="lum-fonte-gerado" class="lum-fonte-meta"></p>
-            </div>
-          </details>
         </div>
 
-        <!-- LADO DIREITO: 3 CARDS DE ESTRATÉGIA E OPERAÇÃO -->
-        <div class="luminarias-side-cards" id="lum-side-cards-container">
+        <!-- PÁGINA 2 NO PDF / COLUNA DIREITA NA TELA: CARDS DE INSIGHTS + METODOLOGIA -->
+        <div class="luminarias-page2-wrapper" id="lum-page2-wrapper">
           
-          <!-- Card 1: Padronização de Estoque -->
-          <div class="card luminarias-insight-card">
-            <div class="lum-insight-icon-box blue">
-              <i class="fa-solid fa-box-archive"></i>
+          <!-- Cabeçalho Executivo de Impressão (Apenas no topo da Página 2 do PDF) -->
+          <div class="lum-print-page2-header print-only">
+            <div class="print-brand-left">
+              <div class="logo-card print-logo-card">
+                <img src="./logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="header-logo" style="height: 32px; max-height: 32px; max-width: 150px; width: auto; object-fit: contain;">
+              </div>
+              <div class="print-titles">
+                <h2>Barretos Inteligente &bull; Diretrizes e Metodologia Técnica</h2>
+                <p>Gestão Estratégica de Luminárias LED & Auditoria da Coluna Materiais SGI</p>
+              </div>
             </div>
-            <div class="lum-insight-body">
-              <h3 class="lum-insight-title">Padronização de Estoque</h3>
-              <p class="lum-insight-text">Garantia contínua de lotes de 70W pela alta demanda na rede.</p>
-            </div>
-          </div>
-
-          <!-- Card 2: Rede de Telegestão -->
-          <div class="card luminarias-insight-card">
-            <div class="lum-insight-icon-box green">
-              <i class="fa-solid fa-wifi"></i>
-            </div>
-            <div class="lum-insight-body">
-              <h3 class="lum-insight-title">Rede de Telegestão</h3>
-              <p class="lum-insight-text">97 módulos readequados para monitoramento e controle inteligente.</p>
+            <div class="print-meta-right">
+              <div>Página <strong>2 de 2</strong></div>
+              <div>Auditoria: <strong>Coluna Materiais / SGI</strong></div>
             </div>
           </div>
 
-          <!-- Card 3: Eficiência e Confiabilidade -->
-          <div class="card luminarias-insight-card">
-            <div class="lum-insight-icon-box yellow">
-              <i class="fa-solid fa-arrow-trend-up"></i>
+          <!-- Título da Seção Estratégica no Print -->
+          <div class="lum-print-section-title print-only">
+            <h3><i class="fa-solid fa-chart-line"></i> Diretrizes Estratégicas e Indicadores de Parque</h3>
+          </div>
+
+          <!-- 3 CARDS DE ESTRATÉGIA E OPERAÇÃO (GRID 3 COLUNAS NO PRINT) -->
+          <div class="luminarias-side-cards" id="lum-side-cards-container">
+            <!-- Card 1: Padronização de Estoque -->
+            <div class="card luminarias-insight-card">
+              <div class="lum-insight-icon-box blue">
+                <i class="fa-solid fa-box-archive"></i>
+              </div>
+              <div class="lum-insight-body">
+                <h3 class="lum-insight-title">Padronização de Estoque</h3>
+                <p class="lum-insight-text">Garantia contínua de lotes de 70W pela alta demanda na rede.</p>
+              </div>
             </div>
-            <div class="lum-insight-body">
-              <h3 class="lum-insight-title">Eficiência e Confiabilidade</h3>
-              <p class="lum-insight-text">Redução de consumo energético e queda na taxa de chamados.</p>
+
+            <!-- Card 2: Rede de Telegestão -->
+            <div class="card luminarias-insight-card">
+              <div class="lum-insight-icon-box green">
+                <i class="fa-solid fa-wifi"></i>
+              </div>
+              <div class="lum-insight-body">
+                <h3 class="lum-insight-title">Rede de Telegestão</h3>
+                <p class="lum-insight-text">97 módulos readequados para monitoramento e controle inteligente.</p>
+              </div>
+            </div>
+
+            <!-- Card 3: Eficiência e Confiabilidade -->
+            <div class="card luminarias-insight-card">
+              <div class="lum-insight-icon-box yellow">
+                <i class="fa-solid fa-arrow-trend-up"></i>
+              </div>
+              <div class="lum-insight-body">
+                <h3 class="lum-insight-title">Eficiência e Confiabilidade</h3>
+                <p class="lum-insight-text">Redução de consumo energético e queda na taxa de chamados.</p>
+              </div>
             </div>
           </div>
 
-      </div>
+          <!-- CARD DE EXPLICAÇÃO DO CÁLCULO MANUAL (AUDITORIA SGI) -->
+          <div class="card lum-fonte-card" id="lum-fonte-card">
+            <div class="lum-fonte-card-header">
+              <div class="lum-fonte-icon">
+                <i class="fa-solid fa-calculator"></i>
+              </div>
+              <div class="lum-fonte-header-text">
+                <h3 class="lum-fonte-title">Metodologia de Cálculo &amp; Conferência Manual</h3>
+                <p class="lum-fonte-subtitle">Critérios técnicos de extração direta da planilha de Atendidos SGI Exati</p>
+              </div>
+            </div>
+            <div class="lum-fonte-body">
+              <p class="lum-fonte-intro">
+                Fonte primária: coluna <strong>Materiais</strong> da planilha oficial de Atendidos. Cada lançamento operacional segue a sintaxe padrão: <code>Op:Operação, LUMINÁRIA LED [Potência]W - [Modelo], Qtd:1.00</code>.
+              </p>
+              <ul class="lum-fonte-rules">
+                <li><strong>Período Auditado:</strong> Considera-se a <em>Data Inicial de Atendimento</em> dentro do intervalo selecionado no filtro geral.</li>
+                <li><strong>Contagem Fiel:</strong> Soma-se estritamente o campo <code>Qtd</code> de luminárias e projetores LED com status <code>Instalado</code>, <code>Substituído</code>, <code>Mantido</code> ou <code>Removido</code>.</li>
+                <li><strong>Substituições de Parque:</strong> Registros no formato duplo <code>ANTIGA // NOVA</code> contabilizam a luminária nova implantada (após <code>//</code>).</li>
+                <li><strong>Equipamentos vs Atributos:</strong> Metadados técnicos (ex.: <em>Tipo de Lâmpada</em>, <em>Potência da Lâmpada</em>) são ignorados para não duplicar ativos.</li>
+                <li><strong>Sistemas Auxiliares:</strong> Relés fotoelétricos e módulos de telegestão são contabilizados de forma segregada no indicador auxiliar.</li>
+              </ul>
+              <div class="lum-fonte-footer">
+                <i class="fa-solid fa-database" style="color: var(--primary); margin-right: 4px;"></i>
+                <span id="lum-fonte-gerado" class="lum-fonte-meta"></span>
+              </div>
+            </div>
+          </div>
 
-      <!-- DRILL-DOWN ANALÍTICO DE ORDENS E PROTOCOLOS POR POTÊNCIA -->
-      <div class="card luminarias-drilldown-card" id="lum-drilldown-card" style="display: none; margin-top: 24px;">
+        </div> <!-- /.luminarias-page2-wrapper -->
+
+      </div> <!-- /.luminarias-layout-grid -->
+
+      <!-- DRILL-DOWN ANALÍTICO DE ORDENS E PROTOCOLOS POR POTÊNCIA (OCULTO NO PDF) -->
+      <div class="card luminarias-drilldown-card no-print" id="lum-drilldown-card" style="display: none; margin-top: 24px;">
         <div class="card-header" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
           <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
             <h2 class="card-title" style="font-size: 1.15rem; font-weight: 700; margin: 0;">
