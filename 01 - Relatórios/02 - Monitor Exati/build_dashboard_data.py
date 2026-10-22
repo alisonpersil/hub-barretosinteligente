@@ -47,7 +47,7 @@ def get_file_mtime_sp(file_path):
 import pandas as pd
 import numpy as np
 
-from exati_column_resolver import resolve_columns, detect_dataset_type, get_col_val
+from exati_column_resolver import resolve_columns, detect_dataset_type, get_col_val, normalize_header
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 base_dir = os.path.join(SCRIPT_DIR, "Base de dados")
@@ -117,11 +117,29 @@ col_sol = a_map.get('solucao', 'Solução')
 protocols_at = set(df_a[col_prot_at].dropna().astype(str).str.strip().str.replace(r'\.0$', '', regex=True).str.lower()) if col_prot_at in df_a.columns else set()
 os_at = set(df_a[col_os].dropna().astype(str).str.strip().str.replace(r'\.0$', '', regex=True).str.lower()) if col_os in df_a.columns else set()
 
-# Conversão de colunas de data em Atendidos
-if 'dt_inicio' not in df_a.columns:
-    df_a['dt_inicio'] = pd.to_datetime(df_a[col_inicio], errors='coerce') if col_inicio in df_a.columns else pd.NaT
-    df_a['dt_fim'] = pd.to_datetime(df_a[col_fim], errors='coerce') if col_fim in df_a.columns else pd.NaT
-    df_a['dt_reclamacao'] = pd.to_datetime(df_a[col_rec], errors='coerce') if col_rec in df_a.columns else pd.NaT
+col_hora_inicio = a_map.get('hora_inicio') or next((c for c in df_a.columns if 'hora in' in normalize_header(c)), None)
+col_hora_fim = a_map.get('hora_fim') or next((c for c in df_a.columns if 'hora fim' in normalize_header(c)), None)
+col_hora_rec = a_map.get('hora_reclamacao') or next((c for c in df_a.columns if 'hora reclam' in normalize_header(c)), None)
+
+def combine_date_time_series(df, col_d, col_h):
+    if not col_d or col_d not in df.columns:
+        return pd.Series(pd.NaT, index=df.index)
+    d_raw = df[col_d].astype(str).str.strip().str.split('T').str[0].str.split(' ').str[0]
+    if col_h and col_h in df.columns:
+        h_raw = df[col_h].astype(str).str.strip().str.split('.').str[0]
+        h_final = h_raw.where(h_raw.str.match(r'^\d{1,2}:\d{2}'), '00:00:00')
+        combined = d_raw + ' ' + h_final
+        return pd.to_datetime(combined, errors='coerce')
+    return pd.to_datetime(df[col_d], errors='coerce')
+
+# Conversão de colunas de data em Atendidos (com junção de horários reais)
+needs_time_recalc = ('dt_inicio' not in df_a.columns) or ((df_a['dt_inicio'].dt.hour == 0).all())
+
+if needs_time_recalc:
+    print("Combinando colunas de Data e Hora operacional em alta precisão...")
+    df_a['dt_inicio'] = combine_date_time_series(df_a, col_inicio, col_hora_inicio)
+    df_a['dt_fim'] = combine_date_time_series(df_a, col_fim, col_hora_fim)
+    df_a['dt_reclamacao'] = combine_date_time_series(df_a, col_rec, col_hora_rec)
 
     df_a['ano'] = df_a['dt_inicio'].dt.year
     df_a['ano_mes'] = df_a['dt_inicio'].dt.strftime('%Y-%m')
@@ -134,7 +152,7 @@ if 'dt_inicio' not in df_a.columns:
     )
     try:
         df_a.to_pickle(cache_file)
-        print("Cache de Atendidos gerado com sucesso!")
+        print("Cache de Atendidos atualizado com horários operacionais reais!")
     except Exception as e:
         print(f"Erro salvando cache: {e}")
 

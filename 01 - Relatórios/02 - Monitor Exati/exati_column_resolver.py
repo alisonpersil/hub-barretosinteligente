@@ -58,15 +58,24 @@ ATENDIDOS_SCHEMA = {
     ],
     'data_inicio': [
         'data inicial atendimento', 'data inicial', 'dt inicio', 'data inicio',
-        'inicio atendimento', 'dt inicial', 'hora inicio', 'data abertura', 'dt abertura'
+        'inicio atendimento', 'dt inicial', 'data abertura', 'dt abertura'
+    ],
+    'hora_inicio': [
+        'hora inicio', 'hora inicial', 'hr inicio', 'horario inicio', 'hora de inicio'
     ],
     'data_fim': [
         'data conclusao atendimento', 'data conclusao', 'dt conclusao', 'data fim',
         'dt fim', 'conclusao atendimento', 'termino atendimento', 'data termino', 'data finalizacao'
     ],
+    'hora_fim': [
+        'hora fim', 'hora conclusao', 'hora final', 'hr fim', 'horario fim', 'hora termino'
+    ],
     'data_reclamacao': [
         'data da reclamacao', 'data de reclamacao', 'data reclamacao', 'dt reclamacao',
-        'dt rec', 'reclamacao data', 'hora reclamacao', 'data da ocorrencia', 'data ocorrencia'
+        'dt rec', 'reclamacao data', 'data da ocorrencia', 'data ocorrencia'
+    ],
+    'hora_reclamacao': [
+        'hora reclamacao', 'hora da reclamacao', 'hr reclamacao', 'hora ocorrencia', 'hora de reclamacao'
     ],
     'origem': [
         'origem da ocorrencia', 'origem de ocorrencia', 'origem ocorrencia', 'origem da solicitacao',
