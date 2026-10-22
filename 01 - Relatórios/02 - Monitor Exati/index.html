@@ -99,6 +99,7 @@
               <span class="popover-lbl">Atalhos Rápidos:</span>
               <div class="popover-presets">
                 <button class="preset-btn active" data-preset="2026">Ano 2026</button>
+                <button class="preset-btn" data-preset="outubro">Outubro / 2026 (SLA: 4d)</button>
                 <button class="preset-btn" data-preset="30d">Últimos 30 Dias</button>
                 <button class="preset-btn" data-preset="90d">Últimos 90 Dias</button>
                 <button class="preset-btn" data-preset="2025">Ano 2025</button>
@@ -1076,10 +1077,10 @@
             <table class="data-table luminarias-table">
               <thead>
                 <tr>
-                  <th>Potência</th>
-                  <th>Modelo Fabricante</th>
-                  <th style="text-align: right;">Qtd</th>
-                  <th style="text-align: right;">% Total</th>
+                  <th class="sortable" data-sort="potencia" title="Clique para ordenar por Potência">Potência <span class="sort-icon">↕</span></th>
+                  <th class="sortable" data-sort="modelo" title="Clique para ordenar por Modelo">Modelo Fabricante <span class="sort-icon">↕</span></th>
+                  <th class="sortable active-sort" data-sort="qtd" style="text-align: right;" title="Clique para ordenar por Quantidade">Qtd <span class="sort-icon">▼</span></th>
+                  <th class="sortable" data-sort="pct" style="text-align: right;" title="Clique para ordenar por Percentual">% Total <span class="sort-icon">↕</span></th>
                 </tr>
               </thead>
               <tbody id="tbody-luminarias-potencia">
@@ -1212,14 +1213,14 @@
           <table class="data-table luminarias-drill-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
             <thead style="position: sticky; top: 0; z-index: 2; background: var(--bg-card);">
               <tr>
-                <th style="width: 90px;">OS</th>
-                <th style="width: 110px;">Protocolo</th>
-                <th style="width: 130px;">Data Atend.</th>
-                <th>Bairro</th>
-                <th style="width: 120px;">Operação</th>
-                <th>Equipamento / Modelo</th>
-                <th style="text-align: right; width: 60px;">Qtd</th>
-                <th>Equipe</th>
+                <th class="sortable active-sort" data-sort="os" style="width: 90px;" title="Clique para ordenar por OS">OS <span class="sort-icon">▼</span></th>
+                <th class="sortable" data-sort="proto" style="width: 110px;" title="Clique para ordenar por Protocolo">Protocolo <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="dt" style="width: 130px;" title="Clique para ordenar por Data de Atendimento">Data Atend. <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="bairro" title="Clique para ordenar por Bairro">Bairro <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="op" style="width: 120px;" title="Clique para ordenar por Operação">Operação <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="modelo" title="Clique para ordenar por Equipamento/Modelo">Equipamento / Modelo <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="qtd" style="text-align: right; width: 60px;" title="Clique para ordenar por Quantidade">Qtd <span class="sort-icon">↕</span></th>
+                <th class="sortable" data-sort="eq" title="Clique para ordenar por Equipe">Equipe <span class="sort-icon">↕</span></th>
               </tr>
             </thead>
             <tbody id="tbody-lum-drilldown">
@@ -1325,10 +1326,10 @@
               <table class="data-table luminarias-table">
                 <thead>
                   <tr>
-                    <th>Dispositivo / Categoria</th>
-                    <th>Especificação Técnica</th>
-                    <th style="text-align: right;">Qtd</th>
-                    <th style="text-align: right;">% Total</th>
+                    <th class="sortable" data-sort="categoria" title="Clique para ordenar por Categoria">Dispositivo / Categoria <span class="sort-icon">↕</span></th>
+                    <th class="sortable" data-sort="modelo" title="Clique para ordenar por Especificação">Especificação Técnica <span class="sort-icon">↕</span></th>
+                    <th class="sortable active-sort" data-sort="qtd" style="text-align: right;" title="Clique para ordenar por Quantidade">Qtd <span class="sort-icon">▼</span></th>
+                    <th class="sortable" data-sort="pct" style="text-align: right;" title="Clique para ordenar por Percentual">% Total <span class="sort-icon">↕</span></th>
                   </tr>
                 </thead>
                 <tbody id="tbody-telegestao-dispositivos">
@@ -1427,14 +1428,14 @@
             <table class="data-table luminarias-drill-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
               <thead style="position: sticky; top: 0; z-index: 2; background: var(--bg-card);">
                 <tr>
-                  <th style="width: 90px;">OS</th>
-                  <th style="width: 110px;">Protocolo</th>
-                  <th style="width: 130px;">Data Atend.</th>
-                  <th>Bairro</th>
-                  <th style="width: 120px;">Operação</th>
-                  <th>Dispositivo / Item</th>
-                  <th style="text-align: right; width: 60px;">Qtd</th>
-                  <th>Equipe</th>
+                  <th class="sortable active-sort" data-sort="os" style="width: 90px;" title="Clique para ordenar por OS">OS <span class="sort-icon">▼</span></th>
+                  <th class="sortable" data-sort="proto" style="width: 110px;" title="Clique para ordenar por Protocolo">Protocolo <span class="sort-icon">↕</span></th>
+                  <th class="sortable" data-sort="dt" style="width: 130px;" title="Clique para ordenar por Data de Atendimento">Data Atend. <span class="sort-icon">↕</span></th>
+                  <th class="sortable" data-sort="bairro" title="Clique para ordenar por Bairro">Bairro <span class="sort-icon">↕</span></th>
+                  <th class="sortable" data-sort="op" style="width: 120px;" title="Clique para ordenar por Operação">Operação <span class="sort-icon">↕</span></th>
+                  <th class="sortable" data-sort="modelo" title="Clique para ordenar por Dispositivo/Item">Dispositivo / Item <span class="sort-icon">↕</span></th>
+                  <th class="sortable" data-sort="qtd" style="text-align: right; width: 60px;" title="Clique para ordenar por Quantidade">Qtd <span class="sort-icon">↕</span></th>
+                  <th class="sortable" data-sort="eq" title="Clique para ordenar por Equipe">Equipe <span class="sort-icon">↕</span></th>
                 </tr>
               </thead>
               <tbody id="tbody-tg-drilldown">

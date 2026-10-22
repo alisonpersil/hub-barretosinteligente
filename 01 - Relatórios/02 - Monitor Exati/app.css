@@ -7046,3 +7046,40 @@ canvas {
 .btn-export-excel.btn-compact i {
   font-size: 0.82rem;
 }
+
+/* Estilos aprimorados para cabeçalhos ordenáveis (Luminárias & Telegestão) */
+.luminarias-drill-table th.sortable,
+.luminarias-table th.sortable {
+  cursor: pointer !important;
+  user-select: none;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.luminarias-drill-table th.sortable:hover,
+.luminarias-table th.sortable:hover {
+  background: rgba(37, 99, 235, 0.09) !important;
+  color: var(--primary) !important;
+}
+
+.luminarias-drill-table th.active-sort,
+.luminarias-table th.active-sort {
+  color: var(--primary) !important;
+  background: rgba(37, 99, 235, 0.12) !important;
+  font-weight: 700;
+}
+
+.luminarias-drill-table th .sort-icon,
+.luminarias-table th .sort-icon {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  transition: transform 0.15s ease;
+}
+
+.luminarias-drill-table th.active-sort .sort-icon,
+.luminarias-table th.active-sort .sort-icon {
+  color: var(--primary);
+  font-weight: 900;
+}

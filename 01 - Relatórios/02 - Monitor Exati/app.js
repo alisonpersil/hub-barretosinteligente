@@ -350,6 +350,10 @@ function initDateFilters() {
         dtInicio = '2026-01-01';
         dtFim = dataMax;
         labelPreset = 'Ano 2026';
+      } else if (preset === 'outubro') {
+        dtInicio = '2026-10-01';
+        dtFim = dataMax;
+        labelPreset = 'Outubro 2026';
       } else if (preset === '30d') {
         const dFim = new Date(dataMax);
         const dIni = new Date(dFim);
@@ -421,6 +425,9 @@ function initDateFilters() {
 const PRESET_MAP = {
   '2026': { key: '2026', label: 'Ano 2026' },
   'Ano 2026': { key: '2026', label: 'Ano 2026' },
+  'outubro': { key: 'outubro', label: 'Outubro 2026' },
+  'Outubro 2026': { key: 'outubro', label: 'Outubro 2026' },
+  'Outubro / 2026': { key: 'outubro', label: 'Outubro 2026' },
   '30d': { key: '30d', label: 'Últimos 30 Dias' },
   'Últimos 30 Dias': { key: '30d', label: 'Últimos 30 Dias' },
   '90d': { key: '90d', label: 'Últimos 90 Dias' },
@@ -437,6 +444,7 @@ const PRESET_MAP = {
 function isCurrentOrTotalPreset(presetKey, presetLabel) {
   const k = String(presetKey || '').trim().toLowerCase();
   const l = String(presetLabel || '').trim().toLowerCase();
+  if (k === 'outubro' || l.includes('outubro')) return false;
   return !k || k === 'tudo' || k === '2026' || k === '30d' || k === '90d' ||
          k.includes('2026') || l.includes('2026') || l.includes('total') || l.includes('consolidado');
 }
@@ -937,6 +945,42 @@ function applyDateFilter(inicioStr, fimStr, nomePreset, notify = true) {
 
   // 5. Filtrar Tabela de Pendentes e Tabela Analítica
   renderPendentesTable();
+
+  // Sincronizar o Mês da Tabela Analítica com o Filtro Global (Outubro, Setembro ou Geral)
+  const isOct = presetInfo.key === 'outubro' || (inicioStr.startsWith('2026-10') && fimStr.startsWith('2026-10'));
+  const isSep = (inicioStr.startsWith('2026-09') && fimStr.startsWith('2026-09'));
+  const isTotal = (presetInfo.key === '2026' || presetInfo.key === 'tudo');
+
+  if (typeof analiticoState !== 'undefined') {
+    const selMes = document.getElementById('filtro-analitico-mes');
+    const allChips = document.querySelectorAll('.analitico-quick-chips .quick-chip');
+    if (isOct) {
+      analiticoState.mesFilter = '2026-10';
+      if (selMes) selMes.value = '2026-10';
+      const chipOct = document.getElementById('btn-quick-outubro');
+      if (chipOct && allChips.length) {
+        allChips.forEach(c => c.classList.remove('active'));
+        chipOct.classList.add('active');
+      }
+    } else if (isSep) {
+      analiticoState.mesFilter = '2026-09';
+      if (selMes) selMes.value = '2026-09';
+      const chipSep = document.getElementById('btn-quick-setembro');
+      if (chipSep && allChips.length) {
+        allChips.forEach(c => c.classList.remove('active'));
+        chipSep.classList.add('active');
+      }
+    } else if (isTotal) {
+      analiticoState.mesFilter = 'todos';
+      if (selMes) selMes.value = 'todos';
+      const chipTodos = document.querySelector('.analitico-quick-chips .quick-chip[data-reset="true"]');
+      if (chipTodos && allChips.length) {
+        allChips.forEach(c => c.classList.remove('active'));
+        chipTodos.classList.add('active');
+      }
+    }
+  }
+
   if (typeof applyAnaliticoFilters === 'function') {
     applyAnaliticoFilters();
   }
@@ -2938,7 +2982,25 @@ function renderLuminariasTab() {
     const nomeModelo = isProj ? (modelo.replace('PROJETOR', '').trim() || 'Projetor') : modelo;
     porPot[potKey].modelos[nomeModelo] = (porPot[potKey].modelos[nomeModelo] || 0) + v;
   }
-  const linhas = Object.values(porPot).sort((a, b) => b.qtd - a.qtd || a.watts - b.watts);
+  const allLinhas = Object.values(porPot);
+  const trueLider = allLinhas.slice().sort((a, b) => b.qtd - a.qtd)[0];
+  const sortColLum = lumSummarySort.col || 'qtd';
+  const sortDirLum = lumSummarySort.dir === 'asc' ? 1 : -1;
+  const linhas = allLinhas.sort((a, b) => {
+    if (sortColLum === 'qtd' || sortColLum === 'pct') {
+      return (a.qtd - b.qtd) * sortDirLum;
+    }
+    if (sortColLum === 'potencia') {
+      if (a.watts !== b.watts) return (a.watts - b.watts) * sortDirLum;
+      return a.potencia.localeCompare(b.potencia, 'pt-BR') * sortDirLum;
+    }
+    if (sortColLum === 'modelo') {
+      const modA = Object.keys(a.modelos).join(', ');
+      const modB = Object.keys(b.modelos).join(', ');
+      return modA.localeCompare(modB, 'pt-BR') * sortDirLum;
+    }
+    return 0;
+  });
   const total = linhas.reduce((s, l) => s + l.qtd, 0);
   const fmtPct = (n) => (total > 0 ? (n / total * 100) : 0).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
   const titleCase = (s) => String(s).toLowerCase().replace(/(^|\s|-)\S/g, c => c.toUpperCase()).replace(/\bAr-n\b/i, 'AR-N').replace(/\bIi\b/, 'II').replace(/\bPf\b/, 'PF');
@@ -2954,8 +3016,8 @@ function renderLuminariasTab() {
   setTxt('lum-kpi-total-sub', `LED ${opLabels[op]} • ${periodoTxt}`);
   setTxt('badge-total-lum-table', `${total.toLocaleString('pt-BR')} unidades • ${periodoTxt}`);
 
-  if (linhas.length > 0) {
-    const lider = linhas[0];
+  if (linhas.length > 0 && trueLider) {
+    const lider = trueLider;
     const modeloLider = Object.entries(lider.modelos).sort((a, b) => b[1] - a[1])[0];
     setTxt('lum-kpi-predom-pct', fmtPct(lider.qtd));
     setTxt('lum-kpi-predom-desc', `${lider.potencia} ${titleCase(modeloLider[0])} (${lider.qtd.toLocaleString('pt-BR')} un)`);
@@ -3028,6 +3090,22 @@ function renderLuminariasTab() {
         </tr>`;
       }).join('');
 
+      // Atualiza ícones de ordenação na tabela superior
+      const lumMainCard = document.getElementById('lum-main-card');
+      if (lumMainCard) {
+        lumMainCard.querySelectorAll('thead th.sortable').forEach(th => {
+          const col = th.getAttribute('data-sort');
+          const icon = th.querySelector('.sort-icon');
+          if (col === sortColLum) {
+            th.classList.add('active-sort');
+            if (icon) icon.textContent = sortDirLum === 1 ? '▲' : '▼';
+          } else {
+            th.classList.remove('active-sort');
+            if (icon) icon.textContent = '↕';
+          }
+        });
+      }
+
       elTbody.querySelectorAll('.lum-pot-row').forEach(tr => {
         tr.addEventListener('click', () => {
           const pot = tr.getAttribute('data-pot');
@@ -3097,7 +3175,29 @@ function renderLuminariasTab() {
 
 // Estado do seletor de operação da aba Luminárias
 let lumOpState = 'tudo';
+let lumSummarySort = { col: 'qtd', dir: 'desc' };
+
+function initLumSummarySortListeners() {
+  const card = document.getElementById('lum-main-card');
+  if (!card || card.dataset.sortBound) return;
+  card.dataset.sortBound = '1';
+  card.querySelectorAll('thead th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.getAttribute('data-sort');
+      if (!col) return;
+      if (lumSummarySort.col === col) {
+        lumSummarySort.dir = lumSummarySort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        lumSummarySort.col = col;
+        lumSummarySort.dir = (col === 'qtd' || col === 'pct') ? 'desc' : 'asc';
+      }
+      renderLuminariasTab();
+    });
+  });
+}
 function initLuminariasOpToggle() {
+  initLumSummarySortListeners();
+  initTgSummarySortListeners();
   const wrap = document.getElementById('lum-op-toggle');
   if (!wrap || wrap.dataset.bound) return;
   wrap.dataset.bound = '1';
@@ -3434,9 +3534,12 @@ function applyAnaliticoFilters() {
       // 0b. Filtro Temporal Global (dateFilterState)
       // Se o usuário digitou uma busca específica (ex: '1827690', número de OS ou texto),
       // ignoramos a restrição de data para garantir localização instantânea de qualquer chamado.
-      if (!q && r.data_iso) {
-        if (dateFilterState.inicio && r.data_iso < dateFilterState.inicio) return false;
-        if (dateFilterState.fim && r.data_iso > dateFilterState.fim) return false;
+      if (!q) {
+        let refDate = (r.dt_rec && r.dt_rec !== 'Ronda Interna' && !r.dt_rec.toLowerCase().includes('não informada'))
+          ? r.dt_rec.slice(0, 10).split('/').reverse().join('-')
+          : (r.data_iso || '');
+        if (dateFilterState.inicio && refDate && refDate < dateFilterState.inicio) return false;
+        if (dateFilterState.fim && refDate && refDate > dateFilterState.fim) return false;
       }
     }
 
@@ -5743,7 +5846,9 @@ let lumDrillState = {
   activePot: null,
   search: '',
   currentPage: 1,
-  pageSize: 25
+  pageSize: 25,
+  sortCol: 'os',
+  sortDir: 'desc'
 };
 
 function openLumDrillDown(pot) {
@@ -5810,6 +5915,76 @@ function renderLumDrillDown() {
       if (!match) return false;
     }
     return true;
+  });
+
+  // Ordenação dos registros do Drill-Down
+  const parseBrDateToIso = (str) => {
+    if (!str) return '';
+    const parts = str.trim().split(' ');
+    const dParts = parts[0].split('/');
+    if (dParts.length === 3) {
+      const yyyy = dParts[2];
+      const mm = dParts[1].padStart(2, '0');
+      const dd = dParts[0].padStart(2, '0');
+      return `${yyyy}-${mm}-${dd} ${parts[1] || '00:00'}`;
+    }
+    return str;
+  };
+
+  const sortColLumDrill = lumDrillState.sortCol || 'os';
+  const sortDirLumDrill = lumDrillState.sortDir === 'asc' ? 1 : -1;
+
+  filtrados.sort((a, b) => {
+    let valA = a[sortColLumDrill];
+    let valB = b[sortColLumDrill];
+
+    if (sortColLumDrill === 'os' || sortColLumDrill === 'qtd') {
+      const numA = Number(valA) || 0;
+      const numB = Number(valB) || 0;
+      return (numA - numB) * sortDirLumDrill;
+    }
+
+    if (sortColLumDrill === 'dt') {
+      const isNullA = !a.dt && !a.d_iso;
+      const isNullB = !b.dt && !b.d_iso;
+      if (isNullA && isNullB) return 0;
+      if (isNullA) return 1;
+      if (isNullB) return -1;
+      const isoA = a.d_iso ? (a.d_iso + ' ' + (a.dt ? a.dt.split(' ')[1] || '00:00' : '00:00')) : parseBrDateToIso(a.dt);
+      const isoB = b.d_iso ? (b.d_iso + ' ' + (b.dt ? b.dt.split(' ')[1] || '00:00' : '00:00')) : parseBrDateToIso(b.dt);
+      return isoA.localeCompare(isoB) * sortDirLumDrill;
+    }
+
+    if (sortColLumDrill === 'proto') {
+      const isNullA = !valA;
+      const isNullB = !valB;
+      if (isNullA && isNullB) return 0;
+      if (isNullA) return 1;
+      if (isNullB) return -1;
+      return String(valA).localeCompare(String(valB), 'pt-BR', { numeric: true }) * sortDirLumDrill;
+    }
+
+    if (sortColLumDrill === 'modelo') {
+      valA = a.item || a.modelo || '';
+      valB = b.item || b.modelo || '';
+    }
+
+    valA = (valA || '').toString().toLowerCase();
+    valB = (valB || '').toString().toLowerCase();
+    return valA.localeCompare(valB, 'pt-BR') * sortDirLumDrill;
+  });
+
+  // Atualiza indicadores visuais nos headers do drilldown
+  card.querySelectorAll('thead th.sortable').forEach(th => {
+    const col = th.getAttribute('data-sort');
+    const icon = th.querySelector('.sort-icon');
+    if (col === sortColLumDrill) {
+      th.classList.add('active-sort');
+      if (icon) icon.textContent = sortDirLumDrill === 1 ? '▲' : '▼';
+    } else {
+      th.classList.remove('active-sort');
+      if (icon) icon.textContent = '↕';
+    }
   });
 
   const elTitle = document.getElementById('lum-drill-pot-title');
@@ -5896,6 +6071,22 @@ function initLumDrillDownListeners() {
     });
   }
 
+  // Listeners de ordenação de colunas do Drill-Down
+  card.querySelectorAll('thead th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.getAttribute('data-sort');
+      if (!col) return;
+      if (lumDrillState.sortCol === col) {
+        lumDrillState.sortDir = lumDrillState.sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        lumDrillState.sortCol = col;
+        lumDrillState.sortDir = (col === 'os' || col === 'qtd' || col === 'dt') ? 'desc' : 'asc';
+      }
+      lumDrillState.currentPage = 1;
+      renderLumDrillDown();
+    });
+  });
+
   const btnClose = document.getElementById('btn-lum-drill-close');
   if (btnClose) {
     btnClose.addEventListener('click', closeLumDrillDown);
@@ -5981,11 +6172,34 @@ function exportLumDrillDownCsv() {
 
 let ativosSubtabState = 'led';
 let tgOpState = 'tudo';
+let tgSummarySort = { col: 'qtd', dir: 'desc' };
+
+function initTgSummarySortListeners() {
+  const card = document.getElementById('tg-main-card');
+  if (!card || card.dataset.sortBound) return;
+  card.dataset.sortBound = '1';
+  card.querySelectorAll('thead th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.getAttribute('data-sort');
+      if (!col) return;
+      if (tgSummarySort.col === col) {
+        tgSummarySort.dir = tgSummarySort.dir === 'asc' ? 'desc' : 'asc';
+      } else {
+        tgSummarySort.col = col;
+        tgSummarySort.dir = (col === 'qtd' || col === 'pct') ? 'desc' : 'asc';
+      }
+      renderTelegestaoTab();
+    });
+  });
+}
+
 let tgDrillState = {
   activeCat: null,
   search: '',
   currentPage: 1,
-  pageSize: 25
+  pageSize: 25,
+  sortCol: 'os',
+  sortDir: 'desc'
 };
 
 function initAtivosSubnav() {
@@ -6081,11 +6295,24 @@ function renderTelegestaoTab() {
     'Relé Timer': 'Temporizador Digital de Rede'
   };
 
+  const sortColTg = tgSummarySort.col || 'qtd';
+  const sortDirTg = tgSummarySort.dir === 'asc' ? 1 : -1;
   const linhas = Object.entries(porCat).map(([cat, qtd]) => ({
     categoria: cat,
     modelo: catSpecs[cat] || 'Dispositivo de Controle',
     qtd
-  })).sort((a, b) => b.qtd - a.qtd);
+  })).sort((a, b) => {
+    if (sortColTg === 'qtd' || sortColTg === 'pct') {
+      return (a.qtd - b.qtd) * sortDirTg;
+    }
+    if (sortColTg === 'categoria') {
+      return a.categoria.localeCompare(b.categoria, 'pt-BR') * sortDirTg;
+    }
+    if (sortColTg === 'modelo') {
+      return a.modelo.localeCompare(b.modelo, 'pt-BR') * sortDirTg;
+    }
+    return 0;
+  });
 
   const setTxt = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = txt; };
   const periodoTxt = (dateFilterState.label && dateFilterState.label !== 'Personalizado')
@@ -6136,6 +6363,22 @@ function renderTelegestaoTab() {
           <td class="pct-cell">${fmtPct(l.qtd)}</td>
         </tr>`;
       }).join('');
+
+      // Atualiza indicadores visuais nos headers da tabela superior de telegestão
+      const tgMainCard = document.getElementById('tg-main-card');
+      if (tgMainCard) {
+        tgMainCard.querySelectorAll('thead th.sortable').forEach(th => {
+          const col = th.getAttribute('data-sort');
+          const icon = th.querySelector('.sort-icon');
+          if (col === sortColTg) {
+            th.classList.add('active-sort');
+            if (icon) icon.textContent = sortDirTg === 1 ? '▲' : '▼';
+          } else {
+            th.classList.remove('active-sort');
+            if (icon) icon.textContent = '↕';
+          }
+        });
+      }
 
       elTbody.querySelectorAll('.tg-cat-row').forEach(tr => {
         tr.addEventListener('click', () => {
@@ -6264,6 +6507,76 @@ function renderTgDrillDown() {
     return true;
   });
 
+  // Ordenação dos registros do Drill-Down de Telegestão
+  const parseBrDateToIso = (str) => {
+    if (!str) return '';
+    const parts = str.trim().split(' ');
+    const dParts = parts[0].split('/');
+    if (dParts.length === 3) {
+      const yyyy = dParts[2];
+      const mm = dParts[1].padStart(2, '0');
+      const dd = dParts[0].padStart(2, '0');
+      return `${yyyy}-${mm}-${dd} ${parts[1] || '00:00'}`;
+    }
+    return str;
+  };
+
+  const sortColTgDrill = tgDrillState.sortCol || 'os';
+  const sortDirTgDrill = tgDrillState.sortDir === 'asc' ? 1 : -1;
+
+  filtrados.sort((a, b) => {
+    let valA = a[sortColTgDrill];
+    let valB = b[sortColTgDrill];
+
+    if (sortColTgDrill === 'os' || sortColTgDrill === 'qtd') {
+      const numA = Number(valA) || 0;
+      const numB = Number(valB) || 0;
+      return (numA - numB) * sortDirTgDrill;
+    }
+
+    if (sortColTgDrill === 'dt') {
+      const isNullA = !a.dt && !a.d_iso;
+      const isNullB = !b.dt && !b.d_iso;
+      if (isNullA && isNullB) return 0;
+      if (isNullA) return 1;
+      if (isNullB) return -1;
+      const isoA = a.d_iso ? (a.d_iso + ' ' + (a.dt ? a.dt.split(' ')[1] || '00:00' : '00:00')) : parseBrDateToIso(a.dt);
+      const isoB = b.d_iso ? (b.d_iso + ' ' + (b.dt ? b.dt.split(' ')[1] || '00:00' : '00:00')) : parseBrDateToIso(b.dt);
+      return isoA.localeCompare(isoB) * sortDirTgDrill;
+    }
+
+    if (sortColTgDrill === 'proto') {
+      const isNullA = !valA;
+      const isNullB = !valB;
+      if (isNullA && isNullB) return 0;
+      if (isNullA) return 1;
+      if (isNullB) return -1;
+      return String(valA).localeCompare(String(valB), 'pt-BR', { numeric: true }) * sortDirTgDrill;
+    }
+
+    if (sortColTgDrill === 'modelo') {
+      valA = a.item || a.modelo || a.cat || '';
+      valB = b.item || b.modelo || b.cat || '';
+    }
+
+    valA = (valA || '').toString().toLowerCase();
+    valB = (valB || '').toString().toLowerCase();
+    return valA.localeCompare(valB, 'pt-BR') * sortDirTgDrill;
+  });
+
+  // Atualiza indicadores visuais nos headers do drilldown de telegestão
+  card.querySelectorAll('thead th.sortable').forEach(th => {
+    const col = th.getAttribute('data-sort');
+    const icon = th.querySelector('.sort-icon');
+    if (col === sortColTgDrill) {
+      th.classList.add('active-sort');
+      if (icon) icon.textContent = sortDirTgDrill === 1 ? '▲' : '▼';
+    } else {
+      th.classList.remove('active-sort');
+      if (icon) icon.textContent = '↕';
+    }
+  });
+
   const elTitle = document.getElementById('tg-drill-cat-title');
   const elBadgeCount = document.getElementById('tg-drill-count-badge');
   const elBadgeOp = document.getElementById('tg-drill-op-badge');
@@ -6346,6 +6659,22 @@ function initTgDrillDownListeners() {
       renderTgDrillDown();
     });
   }
+
+  // Listeners de ordenação de colunas do Drill-Down de Telegestão
+  card.querySelectorAll('thead th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.getAttribute('data-sort');
+      if (!col) return;
+      if (tgDrillState.sortCol === col) {
+        tgDrillState.sortDir = tgDrillState.sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        tgDrillState.sortCol = col;
+        tgDrillState.sortDir = (col === 'os' || col === 'qtd' || col === 'dt') ? 'desc' : 'asc';
+      }
+      tgDrillState.currentPage = 1;
+      renderTgDrillDown();
+    });
+  });
 
   const btnClose = document.getElementById('btn-tg-drill-close');
   if (btnClose) {
