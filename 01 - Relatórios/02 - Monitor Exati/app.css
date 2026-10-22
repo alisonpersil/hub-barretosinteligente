@@ -2920,6 +2920,7 @@ body {
 }
 
 /* Tabela e Cabeçalhos com Ordenação */
+.data-table th.sortable,
 .analitico-table th.sortable {
   cursor: pointer;
   user-select: none;
@@ -2927,22 +2928,26 @@ body {
   white-space: nowrap;
 }
 
+.data-table th.sortable:hover,
 .analitico-table th.sortable:hover {
   background: var(--bg-hover);
   color: var(--primary);
 }
 
+.data-table th.active-sort,
 .analitico-table th.active-sort {
   color: var(--primary);
   background: rgba(59, 130, 246, 0.08);
 }
 
+.data-table th .sort-icon,
 .analitico-table th .sort-icon {
   font-size: 0.7rem;
   margin-left: 4px;
   opacity: 0.6;
 }
 
+.data-table th.active-sort .sort-icon,
 .analitico-table th.active-sort .sort-icon {
   opacity: 1;
   font-weight: bold;

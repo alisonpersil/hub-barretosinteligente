@@ -888,14 +888,15 @@
           <table class="data-table">
             <thead id="thead-backlog-tabela">
               <tr>
-                <th>Protocolo</th>
-                <th>Data Abertura</th>
-                <th>Origem</th>
-                <th>Pontos Físicos</th>
-                <th>Bairro(s)</th>
-                <th>Solicitante</th>
-                <th>Status SLA</th>
-                <th>Tempo Restante / Atraso</th>
+                <th data-sort="proto" class="sortable">Protocolo <span class="sort-icon">↕</span></th>
+                <th data-sort="dt_sol" class="sortable">Data Abertura <span class="sort-icon">↕</span></th>
+                <th data-sort="origem" class="sortable">Origem <span class="sort-icon">↕</span></th>
+                <th data-sort="pontos" class="sortable">Pontos Físicos <span class="sort-icon">↕</span></th>
+                <th data-sort="bairro" class="sortable">Bairro(s) <span class="sort-icon">↕</span></th>
+                <th data-sort="solicitante" class="sortable">Solicitante <span class="sort-icon">↕</span></th>
+                <th data-sort="sla_dias" class="sortable active-sort desc" style="background: rgba(16, 185, 129, 0.08); color: #10b981;" title="SLA em dias: atraso ou prazo restante vs meta de 7d"><i class="fa-solid fa-stopwatch" style="margin-right: 4px;"></i>SLA <span class="sort-icon">▼</span></th>
+                <th data-sort="sla_status" class="sortable">Status SLA <span class="sort-icon">↕</span></th>
+                <th data-sort="tempo_rest" class="sortable">Tempo Restante / Atraso <span class="sort-icon">↕</span></th>
               </tr>
             </thead>
             <tbody id="tbody-pendentes">
@@ -1391,7 +1392,7 @@
                 <th data-sort="origem" class="sortable">Origem <span class="sort-icon">↕</span></th>
                 <th data-sort="dt_rec" class="sortable">Data Reclamação <span class="sort-icon">↕</span></th>
                 <th data-sort="dt_fim" class="sortable">Data Conclusão <span class="sort-icon">↕</span></th>
-                <th data-sort="dias" class="sortable active-sort desc" style="background: rgba(16, 185, 129, 0.08); color: #10b981;" title="Tempo de Resolução: Data Conclusão - Data Reclamação"><i class="fa-solid fa-stopwatch" style="margin-right: 4px;"></i>SLA (Dias / Horas) <span class="sort-icon">▼</span></th>
+                <th data-sort="dias" class="sortable active-sort desc" style="background: rgba(16, 185, 129, 0.08); color: #10b981;" title="SLA: Tempo de Resolução (Data Conclusão - Data Reclamação) em Dias"><i class="fa-solid fa-stopwatch" style="margin-right: 4px;"></i>SLA <span class="sort-icon">▼</span></th>
                 <th data-sort="sla" class="sortable">Status SLA <span class="sort-icon">↕</span></th>
                 <th data-sort="eq" class="sortable">Equipe <span class="sort-icon">↕</span></th>
                 <th data-sort="bairro" class="sortable">Bairro <span class="sort-icon">↕</span></th>

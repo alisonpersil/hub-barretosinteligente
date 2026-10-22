@@ -2428,6 +2428,30 @@ function renderBurndownChart(backlogInicial, queimaDiaria, diasParaZerar) {
 // ==========================================
 let filtroAtual = 'todos';
 let buscaAtual = '';
+let pendentesSort = {
+  col: 'sla_dias',
+  dir: 'desc'
+};
+
+function setupPendentesTableSort() {
+  const thead = document.getElementById('thead-backlog-tabela');
+  if (!thead || thead.dataset.sortInit) return;
+  thead.dataset.sortInit = 'true';
+
+  thead.addEventListener('click', (e) => {
+    const th = e.target.closest('th.sortable');
+    if (!th) return;
+    const col = th.getAttribute('data-sort');
+    if (!col) return;
+    if (pendentesSort.col === col) {
+      pendentesSort.dir = pendentesSort.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+      pendentesSort.col = col;
+      pendentesSort.dir = (col === 'sla_dias' || col === 'pontos') ? 'desc' : 'asc';
+    }
+    renderPendentesTable();
+  });
+}
 
 function updateFilterButtonsForAtendidos(atendidosList, targetIso, mode) {
   const subset = atendidosList.filter(a => {
@@ -2517,6 +2541,16 @@ function renderPendentesTable() {
   const titleEl = document.getElementById('titulo-tabela-backlog');
   const totalEl = document.getElementById('table-total-count');
 
+  setupPendentesTableSort();
+
+  const getThSort = (col, label, title, icon = '') => {
+    const isActive = pendentesSort.col === col;
+    const iconDir = isActive ? (pendentesSort.dir === 'asc' ? '▲' : '▼') : '↕';
+    const cls = `sortable ${isActive ? `active-sort ${pendentesSort.dir}` : ''}`;
+    const style = isActive && col === 'sla_dias' ? 'style="background: rgba(16, 185, 129, 0.08); color: #10b981;"' : '';
+    return `<th data-sort="${col}" class="${cls}" ${style} title="${title}">${icon}${label} <span class="sort-icon">${iconDir}</span></th>`;
+  };
+
   // =========================================================================
   // CASO 1: VISUALIZANDO ATENDIMENTOS REALIZADOS (Clique na Coluna de Atendidos)
   // =========================================================================
@@ -2524,14 +2558,15 @@ function renderPendentesTable() {
     if (thead) {
       thead.innerHTML = `
         <tr>
-          <th>OS / Protocolo</th>
-          <th>Data Conclusão</th>
-          <th>Origem</th>
-          <th>Equipe</th>
-          <th>Bairro(s)</th>
-          <th>Tipo de Serviço</th>
-          <th>Status SLA</th>
-          <th>Tempo Resolução</th>
+          ${getThSort('os', 'OS / Protocolo', 'Ordenar por OS')}
+          ${getThSort('dt_fim', 'Data Conclusão', 'Ordenar por Data de Conclusão')}
+          ${getThSort('origem', 'Origem', 'Ordenar por Origem')}
+          ${getThSort('eq', 'Equipe', 'Ordenar por Equipe')}
+          ${getThSort('bairro', 'Bairro(s)', 'Ordenar por Bairro')}
+          ${getThSort('tipo', 'Tipo de Serviço', 'Ordenar por Tipo')}
+          ${getThSort('sla_dias', 'SLA', 'SLA em dias: prazo de resolução (Data Conclusão - Data Reclamação)', '<i class="fa-solid fa-stopwatch" style="margin-right: 4px;"></i>')}
+          ${getThSort('sla_status', 'Status SLA', 'Ordenar por Status SLA')}
+          ${getThSort('horas', 'Tempo Resolução', 'Tempo de Resolução')}
         </tr>
       `;
     }
@@ -2569,13 +2604,30 @@ function renderPendentesTable() {
       return true;
     });
 
+    filtrados.sort((a, b) => {
+      const col = pendentesSort.col;
+      const dir = pendentesSort.dir === 'asc' ? 1 : -1;
+      if (col === 'sla_dias') {
+        const valA = (a.dias !== null && a.dias !== undefined && !isNaN(a.dias)) ? Number(a.dias) : -999;
+        const valB = (b.dias !== null && b.dias !== undefined && !isNaN(b.dias)) ? Number(b.dias) : -999;
+        return (valA - valB) * dir;
+      }
+      if (col === 'os') return (Number(a.os || 0) - Number(b.os || 0)) * dir;
+      if (col === 'dt_fim') return ((a.data_iso || '')).localeCompare(b.data_iso || '') * dir;
+      if (col === 'horas') return (Number(a.horas || 0) - Number(b.horas || 0)) * dir;
+      if (col === 'sla_status') return ((a.sla || '')).localeCompare(b.sla || '') * dir;
+      const valA = (a[col] || '').toString().toLowerCase();
+      const valB = (b[col] || '').toString().toLowerCase();
+      return valA.localeCompare(valB) * dir;
+    });
+
     if (totalEl) {
       const modeTxt = filtroGraficoData.mode === 'acumulado' ? 'acumuladas até' : 'concluídas em';
       totalEl.textContent = `${filtrados.length} ordens de serviço ${modeTxt} ${filtroGraficoData.label}`;
     }
 
     if (filtrados.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 32px; color: var(--text-dim);">Nenhuma ordem concluída encontrada com os filtros selecionados.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 32px; color: var(--text-dim);">Nenhuma ordem concluída encontrada com os filtros selecionados.</td></tr>`;
       return;
     }
 
@@ -2599,6 +2651,22 @@ function renderPendentesTable() {
         ? `<strong>${item.os}</strong><span style="display:block; font-size:0.75rem; color:var(--text-dim);">${item.proto}</span>`
         : `<strong>${item.os}</strong>`;
 
+      const dVal = (item.dias !== null && item.dias !== undefined && !isNaN(item.dias)) ? Math.round(Number(item.dias)) : null;
+      let badgeSlaKpi = '';
+      if (dVal !== null) {
+        if (dVal <= 1) {
+          badgeSlaKpi = `<span class="tma-badge tma-badge-quick" title="SLA: Resolução em ${dVal}d"><i class="fa-solid fa-bolt"></i> ${dVal}d</span>`;
+        } else if (dVal <= 3) {
+          badgeSlaKpi = `<span class="tma-badge tma-badge-ontime" title="SLA: Resolução em ${dVal}d"><i class="fa-solid fa-stopwatch"></i> ${dVal}d</span>`;
+        } else if (dVal <= 7) {
+          badgeSlaKpi = `<span class="tma-badge tma-badge-warning" title="SLA: Resolução em ${dVal}d"><i class="fa-solid fa-triangle-exclamation"></i> ${dVal}d</span>`;
+        } else {
+          badgeSlaKpi = `<span class="tma-badge tma-badge-danger" title="SLA: Resolução em ${dVal}d (Acima da meta de 7d)"><i class="fa-solid fa-circle-exclamation"></i> ${dVal}d</span>`;
+        }
+      } else {
+        badgeSlaKpi = `<span class="badge badge-secondary" title="Atendimento de Ronda Interna"><i class="fa-solid fa-shield-halved"></i> Ronda</span>`;
+      }
+
       const tempoSla = (item.dias !== null && item.dias !== undefined && !isNaN(item.dias))
         ? `${Math.round(Number(item.dias))} dias`
         : (item.sla === 'Ronda' ? '<span style="color:var(--text-dim);">Ronda</span>' : '-');
@@ -2610,6 +2678,7 @@ function renderPendentesTable() {
         <td>${eqBadge}</td>
         <td>${item.bairro || '-'}</td>
         <td style="font-size: 0.85rem;">${item.tipo || item.solucao || 'Manutenção'}</td>
+        <td style="white-space: nowrap;">${badgeSlaKpi}</td>
         <td>${badgeSla}</td>
         <td style="color: var(--text-dim); font-size: 0.85rem; font-weight: 600;">${tempoSla}</td>
       `;
@@ -2624,14 +2693,15 @@ function renderPendentesTable() {
   if (thead) {
     thead.innerHTML = `
       <tr>
-        <th>Protocolo</th>
-        <th>Data Abertura</th>
-        <th>Origem</th>
-        <th>Pontos Físicos</th>
-        <th>Bairro(s)</th>
-        <th>Solicitante</th>
-        <th>Status SLA</th>
-        <th>Tempo Restante / Atraso</th>
+        ${getThSort('proto', 'Protocolo', 'Ordenar por Protocolo')}
+        ${getThSort('dt_sol', 'Data Abertura', 'Ordenar por Data de Abertura')}
+        ${getThSort('origem', 'Origem', 'Ordenar por Origem')}
+        ${getThSort('pontos', 'Pontos Físicos', 'Ordenar por Pontos Físicos')}
+        ${getThSort('bairro', 'Bairro(s)', 'Ordenar por Bairro')}
+        ${getThSort('solicitante', 'Solicitante', 'Ordenar por Solicitante')}
+        ${getThSort('sla_dias', 'SLA', 'SLA em dias: atraso ou prazo restante vs meta de 7d', '<i class="fa-solid fa-stopwatch" style="margin-right: 4px;"></i>')}
+        ${getThSort('sla_status', 'Status SLA', 'Ordenar por Status SLA')}
+        ${getThSort('tempo_rest', 'Tempo Restante / Atraso', 'Tempo Restante ou Atraso')}
       </tr>
     `;
   }
@@ -2688,6 +2758,25 @@ function renderPendentesTable() {
     return true;
   });
 
+  filtrados.sort((a, b) => {
+    const col = pendentesSort.col;
+    const dir = pendentesSort.dir === 'asc' ? 1 : -1;
+    if (col === 'sla_dias') {
+      const valA = a.is_vencido ? (a.dias_atraso || 0) : -(a.dias_sla_restantes !== undefined ? a.dias_sla_restantes : 0);
+      const valB = b.is_vencido ? (b.dias_atraso || 0) : -(b.dias_sla_restantes !== undefined ? b.dias_sla_restantes : 0);
+      return (valA - valB) * dir;
+    }
+    if (col === 'proto') return (a.protocolo || '').localeCompare(b.protocolo || '') * dir;
+    if (col === 'dt_sol') return ((a.data_iso || '')).localeCompare(b.data_iso || '') * dir;
+    if (col === 'pontos') return ((a.pontos || 1) - (b.pontos || 1)) * dir;
+    if (col === 'bairro') return ((a.bairro || '')).localeCompare(b.bairro || '') * dir;
+    if (col === 'origem') return ((a.origem || '')).localeCompare(b.origem || '') * dir;
+    if (col === 'solicitante') return ((a.solicitante || '')).localeCompare(b.solicitante || '') * dir;
+    if (col === 'sla_status') return ((a.is_vencido ? 1 : 0) - (b.is_vencido ? 1 : 0)) * dir;
+    if (col === 'tempo_rest') return ((a.tempo_restante_texto || '')).localeCompare(b.tempo_restante_texto || '') * dir;
+    return 0;
+  });
+
   const totalElCount = document.getElementById('table-total-count');
   if (totalElCount) {
     if (filtroGraficoData) {
@@ -2701,16 +2790,25 @@ function renderPendentesTable() {
   }
 
   if (filtrados.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 32px; color: var(--text-dim);">Nenhuma ordem pendente encontrada com os filtros selecionados.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 32px; color: var(--text-dim);">Nenhuma ordem pendente encontrada com os filtros selecionados.</td></tr>`;
     return;
   }
 
   filtrados.forEach(item => {
     const tr = document.createElement('tr');
 
+    let badgeSlaKpi = '';
+    if (item.is_vencido) {
+      const d = item.dias_atraso || 0;
+      badgeSlaKpi = `<span class="tma-badge tma-badge-danger" title="SLA Vencido: atraso de ${d} dias além do limite de 7d"><i class="fa-solid fa-triangle-exclamation"></i> ${d}d <small>(Atraso)</small></span>`;
+    } else {
+      const d = item.dias_sla_restantes !== undefined ? item.dias_sla_restantes : 0;
+      badgeSlaKpi = `<span class="tma-badge tma-badge-ontime" title="SLA no Prazo: restam ${d} dias para o limite de 7d"><i class="fa-solid fa-clock"></i> ${d}d <small>(Restam)</small></span>`;
+    }
+
     let badgeStatus = item.is_vencido
-      ? `<span class="badge badge-danger">Vencido (${item.dias_atraso}d)</span>`
-      : `<span class="badge badge-success">No Prazo (${item.dias_sla_restantes}d)</span>`;
+      ? `<span class="badge badge-danger">Vencido</span>`
+      : `<span class="badge badge-success">No Prazo</span>`;
 
     let badgeOrigem = item.origem.includes('Ronda')
       ? `<span class="badge badge-warning">Ronda Própria</span>`
@@ -2734,6 +2832,7 @@ function renderPendentesTable() {
       <td><span class="badge badge-info" style="font-weight: 700;">${item.pontos} pt${item.pontos > 1 ? 's' : ''}</span></td>
       <td>${item.bairro}</td>
       <td>${item.solicitante}</td>
+      <td style="white-space: nowrap;">${badgeSlaKpi}</td>
       <td>${badgeStatus}</td>
       <td style="color: var(--text-dim); font-size: 0.8rem;">${item.tempo_restante_texto}</td>
     `;
@@ -3471,9 +3570,8 @@ function exportarAnaliticoExcel() {
     'Protocolo': r.proto || '-',
     'Origem': r.origem || 'Não Informada',
     'Data Reclamação': r.dt_rec,
-    'Data Conclusão': r.dt_fim || (r.is_pendente ? 'Em Aberto (Backlog)' : '-'),
-    'Tempo Resolução (Dias)': r.dias !== null ? r.dias : 'Ronda Interna',
-    'Tempo Resolução (Horas)': r.horas !== null ? r.horas : '-',
+    'SLA (Dias)': r.dias !== null ? r.dias : 'Ronda Interna',
+    'SLA (Horas)': r.horas !== null ? r.horas : '-',
     'Status SLA': r.sla,
     'Situação Operacional': r.is_pendente ? (r.alerta_auditoria ? 'Backlog (Detectado Exclusão)' : 'Pendente em Aberto') : 'Concluído',
     'Equipe': r.eq,
