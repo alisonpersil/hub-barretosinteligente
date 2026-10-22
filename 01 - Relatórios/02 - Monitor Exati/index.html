@@ -423,9 +423,9 @@
             </div>
           </div>
           <div class="kpi-value-row">
-            <div class="kpi-value" id="kpi-tma-medio">5d</div>
-            <span class="kpi-mom-badge up-danger" id="kpi-tma-mom" title="Comparativo do SLA contra o mês anterior">
-              &uarr; vs Set/26: +150% (+3d)
+            <div class="kpi-value" id="kpi-tma-medio">4d</div>
+            <span class="kpi-mom-badge down-success" id="kpi-tma-mom" title="Comparativo do SLA contra o mês anterior">
+              &darr; vs Set/26: -20% (-1d)
             </span>
           </div>
           <div class="kpi-footer">
@@ -1107,8 +1107,62 @@
             </div>
           </div>
 
+      </div>
+
+      <!-- DRILL-DOWN ANALÍTICO DE ORDENS E PROTOCOLOS POR POTÊNCIA -->
+      <div class="card luminarias-drilldown-card" id="lum-drilldown-card" style="display: none; margin-top: 24px;">
+        <div class="card-header" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <h2 class="card-title" style="font-size: 1.15rem; font-weight: 700; margin: 0;">
+              <i class="fa-solid fa-list-check" style="color: var(--primary); margin-right: 6px;"></i>
+              Ordens de Serviço &amp; Protocolos &bull; <span id="lum-drill-pot-title" style="color: var(--primary);">LED 30W</span>
+            </h2>
+            <span class="badge badge-info" id="lum-drill-count-badge">0 registros</span>
+            <span class="badge badge-warning" id="lum-drill-op-badge">Tudo</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+            <div class="search-box" style="position: relative;">
+              <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 0.8rem;"></i>
+              <input type="text" id="lum-drill-search" placeholder="Buscar OS, protocolo, bairro, equipe..." class="search-input" style="padding-left: 30px; font-size: 0.82rem; height: 34px; width: 260px;">
+            </div>
+            <button class="btn-secondary" id="btn-lum-drill-export" title="Exportar linhas filtradas para CSV" style="height: 34px; padding: 0 12px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card-sub); color: var(--text-main);">
+              <i class="fa-solid fa-file-csv"></i> Exportar
+            </button>
+            <button class="btn-icon" id="btn-lum-drill-close" title="Fechar detalhamento" style="height: 34px; width: 34px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card-sub); cursor: pointer; color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
         </div>
 
+        <div class="table-responsive" style="max-height: 520px; overflow-y: auto; margin-top: 14px; border: 1px solid var(--border-color); border-radius: 8px;">
+          <table class="data-table luminarias-drill-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
+            <thead style="position: sticky; top: 0; z-index: 2; background: var(--bg-card);">
+              <tr>
+                <th style="width: 90px;">OS</th>
+                <th style="width: 110px;">Protocolo</th>
+                <th style="width: 130px;">Data Atend.</th>
+                <th>Bairro</th>
+                <th style="width: 120px;">Operação</th>
+                <th>Equipamento / Modelo</th>
+                <th style="text-align: right; width: 60px;">Qtd</th>
+                <th>Equipe</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-lum-drilldown">
+              <tr><td colspan="8" class="lum-empty">Selecione uma potência na tabela acima para auditar as ordens de serviço.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginação / Rodapé do Drill-Down -->
+        <div class="drill-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 8px; font-size: 0.82rem; color: var(--text-secondary);">
+          <div id="lum-drill-info">Exibindo 0 registros</div>
+          <div style="display: flex; gap: 6px; align-items: center;">
+            <button class="btn-micro-toggle" id="btn-lum-drill-prev" disabled style="padding: 4px 10px; font-size: 0.78rem; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; background: var(--bg-card-sub); color: var(--text-secondary);">Anterior</button>
+            <span id="lum-drill-page-num" style="font-weight: 600; padding: 0 4px;">1 / 1</span>
+            <button class="btn-micro-toggle" id="btn-lum-drill-next" disabled style="padding: 4px 10px; font-size: 0.78rem; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; background: var(--bg-card-sub); color: var(--text-secondary);">Próxima</button>
+          </div>
+        </div>
       </div>
 
     </section>
