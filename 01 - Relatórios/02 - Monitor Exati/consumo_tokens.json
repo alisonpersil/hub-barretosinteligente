@@ -1,14 +1,30 @@
 {
-  "updated_at": "21/10/2026 16:11:24",
+  "updated_at": "22/10/2026 08:39:24",
   "taxa_dolar": 5.5,
   "limite_mensal_brl": 50.0,
-  "total_requisicoes": 8,
+  "total_requisicoes": 9,
   "total_prompt_tokens": 2684,
   "total_completion_tokens": 1517,
   "total_tokens": 4201,
   "custo_total_usd": 0.001312,
   "custo_total_brl": 0.00722,
   "historico": [
+    {
+      "id": "aud-1792669588",
+      "timestamp": "22/10/2026 08:39:24",
+      "modelo": "gpt-4o-mini",
+      "origem": "Auditoria de Planilhas Exati",
+      "arquivo_pendentes": "ConsultarSolicitacao-5636.xlsx",
+      "arquivo_atendidos": "sgi_pontos_servicos_atendidos_5010f55f-d7b3-4cfd-98ce-2a4a7a1786fe.xls",
+      "prompt_tokens": 0,
+      "completion_tokens": 0,
+      "total_tokens": 0,
+      "custo_usd": 0.0,
+      "custo_brl": 0.0,
+      "status": "APROVADO_LOCAL",
+      "confianca_percent": 100,
+      "resumo_executivo": "Base consolidada auditada localmente com 2905 atendimentos concluídos e 22 pendentes no backlog."
+    },
     {
       "id": "aud-1792610127",
       "timestamp": "21/10/2026 16:11:24",
