@@ -380,9 +380,11 @@ for d_str, grp in df_a.groupby('data_iso'):
 mensal = df_a.groupby('ano_mes')['Atendimento'].count().tail(18)
 mensal_sla = []
 for m_idx in mensal.index:
-    df_m = df_a[df_a['ano_mes'] == m_idx]
+    df_m = df_a[df_a['dt_reclamacao'].dt.strftime('%Y-%m') == m_idx]
+    if df_m.empty or len(df_m['dias_resolucao'].dropna()) == 0:
+        df_m = df_a[df_a['ano_mes'] == m_idx]
     dias_m = df_m['dias_resolucao'].dropna()
-    m_avg = int(round(float(dias_m.mean()))) if len(dias_m) > 0 else 0
+    m_avg = int(round(float(dias_m.median()))) if len(dias_m) > 0 else 0
     mensal_sla.append(m_avg)
 
 df_30_sorted = df_30.sort_values('dt_inicio')
@@ -431,12 +433,13 @@ for idx, r in df_2026.iterrows():
         else:
             origem_clean = origem_raw
 
+    dt_fim_clean = r['dt_fim'] if pd.notna(r['dt_fim']) else r['dt_inicio']
     atendidos_2026_rows.append({
         'os': int(get_col_val(r, a_map, 'os', 0)),
         'proto': str(get_col_val(r, a_map, 'protocolo', '')),
         'origem': origem_clean,
         'dt_rec': r['dt_reclamacao'].strftime('%d/%m/%Y %H:%M') if pd.notna(r['dt_reclamacao']) else 'Ronda Interna',
-        'dt_fim': r['dt_fim'].strftime('%d/%m/%Y %H:%M') if pd.notna(r['dt_fim']) else '',
+        'dt_fim': dt_fim_clean.strftime('%d/%m/%Y %H:%M') if pd.notna(dt_fim_clean) else '',
         'data_iso': r['dt_inicio'].strftime('%Y-%m-%d') if pd.notna(r['dt_inicio']) else '',
         'dias': dias_round,
         'horas': horas_round,
@@ -502,6 +505,122 @@ for b in top_bairros_idx:
     top_bairros_sla.append(sla_v)
 
 # 2.0 Análise Operacional de Luminárias por Potência & Sistemas Auxiliares (Materiais)
+# Extração DETERMINÍSTICA (regex) da coluna Materiais — sem IA, 100% reprodutível e auditável.
+# Formato SGI: "Op:Instalado, LUMINÁRIA LED 70W - ARGOS AR-N, Qtd:1.00 | Op:Removido, ..."
+# Agregado por dia (data inicial do atendimento) em `luminarias_daily` para o filtro de datas do front.
+print("3.1 Extraindo luminárias por potência da coluna Materiais...")
+LUM_ITEM_RE = re.compile(r'Op:\s*([^,|]+?)\s*,\s*(.*?)\s*,\s*Qtd:\s*([\d.,]+)', re.I)
+LUM_LED_RE = re.compile(r'LUMIN[AÁ]RIA\s+LED\s+(\d+)\s*W(?:\s*-\s*(.+))?', re.I)
+LUM_PROJ_RE = re.compile(r'PROJETOR\b(?:\s+(\S+))?.*?(\d+)\s*W', re.I)
+
+col_mat_all = next((c for c in df_a.columns if 'mater' in str(c).lower()), None)
+
+def _lum_parse_qtd(q):
+    try:
+        v = float(str(q).replace(',', '.'))
+        return int(round(v)) if v > 0 else 1
+    except Exception:
+        return 1
+
+def _lum_classify(nome):
+    """Retorna chave 'POT|MODELO' para luminárias LED/projetores, 'CONV' para convencionais, ou None."""
+    n = nome.strip().upper()
+    m = LUM_LED_RE.search(n)
+    if m:
+        modelo = (m.group(2) or 'LED').strip().rstrip(',').strip() or 'LED'
+        return f"{int(m.group(1))}W|{modelo}"
+    if 'PROJETOR' in n:
+        mp = LUM_PROJ_RE.search(n)
+        if mp:
+            marca = (mp.group(1) or '').strip()
+            marca = '' if marca.upper().endswith('W') else marca
+            return f"{int(mp.group(2))}W|PROJETOR{(' ' + marca) if marca else ''}"
+        return None
+    if n.startswith('LUMIN') and 'SUPORTE' not in n:
+        return 'CONV'
+    return None
+
+lum_daily_map = {}
+if col_mat_all:
+    for d_str, mat_text in zip(df_a['data_iso'], df_a[col_mat_all]):
+        if not isinstance(d_str, str) or not d_str or pd.isna(mat_text):
+            continue
+        mat_text = str(mat_text)
+        if 'Op:' not in mat_text:
+            continue
+        rec = lum_daily_map.setdefault(d_str, {"d": d_str, "i": Counter(), "m": Counter(), "r": Counter(),
+                                                "rel": 0, "tg": 0, "at_i": 0, "at_m": 0, "at_r": 0, "at_im": 0, "at_any": 0})
+        tem = {"i": False, "m": False, "r": False}
+        for mm in LUM_ITEM_RE.finditer(mat_text):
+            op = mm.group(1).strip().lower()
+            nome = mm.group(2)
+            qtd = _lum_parse_qtd(mm.group(3))
+            # Substituído: "ANTIGO // NOVO" -> o item novo (instalado) é o último
+            partes = [p.strip() for p in nome.split('//') if p.strip()]
+            if not partes:
+                continue
+            alvo = partes[-1]
+            alvo_up = alvo.upper()
+            if op.startswith('instal') or op.startswith('substitu'):
+                if 'TELEGEST' in alvo_up:
+                    rec["tg"] += qtd
+                elif alvo_up.startswith('REL') and 'FOTO' in alvo_up:
+                    rec["rel"] += qtd
+            # Atributos técnicos ("Tipo de Lâmpada: ...") não são equipamentos
+            if ':' in alvo:
+                continue
+            chave = _lum_classify(alvo)
+            if not chave:
+                continue
+            if op.startswith('instal') or op.startswith('substitu'):
+                bucket = "i"
+            elif op.startswith('mantid'):
+                bucket = "m"
+            elif op.startswith('remov'):
+                bucket = "r"
+            else:
+                continue
+            rec[bucket][chave] += qtd
+            tem[bucket] = True
+        if tem["i"]: rec["at_i"] += 1
+        if tem["m"]: rec["at_m"] += 1
+        if tem["r"]: rec["at_r"] += 1
+        if tem["i"] or tem["m"]: rec["at_im"] += 1
+        if any(tem.values()): rec["at_any"] += 1
+
+luminarias_daily = []
+for d_str in sorted(lum_daily_map.keys()):
+    rec = lum_daily_map[d_str]
+    if not (rec["i"] or rec["m"] or rec["r"] or rec["rel"] or rec["tg"]):
+        continue
+    luminarias_daily.append({
+        "d": d_str,
+        "i": dict(rec["i"]), "m": dict(rec["m"]), "r": dict(rec["r"]),
+        "rel": int(rec["rel"]), "tg": int(rec["tg"]),
+        "at_i": rec["at_i"], "at_m": rec["at_m"], "at_r": rec["at_r"], "at_im": rec["at_im"], "at_any": rec["at_any"]
+    })
+print(f"    -> {len(luminarias_daily)} dias com movimentação de luminárias extraídos.")
+
+# Resumo estático de 2026 (compatibilidade): calculado dos dados reais, sem números fixos
+_lum_2026_inst = Counter()
+_lum_2026_rel = _lum_2026_tg = _lum_2026_at = 0
+for rec in luminarias_daily:
+    if rec["d"].startswith('2026'):
+        for k, v in rec["i"].items():
+            if k != 'CONV':
+                _lum_2026_inst[k] += v
+        _lum_2026_rel += rec["rel"]; _lum_2026_tg += rec["tg"]; _lum_2026_at += rec["at_i"]
+_lum_2026_total = int(sum(_lum_2026_inst.values()))
+luminarias_data = {
+    "fonte": "Coluna Materiais (SGI Exati) • extração determinística por regex",
+    "total_luminarias_instaladas_2026": _lum_2026_total,
+    "atendimentos_com_instalacao_2026": _lum_2026_at,
+    "reles_instalados_2026": _lum_2026_rel,
+    "telegestoes_instaladas_2026": _lum_2026_tg,
+    "top_2026": [{"chave": k, "qtd": int(v)} for k, v in _lum_2026_inst.most_common(10)]
+}
+
+# --- Bloco legado (mantido apenas para referência; não é mais usado no front) ---
 col_materiais = None
 for c in df_2026.columns:
     if 'mater' in str(c).lower():
@@ -546,8 +665,8 @@ if col_materiais and col_materiais in df_2026.columns:
                 lum_pot_counts[pot_key] += 1
                 total_luminarias_count += 1
 
-# Calibração e consolidação do painel de luminárias conforme auditoria PMO Barretos
-luminarias_data = {
+# (Removido) Valores fixos de calibração manual — substituídos pela extração real acima
+_luminarias_legado_fixo = {
     "total_luminarias": 423,
     "modelo_predominante_pct": "59,6%",
     "modelo_predominante_desc": "LED 70W Argos AR-N (252 un)",
@@ -774,7 +893,8 @@ dashboard_data = {
     },
     "atendidos_2026": atendidos_2026_rows,
     "solicitacoes_full": solicitacoes_full_rows,
-    "luminarias": luminarias_data
+    "luminarias": luminarias_data,
+    "luminarias_daily": luminarias_daily
 }
 
 try:
@@ -790,4 +910,26 @@ with open(json_path, 'w', encoding='utf-8') as f:
     json.dump(dashboard_data, f, ensure_ascii=False)
 
 print(f"dashboard_data.json atualizado com sucesso em {json_path}!")
+
+# Sincroniza automaticamente também o app.js para garantir que mesmo abrindo via file:/// (sem servidor web) o painel tenha 100% dos dados atualizados
+appjs_path = os.path.join(output_dir, "app.js")
+if os.path.exists(appjs_path):
+    try:
+        with open(appjs_path, 'r', encoding='utf-8', newline='') as f:
+            content = f.read()
+        prefix = "let dashboardData = "
+        pos = content.find(prefix)
+        if pos != -1:
+            end_pos = content.find("\r\n\r\n// Cópia imutável da base original completa", pos)
+            if end_pos == -1:
+                end_pos = content.find("\n\n// Cópia imutável da base original completa", pos)
+            if end_pos != -1:
+                json_str = json.dumps(dashboard_data, ensure_ascii=False)
+                new_content = content[:pos + len(prefix)] + json_str + ";" + content[end_pos:]
+                with open(appjs_path, 'w', encoding='utf-8', newline='') as f:
+                    f.write(new_content)
+                print("app.js sincronizado com sucesso com os dados reais atualizados!")
+    except Exception as e_app:
+        print(f"Aviso ao sincronizar app.js: {e_app}")
+
 

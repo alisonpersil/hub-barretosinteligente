@@ -6172,6 +6172,139 @@ canvas {
   margin: 0;
 }
 
+/* Seletor de Tipo de Operação da Aba Luminárias */
+.lum-op-toggle {
+  display: inline-flex;
+  gap: 6px;
+  background: var(--bg-card-sub, #f1f5f9);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  margin-top: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.lum-op-btn {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+}
+
+.lum-op-btn:hover {
+  color: var(--text-main);
+  background: rgba(148, 163, 184, 0.15);
+}
+
+.lum-op-btn.active {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 2px 8px var(--primary-glow);
+}
+
+/* Indicador de cor e tags da tabela de luminárias */
+.lum-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  vertical-align: middle;
+}
+
+.lum-lider-tag {
+  display: inline-block;
+  font-style: normal;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+  background: rgba(14, 165, 233, 0.12);
+  color: #0284c7;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+[data-theme="dark"] .lum-lider-tag {
+  background: rgba(56, 189, 248, 0.15);
+  color: #38bdf8;
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.lum-empty {
+  text-align: center;
+  padding: 24px !important;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Nota explicativa de auditoria e cálculo manual */
+.lum-fonte-note {
+  margin-top: 20px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--bg-card-sub, rgba(148, 163, 184, 0.08));
+  border: 1px solid var(--border-color);
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+
+.lum-fonte-note summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  user-select: none;
+}
+
+.lum-fonte-note summary i {
+  color: var(--primary);
+}
+
+.lum-fonte-note[open] {
+  padding-bottom: 14px;
+}
+
+.lum-fonte-body {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+  line-height: 1.6;
+}
+
+.lum-fonte-body ul {
+  margin: 8px 0 8px 20px;
+}
+
+.lum-fonte-body li {
+  margin-bottom: 4px;
+}
+
+.lum-fonte-body code {
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 0.78rem;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--text-main);
+}
+
+.lum-fonte-meta {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
 /* Responsividade */
 @media (max-width: 1200px) {
   .luminarias-layout-grid {

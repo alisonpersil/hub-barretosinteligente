@@ -976,41 +976,41 @@
       <div class="luminarias-kpi-grid">
         <!-- Card 1: Total de Luminárias -->
         <div class="card luminarias-kpi-card card-blue-top">
-          <div class="luminarias-card-label">Total de Luminárias</div>
+          <div class="luminarias-card-label" id="lum-kpi-total-label">Total de Luminárias</div>
           <div class="luminarias-card-value-row">
-            <span class="luminarias-val" id="lum-kpi-total">423</span>
+            <span class="luminarias-val" id="lum-kpi-total">—</span>
             <span class="luminarias-unit">un</span>
           </div>
-          <div class="luminarias-card-sub" id="lum-kpi-total-sub">Substituição e expansão LED</div>
+          <div class="luminarias-card-sub" id="lum-kpi-total-sub">Calculando a partir da coluna Materiais...</div>
         </div>
 
-        <!-- Card 2: Modelo Predominante -->
+        <!-- Card 2: Potência Predominante -->
         <div class="card luminarias-kpi-card card-cyan-top">
-          <div class="luminarias-card-label">Modelo Predominante</div>
+          <div class="luminarias-card-label">Potência Predominante</div>
           <div class="luminarias-card-value-row">
-            <span class="luminarias-val highlight-cyan" id="lum-kpi-predom-pct">59,6%</span>
+            <span class="luminarias-val highlight-cyan" id="lum-kpi-predom-pct">—</span>
           </div>
-          <div class="luminarias-card-sub" id="lum-kpi-predom-desc">LED 70W Argos AR-N (252 un)</div>
+          <div class="luminarias-card-sub" id="lum-kpi-predom-desc">—</div>
         </div>
 
         <!-- Card 3: Atendimentos Analisados -->
         <div class="card luminarias-kpi-card card-green-top">
           <div class="luminarias-card-label">Atendimentos Analisados</div>
           <div class="luminarias-card-value-row">
-            <span class="luminarias-val" id="lum-kpi-atend">738</span>
+            <span class="luminarias-val" id="lum-kpi-atend">—</span>
             <span class="luminarias-unit">pts</span>
           </div>
-          <div class="luminarias-card-sub" id="lum-kpi-atend-sub">Registros operacionais auditados</div>
+          <div class="luminarias-card-sub" id="lum-kpi-atend-sub">Atendimentos com luminária registrada</div>
         </div>
 
         <!-- Card 4: Sistemas Auxiliares -->
         <div class="card luminarias-kpi-card card-orange-top">
           <div class="luminarias-card-label">Sistemas Auxiliares</div>
           <div class="luminarias-card-value-row">
-            <span class="luminarias-val highlight-orange" id="lum-kpi-aux">213+</span>
+            <span class="luminarias-val highlight-orange" id="lum-kpi-aux">—</span>
             <span class="luminarias-unit highlight-orange">dispositivos</span>
           </div>
-          <div class="luminarias-card-sub" id="lum-kpi-aux-desc">116 relés e 97 telegestões</div>
+          <div class="luminarias-card-sub" id="lum-kpi-aux-desc">Relés e telegestões instalados</div>
         </div>
       </div>
 
@@ -1024,19 +1024,21 @@
               <h2 class="card-title" style="font-size: 1.15rem; font-weight: 700;">
                 <i class="fa-solid fa-bolt" style="margin-right: 6px; color: var(--accent-blue);"></i> Distribuição de Equipamentos por Potência
               </h2>
-              <p class="card-subtitle" style="font-size: 0.8rem;">Levantamento extraído da coluna de Materiais operacionais (Argos / Agnes / LED)</p>
+              <p class="card-subtitle" style="font-size: 0.8rem;" id="lum-table-subtitle">Extraído da coluna Materiais do SGI Exati • período do filtro de datas</p>
             </div>
-            <span class="badge badge-info" id="badge-total-lum-table">423 unidades catalogadas</span>
+            <span class="badge badge-info" id="badge-total-lum-table">—</span>
+          </div>
+
+          <!-- Seletor de Operação (Op: do campo Materiais) -->
+          <div class="lum-op-toggle" id="lum-op-toggle" role="tablist" aria-label="Tipo de operação">
+            <button class="lum-op-btn active" data-op="parque" id="lum-op-parque" title="Mantidas + Substituídas + Instaladas: luminárias presentes nos pontos atendidos">Parque atendido</button>
+            <button class="lum-op-btn" data-op="i" id="lum-op-instaladas" title="Op:Instalado + Op:Substituído (item novo após //)">Instaladas / Trocadas</button>
+            <button class="lum-op-btn" data-op="m" id="lum-op-mantidas" title="Op:Mantido">Mantidas</button>
+            <button class="lum-op-btn" data-op="r" id="lum-op-removidas" title="Op:Removido">Removidas</button>
           </div>
 
           <!-- Barra de Progresso Visual Segmentada -->
-          <div class="luminarias-bar-container" id="lum-bar-container" title="Proporção por potência na rede de iluminação">
-            <div class="lum-bar-segment" style="width: 59.6%; background: #0ea5e9;" title="LED 70W: 59,6% (252 un)"></div>
-            <div class="lum-bar-segment" style="width: 10.6%; background: #3b82f6;" title="LED 120W: 10,6% (45 un)"></div>
-            <div class="lum-bar-segment" style="width: 10.2%; background: #10b981;" title="LED 30W: 10,2% (43 un)"></div>
-            <div class="lum-bar-segment" style="width: 6.9%; background: #6366f1;" title="LED 90W: 6,9% (29 un)"></div>
-            <div class="lum-bar-segment" style="width: 12.7%; background: #f59e0b;" title="Outros / Projetores: 12,7% (54 un)"></div>
-          </div>
+          <div class="luminarias-bar-container" id="lum-bar-container" title="Proporção por potência"></div>
 
           <div class="table-responsive" style="margin-top: 14px;">
             <table class="data-table luminarias-table">
@@ -1049,39 +1051,24 @@
                 </tr>
               </thead>
               <tbody id="tbody-luminarias-potencia">
-                <tr>
-                  <td><span class="pot-tag lider">LED 70W</span></td>
-                  <td><span class="modelo-desc-text">Argos AR-N (Líder)</span></td>
-                  <td class="qtd-cell">252</td>
-                  <td class="pct-cell">59,6%</td>
-                </tr>
-                <tr>
-                  <td><span class="pot-tag">LED 120W</span></td>
-                  <td><span class="modelo-desc-text">Argos AR-N / Agnes</span></td>
-                  <td class="qtd-cell">45</td>
-                  <td class="pct-cell">10,6%</td>
-                </tr>
-                <tr>
-                  <td><span class="pot-tag">LED 30W</span></td>
-                  <td><span class="modelo-desc-text">Argos AR-N</span></td>
-                  <td class="qtd-cell">43</td>
-                  <td class="pct-cell">10,2%</td>
-                </tr>
-                <tr>
-                  <td><span class="pot-tag">LED 90W</span></td>
-                  <td><span class="modelo-desc-text">Argos AR-N</span></td>
-                  <td class="qtd-cell">29</td>
-                  <td class="pct-cell">6,9%</td>
-                </tr>
-                <tr>
-                  <td><span class="pot-tag">Outros / Projetores</span></td>
-                  <td><span class="modelo-desc-text">50W, 80W, 100W, 150W</span></td>
-                  <td class="qtd-cell">54</td>
-                  <td class="pct-cell">12,7%</td>
-                </tr>
+                <tr><td colspan="4" class="lum-empty">Carregando dados...</td></tr>
               </tbody>
             </table>
           </div>
+
+          <details class="lum-fonte-note" id="lum-fonte-note">
+            <summary><i class="fa-solid fa-circle-check"></i> Como este número é calculado (conferência manual)</summary>
+            <div class="lum-fonte-body">
+              <p>Fonte: coluna <strong>Materiais</strong> da planilha de Atendidos do SGI. Cada item segue o padrão <code>Op:Operação, LUMINÁRIA LED 70W - ARGOS AR-N, Qtd:1.00</code>.</p>
+              <ul>
+                <li>Data considerada: <strong>Data Inicial Atendimento</strong>, dentro do filtro de datas do topo.</li>
+                <li>Soma-se o campo <strong>Qtd</strong> de cada item <code>LUMINÁRIA LED xxW</code> ou <code>PROJETOR xxW</code>.</li>
+                <li><strong>Substituído</strong> no formato <code>ANTIGA // NOVA</code>: conta-se a luminária NOVA (após <code>//</code>).</li>
+                <li>Linhas de atributo técnico (ex.: <code>Tipo de Lâmpada: LED, Potência da Lâmpada: 80.0</code>) não são contadas como equipamento.</li>
+              </ul>
+              <p id="lum-fonte-gerado" class="lum-fonte-meta"></p>
+            </div>
+          </details>
         </div>
 
         <!-- LADO DIREITO: 3 CARDS DE ESTRATÉGIA E OPERAÇÃO -->
@@ -1448,8 +1435,8 @@
             <label for="filtro-analitico-mes" class="filter-label"><i class="fa-solid fa-calendar-days" style="color: var(--primary);"></i> Mês:</label>
             <select id="filtro-analitico-mes" class="custom-select" style="font-weight: 600; color: var(--primary);">
               <option value="todos">Todos os Meses (2026)</option>
-              <option value="2026-10">Outubro / 2026 (SLA: 9d)</option>
-              <option value="2026-09">Setembro / 2026 (SLA: 2d)</option>
+              <option value="2026-10">Outubro / 2026 (SLA: 4d)</option>
+              <option value="2026-09">Setembro / 2026 (SLA: 5d)</option>
               <option value="2026-08">Agosto / 2026 (SLA: 1d)</option>
               <option value="2026-07">Julho / 2026 (SLA: 1d)</option>
               <option value="2026-06">Junho / 2026 (SLA: 2d)</option>
@@ -1515,8 +1502,8 @@
         <!-- Chips de 1 Clique para Filtro Imediato -->
         <div class="analitico-quick-chips">
           <span style="font-size: 0.74rem; font-weight: 600; color: var(--text-dim); margin-right: 2px;">Atalhos rápidos:</span>
-          <button class="quick-chip" data-mes="2026-10" id="btn-quick-outubro" style="border-color: rgba(245, 158, 11, 0.4); color: #f59e0b;"><i class="fa-solid fa-calendar-day"></i> Outubro/2026 (SLA: 9d)</button>
-          <button class="quick-chip" data-mes="2026-09" id="btn-quick-setembro"><i class="fa-solid fa-calendar"></i> Setembro/2026 (SLA: 2d)</button>
+          <button class="quick-chip" data-mes="2026-10" id="btn-quick-outubro" style="border-color: rgba(245, 158, 11, 0.4); color: #f59e0b;"><i class="fa-solid fa-calendar-day"></i> Outubro/2026 (SLA: 4d)</button>
+          <button class="quick-chip" data-mes="2026-09" id="btn-quick-setembro"><i class="fa-solid fa-calendar"></i> Setembro/2026 (SLA: 5d)</button>
           <button class="quick-chip" data-sla="pendentes" id="btn-quick-backlog"><i class="fa-solid fa-clock-rotate-left"></i> Backlog (<span id="analitico-chip-backlog">30</span>)</button>
           <button class="quick-chip" data-sla="exclusao" style="border-color: rgba(239, 68, 68, 0.4); color: #ef4444;" id="btn-quick-exclusao"><i class="fa-solid fa-triangle-exclamation"></i> Detectado Exclusão (<span id="analitico-chip-exclusao">1</span>)</button>
           <button class="quick-chip" data-origem="callcenter"><i class="fa-solid fa-headset"></i> Call Center</button>
