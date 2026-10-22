@@ -2861,10 +2861,10 @@ function renderLuminariasTab() {
 
   const ini = dateFilterState.inicio || '2026-01-01';
   const fim = dateFilterState.fim || '2099-12-31';
-  const op = lumOpState || 'parque';
-  const opBuckets = op === 'parque' ? ['i', 'm'] : [op];
+  const op = lumOpState || 'tudo';
+  const opBuckets = op === 'tudo' ? ['i', 'm', 'r'] : [op];
   const opLabels = {
-    parque: 'no parque atendido',
+    tudo: 'total (instaladas, mantidas e removidas)',
     i: 'instaladas / trocadas',
     m: 'mantidas',
     r: 'removidas'
@@ -2878,7 +2878,7 @@ function renderLuminariasTab() {
     diasComDados++;
     rel += r.rel || 0;
     tg += r.tg || 0;
-    atend += op === 'parque' ? (r.at_im || 0) : (r['at_' + op] || 0);
+    atend += op === 'tudo' ? (r.at_any || 0) : (r['at_' + op] || 0);
     opBuckets.forEach(b => {
       const obj = r[b] || {};
       for (const [k, v] of Object.entries(obj)) {
@@ -2927,7 +2927,7 @@ function renderLuminariasTab() {
 
   setTxt('lum-kpi-atend', atend.toLocaleString('pt-BR'));
   const totalAtendPeriodo = (dashboardData.daily_records || []).filter(r => r.d >= ini && r.d <= fim).reduce((s, r) => s + (r.tot || 0), 0);
-  setTxt('lum-kpi-atend-sub', `de ${totalAtendPeriodo.toLocaleString('pt-BR')} atendimentos no período com luminária ${op === 'parque' ? 'registrada' : opLabels[op]}`);
+  setTxt('lum-kpi-atend-sub', `de ${totalAtendPeriodo.toLocaleString('pt-BR')} atendimentos no período com luminária ${op === 'tudo' ? 'registrada' : opLabels[op]}`);
 
   setTxt('lum-kpi-aux', (rel + tg).toLocaleString('pt-BR'));
   setTxt('lum-kpi-aux-desc', `${rel.toLocaleString('pt-BR')} relés e ${tg.toLocaleString('pt-BR')} telegestões instalados`);
@@ -3006,7 +3006,7 @@ function renderLuminariasTab() {
 }
 
 // Estado do seletor de operação da aba Luminárias
-let lumOpState = 'parque';
+let lumOpState = 'tudo';
 function initLuminariasOpToggle() {
   const wrap = document.getElementById('lum-op-toggle');
   if (!wrap || wrap.dataset.bound) return;
@@ -3015,7 +3015,7 @@ function initLuminariasOpToggle() {
     btn.addEventListener('click', () => {
       wrap.querySelectorAll('.lum-op-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
-      lumOpState = btn.getAttribute('data-op') || 'parque';
+      lumOpState = btn.getAttribute('data-op') || 'tudo';
       renderLuminariasTab();
     });
   });
