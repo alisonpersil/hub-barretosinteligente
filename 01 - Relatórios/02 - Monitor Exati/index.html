@@ -287,10 +287,10 @@
               <span>Bairros</span>
             </button>
 
-            <button class="subnav-chip" data-target="tab-luminarias" data-title="Gestão de Luminárias LED" data-sub="Distribuição de equipamentos por potência, fabricante e sistemas auxiliares de telegestão">
+            <button class="subnav-chip" data-target="tab-luminarias" data-title="Gestão de Ativos (LED &amp; Telegestão)" data-sub="Distribuição de luminárias por potência e gestão completa de módulos de telegestão e relés">
               <i class="fa-solid fa-lightbulb"></i>
-              <span>Luminárias</span>
-              <span class="chip-badge highlight" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3);">LED</span>
+              <span>Luminárias &amp; Telegestão</span>
+              <span class="chip-badge highlight" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3);">Ativos</span>
             </button>
 
             <button class="subnav-chip" data-target="tab-analitico" data-title="Tabela Analítica (Full)" data-sub="Detalhamento linha a linha de todas as 2.884 solicitações (Atendimentos + Backlog), tempos de resolução e auditoria HUB">
@@ -969,8 +969,25 @@
       </div>
     </section>
 
-    <!-- ==================== ABA: GESTÃO DE LUMINÁRIAS LED ==================== -->
+    <!-- ==================== ABA: GESTÃO DE LUMINÁRIAS & TELEGESTÃO ==================== -->
     <section id="tab-luminarias" class="tab-content">
+
+      <!-- SUB-NAVEGAÇÃO: LUMINÁRIAS LED vs TELEGESTÃO & RELÉS -->
+      <div class="ativos-subnav-bar" id="ativos-subnav-bar">
+        <button class="ativos-subnav-btn active" data-subtab="led" id="btn-subtab-led">
+          <i class="fa-solid fa-lightbulb"></i>
+          <span>Luminárias LED</span>
+          <span class="subtab-counter-badge" id="badge-subtab-led">1.241 un</span>
+        </button>
+        <button class="ativos-subnav-btn" data-subtab="telegestao" id="btn-subtab-telegestao">
+          <i class="fa-solid fa-wifi"></i>
+          <span>Telegestão &amp; Relés</span>
+          <span class="subtab-counter-badge" id="badge-subtab-telegestao">2.973 un</span>
+        </button>
+      </div>
+
+      <!-- ==================== SUB-ABA 1: LUMINÁRIAS LED ==================== -->
+      <div id="subtab-content-led" class="ativos-subtab-content active">
 
       <!-- 4 CARDS NO TOPO -->
       <div class="luminarias-kpi-grid">
@@ -1207,6 +1224,214 @@
           </div>
         </div>
       </div>
+
+      </div> <!-- /#subtab-content-led -->
+
+      <!-- ==================== SUB-ABA 2: TELEGESTÃO & RELÉS ==================== -->
+      <div id="subtab-content-telegestao" class="ativos-subtab-content" style="display: none;">
+        
+        <!-- 4 CARDS NO TOPO TELEGESTÃO -->
+        <div class="luminarias-kpi-grid">
+          <!-- Card 1: Total de Dispositivos -->
+          <div class="card luminarias-kpi-card card-blue-top">
+            <div class="luminarias-card-label" id="tg-kpi-total-label">Total de Dispositivos</div>
+            <div class="luminarias-card-value-row">
+              <span class="luminarias-val" id="tg-kpi-total">—</span>
+              <span class="luminarias-unit">un</span>
+            </div>
+            <div class="luminarias-card-sub" id="tg-kpi-total-sub">Telegestão, relés e acessórios no período</div>
+          </div>
+
+          <!-- Card 2: Módulos de Telegestão -->
+          <div class="card luminarias-kpi-card card-cyan-top">
+            <div class="luminarias-card-label">Módulos de Telegestão</div>
+            <div class="luminarias-card-value-row">
+              <span class="luminarias-val highlight-cyan" id="tg-kpi-modulos">—</span>
+              <span class="luminarias-unit highlight-cyan">módulos</span>
+            </div>
+            <div class="luminarias-card-sub" id="tg-kpi-modulos-sub">Ativados e operados na rede inteligente</div>
+          </div>
+
+          <!-- Card 3: Relés Fotoelétricos -->
+          <div class="card luminarias-kpi-card card-green-top">
+            <div class="luminarias-card-label">Relés Fotoelétricos</div>
+            <div class="luminarias-card-value-row">
+              <span class="luminarias-val" id="tg-kpi-reles">—</span>
+              <span class="luminarias-unit">relés</span>
+            </div>
+            <div class="luminarias-card-sub" id="tg-kpi-reles-sub">Movimentações e modernizações</div>
+          </div>
+
+          <!-- Card 4: Acessórios & Shorting Caps -->
+          <div class="card luminarias-kpi-card card-orange-top">
+            <div class="luminarias-card-label">Acessórios de Rede</div>
+            <div class="luminarias-card-value-row">
+              <span class="luminarias-val highlight-orange" id="tg-kpi-acessorios">—</span>
+              <span class="luminarias-unit highlight-orange">peças</span>
+            </div>
+            <div class="luminarias-card-sub" id="tg-kpi-acessorios-sub">Bases 10A e tampas curto-circuito</div>
+          </div>
+        </div>
+
+        <!-- CORPO PRINCIPAL TELEGESTÃO: PÁGINA 1 (TABELA) + PÁGINA 2 (DIRETRIZES) -->
+        <div class="luminarias-layout-grid">
+          
+          <!-- TABELA DE DISPOSITIVOS (PÁGINA 1 NO PDF, 100% LARGURA) -->
+          <div class="card luminarias-main-card" id="tg-main-card">
+            <div class="card-header" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <div>
+                <h2 class="card-title" style="font-size: 1.15rem; font-weight: 700;">
+                  <i class="fa-solid fa-wifi" style="margin-right: 6px; color: var(--accent-blue);"></i> Dispositivos de Telegestão, Relés &amp; Controle
+                </h2>
+                <p class="card-subtitle" style="font-size: 0.8rem;" id="tg-table-subtitle">Extraído da coluna Materiais do SGI Exati • período do filtro de datas</p>
+              </div>
+              <span class="badge badge-info" id="badge-total-tg-table">—</span>
+            </div>
+
+            <!-- Seletor de Operação Telegestão -->
+            <div class="lum-op-toggle" id="tg-op-toggle" role="tablist" aria-label="Tipo de operação Telegestão">
+              <button class="lum-op-btn active" data-op="tudo" id="tg-op-tudo" title="Total consolidado de dispositivos">Tudo</button>
+              <button class="lum-op-btn" data-op="i" id="tg-op-instaladas" title="Dispositivos instalados e substituídos">Instalados / Trocados</button>
+              <button class="lum-op-btn" data-op="r" id="tg-op-removidas" title="Dispositivos retirados da rede para modernização">Removidos</button>
+            </div>
+
+            <!-- Barra de Progresso Visual Segmentada -->
+            <div class="luminarias-bar-container" id="tg-bar-container" title="Proporção por tipo de dispositivo"></div>
+
+            <div class="table-responsive" style="margin-top: 14px;">
+              <table class="data-table luminarias-table">
+                <thead>
+                  <tr>
+                    <th>Dispositivo / Categoria</th>
+                    <th>Especificação Técnica</th>
+                    <th style="text-align: right;">Qtd</th>
+                    <th style="text-align: right;">% Total</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-telegestao-dispositivos">
+                  <tr><td colspan="4" class="lum-empty">Carregando dispositivos de telegestão...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- BLOCO ESTRATÉGICO TELEGESTÃO (COLUNA DIREITA / PÁGINA 2 PDF) -->
+          <div class="luminarias-page2-wrapper" id="tg-page2-wrapper">
+            
+            <div class="lum-print-page2-header print-only">
+              <div class="print-brand-left">
+                <div class="logo-card print-logo-card">
+                  <img src="./logo-ipbarretos-horizontal-alta.png" alt="Barretos Inteligente" class="header-logo" style="height: 32px; max-height: 32px; max-width: 150px; width: auto; object-fit: contain;">
+                </div>
+                <div class="print-titles">
+                  <h2>Barretos Inteligente &bull; Telegestão, Relés &amp; Automação</h2>
+                  <p>Gestão de Dispositivos Conectados, Periféricos e Migração Tecnológica SGI</p>
+                </div>
+              </div>
+              <div class="print-meta-right">
+                <div>Página <strong>2 de 2</strong></div>
+                <div>Auditoria: <strong>Coluna Materiais / SGI</strong></div>
+              </div>
+            </div>
+
+            <div class="lum-print-section-title print-only">
+              <h3><i class="fa-solid fa-signal"></i> Estratégia de Conectividade e Modernização de Parque</h3>
+            </div>
+
+            <!-- 3 CARDS DE INTELIGÊNCIA TELEGESTÃO -->
+            <div class="luminarias-side-cards" id="tg-side-cards-container">
+              <!-- Gerados dinamicamente via renderTelegestaoTab() -->
+            </div>
+
+            <!-- CARD DE METODOLOGIA TELEGESTÃO -->
+            <div class="card lum-fonte-card" id="tg-fonte-card">
+              <div class="lum-fonte-card-header">
+                <div class="lum-fonte-icon">
+                  <i class="fa-solid fa-network-wired"></i>
+                </div>
+                <div class="lum-fonte-header-text">
+                  <h3 class="lum-fonte-title">Auditoria de Telegestão &amp; Dispositivos</h3>
+                  <p class="lum-fonte-subtitle">Regras técnicas de rastreamento de módulos e relés na planilha SGI</p>
+                </div>
+              </div>
+              <div class="lum-fonte-body">
+                <p class="lum-fonte-intro">
+                  Fonte: registros da coluna <strong>Materiais</strong> contendo <code>TELEGESTÃO</code>, <code>RELÉ FOTOELÉTRICO</code>, <code>BASE 10A</code> e <code>SHORTING CAP</code>.
+                </p>
+                <ul class="lum-fonte-rules">
+                  <li><strong>Migração Tecnológica:</strong> A retirada de relés fotoelétricos associada à entrada de telegestão é computada com o status <code>Removido</code>.</li>
+                  <li><strong>Módulos Conectados:</strong> Contabilizam-se módulos inteligentes com status <code>Instalado</code> ou <code>Substituído</code>.</li>
+                  <li><strong>Periféricos e Segurança:</strong> Tampas de curto-circuito (<em>shorting caps</em>) e bases 10A são rastreados para integridade dos pontos.</li>
+                  <li><strong>Atributos Técnicos:</strong> Lançamentos como <em>Perda Relé (W)</em> e <em>Tipo de Relé: NA</em> são desconsiderados para não distorcer o quantitativo físico.</li>
+                </ul>
+                <div class="lum-fonte-footer">
+                  <i class="fa-solid fa-database" style="color: var(--primary); margin-right: 4px;"></i>
+                  <span id="tg-fonte-gerado" class="lum-fonte-meta"></span>
+                </div>
+              </div>
+            </div>
+
+          </div> <!-- /#tg-page2-wrapper -->
+
+        </div> <!-- /.luminarias-layout-grid -->
+
+        <!-- DRILL-DOWN ANALÍTICO DE TELEGESTÃO -->
+        <div class="card luminarias-drilldown-card no-print" id="tg-drilldown-card" style="display: none; margin-top: 24px;">
+          <div class="card-header" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <h2 class="card-title" style="font-size: 1.15rem; font-weight: 700; margin: 0;">
+                <i class="fa-solid fa-list-check" style="color: var(--primary); margin-right: 6px;"></i>
+                Ordens de Serviço &amp; Protocolos &bull; <span id="tg-drill-cat-title" style="color: var(--primary);">Módulo de Telegestão</span>
+              </h2>
+              <span class="badge badge-info" id="tg-drill-count-badge">0 registros</span>
+              <span class="badge badge-warning" id="tg-drill-op-badge">Tudo</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+              <div class="search-box" style="position: relative;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-dim); font-size: 0.8rem;"></i>
+                <input type="text" id="tg-drill-search" placeholder="Buscar OS, protocolo, bairro, equipe..." class="search-input" style="padding-left: 30px; font-size: 0.82rem; height: 34px; width: 260px;">
+              </div>
+              <button class="btn-secondary" id="btn-tg-drill-export" title="Exportar linhas filtradas para CSV" style="height: 34px; padding: 0 12px; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card-sub); color: var(--text-main);">
+                <i class="fa-solid fa-file-csv"></i> Exportar
+              </button>
+              <button class="btn-icon" id="btn-tg-drill-close" title="Fechar detalhamento" style="height: 34px; width: 34px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card-sub); cursor: pointer; color: var(--text-secondary); display: inline-flex; align-items: center; justify-content: center;">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="table-responsive" style="max-height: 520px; overflow-y: auto; margin-top: 14px; border: 1px solid var(--border-color); border-radius: 8px;">
+            <table class="data-table luminarias-drill-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
+              <thead style="position: sticky; top: 0; z-index: 2; background: var(--bg-card);">
+                <tr>
+                  <th style="width: 90px;">OS</th>
+                  <th style="width: 110px;">Protocolo</th>
+                  <th style="width: 130px;">Data Atend.</th>
+                  <th>Bairro</th>
+                  <th style="width: 120px;">Operação</th>
+                  <th>Dispositivo / Item</th>
+                  <th style="text-align: right; width: 60px;">Qtd</th>
+                  <th>Equipe</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-tg-drilldown">
+                <tr><td colspan="8" class="lum-empty">Selecione uma categoria de dispositivo na tabela acima para auditar as ordens de serviço.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Paginação do Drill-Down Telegestão -->
+          <div class="drill-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; flex-wrap: wrap; gap: 8px; font-size: 0.82rem; color: var(--text-secondary);">
+            <div id="tg-drill-info">Exibindo 0 registros</div>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button class="btn-micro-toggle" id="btn-tg-drill-prev" disabled style="padding: 4px 10px; font-size: 0.78rem; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; background: var(--bg-card-sub); color: var(--text-secondary);">Anterior</button>
+              <span id="tg-drill-page-num" style="font-weight: 600; padding: 0 4px;">1 / 1</span>
+              <button class="btn-micro-toggle" id="btn-tg-drill-next" disabled style="padding: 4px 10px; font-size: 0.78rem; border-radius: 6px; border: 1px solid var(--border-color); cursor: pointer; background: var(--bg-card-sub); color: var(--text-secondary);">Próxima</button>
+            </div>
+          </div>
+        </div>
+
+      </div> <!-- /#subtab-content-telegestao -->
 
     </section>
 

@@ -3514,8 +3514,21 @@ body {
     display: block !important;
   }
 
+  .ativos-subnav-bar {
+    display: none !important;
+  }
+
+  .ativos-subtab-content {
+    display: none !important;
+  }
+
+  .ativos-subtab-content.active {
+    display: block !important;
+  }
+
   .no-print,
   #lum-drilldown-card,
+  #tg-drilldown-card,
   .luminarias-drilldown-card {
     display: none !important;
     visibility: hidden !important;
@@ -6613,6 +6626,83 @@ canvas {
 /* Classes de Impressão */
 .print-only {
   display: none !important;
+}
+
+/* Sub-Navegação de Ativos: Luminárias LED vs Telegestão & Relés */
+.ativos-subnav-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 14px;
+}
+
+.ativos-subnav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  border-radius: 10px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ativos-subnav-btn:hover {
+  background: var(--bg-card-hover, rgba(255, 255, 255, 0.04));
+  color: var(--text-main);
+  border-color: rgba(14, 165, 233, 0.3);
+}
+
+.ativos-subnav-btn.active {
+  background: var(--primary, #0ea5e9);
+  color: #ffffff;
+  border-color: var(--primary, #0ea5e9);
+  box-shadow: 0 4px 14px rgba(14, 165, 233, 0.25);
+}
+
+[data-theme="light"] .ativos-subnav-btn.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+}
+
+.subtab-counter-badge {
+  font-size: 0.74rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.22);
+  color: inherit;
+  font-weight: 700;
+}
+
+.ativos-subnav-btn:not(.active) .subtab-counter-badge {
+  background: var(--bg-card-sub, rgba(148, 163, 184, 0.12));
+  color: var(--text-secondary);
+}
+
+.tg-cat-row {
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.tg-cat-row:hover td {
+  background: rgba(37, 99, 235, 0.08) !important;
+}
+
+.tg-cat-row.selected td {
+  background: rgba(37, 99, 235, 0.15) !important;
+  border-bottom: 2px solid var(--primary) !important;
+}
+
+.tg-cat-row.selected .pot-tag {
+  color: var(--primary) !important;
+  font-weight: 800;
 }
 
 /* Wrapper da coluna direita (na tela) / Página 2 (no PDF) */

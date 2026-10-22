@@ -705,6 +705,153 @@ if col_mat_all and col_mat_all in df_2026.columns:
             })
 print(f"    -> {len(luminarias_detalhes_2026)} registros analíticos de luminárias extraídos para o drill-down.")
 
+# 3.3 Dispositivos de Telegestão e Relés (Extração Diária e Analítica 2026)
+print("3.3 Extraindo dispositivos de Telegestão e Relés da coluna Materiais...")
+tg_daily_map = {}
+telegestao_detalhes_2026 = []
+
+if col_mat_all:
+    for d_str, mat_text in zip(df_a['data_iso'], df_a[col_mat_all]):
+        if not isinstance(d_str, str) or not d_str or pd.isna(mat_text):
+            continue
+        mat_text = str(mat_text)
+        if 'Op:' not in mat_text:
+            continue
+        rec_tg = tg_daily_map.setdefault(d_str, {"d": d_str, "i": Counter(), "m": Counter(), "r": Counter(), "at_any": 0})
+        tem_tg = False
+        for mm in LUM_ITEM_RE.finditer(mat_text):
+            op = mm.group(1).strip().lower()
+            nome = mm.group(2)
+            qtd = _lum_parse_qtd(mm.group(3))
+            partes = [p.strip() for p in nome.split('//') if p.strip()]
+            if not partes: continue
+            alvo = partes[-1]
+            alvo_up = alvo.upper()
+            if any(att in alvo_up for att in ['PERDA', 'TIPO DE', 'POTÊNCIA', 'POTENCIA', 'FATOR']):
+                continue
+            cat = None
+            mod = None
+            if 'TELEGEST' in alvo_up:
+                cat = 'Módulo de Telegestão'
+                mod = 'Módulo Telegestão Inteligente'
+            elif 'FOTOELETRICO' in alvo_up or 'FOTOELÉTRICO' in alvo_up:
+                cat = 'Relé Fotoelétrico'
+                mod = 'Eletrônico 105-305V NF'
+            elif 'BASE' in alvo_up and 'RELE' in alvo_up:
+                cat = 'Base para Relé'
+                mod = 'Base 10A Padrão'
+            elif 'SHORTING' in alvo_up or 'CEGO' in alvo_up:
+                cat = 'Relé Cego (Shorting Cap)'
+                mod = 'Tampa de Fechamento'
+            elif 'TIMER' in alvo_up:
+                cat = 'Relé Timer'
+                mod = 'Temporizador Digital'
+            if not cat:
+                continue
+
+            if op.startswith('instal'):
+                bucket = 'i'
+            elif op.startswith('substitu'):
+                bucket = 'i'
+            elif op.startswith('mantid'):
+                bucket = 'm'
+            elif op.startswith('remov'):
+                bucket = 'r'
+            else:
+                continue
+            rec_tg[bucket][cat] += qtd
+            tem_tg = True
+        if tem_tg:
+            rec_tg["at_any"] += 1
+
+telegestao_daily = []
+for d_str in sorted(tg_daily_map.keys()):
+    rec_tg = tg_daily_map[d_str]
+    if not (rec_tg["i"] or rec_tg["m"] or rec_tg["r"]):
+        continue
+    telegestao_daily.append({
+        "d": d_str,
+        "i": dict(rec_tg["i"]), "m": dict(rec_tg["m"]), "r": dict(rec_tg["r"]),
+        "at_any": rec_tg["at_any"]
+    })
+
+# Extrair detalhes 2026 de telegestão
+if col_mat_all and col_mat_all in df_2026.columns:
+    for idx, r in df_2026.iterrows():
+        mat_text = str(r[col_mat_all]) if pd.notna(r[col_mat_all]) else ''
+        if 'Op:' not in mat_text:
+            continue
+        os_val = int(get_col_val(r, a_map, 'os', 0))
+        proto_val = str(get_col_val(r, a_map, 'protocolo', ''))
+        bairro_val = str(get_col_val(r, a_map, 'bairro', 'Não Informado'))
+        eq_val = str(get_col_val(r, a_map, 'equipe', 'Sem Equipe'))
+        d_iso = r['dt_inicio'].strftime('%Y-%m-%d') if pd.notna(r['dt_inicio']) else ''
+        dt_fmt = r['dt_inicio'].strftime('%d/%m/%Y %H:%M') if pd.notna(r['dt_inicio']) else ''
+        
+        for mm in LUM_ITEM_RE.finditer(mat_text):
+            op = mm.group(1).strip().lower()
+            nome = mm.group(2).strip()
+            qtd = _lum_parse_qtd(mm.group(3))
+            partes = [p.strip() for p in nome.split('//') if p.strip()]
+            if not partes: continue
+            alvo = partes[-1]
+            alvo_up = alvo.upper()
+            if any(att in alvo_up for att in ['PERDA', 'TIPO DE', 'POTÊNCIA', 'POTENCIA', 'FATOR']):
+                continue
+            cat = None
+            mod = None
+            if 'TELEGEST' in alvo_up:
+                cat = 'Módulo de Telegestão'
+                mod = 'Módulo Telegestão Inteligente'
+            elif 'FOTOELETRICO' in alvo_up or 'FOTOELÉTRICO' in alvo_up:
+                cat = 'Relé Fotoelétrico'
+                mod = 'Eletrônico 105-305V NF'
+            elif 'BASE' in alvo_up and 'RELE' in alvo_up:
+                cat = 'Base para Relé'
+                mod = 'Base 10A Padrão'
+            elif 'SHORTING' in alvo_up or 'CEGO' in alvo_up:
+                cat = 'Relé Cego (Shorting Cap)'
+                mod = 'Tampa de Fechamento'
+            elif 'TIMER' in alvo_up:
+                cat = 'Relé Timer'
+                mod = 'Temporizador Digital'
+            if not cat:
+                continue
+
+            if op.startswith('instal'):
+                op_label = 'Instalado'
+                bucket = 'i'
+            elif op.startswith('substitu'):
+                op_label = 'Substituído'
+                bucket = 'i'
+            elif op.startswith('mantid'):
+                op_label = 'Mantido'
+                bucket = 'm'
+            elif op.startswith('remov'):
+                op_label = 'Removido'
+                bucket = 'r'
+            else:
+                continue
+
+            telegestao_detalhes_2026.append({
+                'os': os_val,
+                'proto': proto_val,
+                'dt': dt_fmt,
+                'd_iso': d_iso,
+                'bairro': bairro_val,
+                'eq': eq_val,
+                'op': op_label,
+                'bucket': bucket,
+                'cat': cat,
+                'modelo': mod,
+                'item': alvo,
+                'qtd': qtd
+            })
+
+print(f"    -> {len(telegestao_daily)} dias com movimentação de telegestão/relés extraídos.")
+print(f"    -> {len(telegestao_detalhes_2026)} registros analíticos de telegestão/relés extraídos para o drill-down.")
+
+
 
 latest_atendidos_file = sorted(atendidos_files, key=get_file_epoch_sp, reverse=True)[0] if atendidos_files else None
 at_mtime = get_file_mtime_sp(latest_atendidos_file) if latest_atendidos_file else get_sp_now()
@@ -897,7 +1044,9 @@ dashboard_data = {
     "solicitacoes_full": solicitacoes_full_rows,
     "luminarias": luminarias_data,
     "luminarias_daily": luminarias_daily,
-    "luminarias_detalhes": luminarias_detalhes_2026
+    "luminarias_detalhes": luminarias_detalhes_2026,
+    "telegestao_daily": telegestao_daily,
+    "telegestao_detalhes": telegestao_detalhes_2026
 }
 
 try:
