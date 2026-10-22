@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initAnaliticoTable();
   initLuminariasOpToggle();
   renderLuminariasTab();
+  initMetodologiaModals();
   setupEventListeners();
   setupUploadModal();
 });
@@ -3080,7 +3081,9 @@ function renderLuminariasTab() {
 
   // 7. Rodapé de auditoria
   const meta = dashboardData.metadata || {};
-  setTxt('lum-fonte-gerado', `Base: ${meta.atendidos_arquivo || 'planilha SGI'} • painel gerado em ${meta.gerado_em || '—'} • ${diasComDados} dias com registros no período.`);
+  const lumAuditMsg = `Base: ${meta.atendidos_arquivo || 'planilha SGI'} • painel gerado em ${meta.gerado_em || '—'} • ${diasComDados} dias com registros no período.`;
+  setTxt('lum-fonte-gerado', lumAuditMsg);
+  setTxt('modal-lum-fonte-gerado', lumAuditMsg);
 
   // 8. Se o Drill-Down estiver aberto ou iniciado, inicializa listeners e atualiza tabela
   if (typeof initLumDrillDownListeners === 'function') initLumDrillDownListeners();
@@ -6166,7 +6169,9 @@ function renderTelegestaoTab() {
 
   // Rodapé auditoria
   const meta = dashboardData.metadata || {};
-  setTxt('tg-fonte-gerado', `Base: ${meta.atendidos_arquivo || 'planilha SGI'} • painel gerado em ${meta.gerado_em || '—'} • ${diasComDados} dias com registros de dispositivos no período.`);
+  const tgAuditMsg = `Base: ${meta.atendidos_arquivo || 'planilha SGI'} • painel gerado em ${meta.gerado_em || '—'} • ${diasComDados} dias com registros de dispositivos no período.`;
+  setTxt('tg-fonte-gerado', tgAuditMsg);
+  setTxt('modal-tg-fonte-gerado', tgAuditMsg);
 
   // Sincronizar Drill-Down se aberto
   initTgDrillDownListeners();
@@ -6405,4 +6410,47 @@ function exportTgDrillDownCsv() {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+
+// ==========================================
+// MODAIS DE METODOLOGIA (LUMINÁRIAS & TELEGESTÃO)
+// ==========================================
+function initMetodologiaModals() {
+  function setupModal(btnId, modalId, closeId, okId) {
+    const btn = document.getElementById(btnId);
+    const modal = document.getElementById(modalId);
+    const closeBtn = document.getElementById(closeId);
+    const okBtn = document.getElementById(okId);
+
+    if (!modal) return;
+
+    const open = (e) => {
+      if (e) e.stopPropagation();
+      modal.classList.add('active');
+    };
+    const close = () => modal.classList.remove('active');
+
+    if (btn) btn.addEventListener('click', open);
+    if (closeBtn) closeBtn.addEventListener('click', close);
+    if (okBtn) okBtn.addEventListener('click', close);
+
+    // Fechar ao clicar no backdrop (overlay)
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) close();
+    });
+  }
+
+  setupModal('btn-lum-info-metodologia', 'modal-metodologia-lum', 'modal-metodologia-lum-close', 'modal-metodologia-lum-btn-ok');
+  setupModal('btn-tg-info-metodologia', 'modal-metodologia-tg', 'modal-metodologia-tg-close', 'modal-metodologia-tg-btn-ok');
+
+  // Fechar com a tecla ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const ml = document.getElementById('modal-metodologia-lum');
+      const mt = document.getElementById('modal-metodologia-tg');
+      if (ml && ml.classList.contains('active')) ml.classList.remove('active');
+      if (mt && mt.classList.contains('active')) mt.classList.remove('active');
+    }
+  });
 }

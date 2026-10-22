@@ -6987,4 +6987,47 @@ canvas {
   }
 }
 
+/* Botão Circular de Ajuda / Informação Metodologia */
+.btn-info-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card-sub, rgba(148, 163, 184, 0.12));
+  color: var(--text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 0;
+  line-height: 1;
+}
+
+.btn-info-circle:hover {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--primary, #2563eb);
+  border-color: rgba(37, 99, 235, 0.4);
+  transform: scale(1.08);
+}
+
+.btn-info-circle:active {
+  transform: scale(0.96);
+}
+
+[data-theme="light"] .btn-info-circle {
+  background: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+[data-theme="light"] .btn-info-circle:hover {
+  background: #e0f2fe;
+  color: #0284c7;
+  border-color: #7dd3fc;
+}
+
+
 

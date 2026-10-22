@@ -1044,7 +1044,12 @@
               </h2>
               <p class="card-subtitle" style="font-size: 0.8rem;" id="lum-table-subtitle">Extraído da coluna Materiais do SGI Exati • período do filtro de datas</p>
             </div>
-            <span class="badge badge-info" id="badge-total-lum-table">—</span>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="badge badge-info" id="badge-total-lum-table">—</span>
+              <button class="btn-info-circle" id="btn-lum-info-metodologia" type="button" title="Metodologia de cálculo e conferência manual">
+                <i class="fa-solid fa-question"></i>
+              </button>
+            </div>
           </div>
 
           <!-- Seletor de Operação (Op: do campo Materiais) -->
@@ -1136,8 +1141,8 @@
             </div>
           </div>
 
-          <!-- CARD DE EXPLICAÇÃO DO CÁLCULO MANUAL (AUDITORIA SGI) -->
-          <div class="card lum-fonte-card" id="lum-fonte-card">
+          <!-- CARD DE EXPLICAÇÃO DO CÁLCULO MANUAL (AUDITORIA SGI - APENAS NO PRINT) -->
+          <div class="card lum-fonte-card print-only" id="lum-fonte-card">
             <div class="lum-fonte-card-header">
               <div class="lum-fonte-icon">
                 <i class="fa-solid fa-calculator"></i>
@@ -1285,7 +1290,12 @@
                 </h2>
                 <p class="card-subtitle" style="font-size: 0.8rem;" id="tg-table-subtitle">Extraído da coluna Materiais do SGI Exati • período do filtro de datas</p>
               </div>
-              <span class="badge badge-info" id="badge-total-tg-table">—</span>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="badge badge-info" id="badge-total-tg-table">—</span>
+                <button class="btn-info-circle" id="btn-tg-info-metodologia" type="button" title="Auditoria e metodologia de telegestão">
+                  <i class="fa-solid fa-question"></i>
+                </button>
+              </div>
             </div>
 
             <!-- Seletor de Operação Telegestão -->
@@ -1343,8 +1353,8 @@
               <!-- Gerados dinamicamente via renderTelegestaoTab() -->
             </div>
 
-            <!-- CARD DE METODOLOGIA TELEGESTÃO -->
-            <div class="card lum-fonte-card" id="tg-fonte-card">
+            <!-- CARD DE METODOLOGIA TELEGESTÃO (APENAS NO PRINT) -->
+            <div class="card lum-fonte-card print-only" id="tg-fonte-card">
               <div class="lum-fonte-card-header">
                 <div class="lum-fonte-icon">
                   <i class="fa-solid fa-network-wired"></i>
@@ -2106,6 +2116,88 @@ DIVIDE(BacklogAtual, CapacidadeDiaria, 0)</pre>
   <!-- Shared Sidebar Controller & Rádio Global -->
   <script src="/js/sidebar.js"></script>
   <script src="/js/radio.js" defer></script>
+
+
+  <!-- ========================================================
+       MODAIS DE METODOLOGIA E CONFERÊNCIA MANUAL (AO CLICAR NO '?')
+       ======================================================== -->
+  
+  <!-- Modal Metodologia Luminárias LED -->
+  <div class="modal-overlay" id="modal-metodologia-lum">
+    <div class="modal-card" style="max-width: 620px;">
+      <button class="modal-close" id="modal-metodologia-lum-close" title="Fechar">&times;</button>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+        <div class="lum-fonte-icon">
+          <i class="fa-solid fa-calculator"></i>
+        </div>
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin: 0;">
+            Metodologia de Cálculo &amp; Conferência Manual
+          </h3>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 2px 0 0 0;">
+            Critérios técnicos de extração da coluna Materiais da planilha SGI Exati
+          </p>
+        </div>
+      </div>
+      <div class="lum-fonte-body" style="font-size: 0.86rem; line-height: 1.6; color: var(--text-secondary);">
+        <p style="margin-bottom: 12px;">
+          Fonte primária: coluna <strong>Materiais</strong> da planilha oficial de Atendidos. Cada lançamento operacional segue a sintaxe padrão: <code>Op:Operação, LUMINÁRIA LED [Potência]W - [Modelo], Qtd:1.00</code>.
+        </p>
+        <ul style="margin: 0 0 14px 20px; padding: 0;">
+          <li style="margin-bottom: 8px;"><strong>Período Auditado:</strong> Considera-se a <em>Data Inicial de Atendimento</em> dentro do intervalo selecionado no filtro geral.</li>
+          <li style="margin-bottom: 8px;"><strong>Contagem Fiel:</strong> Soma-se estritamente o campo <code>Qtd</code> de luminárias e projetores LED com status <code>Instalado</code>, <code>Substituído</code>, <code>Mantido</code> ou <code>Removido</code>.</li>
+          <li style="margin-bottom: 8px;"><strong>Substituições de Parque:</strong> Registros no formato duplo <code>ANTIGA // NOVA</code> contabilizam a luminária nova implantada (após <code>//</code>).</li>
+          <li style="margin-bottom: 8px;"><strong>Equipamentos vs Atributos:</strong> Metadados técnicos (ex.: <em>Tipo de Lâmpada</em>, <em>Potência da Lâmpada</em>) são ignorados para não duplicar ativos.</li>
+          <li style="margin-bottom: 8px;"><strong>Sistemas Auxiliares:</strong> Relés fotoelétricos e módulos de telegestão são contabilizados de forma segregada na sub-aba de Telegestão.</li>
+        </ul>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 0.78rem; color: var(--text-dim); display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-database" style="color: var(--primary);"></i>
+          <span id="modal-lum-fonte-gerado">Base: Planilha Atendidos SGI • 100% auditado</span>
+        </div>
+      </div>
+      <div style="margin-top: 18px; display: flex; justify-content: flex-end;">
+        <button class="btn-secondary" id="modal-metodologia-lum-btn-ok" style="padding: 6px 18px; border-radius: 8px; font-size: 0.85rem;">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Metodologia Telegestão & Relés -->
+  <div class="modal-overlay" id="modal-metodologia-tg">
+    <div class="modal-card" style="max-width: 620px;">
+      <button class="modal-close" id="modal-metodologia-tg-close" title="Fechar">&times;</button>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 14px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px;">
+        <div class="lum-fonte-icon">
+          <i class="fa-solid fa-network-wired"></i>
+        </div>
+        <div>
+          <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--text-main); margin: 0;">
+            Auditoria de Telegestão &amp; Dispositivos
+          </h3>
+          <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 2px 0 0 0;">
+            Regras técnicas de rastreamento de módulos e relés na planilha SGI
+          </p>
+        </div>
+      </div>
+      <div class="lum-fonte-body" style="font-size: 0.86rem; line-height: 1.6; color: var(--text-secondary);">
+        <p style="margin-bottom: 12px;">
+          Fonte: registros da coluna <strong>Materiais</strong> contendo <code>TELEGESTÃO</code>, <code>RELÉ FOTOELÉTRICO</code>, <code>BASE 10A</code> e <code>SHORTING CAP</code>.
+        </p>
+        <ul style="margin: 0 0 14px 20px; padding: 0;">
+          <li style="margin-bottom: 8px;"><strong>Migração Tecnológica:</strong> A retirada de relés fotoelétricos associada à entrada de telegestão é computada com o status <code>Removido</code>.</li>
+          <li style="margin-bottom: 8px;"><strong>Módulos Conectados:</strong> Contabilizam-se módulos inteligentes com status <code>Instalado</code> ou <code>Substituído</code>.</li>
+          <li style="margin-bottom: 8px;"><strong>Periféricos e Segurança:</strong> Tampas de curto-circuito (<em>shorting caps</em>) e bases 10A são rastreados para integridade dos pontos.</li>
+          <li style="margin-bottom: 8px;"><strong>Atributos Técnicos:</strong> Lançamentos como <em>Perda Relé (W)</em> e <em>Tipo de Relé: NA</em> são desconsiderados para não distorcer o quantitativo físico.</li>
+        </ul>
+        <div style="margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--border-color); font-size: 0.78rem; color: var(--text-dim); display: flex; align-items: center; gap: 6px;">
+          <i class="fa-solid fa-database" style="color: var(--primary);"></i>
+          <span id="modal-tg-fonte-gerado">Base: Planilha Atendidos SGI • 100% auditado</span>
+        </div>
+      </div>
+      <div style="margin-top: 18px; display: flex; justify-content: flex-end;">
+        <button class="btn-secondary" id="modal-metodologia-tg-btn-ok" style="padding: 6px 18px; border-radius: 8px; font-size: 0.85rem;">Entendido</button>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
