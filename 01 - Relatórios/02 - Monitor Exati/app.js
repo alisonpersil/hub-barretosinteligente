@@ -94,6 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   initSimulator();
   renderPendentesTable();
   initAnaliticoTable();
+  renderLuminariasTab();
   setupEventListeners();
   setupUploadModal();
 });
@@ -2839,6 +2840,113 @@ function renderPendentesTable() {
 
     tbody.appendChild(tr);
   });
+}
+
+// ==========================================
+// ABA: GESTÃO DE LUMINÁRIAS LED
+// ==========================================
+function renderLuminariasTab() {
+  const lumData = (dashboardData && dashboardData.luminarias) || {
+    total_luminarias: 423,
+    modelo_predominante_pct: "59,6%",
+    modelo_predominante_desc: "LED 70W Argos AR-N (252 un)",
+    atendimentos_analisados: 738,
+    sistemas_auxiliares_total: "213+",
+    sistemas_auxiliares_desc: "116 relés e 97 telegestões",
+    distribuicao: [
+      { potencia: "LED 70W", modelo: "Argos AR-N (Líder)", qtd: 252, pct: "59,6%", pct_num: 59.6, color: "#0ea5e9", is_lider: true },
+      { potencia: "LED 120W", modelo: "Argos AR-N / Agnes", qtd: 45, pct: "10,6%", pct_num: 10.6, color: "#3b82f6", is_lider: false },
+      { potencia: "LED 30W", modelo: "Argos AR-N", qtd: 43, pct: "10,2%", pct_num: 10.2, color: "#10b981", is_lider: false },
+      { potencia: "LED 90W", modelo: "Argos AR-N", qtd: 29, pct: "6,9%", pct_num: 6.9, color: "#6366f1", is_lider: false },
+      { potencia: "Outros / Projetores", modelo: "50W, 80W, 100W, 150W", qtd: 54, pct: "12,7%", pct_num: 12.7, color: "#f59e0b", is_lider: false }
+    ],
+    insights: [
+      {
+        tipo: "estoque",
+        titulo: "Padronização de Estoque",
+        texto: "Garantia contínua de lotes de 70W pela alta demanda na rede.",
+        icone: "fa-solid fa-box-archive",
+        cor: "blue"
+      },
+      {
+        tipo: "telegestao",
+        titulo: "Rede de Telegestão",
+        texto: "97 módulos readequados para monitoramento e controle inteligente.",
+        icone: "fa-solid fa-wifi",
+        cor: "green"
+      },
+      {
+        tipo: "eficiencia",
+        titulo: "Eficiência e Confiabilidade",
+        texto: "Redução de consumo energético e queda na taxa de chamados.",
+        icone: "fa-solid fa-arrow-trend-up",
+        cor: "yellow"
+      }
+    ]
+  };
+
+  // 1. Atualizar Mini-Cards KPI no Topo
+  const elTotal = document.getElementById('lum-kpi-total');
+  const elPredomPct = document.getElementById('lum-kpi-predom-pct');
+  const elPredomDesc = document.getElementById('lum-kpi-predom-desc');
+  const elAtend = document.getElementById('lum-kpi-atend');
+  const elAux = document.getElementById('lum-kpi-aux');
+  const elAuxDesc = document.getElementById('lum-kpi-aux-desc');
+  const elBadgeTotalTable = document.getElementById('badge-total-lum-table');
+
+  if (elTotal) elTotal.textContent = (lumData.total_luminarias || 423).toLocaleString('pt-BR');
+  if (elPredomPct) elPredomPct.textContent = lumData.modelo_predominante_pct || '59,6%';
+  if (elPredomDesc) elPredomDesc.textContent = lumData.modelo_predominante_desc || 'LED 70W Argos AR-N (252 un)';
+  if (elAtend) elAtend.textContent = (lumData.atendimentos_analisados || 738).toLocaleString('pt-BR');
+  if (elAux) elAux.textContent = lumData.sistemas_auxiliares_total || '213+';
+  if (elAuxDesc) elAuxDesc.textContent = lumData.sistemas_auxiliares_desc || '116 relés e 97 telegestões';
+  if (elBadgeTotalTable) elBadgeTotalTable.textContent = `${(lumData.total_luminarias || 423).toLocaleString('pt-BR')} unidades catalogadas`;
+
+  // 2. Barra Visual de Distribuição Segmentada
+  const barContainer = document.getElementById('lum-bar-container');
+  if (barContainer && lumData.distribuicao) {
+    barContainer.innerHTML = lumData.distribuicao.map(d => {
+      const pctVal = typeof d.pct_num === 'number' ? d.pct_num : parseFloat(String(d.pct).replace(',', '.')) || 10;
+      return `<div class="lum-bar-segment" style="width: ${pctVal}%; background: ${d.color || '#0ea5e9'};" title="${escapeHtml(d.potencia)}: ${d.pct} (${d.qtd} un)"></div>`;
+    }).join('');
+  }
+
+  // 3. Tabela de Distribuição por Potência
+  const tbody = document.getElementById('tbody-luminarias-potencia');
+  if (tbody && lumData.distribuicao) {
+    tbody.innerHTML = lumData.distribuicao.map(d => {
+      const isLider = d.is_lider || (d.potencia && d.potencia.includes('70W'));
+      const potClass = isLider ? 'pot-tag lider' : 'pot-tag';
+      return `
+        <tr>
+          <td><span class="${potClass}">${escapeHtml(d.potencia)}</span></td>
+          <td><span class="modelo-desc-text">${escapeHtml(d.modelo)}</span></td>
+          <td class="qtd-cell">${Number(d.qtd).toLocaleString('pt-BR')}</td>
+          <td class="pct-cell">${d.pct}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // 4. Cards Laterais de Insights
+  const sideContainer = document.getElementById('lum-side-cards-container');
+  if (sideContainer && lumData.insights) {
+    sideContainer.innerHTML = lumData.insights.map(item => {
+      const corClass = item.cor || (item.tipo === 'estoque' ? 'blue' : (item.tipo === 'telegestao' ? 'green' : 'yellow'));
+      const icone = item.icone || (item.tipo === 'estoque' ? 'fa-solid fa-box-archive' : (item.tipo === 'telegestao' ? 'fa-solid fa-wifi' : 'fa-solid fa-arrow-trend-up'));
+      return `
+        <div class="card luminarias-insight-card">
+          <div class="lum-insight-icon-box ${corClass}">
+            <i class="${icone}"></i>
+          </div>
+          <div class="lum-insight-body">
+            <h3 class="lum-insight-title">${escapeHtml(item.titulo)}</h3>
+            <p class="lum-insight-text">${escapeHtml(item.texto)}</p>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
 }
 
 // ==========================================

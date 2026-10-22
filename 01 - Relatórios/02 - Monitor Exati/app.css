@@ -5888,4 +5888,310 @@ canvas {
   }
 }
 
+/* ==========================================================================
+   ABA: GESTÃO DE LUMINÁRIAS LED (POR POTÊNCIA & SISTEMAS AUXILIARES)
+   ========================================================================== */
+.luminarias-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.luminarias-kpi-card {
+  padding: 18px 22px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.05));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.luminarias-kpi-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08));
+}
+
+.luminarias-kpi-card.card-blue-top {
+  border-top: 3px solid #0ea5e9;
+}
+.luminarias-kpi-card.card-cyan-top {
+  border-top: 3px solid #0284c7;
+}
+.luminarias-kpi-card.card-green-top {
+  border-top: 3px solid #10b981;
+}
+.luminarias-kpi-card.card-orange-top {
+  border-top: 3px solid #ea580c;
+}
+
+.luminarias-card-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  letter-spacing: -0.2px;
+}
+
+.luminarias-card-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+
+.luminarias-val {
+  font-size: 2.3rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+}
+
+.luminarias-unit {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.luminarias-unit.highlight-orange {
+  color: #ea580c;
+}
+[data-theme="dark"] .luminarias-unit.highlight-orange {
+  color: #fb923c;
+}
+
+.highlight-cyan {
+  color: #0284c7;
+}
+[data-theme="dark"] .highlight-cyan {
+  color: #38bdf8;
+}
+
+.highlight-orange {
+  color: #ea580c;
+}
+[data-theme="dark"] .highlight-orange {
+  color: #fb923c;
+}
+
+.luminarias-card-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Layout em Grid: Tabela à Esquerda + Cards à Direita */
+.luminarias-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+  align-items: start;
+}
+
+.luminarias-main-card {
+  padding: 22px 24px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.05));
+}
+
+.luminarias-bar-container {
+  display: flex;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 14px 0 16px 0;
+  background: rgba(148, 163, 184, 0.18);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.lum-bar-segment {
+  height: 100%;
+  transition: width 0.5s ease;
+}
+
+/* Tabela de Luminárias */
+.luminarias-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 6px;
+}
+
+.luminarias-table th {
+  padding: 12px 14px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: none;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border-color);
+  background: transparent;
+}
+
+.luminarias-table td {
+  padding: 14px 14px;
+  font-size: 0.92rem;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.luminarias-table tr:last-child td {
+  border-bottom: none;
+}
+
+.luminarias-table tr:hover td {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.03));
+}
+
+.pot-tag {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-main);
+}
+
+.pot-tag.lider {
+  color: #0284c7;
+  font-weight: 800;
+}
+[data-theme="dark"] .pot-tag.lider {
+  color: #38bdf8;
+}
+
+.modelo-desc-text {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+}
+
+.qtd-cell {
+  font-weight: 800;
+  font-size: 1rem;
+  text-align: right;
+  color: var(--text-main);
+}
+
+.pct-cell {
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: right;
+  color: var(--text-secondary);
+}
+
+/* Cards Laterais de Estratégia */
+.luminarias-side-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.luminarias-insight-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 22px;
+  border-radius: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(0, 0, 0, 0.05));
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.luminarias-insight-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0, 0, 0, 0.08));
+  border-color: rgba(14, 165, 233, 0.3);
+}
+
+.lum-insight-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.lum-insight-icon-box.blue {
+  background: rgba(14, 165, 233, 0.12);
+  color: #0ea5e9;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
+[data-theme="light"] .lum-insight-icon-box.blue {
+  background: #e0f2fe;
+  color: #0284c7;
+  border-color: #bae6fd;
+}
+
+.lum-insight-icon-box.green {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+[data-theme="light"] .lum-insight-icon-box.green {
+  background: #dcfce7;
+  color: #16a34a;
+  border-color: #bbf7d0;
+}
+
+.lum-insight-icon-box.yellow {
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+[data-theme="light"] .lum-insight-icon-box.yellow {
+  background: #fef3c7;
+  color: #d97706;
+  border-color: #fde68a;
+}
+
+.lum-insight-body {
+  flex: 1;
+}
+
+.lum-insight-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 5px 0;
+  letter-spacing: -0.2px;
+}
+
+.lum-insight-text {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* Responsividade */
+@media (max-width: 1200px) {
+  .luminarias-layout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1024px) {
+  .luminarias-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .luminarias-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .luminarias-val {
+    font-size: 2rem;
+  }
+}
+
 

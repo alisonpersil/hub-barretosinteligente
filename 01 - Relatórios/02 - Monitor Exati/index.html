@@ -287,6 +287,12 @@
               <span>Bairros</span>
             </button>
 
+            <button class="subnav-chip" data-target="tab-luminarias" data-title="Gestão de Luminárias LED" data-sub="Distribuição de equipamentos por potência, fabricante e sistemas auxiliares de telegestão">
+              <i class="fa-solid fa-lightbulb"></i>
+              <span>Luminárias</span>
+              <span class="chip-badge highlight" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9; border: 1px solid rgba(14, 165, 233, 0.3);">LED</span>
+            </button>
+
             <button class="subnav-chip" data-target="tab-analitico" data-title="Tabela Analítica (Full)" data-sub="Detalhamento linha a linha de todas as 2.884 solicitações (Atendimentos + Backlog), tempos de resolução e auditoria HUB">
               <i class="fa-solid fa-table-list"></i>
               <span>Tabela Analítica</span>
@@ -961,6 +967,163 @@
         </div>
 
       </div>
+    </section>
+
+    <!-- ==================== ABA: GESTÃO DE LUMINÁRIAS LED ==================== -->
+    <section id="tab-luminarias" class="tab-content">
+
+      <!-- 4 CARDS NO TOPO -->
+      <div class="luminarias-kpi-grid">
+        <!-- Card 1: Total de Luminárias -->
+        <div class="card luminarias-kpi-card card-blue-top">
+          <div class="luminarias-card-label">Total de Luminárias</div>
+          <div class="luminarias-card-value-row">
+            <span class="luminarias-val" id="lum-kpi-total">423</span>
+            <span class="luminarias-unit">un</span>
+          </div>
+          <div class="luminarias-card-sub" id="lum-kpi-total-sub">Substituição e expansão LED</div>
+        </div>
+
+        <!-- Card 2: Modelo Predominante -->
+        <div class="card luminarias-kpi-card card-cyan-top">
+          <div class="luminarias-card-label">Modelo Predominante</div>
+          <div class="luminarias-card-value-row">
+            <span class="luminarias-val highlight-cyan" id="lum-kpi-predom-pct">59,6%</span>
+          </div>
+          <div class="luminarias-card-sub" id="lum-kpi-predom-desc">LED 70W Argos AR-N (252 un)</div>
+        </div>
+
+        <!-- Card 3: Atendimentos Analisados -->
+        <div class="card luminarias-kpi-card card-green-top">
+          <div class="luminarias-card-label">Atendimentos Analisados</div>
+          <div class="luminarias-card-value-row">
+            <span class="luminarias-val" id="lum-kpi-atend">738</span>
+            <span class="luminarias-unit">pts</span>
+          </div>
+          <div class="luminarias-card-sub" id="lum-kpi-atend-sub">Registros operacionais auditados</div>
+        </div>
+
+        <!-- Card 4: Sistemas Auxiliares -->
+        <div class="card luminarias-kpi-card card-orange-top">
+          <div class="luminarias-card-label">Sistemas Auxiliares</div>
+          <div class="luminarias-card-value-row">
+            <span class="luminarias-val highlight-orange" id="lum-kpi-aux">213+</span>
+            <span class="luminarias-unit highlight-orange">dispositivos</span>
+          </div>
+          <div class="luminarias-card-sub" id="lum-kpi-aux-desc">116 relés e 97 telegestões</div>
+        </div>
+      </div>
+
+      <!-- CORPO PRINCIPAL: TABELA DE POTÊNCIA (ESQUERDA) + CARDS DE INSIGHTS (DIREITA) -->
+      <div class="luminarias-layout-grid">
+        
+        <!-- LADO ESQUERDO: TABELA DE EQUIPAMENTOS POR POTÊNCIA -->
+        <div class="card luminarias-main-card">
+          <div class="card-header" style="justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div>
+              <h2 class="card-title" style="font-size: 1.15rem; font-weight: 700;">
+                <i class="fa-solid fa-bolt" style="margin-right: 6px; color: var(--accent-blue);"></i> Distribuição de Equipamentos por Potência
+              </h2>
+              <p class="card-subtitle" style="font-size: 0.8rem;">Levantamento extraído da coluna de Materiais operacionais (Argos / Agnes / LED)</p>
+            </div>
+            <span class="badge badge-info" id="badge-total-lum-table">423 unidades catalogadas</span>
+          </div>
+
+          <!-- Barra de Progresso Visual Segmentada -->
+          <div class="luminarias-bar-container" id="lum-bar-container" title="Proporção por potência na rede de iluminação">
+            <div class="lum-bar-segment" style="width: 59.6%; background: #0ea5e9;" title="LED 70W: 59,6% (252 un)"></div>
+            <div class="lum-bar-segment" style="width: 10.6%; background: #3b82f6;" title="LED 120W: 10,6% (45 un)"></div>
+            <div class="lum-bar-segment" style="width: 10.2%; background: #10b981;" title="LED 30W: 10,2% (43 un)"></div>
+            <div class="lum-bar-segment" style="width: 6.9%; background: #6366f1;" title="LED 90W: 6,9% (29 un)"></div>
+            <div class="lum-bar-segment" style="width: 12.7%; background: #f59e0b;" title="Outros / Projetores: 12,7% (54 un)"></div>
+          </div>
+
+          <div class="table-responsive" style="margin-top: 14px;">
+            <table class="data-table luminarias-table">
+              <thead>
+                <tr>
+                  <th>Potência</th>
+                  <th>Modelo Fabricante</th>
+                  <th style="text-align: right;">Qtd</th>
+                  <th style="text-align: right;">% Total</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-luminarias-potencia">
+                <tr>
+                  <td><span class="pot-tag lider">LED 70W</span></td>
+                  <td><span class="modelo-desc-text">Argos AR-N (Líder)</span></td>
+                  <td class="qtd-cell">252</td>
+                  <td class="pct-cell">59,6%</td>
+                </tr>
+                <tr>
+                  <td><span class="pot-tag">LED 120W</span></td>
+                  <td><span class="modelo-desc-text">Argos AR-N / Agnes</span></td>
+                  <td class="qtd-cell">45</td>
+                  <td class="pct-cell">10,6%</td>
+                </tr>
+                <tr>
+                  <td><span class="pot-tag">LED 30W</span></td>
+                  <td><span class="modelo-desc-text">Argos AR-N</span></td>
+                  <td class="qtd-cell">43</td>
+                  <td class="pct-cell">10,2%</td>
+                </tr>
+                <tr>
+                  <td><span class="pot-tag">LED 90W</span></td>
+                  <td><span class="modelo-desc-text">Argos AR-N</span></td>
+                  <td class="qtd-cell">29</td>
+                  <td class="pct-cell">6,9%</td>
+                </tr>
+                <tr>
+                  <td><span class="pot-tag">Outros / Projetores</span></td>
+                  <td><span class="modelo-desc-text">50W, 80W, 100W, 150W</span></td>
+                  <td class="qtd-cell">54</td>
+                  <td class="pct-cell">12,7%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- LADO DIREITO: 3 CARDS DE ESTRATÉGIA E OPERAÇÃO -->
+        <div class="luminarias-side-cards" id="lum-side-cards-container">
+          
+          <!-- Card 1: Padronização de Estoque -->
+          <div class="card luminarias-insight-card">
+            <div class="lum-insight-icon-box blue">
+              <i class="fa-solid fa-box-archive"></i>
+            </div>
+            <div class="lum-insight-body">
+              <h3 class="lum-insight-title">Padronização de Estoque</h3>
+              <p class="lum-insight-text">Garantia contínua de lotes de 70W pela alta demanda na rede.</p>
+            </div>
+          </div>
+
+          <!-- Card 2: Rede de Telegestão -->
+          <div class="card luminarias-insight-card">
+            <div class="lum-insight-icon-box green">
+              <i class="fa-solid fa-wifi"></i>
+            </div>
+            <div class="lum-insight-body">
+              <h3 class="lum-insight-title">Rede de Telegestão</h3>
+              <p class="lum-insight-text">97 módulos readequados para monitoramento e controle inteligente.</p>
+            </div>
+          </div>
+
+          <!-- Card 3: Eficiência e Confiabilidade -->
+          <div class="card luminarias-insight-card">
+            <div class="lum-insight-icon-box yellow">
+              <i class="fa-solid fa-arrow-trend-up"></i>
+            </div>
+            <div class="lum-insight-body">
+              <h3 class="lum-insight-title">Eficiência e Confiabilidade</h3>
+              <p class="lum-insight-text">Redução de consumo energético e queda na taxa de chamados.</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
     </section>
 
     <!-- ==================== ABA 5: RESUMO DO DIA • VISÃO MARCELA ==================== -->
