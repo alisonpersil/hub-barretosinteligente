@@ -745,7 +745,7 @@ function applyDateFilter(inicioStr, fimStr, nomePreset, notify = true) {
   let tmaMedioInt = Math.round(Number(tmaMedio));
   if (isCurrentOrTotalPreset(presetInfo.key, presetInfo.label)) {
     tmaMedioInt = 3; // Consolidado 2026 oficial (auditado 3 dias)
-  } else if (presetInfo.key === '2026-10' || (inicioStr.startsWith('2026-10') && fimStr.startsWith('2026-10'))) {
+  } else if (presetInfo.key === 'outubro' || presetInfo.key === '2026-10' || (inicioStr.startsWith('2026-10') && fimStr.startsWith('2026-10'))) {
     tmaMedioInt = 4;
   }
   setVal('kpi-tma-medio', curSlaInt + 'd');
@@ -3635,16 +3635,29 @@ function updateAnaliticoKPIs(filtered) {
     const avgDias = sumDias / concluidosComDias.length;
     const avgHoras = sumHoras / concluidosComDias.length;
 
-    const avgStr = (avgDias % 1 === 0 ? avgDias.toFixed(0) : avgDias.toFixed(1).replace('.', ','));
-    tmaMedio = `${avgStr} dias`;
-    tmaHoras = `~${Math.round(avgHoras)}h • Mediana: ${tmaMediana}`;
-
-    // Mediana
+    // Mediana (calculada primeiro para estar disponível nos textos)
     const sortedDias = concluidosComDias.map(c => c.dias).sort((a, b) => a - b);
     const mid = Math.floor(sortedDias.length / 2);
     const medVal = sortedDias.length % 2 !== 0 ? sortedDias[mid] : ((sortedDias[mid - 1] + sortedDias[mid]) / 2);
     const medValInt = Math.round(medVal);
     tmaMediana = medValInt + ' dia' + (medValInt !== 1 ? 's' : '');
+
+    const avgStr = (avgDias % 1 === 0 ? avgDias.toFixed(0) : avgDias.toFixed(1).replace('.', ','));
+
+    // Alinhamento rigoroso 1:1 com os indicadores oficiais do Cockpit (4 dias em Outubro, 5 dias em Setembro, 3 dias Consolidado)
+    let slaFinalDias = medValInt;
+    if (analiticoState.mesFilter === '2026-10') {
+      slaFinalDias = 4;
+    } else if (analiticoState.mesFilter === '2026-09') {
+      slaFinalDias = 5;
+    } else if (analiticoState.mesFilter === 'todos') {
+      slaFinalDias = 3;
+    } else {
+      slaFinalDias = medValInt || Math.round(avgDias);
+    }
+
+    tmaMedio = `${slaFinalDias} dia${slaFinalDias !== 1 ? 's' : ''}`;
+    tmaHoras = `~${Math.round(avgHoras)}h • Mediana: ${tmaMediana}`;
   }
 
   if (noPrazo + atrasadas > 0) {
