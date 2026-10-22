@@ -33,6 +33,11 @@
 
   <!-- SheetJS para Upload e Exportação Direta no Navegador -->
   <script src="/exati/xlsx.full.min.js"></script>
+  <script>
+    if (typeof XLSX === 'undefined') {
+      document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>');
+    }
+  </script>
 
   <!-- Chart.js para Gráficos -->
   <script src="/exati/chart.umd.min.js"></script>
@@ -1044,8 +1049,12 @@
               </h2>
               <p class="card-subtitle" style="font-size: 0.8rem;" id="lum-table-subtitle">Extraído da coluna Materiais do SGI Exati • período do filtro de datas</p>
             </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
               <span class="badge badge-info" id="badge-total-lum-table">—</span>
+              <button id="btn-lum-export-excel" class="btn-export-excel btn-compact" type="button" title="Baixar tabela de potências e ordens em planilha Excel (.xlsx)">
+                <i class="fa-solid fa-file-excel"></i>
+                <span>Excel</span>
+              </button>
               <button class="btn-info-circle" id="btn-lum-info-metodologia" type="button" title="Metodologia de cálculo e conferência manual">
                 <i class="fa-solid fa-question"></i>
               </button>
@@ -1290,8 +1299,12 @@
                 </h2>
                 <p class="card-subtitle" style="font-size: 0.8rem;" id="tg-table-subtitle">Extraído da coluna Materiais do SGI Exati • período do filtro de datas</p>
               </div>
-              <div style="display: flex; align-items: center; gap: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
                 <span class="badge badge-info" id="badge-total-tg-table">—</span>
+                <button id="btn-tg-export-excel" class="btn-export-excel btn-compact" type="button" title="Baixar tabela de dispositivos e ordens em planilha Excel (.xlsx)">
+                  <i class="fa-solid fa-file-excel"></i>
+                  <span>Excel</span>
+                </button>
                 <button class="btn-info-circle" id="btn-tg-info-metodologia" type="button" title="Auditoria e metodologia de telegestão">
                   <i class="fa-solid fa-question"></i>
                 </button>

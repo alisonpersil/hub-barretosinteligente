@@ -3962,6 +3962,20 @@ function setupEventListeners() {
     });
   }
 
+  const btnLumExport = document.getElementById('btn-lum-export-excel');
+  if (btnLumExport) {
+    btnLumExport.addEventListener('click', () => {
+      exportarLuminariasExcel();
+    });
+  }
+
+  const btnTgExport = document.getElementById('btn-tg-export-excel');
+  if (btnTgExport) {
+    btnTgExport.addEventListener('click', () => {
+      exportarTelegestaoExcel();
+    });
+  }
+
   const copyBtns = document.querySelectorAll('.btn-copy');
   copyBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -6453,4 +6467,274 @@ function initMetodologiaModals() {
       if (mt && mt.classList.contains('active')) mt.classList.remove('active');
     }
   });
+}
+
+
+// ==============================================================================
+// EXPORTAÇÃO EXCEL: TABELA DE LUMINÁRIAS LED & DETALHAMENTO DE ORDENS
+// ==============================================================================
+function exportarLuminariasExcel() {
+  if (typeof XLSX === 'undefined') {
+    showToast('Biblioteca SheetJS (XLSX) não disponível.');
+    return;
+  }
+
+  const ini = dateFilterState.inicio || '2026-01-01';
+  const fim = dateFilterState.fim || '2099-12-31';
+  const op = lumOpState || 'tudo';
+  const opLabels = {
+    tudo: 'Todas (Instaladas, Mantidas e Removidas)',
+    i: 'Instaladas / Trocadas',
+    m: 'Mantidas',
+    r: 'Removidas'
+  };
+  const periodoTxt = (dateFilterState.label && dateFilterState.label !== 'Personalizado')
+    ? dateFilterState.label
+    : `${ini.split('-').reverse().join('/')} a ${fim.split('-').reverse().join('/')}`;
+
+  // 1. Resumo agregado de potências
+  const daily = (dashboardData && Array.isArray(dashboardData.luminarias_daily)) ? dashboardData.luminarias_daily : [];
+  const opBuckets = op === 'tudo' ? ['i', 'm', 'r'] : [op];
+  const porChave = {};
+  daily.forEach(r => {
+    if (r.d < ini || r.d > fim) return;
+    opBuckets.forEach(b => {
+      const obj = r[b] || {};
+      for (const [k, v] of Object.entries(obj)) {
+        if (k === 'CONV') continue;
+        porChave[k] = (porChave[k] || 0) + v;
+      }
+    });
+  });
+
+  const porPot = {};
+  for (const [k, v] of Object.entries(porChave)) {
+    const [pot, modelo] = k.split('|');
+    const isProj = (modelo || '').startsWith('PROJETOR');
+    const potKey = isProj ? `Projetor ${pot}` : `LED ${pot}`;
+    if (!porPot[potKey]) porPot[potKey] = { potencia: potKey, watts: parseInt(pot, 10) || 0, qtd: 0, modelos: {} };
+    porPot[potKey].qtd += v;
+    const nomeModelo = isProj ? (modelo.replace('PROJETOR', '').trim() || 'Projetor') : modelo;
+    porPot[potKey].modelos[nomeModelo] = (porPot[potKey].modelos[nomeModelo] || 0) + v;
+  }
+
+  const linhas = Object.values(porPot).sort((a, b) => b.qtd - a.qtd || a.watts - b.watts);
+  const totalGeral = linhas.reduce((s, l) => s + l.qtd, 0);
+
+  const titleCase = (s) => String(s).toLowerCase().replace(/(^|\s|-)\S/g, c => c.toUpperCase()).replace(/\bAr-n\b/i, 'AR-N').replace(/\bIi\b/, 'II').replace(/\bPf\b/, 'PF');
+
+  // Aba 1: Resumo das Potências
+  const rowsResumo = linhas.map(l => {
+    const modelos = Object.entries(l.modelos).sort((a, b) => b[1] - a[1]);
+    const modelosTxt = modelos.map(([m, q]) => modelos.length > 1 ? `${titleCase(m)} (${q})` : titleCase(m)).join(' / ');
+    const pct = totalGeral > 0 ? (l.qtd / totalGeral * 100) : 0;
+    return {
+      'Potência': l.potencia,
+      'Modelo Fabricante': modelosTxt,
+      'Quantidade (un)': l.qtd,
+      'Participação (%)': Number(pct.toFixed(2)),
+      'Operação': opLabels[op] || op,
+      'Período Auditado': periodoTxt
+    };
+  });
+
+  // Linha de Total Consolidado
+  if (rowsResumo.length > 0) {
+    rowsResumo.push({
+      'Potência': 'TOTAL CONSOLIDADO',
+      'Modelo Fabricante': 'Todos os Modelos Homologados',
+      'Quantidade (un)': totalGeral,
+      'Participação (%)': 100.0,
+      'Operação': opLabels[op] || op,
+      'Período Auditado': periodoTxt
+    });
+  }
+
+  // Aba 2: Todas as Ordens de Serviço e Protocolos do período
+  const allRecords = (dashboardData && Array.isArray(dashboardData.luminarias_detalhes)) ? dashboardData.luminarias_detalhes : [];
+  const filtrados = allRecords.filter(r => {
+    if (r.d_iso && (r.d_iso < ini || r.d_iso > fim)) return false;
+    if (op !== 'tudo' && r.bucket !== op) return false;
+    return true;
+  });
+
+  const rowsOrdens = filtrados.map(r => ({
+    'Ordem de Serviço (OS)': r.os || '',
+    'Protocolo': r.proto || 'Sem protocolo',
+    'Data Atendimento': r.dt || '',
+    'Bairro': r.bairro || '',
+    'Operação': r.op || '',
+    'Potência': r.pot || '',
+    'Modelo': r.modelo || '',
+    'Item Completo (Materiais)': r.item || '',
+    'Quantidade': r.qtd || 1,
+    'Equipe': r.eq || ''
+  }));
+
+  const wb = XLSX.utils.book_new();
+
+  const wsResumo = XLSX.utils.json_to_sheet(rowsResumo);
+  wsResumo['!cols'] = [
+    { wch: 18 }, // Potência
+    { wch: 34 }, // Modelo
+    { wch: 16 }, // Quantidade
+    { wch: 18 }, // Participação
+    { wch: 32 }, // Operação
+    { wch: 25 }  // Período
+  ];
+  XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo_Potencias');
+
+  if (rowsOrdens.length > 0) {
+    const wsOrdens = XLSX.utils.json_to_sheet(rowsOrdens);
+    wsOrdens['!cols'] = [
+      { wch: 12 }, // OS
+      { wch: 16 }, // Protocolo
+      { wch: 18 }, // Data Atendimento
+      { wch: 25 }, // Bairro
+      { wch: 14 }, // Operação
+      { wch: 14 }, // Potência
+      { wch: 24 }, // Modelo
+      { wch: 45 }, // Item Completo
+      { wch: 12 }, // Quantidade
+      { wch: 16 }  // Equipe
+    ];
+    XLSX.utils.book_append_sheet(wb, wsOrdens, 'Ordens_Detalhadas');
+  }
+
+  const opSlug = op === 'tudo' ? 'Todas' : (op === 'i' ? 'Instaladas' : (op === 'm' ? 'Mantidas' : 'Removidas'));
+  const filename = `Luminarias_LED_${opSlug}_${ini}_${fim}.xlsx`;
+  XLSX.writeFile(wb, filename);
+  showToast(`Planilha Excel baixada com sucesso! (${totalGeral.toLocaleString('pt-BR')} luminárias em ${linhas.length} potências)`);
+}
+
+// ==============================================================================
+// EXPORTAÇÃO EXCEL: TABELA DE TELEGESTÃO, RELÉS & DISPOSITIVOS
+// ==============================================================================
+function exportarTelegestaoExcel() {
+  if (typeof XLSX === 'undefined') {
+    showToast('Biblioteca SheetJS (XLSX) não disponível.');
+    return;
+  }
+
+  const ini = dateFilterState.inicio || '2026-01-01';
+  const fim = dateFilterState.fim || '2099-12-31';
+  const op = tgOpState || 'tudo';
+  const opLabels = {
+    tudo: 'Todos os Dispositivos (Instalados, Mantidos e Removidos)',
+    i: 'Instalados / Substituídos',
+    m: 'Mantidos',
+    r: 'Removidos'
+  };
+  const periodoTxt = (dateFilterState.label && dateFilterState.label !== 'Personalizado')
+    ? dateFilterState.label
+    : `${ini.split('-').reverse().join('/')} a ${fim.split('-').reverse().join('/')}`;
+
+  const daily = (dashboardData && Array.isArray(dashboardData.telegestao_daily)) ? dashboardData.telegestao_daily : [];
+  const opBuckets = op === 'tudo' ? ['i', 'm', 'r'] : [op];
+  const porCat = {};
+  daily.forEach(r => {
+    if (r.d < ini || r.d > fim) return;
+    opBuckets.forEach(b => {
+      const obj = r[b] || {};
+      for (const [cat, qtd] of Object.entries(obj)) {
+        porCat[cat] = (porCat[cat] || 0) + qtd;
+      }
+    });
+  });
+
+  const catSpecs = {
+    'Módulo de Telegestão': 'Telegestão Individualizada Inteligente',
+    'Relé Fotoelétrico': 'Eletrônico 105-305V NF',
+    'Relé Cego (Shorting Cap)': 'Tampa Curto-Circuito / Proteção',
+    'Base para Relé': 'Base 10A Padrão NEMA',
+    'Relé Timer': 'Temporizador Digital de Rede'
+  };
+
+  const linhas = Object.entries(porCat).map(([cat, qtd]) => ({
+    categoria: cat,
+    modelo: catSpecs[cat] || 'Dispositivo de Controle',
+    qtd
+  })).sort((a, b) => b.qtd - a.qtd);
+
+  const totalGeral = linhas.reduce((s, l) => s + l.qtd, 0);
+
+  // Aba 1: Resumo dos Dispositivos
+  const rowsResumo = linhas.map(l => {
+    const pct = totalGeral > 0 ? (l.qtd / totalGeral * 100) : 0;
+    return {
+      'Dispositivo / Categoria': l.categoria,
+      'Especificação Técnica': l.modelo,
+      'Quantidade (un)': l.qtd,
+      'Participação (%)': Number(pct.toFixed(2)),
+      'Operação': opLabels[op] || op,
+      'Período Auditado': periodoTxt
+    };
+  });
+
+  if (rowsResumo.length > 0) {
+    rowsResumo.push({
+      'Dispositivo / Categoria': 'TOTAL CONSOLIDADO',
+      'Especificação Técnica': 'Todos os Dispositivos Operados',
+      'Quantidade (un)': totalGeral,
+      'Participação (%)': 100.0,
+      'Operação': opLabels[op] || op,
+      'Período Auditado': periodoTxt
+    });
+  }
+
+  // Aba 2: Todas as Ordens de Telegestão
+  const allRecords = (dashboardData && Array.isArray(dashboardData.telegestao_detalhes)) ? dashboardData.telegestao_detalhes : [];
+  const filtrados = allRecords.filter(r => {
+    if (r.d_iso && (r.d_iso < ini || r.d_iso > fim)) return false;
+    if (op !== 'tudo' && r.bucket !== op) return false;
+    return true;
+  });
+
+  const rowsOrdens = filtrados.map(r => ({
+    'Ordem de Serviço (OS)': r.os || '',
+    'Protocolo': r.proto || 'Sem protocolo',
+    'Data Atendimento': r.dt || '',
+    'Bairro': r.bairro || '',
+    'Operação': r.op || '',
+    'Categoria': r.cat || '',
+    'Especificação': r.modelo || '',
+    'Item Completo (Materiais)': r.item || '',
+    'Quantidade': r.qtd || 1,
+    'Equipe': r.eq || ''
+  }));
+
+  const wb = XLSX.utils.book_new();
+
+  const wsResumo = XLSX.utils.json_to_sheet(rowsResumo);
+  wsResumo['!cols'] = [
+    { wch: 28 }, // Categoria
+    { wch: 38 }, // Especificação
+    { wch: 16 }, // Quantidade
+    { wch: 18 }, // Participação
+    { wch: 35 }, // Operação
+    { wch: 25 }  // Período
+  ];
+  XLSX.utils.book_append_sheet(wb, wsResumo, 'Resumo_Dispositivos');
+
+  if (rowsOrdens.length > 0) {
+    const wsOrdens = XLSX.utils.json_to_sheet(rowsOrdens);
+    wsOrdens['!cols'] = [
+      { wch: 12 }, // OS
+      { wch: 16 }, // Protocolo
+      { wch: 18 }, // Data Atendimento
+      { wch: 25 }, // Bairro
+      { wch: 14 }, // Operação
+      { wch: 26 }, // Categoria
+      { wch: 30 }, // Especificação
+      { wch: 45 }, // Item Completo
+      { wch: 12 }, // Quantidade
+      { wch: 16 }  // Equipe
+    ];
+    XLSX.utils.book_append_sheet(wb, wsOrdens, 'Ordens_Detalhadas');
+  }
+
+  const opSlug = op === 'tudo' ? 'Todos' : (op === 'i' ? 'Instalados' : (op === 'm' ? 'Mantidos' : 'Removidos'));
+  const filename = `Telegestao_Reles_${opSlug}_${ini}_${fim}.xlsx`;
+  XLSX.writeFile(wb, filename);
+  showToast(`Planilha Excel baixada com sucesso! (${totalGeral.toLocaleString('pt-BR')} dispositivos em ${linhas.length} categorias)`);
 }

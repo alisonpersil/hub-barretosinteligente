@@ -7031,3 +7031,18 @@ canvas {
 
 
 
+
+/* Versão compacta do botão Excel para cabeçalhos de tabela */
+.btn-export-excel.btn-compact {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border-radius: 6px;
+  gap: 5px;
+  line-height: 1;
+}
+
+.btn-export-excel.btn-compact i {
+  font-size: 0.82rem;
+}
