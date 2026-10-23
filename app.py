@@ -353,8 +353,55 @@ def normalize_repo_docs_path(subpath):
         return f"01 - Relatórios/01 - Consulta de Ofícios/{subpath}"
     return f"{prefix}/{subpath}"
 
+_INDICE_CSV_CACHE = None
+_GH_DIR_CACHE = {}
+
+def normalize_text_key(text):
+    if not text:
+        return ""
+    import unicodedata
+    t = unicodedata.normalize("NFD", text)
+    t = "".join(c for c in t if unicodedata.category(c) != "Mn")
+    t = re.sub(r"\s+", " ", t)
+    return t.strip().lower()
+
+def extract_core_name_key(name):
+    n = re.sub(r'^\d+[\s\-_.]+', '', name).strip()
+    return normalize_text_key(n)
+
+def get_indice_csv_map():
+    global _INDICE_CSV_CACHE
+    if _INDICE_CSV_CACHE is not None:
+        return _INDICE_CSV_CACHE
+    mapping = {}
+    csv_candidates = [
+        os.path.join(DOCS_DIR, "Protocolos", "_indice.csv"),
+        os.path.join(DOCS_DIR, "_indice.csv"),
+        os.path.join(BASE_DIR, "01 - Relatórios", "01 - Consulta de Ofícios", "Base de dados Ofícios", "Protocolos", "_indice.csv"),
+        os.path.join(BASE_DIR, "Base de dados Ofícios", "Protocolos", "_indice.csv"),
+    ]
+    for cp in csv_candidates:
+        if os.path.isfile(cp):
+            try:
+                import csv
+                with open(cp, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f, delimiter=";")
+                    for r in reader:
+                        pasta = (r.get("Pasta") or "").strip()
+                        arquivo = (r.get("Arquivo") or "").strip()
+                        if pasta and arquivo:
+                            norm_p = normalize_text_key(pasta)
+                            core_f = extract_core_name_key(arquivo)
+                            mapping.setdefault(norm_p, {})[core_f] = arquivo
+                _INDICE_CSV_CACHE = mapping
+                return mapping
+            except Exception as e:
+                print("Erro ao ler _indice.csv:", e, file=sys.stderr)
+    _INDICE_CSV_CACHE = {}
+    return mapping
+
 def fetch_file_from_github(subpath, token=None):
-    """Fetch file content from GitHub repository with token authentication (trying storage branch then main)."""
+    """Fetch file content from GitHub repository with token authentication (trying storage branch then main) and fuzzy prefix resolver."""
     repo_path = normalize_repo_docs_path(subpath)
     encoded_path = urllib.parse.quote(repo_path.replace("\\", "/"), safe="/")
     headers = {"User-Agent": "BarretosHub"}
@@ -370,7 +417,29 @@ def fetch_file_from_github(subpath, token=None):
         except Exception:
             pass
 
-    # Fallback to GitHub Contents API
+    # Fallback 1: Resolution via _indice.csv when filename numbering or prefix diverges
+    parent_folder = os.path.basename(os.path.dirname(subpath))
+    req_file = os.path.basename(subpath)
+    csv_map = get_indice_csv_map()
+    norm_parent = normalize_text_key(parent_folder)
+    core_req = extract_core_name_key(req_file)
+
+    if norm_parent in csv_map and core_req in csv_map[norm_parent]:
+        actual_name = csv_map[norm_parent][core_req]
+        if actual_name != req_file:
+            alt_subpath = os.path.join(os.path.dirname(subpath), actual_name).replace("\\", "/")
+            alt_repo_path = normalize_repo_docs_path(alt_subpath)
+            alt_encoded = urllib.parse.quote(alt_repo_path.replace("\\", "/"), safe="/")
+            for branch in ["storage", "main"]:
+                url = f"https://raw.githubusercontent.com/{GITHUB_REPO}/{branch}/{alt_encoded}"
+                try:
+                    req = urllib.request.Request(url, headers=headers)
+                    with urllib.request.urlopen(req, timeout=30) as resp:
+                        return resp.read(), actual_name
+                except Exception:
+                    pass
+
+    # Fallback 2: GitHub Contents API directly for the exact path
     for branch in ["storage", "main"]:
         try:
             api_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{urllib.parse.quote(repo_path.replace('\\', '/'))}?ref={branch}"
@@ -380,6 +449,35 @@ def fetch_file_from_github(subpath, token=None):
             req2 = urllib.request.Request(api_url, headers=api_headers)
             with urllib.request.urlopen(req2, timeout=30) as resp2:
                 return resp2.read(), os.path.basename(repo_path)
+        except Exception:
+            pass
+
+    # Fallback 3: GitHub Contents API listing parent directory to fuzzy-match by core name
+    parent_repo_path = os.path.dirname(repo_path).replace("\\", "/")
+    for branch in ["storage", "main"]:
+        try:
+            cache_key = f"{branch}:{parent_repo_path}"
+            dir_items = _GH_DIR_CACHE.get(cache_key)
+            if dir_items is None:
+                api_dir_url = f"https://api.github.com/repos/{GITHUB_REPO}/contents/{urllib.parse.quote(parent_repo_path)}?ref={branch}"
+                api_headers = {"User-Agent": "BarretosHub", "Accept": "application/vnd.github.v3+json"}
+                if token:
+                    api_headers["Authorization"] = f"Bearer {token}"
+                req_dir = urllib.request.Request(api_dir_url, headers=api_headers)
+                with urllib.request.urlopen(req_dir, timeout=15) as resp_dir:
+                    dir_items = json.loads(resp_dir.read().decode("utf-8"))
+                    _GH_DIR_CACHE[cache_key] = dir_items if isinstance(dir_items, list) else []
+
+            if isinstance(dir_items, list):
+                for item in dir_items:
+                    if item.get("type") == "file":
+                        item_name = item.get("name", "")
+                        if extract_core_name_key(item_name) == core_req:
+                            download_url = item.get("download_url")
+                            if download_url:
+                                req_dl = urllib.request.Request(download_url, headers=headers)
+                                with urllib.request.urlopen(req_dl, timeout=30) as dl_resp:
+                                    return dl_resp.read(), item_name
         except Exception:
             pass
 
@@ -769,7 +867,7 @@ def get_all_documents():
     return protocolos + oficios
 
 def get_safe_file_path(relative_path):
-    """Ensure relative path is safely within DOCS_DIR, supporting folders and files."""
+    """Ensure relative path is safely within DOCS_DIR, supporting folders and files with fuzzy fallback."""
     import urllib.parse
     import unicodedata
 
@@ -778,13 +876,15 @@ def get_safe_file_path(relative_path):
     if safe_path.startswith(os.path.abspath(DOCS_DIR)) and (os.path.isfile(safe_path) or os.path.isdir(safe_path)):
         return safe_path
 
-    # Robust fallback: search by normalized filename ignoring accents
+    # Robust fallback: search by normalized filename ignoring accents and prefixes
     def strip_accents(text):
         return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn').lower()
 
     target_clean = strip_accents(os.path.basename(decoded_path))
     parent_clean = strip_accents(os.path.basename(os.path.dirname(decoded_path)))
+    target_core = extract_core_name_key(os.path.basename(decoded_path))
     
+    # Exact normalized match
     for root, dirs, files in os.walk(DOCS_DIR):
         for item in dirs + files:
             if strip_accents(item) == target_clean:
@@ -794,6 +894,18 @@ def get_safe_file_path(relative_path):
                         return cand
                 else:
                     return cand
+
+    # Core name match (ignoring '01 - ' numbering prefixes)
+    if target_core:
+        for root, dirs, files in os.walk(DOCS_DIR):
+            for item in dirs + files:
+                if extract_core_name_key(item) == target_core:
+                    cand = os.path.join(root, item)
+                    if parent_clean:
+                        if strip_accents(os.path.basename(os.path.dirname(cand))) == parent_clean:
+                            return cand
+                    else:
+                        return cand
 
     return None
 

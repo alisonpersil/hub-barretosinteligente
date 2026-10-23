@@ -252,7 +252,29 @@ class CidadaoOnlineClient:
                 return resp.read()
         except Exception as e:
             print(f"[ERRO DOWNLOAD] Falha ao baixar anexo {url}: {e}", file=sys.stderr)
-            return None
+def load_indice_csv_map():
+    mapping = {}
+    csv_candidates = [
+        os.path.join(os.getcwd(), "01 - Relatórios", "01 - Consulta de Ofícios", "Base de dados Ofícios", "Protocolos", "_indice.csv"),
+        os.path.join(os.path.dirname(__file__), "..", "01 - Relatórios", "01 - Consulta de Ofícios", "Base de dados Ofícios", "Protocolos", "_indice.csv"),
+    ]
+    for cp in csv_candidates:
+        if os.path.isfile(cp):
+            try:
+                import csv
+                with open(cp, "r", encoding="utf-8") as f:
+                    reader = csv.DictReader(f, delimiter=";")
+                    for r in reader:
+                        pasta = (r.get("Pasta") or "").strip()
+                        arquivo = (r.get("Arquivo") or "").strip()
+                        if pasta and arquivo:
+                            norm_p = normalize_filename(pasta)
+                            core_f = normalize_filename(arquivo)
+                            mapping.setdefault(norm_p, {})[core_f] = arquivo
+                return mapping
+            except Exception:
+                pass
+    return mapping
 
 
 def sync_cidadao_online(
@@ -320,6 +342,8 @@ def sync_cidadao_online(
         actual_index_path = candidates[1]
 
     logger(f"[SYNC] Arquivo docs_index.json: {actual_index_path} (protocolos atuais: {len(hub_data.get('protocolos', []))})")
+
+    indice_map = load_indice_csv_map()
 
     # Mapear protocolos do Hub por número numérico
     hub_by_number = {}
@@ -487,12 +511,15 @@ def sync_cidadao_online(
                 logger(f"    [!] Falha no download de '{nome_original}'")
                 continue
 
-            # Nome formatado no padrão do repositório
-            next_idx = len(hub_proto.get("files", [])) + 1
-            # Evita prefixo duplicado se o nome original já começar com numeração
-            if re.match(r'^\d+\s*-\s*', nome_original):
+            # Nome formatado no padrão do repositório (prioriza nome consagrado em _indice.csv)
+            folder_key = normalize_filename(folder_name)
+            known_in_csv = indice_map.get(folder_key, {}).get(anexo_norm)
+            if known_in_csv:
+                final_filename = known_in_csv
+            elif re.match(r'^\d+\s*-\s*', nome_original):
                 final_filename = nome_original
             else:
+                next_idx = len(hub_proto.get("files", [])) + 1
                 final_filename = f"{next_idx:02d} - {nome_original}"
 
             final_filename = re.sub(r'[\\/*?:"<>|]', "", final_filename)

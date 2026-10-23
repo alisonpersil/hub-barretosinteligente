@@ -126,6 +126,19 @@
       "files": [
         {
           "id": 1,
+          "name": "01 - Oficio_0012_2026_Dimerizacao_Avenidas_CNPJ_assinado.pdf",
+          "relative_path": "Protocolos/20197-2026-GRL - Conclusão da Iluminação de Destaque (Deferido)/01 - Oficio_0012_2026_Dimerizacao_Avenidas_CNPJ_assinado.pdf",
+          "size_bytes": 141365,
+          "size_formatted": "138.1 KB",
+          "mtime": 1792615242.785728,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615242.785728,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 2,
           "name": "02 - Tramite 13-10-2026_11-19-34.pdf",
           "relative_path": "Protocolos/20197-2026-GRL - Conclusão da Iluminação de Destaque (Deferido)/02 - Tramite 13-10-2026_11-19-34.pdf",
           "size_bytes": 38394,
@@ -138,7 +151,7 @@
           "is_pdf": true
         },
         {
-          "id": 2,
+          "id": 3,
           "name": "03 - Tramite 15-10-2026_15-41-26.pdf",
           "relative_path": "Protocolos/20197-2026-GRL - Conclusão da Iluminação de Destaque (Deferido)/03 - Tramite 15-10-2026_15-41-26.pdf",
           "size_bytes": 38951,
@@ -147,19 +160,6 @@
           "mtime_formatted": "21/10/2026 10:08",
           "ctime": 1792589262.631277,
           "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 3,
-          "name": "03 - Oficio_0012_2026_Dimerizacao_Avenidas_CNPJ_assinado.pdf",
-          "relative_path": "Protocolos/20197-2026-GRL - Conclusão da Iluminação de Destaque (Deferido)/03 - Oficio_0012_2026_Dimerizacao_Avenidas_CNPJ_assinado.pdf",
-          "size_bytes": 141365,
-          "size_formatted": "138.1 KB",
-          "mtime": 1792615242.785728,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615242.785728,
-          "ctime_formatted": "21/10/2026 17:40",
           "extension": ".pdf",
           "is_pdf": true
         }
@@ -690,6 +690,19 @@
         },
         {
           "id": 3,
+          "name": "03 - IP Barretos Concessionária de Cidade Inteligente SA (cancelamento de nota indeferido 45 dias).pdf",
+          "relative_path": "Protocolos/15447-2026-GRL - Cancelamento NFs 57 e 58 (Indeferido)/03 - IP Barretos Concessionária de Cidade Inteligente SA (cancelamento de nota indeferido 45 dias).pdf",
+          "size_bytes": 863496,
+          "size_formatted": "843.3 KB",
+          "mtime": 1792615247.4563649,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615247.4563649,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 4,
           "name": "04 - Tramite 13-08-2026_10-20-35.pdf",
           "relative_path": "Protocolos/15447-2026-GRL - Cancelamento NFs 57 e 58 (Indeferido)/04 - Tramite 13-08-2026_10-20-35.pdf",
           "size_bytes": 41119,
@@ -702,7 +715,7 @@
           "is_pdf": true
         },
         {
-          "id": 4,
+          "id": 5,
           "name": "05 - Tramite 12-10-2026_23-16-27.pdf",
           "relative_path": "Protocolos/15447-2026-GRL - Cancelamento NFs 57 e 58 (Indeferido)/05 - Tramite 12-10-2026_23-16-27.pdf",
           "size_bytes": 38336,
@@ -711,19 +724,6 @@
           "mtime_formatted": "21/10/2026 10:09",
           "ctime": 1792589261.9745815,
           "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 5,
-          "name": "05 - IP Barretos Concessionária de Cidade Inteligente SA (cancelamento de nota indeferido 45 dias).pdf",
-          "relative_path": "Protocolos/15447-2026-GRL - Cancelamento NFs 57 e 58 (Indeferido)/05 - IP Barretos Concessionária de Cidade Inteligente SA (cancelamento de nota indeferido 45 dias).pdf",
-          "size_bytes": 863496,
-          "size_formatted": "843.3 KB",
-          "mtime": 1792615247.4563649,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615247.4563649,
-          "ctime_formatted": "21/10/2026 17:40",
           "extension": ".pdf",
           "is_pdf": true
         }
@@ -852,6 +852,19 @@
         },
         {
           "id": 2,
+          "name": "02 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
+          "relative_path": "Protocolos/14742-2026-GRL - Revitalização Iluminação Praça de Eventos do Recinto/02 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
+          "size_bytes": 69984,
+          "size_formatted": "68.3 KB",
+          "mtime": 1792615249.0001469,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615249.0001469,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 3,
           "name": "03 - 03_Memorial_Descritivo_PPP_assinado.pdf",
           "relative_path": "Protocolos/14742-2026-GRL - Revitalização Iluminação Praça de Eventos do Recinto/03 - 03_Memorial_Descritivo_PPP_assinado.pdf",
           "size_bytes": 78084,
@@ -864,27 +877,14 @@
           "is_pdf": true
         },
         {
-          "id": 3,
-          "name": "03 - Requerimento_0008.26_IP_Barretos_assinado.pdf",
-          "relative_path": "Protocolos/14742-2026-GRL - Revitalização Iluminação Praça de Eventos do Recinto/03 - Requerimento_0008.26_IP_Barretos_assinado.pdf",
-          "size_bytes": 124310,
-          "size_formatted": "121.4 KB",
-          "mtime": 1792615248.0800083,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615248.0800083,
-          "ctime_formatted": "21/10/2026 17:40",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
           "id": 4,
-          "name": "04 - Iluminacao_publica-ORC-20260505-262-CENTRO_assinado.pdf",
-          "relative_path": "Protocolos/14742-2026-GRL - Revitalização Iluminação Praça de Eventos do Recinto/04 - Iluminacao_publica-ORC-20260505-262-CENTRO_assinado.pdf",
-          "size_bytes": 723156,
-          "size_formatted": "706.2 KB",
-          "mtime": 1792615248.3804915,
+          "name": "04 - 02_Planilha_Orcamentaria_PPP_assinado.pdf",
+          "relative_path": "Protocolos/14742-2026-GRL - Revitalização Iluminação Praça de Eventos do Recinto/04 - 02_Planilha_Orcamentaria_PPP_assinado.pdf",
+          "size_bytes": 71960,
+          "size_formatted": "70.3 KB",
+          "mtime": 1792615248.7833116,
           "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615248.3804915,
+          "ctime": 1792615248.7833116,
           "ctime_formatted": "21/10/2026 17:40",
           "extension": ".pdf",
           "is_pdf": true
@@ -904,26 +904,26 @@
         },
         {
           "id": 6,
-          "name": "06 - 02_Planilha_Orcamentaria_PPP_assinado.pdf",
-          "relative_path": "Protocolos/14742-2026-GRL - Revitalização Iluminação Praça de Eventos do Recinto/06 - 02_Planilha_Orcamentaria_PPP_assinado.pdf",
-          "size_bytes": 71960,
-          "size_formatted": "70.3 KB",
-          "mtime": 1792615248.7833116,
+          "name": "06 - Iluminacao_publica-ORC-20260505-262-CENTRO_assinado.pdf",
+          "relative_path": "Protocolos/14742-2026-GRL - Revitalização Iluminação Praça de Eventos do Recinto/06 - Iluminacao_publica-ORC-20260505-262-CENTRO_assinado.pdf",
+          "size_bytes": 723156,
+          "size_formatted": "706.2 KB",
+          "mtime": 1792615248.3804915,
           "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615248.7833116,
+          "ctime": 1792615248.3804915,
           "ctime_formatted": "21/10/2026 17:40",
           "extension": ".pdf",
           "is_pdf": true
         },
         {
           "id": 7,
-          "name": "07 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
-          "relative_path": "Protocolos/14742-2026-GRL - Revitalização Iluminação Praça de Eventos do Recinto/07 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
-          "size_bytes": 69984,
-          "size_formatted": "68.3 KB",
-          "mtime": 1792615249.0001469,
+          "name": "07 - Requerimento_0008.26_IP_Barretos_assinado.pdf",
+          "relative_path": "Protocolos/14742-2026-GRL - Revitalização Iluminação Praça de Eventos do Recinto/07 - Requerimento_0008.26_IP_Barretos_assinado.pdf",
+          "size_bytes": 124310,
+          "size_formatted": "121.4 KB",
+          "mtime": 1792615248.0800083,
           "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615249.0001469,
+          "ctime": 1792615248.0800083,
           "ctime_formatted": "21/10/2026 17:40",
           "extension": ".pdf",
           "is_pdf": true
@@ -1063,13 +1063,13 @@
         },
         {
           "id": 9,
-          "name": "09 - Tramite 28-07-2026_12-18-59.pdf",
-          "relative_path": "Protocolos/13753-2026-GRL - Pagamento Jun-2026 - Parcela 40 - NFs 61 a 63 e BDE (Deferido)/09 - Tramite 28-07-2026_12-18-59.pdf",
-          "size_bytes": 38517,
-          "size_formatted": "37.6 KB",
-          "mtime": 1792615249.9471693,
+          "name": "09 - Oficio_Protocolo_Junho2026__assinado.pdf",
+          "relative_path": "Protocolos/13753-2026-GRL - Pagamento Jun-2026 - Parcela 40 - NFs 61 a 63 e BDE (Deferido)/09 - Oficio_Protocolo_Junho2026__assinado.pdf",
+          "size_bytes": 548886,
+          "size_formatted": "536.0 KB",
+          "mtime": 1792615250.4020233,
           "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615249.9471693,
+          "ctime": 1792615250.4020233,
           "ctime_formatted": "21/10/2026 17:40",
           "extension": ".pdf",
           "is_pdf": true
@@ -1089,13 +1089,13 @@
         },
         {
           "id": 11,
-          "name": "11 - Oficio_Protocolo_Junho2026__assinado.pdf",
-          "relative_path": "Protocolos/13753-2026-GRL - Pagamento Jun-2026 - Parcela 40 - NFs 61 a 63 e BDE (Deferido)/11 - Oficio_Protocolo_Junho2026__assinado.pdf",
-          "size_bytes": 548886,
-          "size_formatted": "536.0 KB",
-          "mtime": 1792615250.4020233,
+          "name": "11 - Tramite 28-07-2026_12-18-59.pdf",
+          "relative_path": "Protocolos/13753-2026-GRL - Pagamento Jun-2026 - Parcela 40 - NFs 61 a 63 e BDE (Deferido)/11 - Tramite 28-07-2026_12-18-59.pdf",
+          "size_bytes": 38517,
+          "size_formatted": "37.6 KB",
+          "mtime": 1792615249.9471693,
           "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615250.4020233,
+          "ctime": 1792615249.9471693,
           "ctime_formatted": "21/10/2026 17:40",
           "extension": ".pdf",
           "is_pdf": true
@@ -1491,6 +1491,19 @@
         },
         {
           "id": 8,
+          "name": "08 - Oficio-_Manifestacao_Tecnica_acerca_do_Oficio_nBA_33BPMI-0230326_assinado.pdf",
+          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/08 - Oficio-_Manifestacao_Tecnica_acerca_do_Oficio_nBA_33BPMI-0230326_assinado.pdf",
+          "size_bytes": 209811,
+          "size_formatted": "204.9 KB",
+          "mtime": 1792615254.116772,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615254.116772,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 9,
           "name": "09 - Oficio Major Esther.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/09 - Oficio Major Esther.pdf",
           "size_bytes": 800035,
@@ -1503,7 +1516,20 @@
           "is_pdf": true
         },
         {
-          "id": 9,
+          "id": 10,
+          "name": "10 - 0. CMOG - processo 12.537-2026 Reconhecimento Facial.pdf",
+          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/10 - 0. CMOG - processo 12.537-2026 Reconhecimento Facial.pdf",
+          "size_bytes": 2731884,
+          "size_formatted": "2.61 MB",
+          "mtime": 1792615253.907421,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615253.907421,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 11,
           "name": "11 - Tramite 30-06-2026_16-34-56.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/11 - Tramite 30-06-2026_16-34-56.pdf",
           "size_bytes": 22299,
@@ -1516,7 +1542,7 @@
           "is_pdf": true
         },
         {
-          "id": 10,
+          "id": 12,
           "name": "12 - Tramite 03-07-2026_10-20-42.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/12 - Tramite 03-07-2026_10-20-42.pdf",
           "size_bytes": 19154,
@@ -1529,7 +1555,7 @@
           "is_pdf": true
         },
         {
-          "id": 11,
+          "id": 13,
           "name": "13 - Tramite 03-07-2026_12-10-05.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/13 - Tramite 03-07-2026_12-10-05.pdf",
           "size_bytes": 19227,
@@ -1542,7 +1568,7 @@
           "is_pdf": true
         },
         {
-          "id": 12,
+          "id": 14,
           "name": "14 - Tramite 14-07-2026_15-22-24.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/14 - Tramite 14-07-2026_15-22-24.pdf",
           "size_bytes": 19187,
@@ -1555,7 +1581,7 @@
           "is_pdf": true
         },
         {
-          "id": 13,
+          "id": 15,
           "name": "15 - parecer - 12.537-2026_signed.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/15 - parecer - 12.537-2026_signed.pdf",
           "size_bytes": 116350,
@@ -1568,7 +1594,7 @@
           "is_pdf": true
         },
         {
-          "id": 14,
+          "id": 16,
           "name": "16 - Tramite 20-07-2026_10-08-53.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/16 - Tramite 20-07-2026_10-08-53.pdf",
           "size_bytes": 21173,
@@ -1581,7 +1607,7 @@
           "is_pdf": true
         },
         {
-          "id": 15,
+          "id": 17,
           "name": "17 - Tramite 20-07-2026_10-27-48.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/17 - Tramite 20-07-2026_10-27-48.pdf",
           "size_bytes": 19117,
@@ -1594,7 +1620,7 @@
           "is_pdf": true
         },
         {
-          "id": 16,
+          "id": 18,
           "name": "18 - Tramite 20-07-2026_10-39-45.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/18 - Tramite 20-07-2026_10-39-45.pdf",
           "size_bytes": 19162,
@@ -1607,7 +1633,7 @@
           "is_pdf": true
         },
         {
-          "id": 17,
+          "id": 19,
           "name": "19 - Tramite 20-07-2026_12-19-59.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/19 - Tramite 20-07-2026_12-19-59.pdf",
           "size_bytes": 19149,
@@ -1620,7 +1646,20 @@
           "is_pdf": true
         },
         {
-          "id": 18,
+          "id": 20,
+          "name": "20 - LEI COMPLEMENTAR N.º 633, DE 15 DE DEZEMBRO DE 2025.pdf",
+          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/20 - LEI COMPLEMENTAR N.º 633, DE 15 DE DEZEMBRO DE 2025.pdf",
+          "size_bytes": 232283,
+          "size_formatted": "226.8 KB",
+          "mtime": 1792615253.432619,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615253.432619,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 21,
           "name": "21 - Tramite 26-07-2026_09-41-31.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/21 - Tramite 26-07-2026_09-41-31.pdf",
           "size_bytes": 21628,
@@ -1633,7 +1672,7 @@
           "is_pdf": true
         },
         {
-          "id": 19,
+          "id": 22,
           "name": "22 - Tramite 27-07-2026_16-22-03.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/22 - Tramite 27-07-2026_16-22-03.pdf",
           "size_bytes": 19195,
@@ -1646,7 +1685,20 @@
           "is_pdf": true
         },
         {
-          "id": 20,
+          "id": 23,
+          "name": "23 - 0. CMOG - processo 12.537-2026 Reconhecimento Facial 2º parecer.pdf",
+          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/23 - 0. CMOG - processo 12.537-2026 Reconhecimento Facial 2º parecer.pdf",
+          "size_bytes": 2916182,
+          "size_formatted": "2.78 MB",
+          "mtime": 1792615253.1491299,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615253.1491299,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 24,
           "name": "24 - Tramite 04-08-2026_16-49-04.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/24 - Tramite 04-08-2026_16-49-04.pdf",
           "size_bytes": 21962,
@@ -1659,7 +1711,7 @@
           "is_pdf": true
         },
         {
-          "id": 21,
+          "id": 25,
           "name": "25 - Declaração de Ficha Orçamentaria 12.537-2026.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/25 - Declaração de Ficha Orçamentaria 12.537-2026.pdf",
           "size_bytes": 2876839,
@@ -1672,7 +1724,7 @@
           "is_pdf": true
         },
         {
-          "id": 22,
+          "id": 26,
           "name": "26 - Tramite 06-08-2026_14-53-56.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/26 - Tramite 06-08-2026_14-53-56.pdf",
           "size_bytes": 21196,
@@ -1685,7 +1737,7 @@
           "is_pdf": true
         },
         {
-          "id": 23,
+          "id": 27,
           "name": "27 - Tramite 10-08-2026_12-22-24.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/27 - Tramite 10-08-2026_12-22-24.pdf",
           "size_bytes": 19154,
@@ -1698,7 +1750,7 @@
           "is_pdf": true
         },
         {
-          "id": 24,
+          "id": 28,
           "name": "28 - 17 - minuta termo aditivo.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/28 - 17 - minuta termo aditivo.pdf",
           "size_bytes": 737174,
@@ -1711,7 +1763,7 @@
           "is_pdf": true
         },
         {
-          "id": 25,
+          "id": 29,
           "name": "29 - Tramite 11-08-2026_10-35-24.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/29 - Tramite 11-08-2026_10-35-24.pdf",
           "size_bytes": 21336,
@@ -1724,7 +1776,7 @@
           "is_pdf": true
         },
         {
-          "id": 26,
+          "id": 30,
           "name": "30 - parecer - 12537-2026 - 2_signed.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/30 - parecer - 12537-2026 - 2_signed.pdf",
           "size_bytes": 116084,
@@ -1737,7 +1789,7 @@
           "is_pdf": true
         },
         {
-          "id": 27,
+          "id": 31,
           "name": "31 - Tramite 12-08-2026_13-14-23.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/31 - Tramite 12-08-2026_13-14-23.pdf",
           "size_bytes": 21173,
@@ -1750,7 +1802,7 @@
           "is_pdf": true
         },
         {
-          "id": 28,
+          "id": 32,
           "name": "32 - Tramite 12-08-2026_17-59-32.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/32 - Tramite 12-08-2026_17-59-32.pdf",
           "size_bytes": 19122,
@@ -1763,7 +1815,20 @@
           "is_pdf": true
         },
         {
-          "id": 29,
+          "id": 33,
+          "name": "33 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
+          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/33 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
+          "size_bytes": 10356941,
+          "size_formatted": "9.88 MB",
+          "mtime": 1792615252.7587562,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615252.7587562,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 34,
           "name": "34 - Tramite 13-10-2026_14-55-26.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/34 - Tramite 13-10-2026_14-55-26.pdf",
           "size_bytes": 21696,
@@ -1776,59 +1841,7 @@
           "is_pdf": true
         },
         {
-          "id": 30,
-          "name": "35 - Tramite 15-10-2026_08-30-44.pdf",
-          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/35 - Tramite 15-10-2026_08-30-44.pdf",
-          "size_bytes": 19171,
-          "size_formatted": "18.7 KB",
-          "mtime": 1792588141.348492,
-          "mtime_formatted": "21/10/2026 10:09",
-          "ctime": 1792589261.5234034,
-          "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 31,
-          "name": "36 - Tramite 16-10-2026_15-26-40.pdf",
-          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/36 - Tramite 16-10-2026_15-26-40.pdf",
-          "size_bytes": 19242,
-          "size_formatted": "18.8 KB",
-          "mtime": 1792588141.3596797,
-          "mtime_formatted": "21/10/2026 10:09",
-          "ctime": 1792589261.5360153,
-          "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 32,
-          "name": "37 - Tramite 19-10-2026_15-04-01.pdf",
-          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/37 - Tramite 19-10-2026_15-04-01.pdf",
-          "size_bytes": 19674,
-          "size_formatted": "19.2 KB",
-          "mtime": 1792588141.368725,
-          "mtime_formatted": "21/10/2026 10:09",
-          "ctime": 1792589261.5526528,
-          "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 33,
-          "name": "38 - Tramite 20-10-2026_12-29-35.pdf",
-          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/38 - Tramite 20-10-2026_12-29-35.pdf",
-          "size_bytes": 19339,
-          "size_formatted": "18.9 KB",
-          "mtime": 1792588141.3782766,
-          "mtime_formatted": "21/10/2026 10:09",
-          "ctime": 1792589261.564288,
-          "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 34,
+          "id": 35,
           "name": "34 - Tramite 21-10-2026_15-43-39.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/34 - Tramite 21-10-2026_15-43-39.pdf",
           "size_bytes": 19256,
@@ -1841,7 +1854,20 @@
           "is_pdf": true
         },
         {
-          "id": 35,
+          "id": 36,
+          "name": "35 - Tramite 15-10-2026_08-30-44.pdf",
+          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/35 - Tramite 15-10-2026_08-30-44.pdf",
+          "size_bytes": 19171,
+          "size_formatted": "18.7 KB",
+          "mtime": 1792588141.348492,
+          "mtime_formatted": "21/10/2026 10:09",
+          "ctime": 1792589261.5234034,
+          "ctime_formatted": "21/10/2026 10:27",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 37,
           "name": "35 - Tramite 21-10-2026_11-58-36.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/35 - Tramite 21-10-2026_11-58-36.pdf",
           "size_bytes": 21496,
@@ -1854,7 +1880,20 @@
           "is_pdf": true
         },
         {
-          "id": 36,
+          "id": 38,
+          "name": "36 - Tramite 16-10-2026_15-26-40.pdf",
+          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/36 - Tramite 16-10-2026_15-26-40.pdf",
+          "size_bytes": 19242,
+          "size_formatted": "18.8 KB",
+          "mtime": 1792588141.3596797,
+          "mtime_formatted": "21/10/2026 10:09",
+          "ctime": 1792589261.5360153,
+          "ctime_formatted": "21/10/2026 10:27",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 39,
           "name": "36 - reserva proceso 12537 2026.pdf",
           "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/36 - reserva proceso 12537 2026.pdf",
           "size_bytes": 133552,
@@ -1867,67 +1906,28 @@
           "is_pdf": true
         },
         {
-          "id": 37,
-          "name": "37 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
-          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/37 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
-          "size_bytes": 10356941,
-          "size_formatted": "9.88 MB",
-          "mtime": 1792615252.7587562,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615252.7587562,
-          "ctime_formatted": "21/10/2026 17:40",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 38,
-          "name": "38 - 0. CMOG - processo 12.537-2026 Reconhecimento Facial 2º parecer.pdf",
-          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/38 - 0. CMOG - processo 12.537-2026 Reconhecimento Facial 2º parecer.pdf",
-          "size_bytes": 2916182,
-          "size_formatted": "2.78 MB",
-          "mtime": 1792615253.1491299,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615253.1491299,
-          "ctime_formatted": "21/10/2026 17:40",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 39,
-          "name": "39 - LEI   COMPLEMENTAR   N.º   633,   DE   15   DE   DEZEMBRO   DE   2025.pdf",
-          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/39 - LEI   COMPLEMENTAR   N.º   633,   DE   15   DE   DEZEMBRO   DE   2025.pdf",
-          "size_bytes": 232283,
-          "size_formatted": "226.8 KB",
-          "mtime": 1792615253.432619,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615253.432619,
-          "ctime_formatted": "21/10/2026 17:40",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
           "id": 40,
-          "name": "40 - 0. CMOG - processo 12.537-2026 Reconhecimento Facial.pdf",
-          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/40 - 0. CMOG - processo 12.537-2026 Reconhecimento Facial.pdf",
-          "size_bytes": 2731884,
-          "size_formatted": "2.61 MB",
-          "mtime": 1792615253.907421,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615253.907421,
-          "ctime_formatted": "21/10/2026 17:40",
+          "name": "37 - Tramite 19-10-2026_15-04-01.pdf",
+          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/37 - Tramite 19-10-2026_15-04-01.pdf",
+          "size_bytes": 19674,
+          "size_formatted": "19.2 KB",
+          "mtime": 1792588141.368725,
+          "mtime_formatted": "21/10/2026 10:09",
+          "ctime": 1792589261.5526528,
+          "ctime_formatted": "21/10/2026 10:27",
           "extension": ".pdf",
           "is_pdf": true
         },
         {
           "id": 41,
-          "name": "41 - Oficio-_Manifestacao_Tecnica_acerca_do_Oficio_nBA_33BPMI-0230326_assinado.pdf",
-          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/41 - Oficio-_Manifestacao_Tecnica_acerca_do_Oficio_nBA_33BPMI-0230326_assinado.pdf",
-          "size_bytes": 209811,
-          "size_formatted": "204.9 KB",
-          "mtime": 1792615254.116772,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615254.116772,
-          "ctime_formatted": "21/10/2026 17:40",
+          "name": "38 - Tramite 20-10-2026_12-29-35.pdf",
+          "relative_path": "Protocolos/12537-2026-GRL - Reconhecimento Facial - Videomonitoramento/38 - Tramite 20-10-2026_12-29-35.pdf",
+          "size_bytes": 19339,
+          "size_formatted": "18.9 KB",
+          "mtime": 1792588141.3782766,
+          "mtime_formatted": "21/10/2026 10:09",
+          "ctime": 1792589261.564288,
+          "ctime_formatted": "21/10/2026 10:27",
           "extension": ".pdf",
           "is_pdf": true
         }
@@ -1962,6 +1962,19 @@
       "files": [
         {
           "id": 1,
+          "name": "01 - Anexo IV - MINUTA DE CONTRATO DE CONCESSAO ADMINISTRATIVA.pdf",
+          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/01 - Anexo IV - MINUTA DE CONTRATO DE CONCESSAO ADMINISTRATIVA.pdf",
+          "size_bytes": 589918,
+          "size_formatted": "576.1 KB",
+          "mtime": 1792615262.8653965,
+          "mtime_formatted": "21/10/2026 17:41",
+          "ctime": 1792615262.8653965,
+          "ctime_formatted": "21/10/2026 17:41",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 2,
           "name": "02 - Anexo III do contrato.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/02 - Anexo III do contrato.pdf",
           "size_bytes": 379443,
@@ -1974,7 +1987,33 @@
           "is_pdf": true
         },
         {
-          "id": 2,
+          "id": 3,
+          "name": "03 - 02_ORCAMENTO_MONTAGEM_CARPORT_IP_BARRETOS_720_MODULOS_BARRETOS_-_SP_Mao_de_obra_.pdf",
+          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/03 - 02_ORCAMENTO_MONTAGEM_CARPORT_IP_BARRETOS_720_MODULOS_BARRETOS_-_SP_Mao_de_obra_.pdf",
+          "size_bytes": 777102,
+          "size_formatted": "758.9 KB",
+          "mtime": 1792615262.6057317,
+          "mtime_formatted": "21/10/2026 17:41",
+          "ctime": 1792615262.6057317,
+          "ctime_formatted": "21/10/2026 17:41",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 4,
+          "name": "04 - 01_ORC_06226_-_CARPORT_2L_-_IP_BARRETOS_CONCEISSIONARIA_-_UPA_POSTAO_-_720P_-_710W.pdf",
+          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/04 - 01_ORC_06226_-_CARPORT_2L_-_IP_BARRETOS_CONCEISSIONARIA_-_UPA_POSTAO_-_720P_-_710W.pdf",
+          "size_bytes": 981305,
+          "size_formatted": "958.3 KB",
+          "mtime": 1792615262.3502908,
+          "mtime_formatted": "21/10/2026 17:41",
+          "ctime": 1792615262.3502908,
+          "ctime_formatted": "21/10/2026 17:41",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 5,
           "name": "05 - 05_Indice_de_Anexos_29_assinado.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/05 - 05_Indice_de_Anexos_29_assinado.pdf",
           "size_bytes": 69388,
@@ -1987,7 +2026,20 @@
           "is_pdf": true
         },
         {
-          "id": 3,
+          "id": 6,
+          "name": "06 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
+          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/06 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
+          "size_bytes": 332260,
+          "size_formatted": "324.5 KB",
+          "mtime": 1792615262.1013846,
+          "mtime_formatted": "21/10/2026 17:41",
+          "ctime": 1792615262.1013846,
+          "ctime_formatted": "21/10/2026 17:41",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 7,
           "name": "07 - 03_Memorial_Descritivo_PPP_assinado.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/07 - 03_Memorial_Descritivo_PPP_assinado.pdf",
           "size_bytes": 341035,
@@ -2000,7 +2052,7 @@
           "is_pdf": true
         },
         {
-          "id": 4,
+          "id": 8,
           "name": "08 - 02_Planilha_Orcamentaria_PPP_assinado.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/08 - 02_Planilha_Orcamentaria_PPP_assinado.pdf",
           "size_bytes": 333784,
@@ -2013,7 +2065,7 @@
           "is_pdf": true
         },
         {
-          "id": 5,
+          "id": 9,
           "name": "09 - 01_Proposta_Tecnica_Comercial_PPP_assinado.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/09 - 01_Proposta_Tecnica_Comercial_PPP_assinado.pdf",
           "size_bytes": 332185,
@@ -2026,7 +2078,20 @@
           "is_pdf": true
         },
         {
-          "id": 6,
+          "id": 10,
+          "name": "10 - Proposta_finaceira_por_aporte_-carpot_rev01_29_assinado.pdf",
+          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/10 - Proposta_finaceira_por_aporte_-carpot_rev01_29_assinado.pdf",
+          "size_bytes": 245719,
+          "size_formatted": "240.0 KB",
+          "mtime": 1792615261.8510664,
+          "mtime_formatted": "21/10/2026 17:41",
+          "ctime": 1792615261.8510664,
+          "ctime_formatted": "21/10/2026 17:41",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 11,
           "name": "11 - Requerimento_0001.2026_assinado.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/11 - Requerimento_0001.2026_assinado.pdf",
           "size_bytes": 309184,
@@ -2039,7 +2104,20 @@
           "is_pdf": true
         },
         {
-          "id": 7,
+          "id": 12,
+          "name": "12 - B - OFICIOS-PROCESSO 12458-2026 - IMPLANTAÇÃO FOTOVOLTAICA.pdf",
+          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/12 - B - OFICIOS-PROCESSO 12458-2026 - IMPLANTAÇÃO FOTOVOLTAICA.pdf",
+          "size_bytes": 2707006,
+          "size_formatted": "2.58 MB",
+          "mtime": 1792615261.591836,
+          "mtime_formatted": "21/10/2026 17:41",
+          "ctime": 1792615261.591836,
+          "ctime_formatted": "21/10/2026 17:41",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 13,
           "name": "13 - Tramite 24-06-2026_08-07-19.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/13 - Tramite 24-06-2026_08-07-19.pdf",
           "size_bytes": 40477,
@@ -2052,7 +2130,7 @@
           "is_pdf": true
         },
         {
-          "id": 8,
+          "id": 14,
           "name": "14 - Tramite 25-06-2026_06-48-19.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/14 - Tramite 25-06-2026_06-48-19.pdf",
           "size_bytes": 38567,
@@ -2065,7 +2143,7 @@
           "is_pdf": true
         },
         {
-          "id": 9,
+          "id": 15,
           "name": "15 - IP BARRETOS CARPORT 176MOD 710W - UPA.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/15 - IP BARRETOS CARPORT 176MOD 710W - UPA.pdf",
           "size_bytes": 1382412,
@@ -2078,7 +2156,20 @@
           "is_pdf": true
         },
         {
-          "id": 10,
+          "id": 16,
+          "name": "16 - IP BARRETOS CARPORT 176MOD 710W - CENTRO DE REABILITAÇÃO.pdf",
+          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/16 - IP BARRETOS CARPORT 176MOD 710W - CENTRO DE REABILITAÇÃO.pdf",
+          "size_bytes": 1382432,
+          "size_formatted": "1.32 MB",
+          "mtime": 1792615261.2071915,
+          "mtime_formatted": "21/10/2026 17:41",
+          "ctime": 1792615261.2071915,
+          "ctime_formatted": "21/10/2026 17:41",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 17,
           "name": "17 - IP BARRETOS CARPORT 112MOD 710W - POSTÃO.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/17 - IP BARRETOS CARPORT 112MOD 710W - POSTÃO.pdf",
           "size_bytes": 1382377,
@@ -2091,7 +2182,7 @@
           "is_pdf": true
         },
         {
-          "id": 11,
+          "id": 18,
           "name": "18 - 0. CMOG - processo 12.458-2026 Carport (1).pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/18 - 0. CMOG - processo 12.458-2026 Carport (1).pdf",
           "size_bytes": 2862581,
@@ -2104,7 +2195,7 @@
           "is_pdf": true
         },
         {
-          "id": 12,
+          "id": 19,
           "name": "19 - Tramite 30-06-2026_16-46-59.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/19 - Tramite 30-06-2026_16-46-59.pdf",
           "size_bytes": 42023,
@@ -2117,7 +2208,7 @@
           "is_pdf": true
         },
         {
-          "id": 13,
+          "id": 20,
           "name": "20 - Tramite 03-07-2026_10-22-45.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/20 - Tramite 03-07-2026_10-22-45.pdf",
           "size_bytes": 38275,
@@ -2130,7 +2221,7 @@
           "is_pdf": true
         },
         {
-          "id": 14,
+          "id": 21,
           "name": "21 - Tramite 03-07-2026_12-34-33.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/21 - Tramite 03-07-2026_12-34-33.pdf",
           "size_bytes": 38366,
@@ -2143,7 +2234,7 @@
           "is_pdf": true
         },
         {
-          "id": 15,
+          "id": 22,
           "name": "22 - parecer - 12.458-2026_signed.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/22 - parecer - 12.458-2026_signed.pdf",
           "size_bytes": 124109,
@@ -2156,7 +2247,7 @@
           "is_pdf": true
         },
         {
-          "id": 16,
+          "id": 23,
           "name": "23 - Tramite 20-07-2026_11-33-41.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/23 - Tramite 20-07-2026_11-33-41.pdf",
           "size_bytes": 40370,
@@ -2169,7 +2260,7 @@
           "is_pdf": true
         },
         {
-          "id": 17,
+          "id": 24,
           "name": "24 - Tramite 20-07-2026_12-00-56.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/24 - Tramite 20-07-2026_12-00-56.pdf",
           "size_bytes": 38245,
@@ -2182,7 +2273,7 @@
           "is_pdf": true
         },
         {
-          "id": 18,
+          "id": 25,
           "name": "25 - Tramite 20-07-2026_13-31-25.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/25 - Tramite 20-07-2026_13-31-25.pdf",
           "size_bytes": 38276,
@@ -2195,7 +2286,7 @@
           "is_pdf": true
         },
         {
-          "id": 19,
+          "id": 26,
           "name": "26 - Tramite 27-07-2026_16-09-11.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/26 - Tramite 27-07-2026_16-09-11.pdf",
           "size_bytes": 38283,
@@ -2208,7 +2299,7 @@
           "is_pdf": true
         },
         {
-          "id": 20,
+          "id": 27,
           "name": "27 - Tramite 31-07-2026_04-43-14.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/27 - Tramite 31-07-2026_04-43-14.pdf",
           "size_bytes": 38370,
@@ -2221,7 +2312,20 @@
           "is_pdf": true
         },
         {
-          "id": 21,
+          "id": 28,
+          "name": "28 - 0. CMOG - processo 12.458-2026 Carport 2º Parecer.pdf",
+          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/28 - 0. CMOG - processo 12.458-2026 Carport 2º Parecer.pdf",
+          "size_bytes": 2951752,
+          "size_formatted": "2.82 MB",
+          "mtime": 1792615260.850923,
+          "mtime_formatted": "21/10/2026 17:41",
+          "ctime": 1792615260.850923,
+          "ctime_formatted": "21/10/2026 17:41",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 29,
           "name": "29 - Tramite 04-08-2026_16-55-34.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/29 - Tramite 04-08-2026_16-55-34.pdf",
           "size_bytes": 41036,
@@ -2234,7 +2338,7 @@
           "is_pdf": true
         },
         {
-          "id": 22,
+          "id": 30,
           "name": "30 - OFICIO RESP. 12.458.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/30 - OFICIO RESP. 12.458.pdf",
           "size_bytes": 2557526,
@@ -2247,7 +2351,7 @@
           "is_pdf": true
         },
         {
-          "id": 23,
+          "id": 31,
           "name": "31 - Declaração de Ficha Orçamentaria 12458-2026.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/31 - Declaração de Ficha Orçamentaria 12458-2026.pdf",
           "size_bytes": 2881344,
@@ -2260,7 +2364,7 @@
           "is_pdf": true
         },
         {
-          "id": 24,
+          "id": 32,
           "name": "32 - Tramite 06-08-2026_15-50-10.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/32 - Tramite 06-08-2026_15-50-10.pdf",
           "size_bytes": 40509,
@@ -2273,7 +2377,7 @@
           "is_pdf": true
         },
         {
-          "id": 25,
+          "id": 33,
           "name": "33 - Tramite 14-08-2026_06-27-02.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/33 - Tramite 14-08-2026_06-27-02.pdf",
           "size_bytes": 38344,
@@ -2286,7 +2390,20 @@
           "is_pdf": true
         },
         {
-          "id": 26,
+          "id": 34,
+          "name": "34 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
+          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/34 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
+          "size_bytes": 10356941,
+          "size_formatted": "9.88 MB",
+          "mtime": 1792615260.3883867,
+          "mtime_formatted": "21/10/2026 17:41",
+          "ctime": 1792615260.3883867,
+          "ctime_formatted": "21/10/2026 17:41",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 35,
           "name": "35 - Tramite 13-10-2026_15-01-43.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/35 - Tramite 13-10-2026_15-01-43.pdf",
           "size_bytes": 40910,
@@ -2299,7 +2416,7 @@
           "is_pdf": true
         },
         {
-          "id": 27,
+          "id": 36,
           "name": "36 - Tramite 15-10-2026_08-31-30.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/36 - Tramite 15-10-2026_08-31-30.pdf",
           "size_bytes": 38313,
@@ -2312,7 +2429,7 @@
           "is_pdf": true
         },
         {
-          "id": 28,
+          "id": 37,
           "name": "37 - 21 - minuta termo aditivo.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/37 - 21 - minuta termo aditivo.pdf",
           "size_bytes": 644179,
@@ -2325,7 +2442,7 @@
           "is_pdf": true
         },
         {
-          "id": 29,
+          "id": 38,
           "name": "38 - Tramite 16-10-2026_15-29-17.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/38 - Tramite 16-10-2026_15-29-17.pdf",
           "size_bytes": 40537,
@@ -2338,7 +2455,7 @@
           "is_pdf": true
         },
         {
-          "id": 30,
+          "id": 39,
           "name": "39 - Tramite 19-10-2026_15-24-31.pdf",
           "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/39 - Tramite 19-10-2026_15-24-31.pdf",
           "size_bytes": 39064,
@@ -2347,123 +2464,6 @@
           "mtime_formatted": "21/10/2026 10:09",
           "ctime": 1792589259.974524,
           "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 31,
-          "name": "31 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
-          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/31 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
-          "size_bytes": 10356941,
-          "size_formatted": "9.88 MB",
-          "mtime": 1792615260.3883867,
-          "mtime_formatted": "21/10/2026 17:41",
-          "ctime": 1792615260.3883867,
-          "ctime_formatted": "21/10/2026 17:41",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 32,
-          "name": "32 - 0. CMOG - processo 12.458-2026 Carport 2º Parecer.pdf",
-          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/32 - 0. CMOG - processo 12.458-2026 Carport 2º Parecer.pdf",
-          "size_bytes": 2951752,
-          "size_formatted": "2.82 MB",
-          "mtime": 1792615260.850923,
-          "mtime_formatted": "21/10/2026 17:41",
-          "ctime": 1792615260.850923,
-          "ctime_formatted": "21/10/2026 17:41",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 33,
-          "name": "33 - IP BARRETOS CARPORT 176MOD 710W - CENTRO DE REABILITAÇÃO.pdf",
-          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/33 - IP BARRETOS CARPORT 176MOD 710W - CENTRO DE REABILITAÇÃO.pdf",
-          "size_bytes": 1382432,
-          "size_formatted": "1.32 MB",
-          "mtime": 1792615261.2071915,
-          "mtime_formatted": "21/10/2026 17:41",
-          "ctime": 1792615261.2071915,
-          "ctime_formatted": "21/10/2026 17:41",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 34,
-          "name": "34 - B - OFICIOS-PROCESSO 12458-2026 - IMPLANTAÇÃO FOTOVOLTAICA.pdf",
-          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/34 - B - OFICIOS-PROCESSO 12458-2026 - IMPLANTAÇÃO FOTOVOLTAICA.pdf",
-          "size_bytes": 2707006,
-          "size_formatted": "2.58 MB",
-          "mtime": 1792615261.591836,
-          "mtime_formatted": "21/10/2026 17:41",
-          "ctime": 1792615261.591836,
-          "ctime_formatted": "21/10/2026 17:41",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 35,
-          "name": "35 - Proposta_finaceira_por_aporte_-carpot_rev01_29_assinado.pdf",
-          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/35 - Proposta_finaceira_por_aporte_-carpot_rev01_29_assinado.pdf",
-          "size_bytes": 245719,
-          "size_formatted": "240.0 KB",
-          "mtime": 1792615261.8510664,
-          "mtime_formatted": "21/10/2026 17:41",
-          "ctime": 1792615261.8510664,
-          "ctime_formatted": "21/10/2026 17:41",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 36,
-          "name": "36 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
-          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/36 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
-          "size_bytes": 332260,
-          "size_formatted": "324.5 KB",
-          "mtime": 1792615262.1013846,
-          "mtime_formatted": "21/10/2026 17:41",
-          "ctime": 1792615262.1013846,
-          "ctime_formatted": "21/10/2026 17:41",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 37,
-          "name": "37 - 01_ORC_06226_-_CARPORT_2L_-_IP_BARRETOS_CONCEISSIONARIA_-_UPA_POSTAO_-_720P_-_710W.pdf",
-          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/37 - 01_ORC_06226_-_CARPORT_2L_-_IP_BARRETOS_CONCEISSIONARIA_-_UPA_POSTAO_-_720P_-_710W.pdf",
-          "size_bytes": 981305,
-          "size_formatted": "958.3 KB",
-          "mtime": 1792615262.3502908,
-          "mtime_formatted": "21/10/2026 17:41",
-          "ctime": 1792615262.3502908,
-          "ctime_formatted": "21/10/2026 17:41",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 38,
-          "name": "38 - 02_ORCAMENTO_MONTAGEM_CARPORT_IP_BARRETOS_720_MODULOS_BARRETOS_-_SP_Mao_de_obra_.pdf",
-          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/38 - 02_ORCAMENTO_MONTAGEM_CARPORT_IP_BARRETOS_720_MODULOS_BARRETOS_-_SP_Mao_de_obra_.pdf",
-          "size_bytes": 777102,
-          "size_formatted": "758.9 KB",
-          "mtime": 1792615262.6057317,
-          "mtime_formatted": "21/10/2026 17:41",
-          "ctime": 1792615262.6057317,
-          "ctime_formatted": "21/10/2026 17:41",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 39,
-          "name": "39 - Anexo IV - MINUTA DE CONTRATO DE CONCESSAO ADMINISTRATIVA.pdf",
-          "relative_path": "Protocolos/12458-2026-GRL - Carport Fotovoltaico - Requerimento 0001-2026/39 - Anexo IV - MINUTA DE CONTRATO DE CONCESSAO ADMINISTRATIVA.pdf",
-          "size_bytes": 589918,
-          "size_formatted": "576.1 KB",
-          "mtime": 1792615262.8653965,
-          "mtime_formatted": "21/10/2026 17:41",
-          "ctime": 1792615262.8653965,
-          "ctime_formatted": "21/10/2026 17:41",
           "extension": ".pdf",
           "is_pdf": true
         }
@@ -2511,6 +2511,19 @@
         },
         {
           "id": 2,
+          "name": "02 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/02 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
+          "size_bytes": 330554,
+          "size_formatted": "322.8 KB",
+          "mtime": 1792615258.967414,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615258.967414,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 3,
           "name": "03 - 03_Memorial_Descritivo_PPP_assinado.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/03 - 03_Memorial_Descritivo_PPP_assinado.pdf",
           "size_bytes": 335362,
@@ -2523,7 +2536,7 @@
           "is_pdf": true
         },
         {
-          "id": 3,
+          "id": 4,
           "name": "04 - 02_Planilha_Orcamentaria_PPP_assinado.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/04 - 02_Planilha_Orcamentaria_PPP_assinado.pdf",
           "size_bytes": 332000,
@@ -2536,7 +2549,20 @@
           "is_pdf": true
         },
         {
-          "id": 4,
+          "id": 5,
+          "name": "05 - 01_Proposta_Tecnica_Comercial_PPP_assinado (1).pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/05 - 01_Proposta_Tecnica_Comercial_PPP_assinado (1).pdf",
+          "size_bytes": 331904,
+          "size_formatted": "324.1 KB",
+          "mtime": 1792615258.6872609,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615258.6872609,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 6,
           "name": "06 - Requerimento_0002.2026_assinado.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/06 - Requerimento_0002.2026_assinado.pdf",
           "size_bytes": 274391,
@@ -2549,7 +2575,20 @@
           "is_pdf": true
         },
         {
-          "id": 5,
+          "id": 7,
+          "name": "07 - A - OFICIOS-PROCESSO 12459-2026 -LICENCIAMENTO E OPERCIONALIZAÇÃO - MURALHA DIGITAL.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/07 - A - OFICIOS-PROCESSO 12459-2026 -LICENCIAMENTO E OPERCIONALIZAÇÃO - MURALHA DIGITAL.pdf",
+          "size_bytes": 2709181,
+          "size_formatted": "2.58 MB",
+          "mtime": 1792615258.4358315,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615258.4358315,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 8,
           "name": "08 - Tramite 24-06-2026_08-20-31.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/08 - Tramite 24-06-2026_08-20-31.pdf",
           "size_bytes": 40478,
@@ -2562,7 +2601,7 @@
           "is_pdf": true
         },
         {
-          "id": 6,
+          "id": 9,
           "name": "09 - Tramite 25-06-2026_06-52-19.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/09 - Tramite 25-06-2026_06-52-19.pdf",
           "size_bytes": 38638,
@@ -2575,7 +2614,20 @@
           "is_pdf": true
         },
         {
-          "id": 7,
+          "id": 10,
+          "name": "10 - Oficio-_Manifestacao_Tecnica_acerca_do_Oficio_nBA_33BPMI-0230326_assinado.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/10 - Oficio-_Manifestacao_Tecnica_acerca_do_Oficio_nBA_33BPMI-0230326_assinado.pdf",
+          "size_bytes": 209811,
+          "size_formatted": "204.9 KB",
+          "mtime": 1792615258.0069509,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615258.0069509,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 11,
           "name": "11 - Oficio Major Esther.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/11 - Oficio Major Esther.pdf",
           "size_bytes": 800035,
@@ -2588,7 +2640,20 @@
           "is_pdf": true
         },
         {
-          "id": 8,
+          "id": 12,
+          "name": "12 - 0. CMOG - processo 12.459-2026 Sentry Muralha Digital.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/12 - 0. CMOG - processo 12.459-2026 Sentry Muralha Digital.pdf",
+          "size_bytes": 2729289,
+          "size_formatted": "2.60 MB",
+          "mtime": 1792615257.780757,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615257.780757,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 13,
           "name": "13 - Tramite 30-06-2026_16-41-06.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/13 - Tramite 30-06-2026_16-41-06.pdf",
           "size_bytes": 41602,
@@ -2601,7 +2666,7 @@
           "is_pdf": true
         },
         {
-          "id": 9,
+          "id": 14,
           "name": "14 - Tramite 03-07-2026_10-21-42.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/14 - Tramite 03-07-2026_10-21-42.pdf",
           "size_bytes": 38274,
@@ -2614,7 +2679,7 @@
           "is_pdf": true
         },
         {
-          "id": 10,
+          "id": 15,
           "name": "15 - Tramite 03-07-2026_12-27-29.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/15 - Tramite 03-07-2026_12-27-29.pdf",
           "size_bytes": 38365,
@@ -2627,7 +2692,7 @@
           "is_pdf": true
         },
         {
-          "id": 11,
+          "id": 16,
           "name": "16 - Tramite 14-07-2026_15-33-04.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/16 - Tramite 14-07-2026_15-33-04.pdf",
           "size_bytes": 38310,
@@ -2640,7 +2705,7 @@
           "is_pdf": true
         },
         {
-          "id": 12,
+          "id": 17,
           "name": "17 - parecer - 12.459-2026_signed.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/17 - parecer - 12.459-2026_signed.pdf",
           "size_bytes": 115519,
@@ -2653,7 +2718,7 @@
           "is_pdf": true
         },
         {
-          "id": 13,
+          "id": 18,
           "name": "18 - Tramite 20-07-2026_10-19-17.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/18 - Tramite 20-07-2026_10-19-17.pdf",
           "size_bytes": 40335,
@@ -2666,7 +2731,7 @@
           "is_pdf": true
         },
         {
-          "id": 14,
+          "id": 19,
           "name": "19 - Tramite 20-07-2026_10-26-58.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/19 - Tramite 20-07-2026_10-26-58.pdf",
           "size_bytes": 38244,
@@ -2679,7 +2744,7 @@
           "is_pdf": true
         },
         {
-          "id": 15,
+          "id": 20,
           "name": "20 - Tramite 20-07-2026_10-38-26.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/20 - Tramite 20-07-2026_10-38-26.pdf",
           "size_bytes": 38280,
@@ -2692,7 +2757,7 @@
           "is_pdf": true
         },
         {
-          "id": 16,
+          "id": 21,
           "name": "21 - Tramite 20-07-2026_12-21-28.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/21 - Tramite 20-07-2026_12-21-28.pdf",
           "size_bytes": 38290,
@@ -2705,7 +2770,20 @@
           "is_pdf": true
         },
         {
-          "id": 17,
+          "id": 22,
+          "name": "22 - LEI COMPLEMENTAR N.º 633, DE 15 DE DEZEMBRO DE 2025.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/22 - LEI COMPLEMENTAR N.º 633, DE 15 DE DEZEMBRO DE 2025.pdf",
+          "size_bytes": 232283,
+          "size_formatted": "226.8 KB",
+          "mtime": 1792615257.3933847,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615257.3933847,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 23,
           "name": "23 - Tramite 26-07-2026_09-38-04.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/23 - Tramite 26-07-2026_09-38-04.pdf",
           "size_bytes": 40787,
@@ -2718,7 +2796,7 @@
           "is_pdf": true
         },
         {
-          "id": 18,
+          "id": 24,
           "name": "24 - Tramite 27-07-2026_16-23-37.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/24 - Tramite 27-07-2026_16-23-37.pdf",
           "size_bytes": 38315,
@@ -2731,7 +2809,20 @@
           "is_pdf": true
         },
         {
-          "id": 19,
+          "id": 25,
+          "name": "25 - 0. CMOG - processo 12.459-2026 Sentry Muralha Digital 2º Parecer.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/25 - 0. CMOG - processo 12.459-2026 Sentry Muralha Digital 2º Parecer.pdf",
+          "size_bytes": 2913838,
+          "size_formatted": "2.78 MB",
+          "mtime": 1792615257.127477,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615257.127477,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 26,
           "name": "26 - Tramite 04-08-2026_16-52-10.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/26 - Tramite 04-08-2026_16-52-10.pdf",
           "size_bytes": 41129,
@@ -2744,7 +2835,7 @@
           "is_pdf": true
         },
         {
-          "id": 20,
+          "id": 27,
           "name": "27 - Tramite 06-08-2026_14-58-13.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/27 - Tramite 06-08-2026_14-58-13.pdf",
           "size_bytes": 38290,
@@ -2757,7 +2848,7 @@
           "is_pdf": true
         },
         {
-          "id": 21,
+          "id": 28,
           "name": "28 - Tramite 10-08-2026_12-21-27.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/28 - Tramite 10-08-2026_12-21-27.pdf",
           "size_bytes": 38274,
@@ -2770,20 +2861,7 @@
           "is_pdf": true
         },
         {
-          "id": 22,
-          "name": "29 - 19 - minuta termo aditivo.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/29 - 19 - minuta termo aditivo.pdf",
-          "size_bytes": 753221,
-          "size_formatted": "735.6 KB",
-          "mtime": 1792588141.885092,
-          "mtime_formatted": "21/10/2026 10:09",
-          "ctime": 1792589260.3855772,
-          "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 23,
+          "id": 29,
           "name": "30 - Tramite 11-08-2026_09-45-48.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/30 - Tramite 11-08-2026_09-45-48.pdf",
           "size_bytes": 40535,
@@ -2796,7 +2874,7 @@
           "is_pdf": true
         },
         {
-          "id": 24,
+          "id": 30,
           "name": "31 - Tramite 11-08-2026_10-04-11.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/31 - Tramite 11-08-2026_10-04-11.pdf",
           "size_bytes": 38349,
@@ -2809,7 +2887,20 @@
           "is_pdf": true
         },
         {
-          "id": 25,
+          "id": 31,
+          "name": "32 - 19 - minuta termo aditivo.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/32 - 19 - minuta termo aditivo.pdf",
+          "size_bytes": 753221,
+          "size_formatted": "735.6 KB",
+          "mtime": 1792588141.885092,
+          "mtime_formatted": "21/10/2026 10:09",
+          "ctime": 1792589260.3855772,
+          "ctime_formatted": "21/10/2026 10:27",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 32,
           "name": "32 - 19 - minuta termo aditivo.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/32 - 19 - minuta termo aditivo.pdf",
           "size_bytes": 761181,
@@ -2822,7 +2913,7 @@
           "is_pdf": true
         },
         {
-          "id": 26,
+          "id": 33,
           "name": "33 - Tramite 11-08-2026_10-33-40.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/33 - Tramite 11-08-2026_10-33-40.pdf",
           "size_bytes": 40432,
@@ -2835,7 +2926,7 @@
           "is_pdf": true
         },
         {
-          "id": 27,
+          "id": 34,
           "name": "34 - parecer - 12.459-2026 - 2_signed.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/34 - parecer - 12.459-2026 - 2_signed.pdf",
           "size_bytes": 115962,
@@ -2848,7 +2939,7 @@
           "is_pdf": true
         },
         {
-          "id": 28,
+          "id": 35,
           "name": "35 - Tramite 12-08-2026_13-12-16.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/35 - Tramite 12-08-2026_13-12-16.pdf",
           "size_bytes": 40335,
@@ -2861,7 +2952,7 @@
           "is_pdf": true
         },
         {
-          "id": 29,
+          "id": 36,
           "name": "36 - Tramite 12-08-2026_18-15-14.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/36 - Tramite 12-08-2026_18-15-14.pdf",
           "size_bytes": 38252,
@@ -2874,85 +2965,7 @@
           "is_pdf": true
         },
         {
-          "id": 30,
-          "name": "38 - Tramite 13-10-2026_15-04-13.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/38 - Tramite 13-10-2026_15-04-13.pdf",
-          "size_bytes": 40881,
-          "size_formatted": "39.9 KB",
-          "mtime": 1792588142.1146302,
-          "mtime_formatted": "21/10/2026 10:09",
-          "ctime": 1792589260.5109935,
-          "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 31,
-          "name": "39 - Tramite 14-10-2026_16-02-29.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/39 - Tramite 14-10-2026_16-02-29.pdf",
-          "size_bytes": 38280,
-          "size_formatted": "37.4 KB",
-          "mtime": 1792588142.12564,
-          "mtime_formatted": "21/10/2026 10:09",
-          "ctime": 1792589260.52678,
-          "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 32,
-          "name": "40 - Tramite 15-10-2026_10-22-40.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/40 - Tramite 15-10-2026_10-22-40.pdf",
-          "size_bytes": 38366,
-          "size_formatted": "37.5 KB",
-          "mtime": 1792588142.1376374,
-          "mtime_formatted": "21/10/2026 10:09",
-          "ctime": 1792589260.5413232,
-          "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 33,
-          "name": "41 - Tramite 16-10-2026_15-27-35.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/41 - Tramite 16-10-2026_15-27-35.pdf",
-          "size_bytes": 38402,
-          "size_formatted": "37.5 KB",
-          "mtime": 1792588142.1486897,
-          "mtime_formatted": "21/10/2026 10:09",
-          "ctime": 1792589260.5533483,
-          "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 34,
-          "name": "42 - Tramite 19-10-2026_15-01-47.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/42 - Tramite 19-10-2026_15-01-47.pdf",
-          "size_bytes": 38820,
-          "size_formatted": "37.9 KB",
-          "mtime": 1792588142.1582775,
-          "mtime_formatted": "21/10/2026 10:09",
-          "ctime": 1792589260.5658994,
-          "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 35,
-          "name": "43 - Tramite 20-10-2026_12-27-41.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/43 - Tramite 20-10-2026_12-27-41.pdf",
-          "size_bytes": 38480,
-          "size_formatted": "37.6 KB",
-          "mtime": 1792588142.1694038,
-          "mtime_formatted": "21/10/2026 10:09",
-          "ctime": 1792589260.577833,
-          "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 36,
+          "id": 37,
           "name": "36 - Tramite 21-10-2026_15-40-55.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/36 - Tramite 21-10-2026_15-40-55.pdf",
           "size_bytes": 38389,
@@ -2965,7 +2978,7 @@
           "is_pdf": true
         },
         {
-          "id": 37,
+          "id": 38,
           "name": "37 - Tramite 21-10-2026_12-00-07.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/37 - Tramite 21-10-2026_12-00-07.pdf",
           "size_bytes": 40676,
@@ -2978,7 +2991,33 @@
           "is_pdf": true
         },
         {
-          "id": 38,
+          "id": 39,
+          "name": "37 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/37 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
+          "size_bytes": 10356941,
+          "size_formatted": "9.88 MB",
+          "mtime": 1792615256.7703316,
+          "mtime_formatted": "21/10/2026 17:40",
+          "ctime": 1792615256.7703316,
+          "ctime_formatted": "21/10/2026 17:40",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 40,
+          "name": "38 - Tramite 13-10-2026_15-04-13.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/38 - Tramite 13-10-2026_15-04-13.pdf",
+          "size_bytes": 40881,
+          "size_formatted": "39.9 KB",
+          "mtime": 1792588142.1146302,
+          "mtime_formatted": "21/10/2026 10:09",
+          "ctime": 1792589260.5109935,
+          "ctime_formatted": "21/10/2026 10:27",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 41,
           "name": "38 - reserva processo n.º12459 de 2026.pdf",
           "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/38 - reserva processo n.º12459 de 2026.pdf",
           "size_bytes": 133210,
@@ -2991,106 +3030,67 @@
           "is_pdf": true
         },
         {
-          "id": 39,
-          "name": "39 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/39 - Manifestação Ténica Verificador Independente Processos Reequilibrio 2026.pdf",
-          "size_bytes": 10356941,
-          "size_formatted": "9.88 MB",
-          "mtime": 1792615256.7703316,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615256.7703316,
-          "ctime_formatted": "21/10/2026 17:40",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 40,
-          "name": "40 - 0. CMOG - processo 12.459-2026 Sentry Muralha Digital 2º Parecer.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/40 - 0. CMOG - processo 12.459-2026 Sentry Muralha Digital 2º Parecer.pdf",
-          "size_bytes": 2913838,
-          "size_formatted": "2.78 MB",
-          "mtime": 1792615257.127477,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615257.127477,
-          "ctime_formatted": "21/10/2026 17:40",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 41,
-          "name": "41 - LEI   COMPLEMENTAR   N.º   633,   DE   15   DE   DEZEMBRO   DE   2025.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/41 - LEI   COMPLEMENTAR   N.º   633,   DE   15   DE   DEZEMBRO   DE   2025.pdf",
-          "size_bytes": 232283,
-          "size_formatted": "226.8 KB",
-          "mtime": 1792615257.3933847,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615257.3933847,
-          "ctime_formatted": "21/10/2026 17:40",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
           "id": 42,
-          "name": "42 - 0. CMOG - processo 12.459-2026 Sentry Muralha Digital.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/42 - 0. CMOG - processo 12.459-2026 Sentry Muralha Digital.pdf",
-          "size_bytes": 2729289,
-          "size_formatted": "2.60 MB",
-          "mtime": 1792615257.780757,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615257.780757,
-          "ctime_formatted": "21/10/2026 17:40",
+          "name": "39 - Tramite 14-10-2026_16-02-29.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/39 - Tramite 14-10-2026_16-02-29.pdf",
+          "size_bytes": 38280,
+          "size_formatted": "37.4 KB",
+          "mtime": 1792588142.12564,
+          "mtime_formatted": "21/10/2026 10:09",
+          "ctime": 1792589260.52678,
+          "ctime_formatted": "21/10/2026 10:27",
           "extension": ".pdf",
           "is_pdf": true
         },
         {
           "id": 43,
-          "name": "43 - Oficio-_Manifestacao_Tecnica_acerca_do_Oficio_nBA_33BPMI-0230326_assinado.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/43 - Oficio-_Manifestacao_Tecnica_acerca_do_Oficio_nBA_33BPMI-0230326_assinado.pdf",
-          "size_bytes": 209811,
-          "size_formatted": "204.9 KB",
-          "mtime": 1792615258.0069509,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615258.0069509,
-          "ctime_formatted": "21/10/2026 17:40",
+          "name": "40 - Tramite 15-10-2026_10-22-40.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/40 - Tramite 15-10-2026_10-22-40.pdf",
+          "size_bytes": 38366,
+          "size_formatted": "37.5 KB",
+          "mtime": 1792588142.1376374,
+          "mtime_formatted": "21/10/2026 10:09",
+          "ctime": 1792589260.5413232,
+          "ctime_formatted": "21/10/2026 10:27",
           "extension": ".pdf",
           "is_pdf": true
         },
         {
           "id": 44,
-          "name": "44 - A - OFICIOS-PROCESSO 12459-2026 -LICENCIAMENTO E OPERCIONALIZAÇÃO - MURALHA DIGITAL.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/44 - A - OFICIOS-PROCESSO 12459-2026 -LICENCIAMENTO E OPERCIONALIZAÇÃO - MURALHA DIGITAL.pdf",
-          "size_bytes": 2709181,
-          "size_formatted": "2.58 MB",
-          "mtime": 1792615258.4358315,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615258.4358315,
-          "ctime_formatted": "21/10/2026 17:40",
+          "name": "41 - Tramite 16-10-2026_15-27-35.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/41 - Tramite 16-10-2026_15-27-35.pdf",
+          "size_bytes": 38402,
+          "size_formatted": "37.5 KB",
+          "mtime": 1792588142.1486897,
+          "mtime_formatted": "21/10/2026 10:09",
+          "ctime": 1792589260.5533483,
+          "ctime_formatted": "21/10/2026 10:27",
           "extension": ".pdf",
           "is_pdf": true
         },
         {
           "id": 45,
-          "name": "45 - 01_Proposta_Tecnica_Comercial_PPP_assinado (1).pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/45 - 01_Proposta_Tecnica_Comercial_PPP_assinado (1).pdf",
-          "size_bytes": 331904,
-          "size_formatted": "324.1 KB",
-          "mtime": 1792615258.6872609,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615258.6872609,
-          "ctime_formatted": "21/10/2026 17:40",
+          "name": "42 - Tramite 19-10-2026_15-01-47.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/42 - Tramite 19-10-2026_15-01-47.pdf",
+          "size_bytes": 38820,
+          "size_formatted": "37.9 KB",
+          "mtime": 1792588142.1582775,
+          "mtime_formatted": "21/10/2026 10:09",
+          "ctime": 1792589260.5658994,
+          "ctime_formatted": "21/10/2026 10:27",
           "extension": ".pdf",
           "is_pdf": true
         },
         {
           "id": 46,
-          "name": "46 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
-          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/46 - 04_Cronograma_Fisico_Financeiro_PPP_assinado.pdf",
-          "size_bytes": 330554,
-          "size_formatted": "322.8 KB",
-          "mtime": 1792615258.967414,
-          "mtime_formatted": "21/10/2026 17:40",
-          "ctime": 1792615258.967414,
-          "ctime_formatted": "21/10/2026 17:40",
+          "name": "43 - Tramite 20-10-2026_12-27-41.pdf",
+          "relative_path": "Protocolos/12459-2026-GRL - Carport Fotovoltaico - Requerimento 0002-2026/43 - Tramite 20-10-2026_12-27-41.pdf",
+          "size_bytes": 38480,
+          "size_formatted": "37.6 KB",
+          "mtime": 1792588142.1694038,
+          "mtime_formatted": "21/10/2026 10:09",
+          "ctime": 1792589260.577833,
+          "ctime_formatted": "21/10/2026 10:27",
           "extension": ".pdf",
           "is_pdf": true
         }
@@ -3469,6 +3469,19 @@
         },
         {
           "id": 7,
+          "name": "07 - RM_IP_Barretos_3_PRM_abril_2026_Protocolo_assinado.pdf",
+          "relative_path": "Protocolos/10245-2026-GRL - Pagamento Abr-2026 - Parcela 38 - NFs 50 a 52 (Deferido)/07 - RM_IP_Barretos_3_PRM_abril_2026_Protocolo_assinado.pdf",
+          "size_bytes": 232965,
+          "size_formatted": "227.5 KB",
+          "mtime": 1792615263.8966057,
+          "mtime_formatted": "21/10/2026 17:41",
+          "ctime": 1792615263.8966057,
+          "ctime_formatted": "21/10/2026 17:41",
+          "extension": ".pdf",
+          "is_pdf": true
+        },
+        {
+          "id": 8,
           "name": "08 - Tramite 13-05-2026_14-02-55.pdf",
           "relative_path": "Protocolos/10245-2026-GRL - Pagamento Abr-2026 - Parcela 38 - NFs 50 a 52 (Deferido)/08 - Tramite 13-05-2026_14-02-55.pdf",
           "size_bytes": 38356,
@@ -3481,7 +3494,7 @@
           "is_pdf": true
         },
         {
-          "id": 8,
+          "id": 9,
           "name": "09 - Tramite 28-05-2026_20-28-49.pdf",
           "relative_path": "Protocolos/10245-2026-GRL - Pagamento Abr-2026 - Parcela 38 - NFs 50 a 52 (Deferido)/09 - Tramite 28-05-2026_20-28-49.pdf",
           "size_bytes": 38555,
@@ -3490,19 +3503,6 @@
           "mtime_formatted": "21/10/2026 10:09",
           "ctime": 1792589259.4289167,
           "ctime_formatted": "21/10/2026 10:27",
-          "extension": ".pdf",
-          "is_pdf": true
-        },
-        {
-          "id": 9,
-          "name": "09 - RM_IP_Barretos_3_PRM_abril_2026_Protocolo_assinado.pdf",
-          "relative_path": "Protocolos/10245-2026-GRL - Pagamento Abr-2026 - Parcela 38 - NFs 50 a 52 (Deferido)/09 - RM_IP_Barretos_3_PRM_abril_2026_Protocolo_assinado.pdf",
-          "size_bytes": 232965,
-          "size_formatted": "227.5 KB",
-          "mtime": 1792615263.8966057,
-          "mtime_formatted": "21/10/2026 17:41",
-          "ctime": 1792615263.8966057,
-          "ctime_formatted": "21/10/2026 17:41",
           "extension": ".pdf",
           "is_pdf": true
         }
