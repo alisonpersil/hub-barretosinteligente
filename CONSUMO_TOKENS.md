@@ -1,7 +1,7 @@
 # 📊 Monitor de Consumo de Tokens & Custos da IA (GPT-4o-mini)
 > **Concessionária Barretos Inteligente** • Observabilidade Contínua de Auditoria de Dados
 
-Última atualização: **22/10/2026 08:39:24** • Status da Cota: **🟢 Operação Normal (Gasto Controlado)**
+Última atualização: **23/10/2026 08:55:24** • Status da Cota: **🟢 Operação Normal (Gasto Controlado)**
 
 ---
 
@@ -14,8 +14,8 @@
 | **Total de Tokens Processados** | **4,201 tokens** | Cota Estimada: 20M tokens | 🟢 Abundante |
 | **Tokens de Prompt (Entrada)** | **2,684 tokens** | $0.15 / 1.000.000 tokens | — |
 | **Tokens de Resposta (Saída)** | **1,517 tokens** | $0.60 / 1.000.000 tokens | — |
-| **Total de Requisições / Uploads** | **9 execuções** | Auditorias disparadas | — |
-| **Custo Médio por Planilha** | **~R$ 0.00080** | ~466 tokens / auditoria | 💰 **1.000 uploads ≈ R$ 0.80** |
+| **Total de Requisições / Uploads** | **10 execuções** | Auditorias disparadas | — |
+| **Custo Médio por Planilha** | **~R$ 0.00072** | ~420 tokens / auditoria | 💰 **1.000 uploads ≈ R$ 0.72** |
 
 > 🛡️ **Por que a cota NÃO esgota como nos bots convencionais (Dify)?**  
 > Diferente de assistentes de chat que carregam histórico infinito e rodam em loops dispendiosos, o nosso **Auditor Cirúrgico GPT-4o-mini** processa apenas um payload enxuto e estruturado (JSON com KPIs consolidados). Cada verificação consome apenas ~560 tokens (menos de um décimo de centavo de real).
@@ -26,6 +26,7 @@
 
 | Data / Hora | Origem / Arquivos | Modelo | Entrada | Saída | Total | Custo (R$) | Status | Confiança |
 | :--- | :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| 23/10/2026 08:55:24 | `ConsultarSolicitacao-5643.xlsx` | `gpt-4o-mini` | 0 | 0 | **0** | R$ 0.00000 | ✅ APROVADO | 100% |
 | 22/10/2026 08:39:24 | `ConsultarSolicitacao-5636.xlsx` | `gpt-4o-mini` | 0 | 0 | **0** | R$ 0.00000 | ✅ APROVADO | 100% |
 | 21/10/2026 16:11:24 | `ConsultarSolicitacao-5633.xlsx` | `gpt-4o-mini` | 0 | 0 | **0** | R$ 0.00000 | ✅ APROVADO | 100% |
 | 21/10/2026 07:40:24 | `ConsultarSolicitacao-5630.xlsx` | `gpt-4o-mini` | 0 | 0 | **0** | R$ 0.00000 | ✅ APROVADO | 100% |
